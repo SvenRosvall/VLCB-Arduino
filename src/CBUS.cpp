@@ -48,7 +48,7 @@
 #include "cbusdefs.h"
 
 // CAN bus controller objects
-ACAN2515 can(MCP2515_CS, SPI, MCP2515_INT);
+ACAN2515 *can;
 extern CBUSConfig config;
 
 // global variables
@@ -65,6 +65,18 @@ byte enum_responses[16];               // 128 bits for storing CAN ID enumeratio
 CBUS::CBUS() {
   numbuffers = NUM_RECV_BUFFS;
   eventhandler = NULL;
+  _csPin = 10;
+  _intPin = 2;
+}
+
+//
+/// set the CS and interrupt pins - option to override defaults
+//
+
+void CBUS::setPins(byte csPin, byte intPin) {
+
+  _csPin = csPin;
+  _intPin = intPin;
 }
 
 //
@@ -106,8 +118,11 @@ bool CBUS::begin(void) {
   // start SPI
   SPI.begin();
 
+  // instantiate CAN bus object
+  can = new ACAN2515(_csPin, SPI, _intPin);
+
   // Serial << F("> initialising CAN controller") << endl;
-  ret = can.begin(settings, [] {can.isr();});
+  ret = can->begin(settings, [] {can->isr();});
 
   if (ret == 0) {
     // Serial << F("> CAN controller initialised ok") << endl;
@@ -154,7 +169,7 @@ void CBUS::setSLiM(void) {
 
 bool CBUS::available(void) {
 
-  return (can.available());
+  return (can->available());
 }
 
 //
@@ -164,7 +179,7 @@ bool CBUS::available(void) {
 CANFrame CBUS::getNextMessage(void) {
 
   CANMessage message;
-  can.receive(message);
+  can->receive(message);
 
   _msg.id = message.id;
   _msg.len = message.len;
@@ -203,7 +218,7 @@ bool CBUS::sendMessage(CANFrame *msg) {
   bitClear(message.id, 9);
   bitSet(message.id, 10);
 
-  _res = can.tryToSend(message);
+  _res = can->tryToSend(message);
   _numMsgsSent++;
 
   return _res;
@@ -264,8 +279,8 @@ bool CBUS::sendCMDERR(byte cerrno) {
 void CBUS::printStatus(void) {
 
   Serial << F("> CBUS status: ");
-  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << can.receiveErrorCounter() << \
-         F(", transmit errors = ") << can.transmitErrorCounter() << endl;
+  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << can->receiveErrorCounter() << \
+         F(", transmit errors = ") << can->transmitErrorCounter() << endl;
 
   return;
 }
@@ -282,7 +297,7 @@ bool CBUS::isRTR(CANFrame *amsg) {
 
 void CBUS::reset(void) {
 
-  can.end();
+  can->end();
   begin();
   return;
 }

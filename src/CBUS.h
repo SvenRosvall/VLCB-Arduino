@@ -113,10 +113,12 @@ class CBUS {
     void checkCANenum(void);
     void indicateMode(byte mode);
     void setNumBuffers(byte num);
+    void setPins(byte CSpin, byte intPin);
     void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
 
   protected:
     CANFrame _msg;
+    byte _csPin, _intPin;
     unsigned int _numMsgsSent, _numMsgsRcvd;
     byte _lastErr;
     CBUSLED _ledGrn, _ledYlw;
