@@ -38,16 +38,10 @@
 #if !defined __CBUS_H__
 #define __CBUS_H__
 
-#include <ACAN2515.h>
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
-
-static const byte MCP2515_CS = 10;                          // SPI chip select pin
-static const byte MCP2515_INT = 2;                          // interrupt pin
-static const byte NUM_RECV_BUFFS = 4;                       // default value
-
-static const uint32_t oscfreq = 16UL * 1000UL * 1000UL;     // 16MHz crystal
-static const uint32_t canbitrate = 125UL * 1000UL;          // 125Kb/s
+#include <CBUSconfig.h>
+#include <CBUSdefs.h>
 
 static const unsigned int SW_TR_HOLD = 6000;       // CBUS push button hold time for SLiM/FLiM transition in millis
 
@@ -74,25 +68,28 @@ typedef struct {
 } CANFrame;
 
 //
-/// forward function declarations
-//
-
-unsigned long ascii_pair_to_byte(const char *pair);
-char *FrameToGridConnect(const CANFrame *frame, char dest[]);
-CANFrame *GridConnectToFrame(const char string[], CANFrame *msg);
-
-//
-/// a class to encapsulate CAN bus and CBUS processing
+/// an abstract class to encapsulate CAN bus and CBUS processing
+/// it must be implemented by a derived subclass
 //
 
 class CBUS {
 
   public:
+    
     CBUS();
-    bool begin(void);
-    bool available();
-    CANFrame getNextMessage();
-    bool sendMessage(CANFrame *msg);
+
+    // these methods are pure virtual and must be implemented by the derived class
+    // in addition, it is not possible to create an instance of this class
+    
+    virtual bool begin(void) = 0;
+    virtual bool available(void) = 0;
+    virtual CANFrame getNextMessage() = 0;
+    virtual bool sendMessage(CANFrame *msg) = 0;
+    virtual void reset(void) = 0;
+    virtual void setNumBuffers(byte num) = 0;
+    virtual void setPins(byte CSpin, byte intPin) = 0;
+
+    // implementations of these methods are provided in the base class
     bool sendWRACK(void);
     bool sendCMDERR(byte cerrno);
     void CANenumeration(void);
@@ -100,7 +97,6 @@ class CBUS {
     void printStatus(void);
     bool isExt(CANFrame *msg);
     bool isRTR(CANFrame *msg);
-    void reset(void);
     void process(void);
     void initFLiM(void);
     void revertSLiM(void);
@@ -112,9 +108,11 @@ class CBUS {
     void setName(unsigned char *mname);
     void checkCANenum(void);
     void indicateMode(byte mode);
-    void setNumBuffers(byte num);
-    void setPins(byte CSpin, byte intPin);
     void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
+
+    unsigned long ascii_pair_to_byte(const char *pair);
+    char *FrameToGridConnect(const CANFrame *frame, char dest[]);
+    CANFrame *GridConnectToFrame(const char string[], CANFrame *msg);
 
   protected:
     CANFrame _msg;
@@ -127,6 +125,12 @@ class CBUS {
     unsigned char *_mname;
     byte numbuffers;
     void (*eventhandler)(byte index, CANFrame *msg);
+
+    bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
+    unsigned long timeOutTimer, CANenumTime;
+    char msgstr[64], dstr[64];
+    byte enums = 0, selected_id;
+    byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
 
 };
 

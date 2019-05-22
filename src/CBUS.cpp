@@ -35,58 +35,20 @@
 
 */
 
-// Arduino libraries
-#include <SPI.h>
-
 // 3rd party libraries
 #include <Streaming.h>
-#include <ACAN2515.h>
 
-// CBUS libraries
-#include <CBUSConfig.h>
-#include "CBUS.h"
-#include "cbusdefs.h"
+// CBUS library
+#include <CBUS.h>
 
-// CAN bus controller objects
-ACAN2515 *can;
+// CBUS configuration object, declared externally
 extern CBUSConfig config;
 
-// global variables
-bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
-unsigned long timeOutTimer, CANenumTime;
-char msgstr[64], dstr[64];
-byte enums = 0, selected_id;
-byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
-
 //
-/// constructor
+/// empty constructor
 //
 
-CBUS::CBUS() {
-  numbuffers = NUM_RECV_BUFFS;
-  eventhandler = NULL;
-  _csPin = 10;
-  _intPin = 2;
-}
-
-//
-/// set the CS and interrupt pins - option to override defaults
-//
-
-void CBUS::setPins(byte csPin, byte intPin) {
-
-  _csPin = csPin;
-  _intPin = intPin;
-}
-
-//
-/// set the number of CAN frame receive buffers
-/// this can be tuned according to load and available memory
-//
-
-void CBUS::setNumBuffers(byte num) {
-  numbuffers = num;
-}
+CBUS::CBUS() {};
 
 //
 /// register the user handler for event opcodes
@@ -97,45 +59,7 @@ void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
 }
 
 //
-/// initialise the CAN controller and buffers, and attach the ISR
-//
-
-bool CBUS::begin(void) {
-
-  uint16_t ret;
-
-  _numMsgsSent = 0;
-  _numMsgsRcvd = 0;
-
-  ACAN2515Settings settings(oscfreq, canbitrate);
-
-  settings.mRequestedMode = ACAN2515Settings::NormalMode;
-  settings.mReceiveBufferSize = numbuffers;
-  settings.mTransmitBuffer0Size = 0;
-  settings.mTransmitBuffer1Size = 0;
-  settings.mTransmitBuffer2Size = 0;
-
-  // start SPI
-  SPI.begin();
-
-  // instantiate CAN bus object
-  can = new ACAN2515(_csPin, SPI, _intPin);
-
-  // Serial << F("> initialising CAN controller") << endl;
-  ret = can->begin(settings, [] {can->isr();});
-
-  if (ret == 0) {
-    // Serial << F("> CAN controller initialised ok") << endl;
-    return true;
-  } else {
-    Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
-    return false;
-  }
-
-}
-
-//
-/// assign a parameter set to the module
+/// assign the module parameter set
 //
 
 void CBUS::setParams(unsigned char *mparams) {
@@ -143,7 +67,7 @@ void CBUS::setParams(unsigned char *mparams) {
 }
 
 //
-/// assign a name to the module
+/// assign the module name
 //
 
 void CBUS::setName(unsigned char *mname) {
@@ -161,67 +85,6 @@ void CBUS::setSLiM(void) {
   config.setFLiM(false);
   config.setCANID(0);
   indicateMode(config.FLiM);
-}
-
-//
-/// check for unprocessed messages in the buffer
-//
-
-bool CBUS::available(void) {
-
-  return (can->available());
-}
-
-//
-/// get next unprocessed message from the buffer
-//
-
-CANFrame CBUS::getNextMessage(void) {
-
-  CANMessage message;
-  can->receive(message);
-
-  _msg.id = message.id;
-  _msg.len = message.len;
-  _msg.rtr = message.rtr;
-  _msg.ext = message.ext;
-  memcpy(_msg.data, message.data, 8);
-
-  ++_numMsgsRcvd;
-  return _msg;
-}
-
-//
-/// send a CBUS message
-//
-
-bool CBUS::sendMessage(CANFrame *msg) {
-
-  // caller must populate the frame data
-  // we set the CAN ID and priority in the header here
-
-  CANMessage message;
-  bool _res;
-
-  message.id = config.CANID;
-  message.len = msg->len;
-  message.rtr = msg->rtr;
-  message.ext = msg->ext;
-  memcpy(message.data, msg->data, 8);
-
-  // set the CBUS message priority - zeroes equate to higher priority
-  // bits 7 and 8 are the minor priority, so 11 = 'low'
-  bitSet(message.id, 7);
-  bitSet(message.id, 8);
-
-  // bits 9 and 10 are the major priority, so 01 = 'medium'
-  bitClear(message.id, 9);
-  bitSet(message.id, 10);
-
-  _res = can->tryToSend(message);
-  _numMsgsSent++;
-
-  return _res;
 }
 
 //
@@ -273,33 +136,21 @@ bool CBUS::sendCMDERR(byte cerrno) {
 }
 
 //
-/// display the CAN bus status instrumentation
+/// is the an Extended CAN frame ?
 //
-
-void CBUS::printStatus(void) {
-
-  Serial << F("> CBUS status: ");
-  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << can->receiveErrorCounter() << \
-         F(", transmit errors = ") << can->transmitErrorCounter() << endl;
-
-  return;
-}
 
 bool CBUS::isExt(CANFrame *amsg) {
 
   return (amsg->ext);
 }
 
+//
+/// is this a Remote frame ?
+//
+
 bool CBUS::isRTR(CANFrame *amsg) {
 
   return (amsg->rtr);
-}
-
-void CBUS::reset(void) {
-
-  can->end();
-  begin();
-  return;
 }
 
 //
@@ -339,11 +190,8 @@ void CBUS::CANenumeration(void) {
   return;
 }
 
-
-
 //
 /// initiate the transition from SLiM to FLiM mode
-/// due to long button press in SLiM mode
 //
 
 void CBUS::initFLiM(void) {
@@ -1274,7 +1122,7 @@ void CBUS::checkCANenum(void) {
 /// convert to and from GridConnect format
 //
 
-char *FrameToGridConnect(const CANFrame *frame, char dest[]) {
+char *CBUS::FrameToGridConnect(const CANFrame *frame, char dest[]) {
 
   // example :SB020N520104;
 
@@ -1317,7 +1165,7 @@ char *FrameToGridConnect(const CANFrame *frame, char dest[]) {
   return dest;
 }
 
-CANFrame *GridConnectToFrame(const char string[], CANFrame *msg) {
+CANFrame *CBUS::GridConnectToFrame(const char string[], CANFrame *msg) {
 
   byte index = 0;
 
@@ -1372,7 +1220,7 @@ CANFrame *GridConnectToFrame(const char string[], CANFrame *msg) {
 }
 
 
-unsigned long ascii_pair_to_byte(const char *pair) {
+unsigned long CBUS::ascii_pair_to_byte(const char *pair) {
 
   unsigned char* data = (unsigned char*)pair;
   unsigned long result;
