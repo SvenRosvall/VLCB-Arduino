@@ -83,7 +83,7 @@ class CBUS {
     
     virtual bool begin(void) = 0;
     virtual bool available(void) = 0;
-    virtual CANFrame getNextMessage() = 0;
+    virtual CANFrame getNextMessage(void) = 0;
     virtual bool sendMessage(CANFrame *msg) = 0;
     virtual void reset(void) = 0;
     virtual void setNumBuffers(byte num) = 0;
