@@ -43,7 +43,6 @@
 #include <CBUSLED.h>
 #include <CBUSSwitch.h>
 
-// external EEPROM -- learned event table
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
@@ -61,37 +60,45 @@ class CBUSConfig {
 
   public:
     void begin(void);
+
     byte findExistingEvent(unsigned int nn, unsigned int en);
     byte findEventSpace(void);
-    void getEvArray(byte idx);
-    void makeEvHashTable(void);
-    void updateEvHashEntry(byte idx);
-    void readEvent(byte idx, byte tarr[]);
-    void clearEvHashTable(void);
+
     void printEvHashTable(bool raw);
     byte getEvTableEntry(byte tindex);
     byte numEvents(void);
     byte makeHash(byte tarr[]);
+    void getEvArray(byte idx);
+    void makeEvHashTable(void);
+    void updateEvHashEntry(byte idx);
+    void clearEvHashTable(void);
+    bool check_hash_collisions(void);
+    
     byte readNV(byte idx);
     void writeNV(byte idx, byte val);
     void loadNVs(void);
-    byte readEEPROM(unsigned int eeaddress);
-    byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]);
-    void writeEEPROM(unsigned int eeaddress, byte data);
-    void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes);
-    void writeeventEEPROM(byte index, byte data[]);
+    
+    void readEvent(byte idx, byte tarr[]);
+    void writeEvent(byte index, byte data[]);
     void cleareventEEPROM(byte index);
-    void resetEEPROM(void);
     void resetModule(CBUSLED green, CBUSLED yellow, CBUSSwitch sw);
-    unsigned int freeSRAM(void);
-    void reboot(void);
+
+    byte readEEPROM(unsigned int eeaddress);
+    void writeEEPROM(unsigned int eeaddress, byte data);
+    byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]);
+    void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes);
+    void resetEEPROM(void);
+
     void setCANID(byte canid);
     void setFLiM(bool f);
     void setNodeNum(unsigned int nn);
+
     bool setEEPROMtype(byte type);
+    unsigned int freeSRAM(void);
+    void reboot(void);
 
     byte eeprom_type;
-    byte EE_EVENTS_START;
+    unsigned int EE_EVENTS_START;
     byte EE_MAX_EVENTS;
     byte EE_NUM_EVS;
     byte EE_BYTES_PER_EVENT;

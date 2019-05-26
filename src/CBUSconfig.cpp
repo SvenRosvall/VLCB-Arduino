@@ -47,7 +47,8 @@
 #include "CBUSconfig.h"
 
 // the event hash table
-byte evthashtbl[64];
+byte evhashtbl[64];
+bool hash_collision = false;
 
 //
 /// initialise and set default values
@@ -128,7 +129,7 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
 
 byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
-  byte tarray[5];
+  byte tarray[4], sarray[4];
   byte tmphash, i;
 
   // Serial << F("> looking for match with ") << nn << ", " << en << endl;
@@ -144,9 +145,30 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
   for (i = 0; i < EE_MAX_EVENTS; i++) {
 
-    if (evthashtbl[i] == tmphash) {
-      // NN + EN hash matches
-      // Serial << F("> match found at hash table idx = ") << i << endl;
+    if (evhashtbl[i] == tmphash) {
+      if (!hash_collision) {
+        // NN + EN hash matches and no hash collisions
+        // no further checking is required
+        Serial << F("> unique match found at hash table index = ") << i << endl;
+      } else {
+        // there is a potential hash collision so we have to check the slower way
+        // first, check if this hash appears in the table more than once
+        byte matches = 0;
+        for (byte j = 0; j < EE_MAX_EVENTS; j++) {
+          if (evhashtbl[j] == tmphash) {
+            ++matches;
+          }
+        }
+
+        if (matches > 1) {
+          // one or more collisions for this hash exist, check the very slow way
+          Serial << F("> this hash matches = ") << matches << endl;
+        } else {
+          // no collisions for this hash, no further checking is required
+          break;
+        }
+      }
+
       break;
     }
   }
@@ -156,7 +178,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 }
 
 //
-/// find an empty EEPROM event index - the hash table entry = 0
+/// find an empty EEPROM event index - the hash table entry == 0
 //
 
 byte CBUSConfig::findEventSpace(void) {
@@ -164,7 +186,7 @@ byte CBUSConfig::findEventSpace(void) {
   byte evidx;
 
   for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++) {
-    if (evthashtbl[evidx] == 0) {
+    if (evhashtbl[evidx] == 0)  {
       // Serial << F("> found empty location at index = ") << evidx << endl;
       break;
     }
@@ -219,7 +241,7 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
 
 void CBUSConfig::makeEvHashTable(void) {
 
-  byte evarray[5];
+  byte evarray[4];
 
   // Serial << F("> creating event hash table") << endl;
 
@@ -228,11 +250,13 @@ void CBUSConfig::makeEvHashTable(void) {
     readEvent(idx, evarray);
 
     if (evarray[0] == 0xff) {
-      evthashtbl[idx] = 0;
+      evhashtbl[idx] = 0;
     } else {
-      evthashtbl[idx] = makeHash(evarray);
+      evhashtbl[idx] = makeHash(evarray);
     }
   }
+
+  hash_collision = check_hash_collisions();
 
   return;
 }
@@ -243,17 +267,19 @@ void CBUSConfig::makeEvHashTable(void) {
 
 void CBUSConfig::updateEvHashEntry(byte idx) {
 
-  byte evarray[5] = {};
-  byte hash = 0;
+  byte evarray[4] = {};
 
+  // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
 
+  // empty slots have first byte set to 0xff
   if (evarray[0] == 0xff) {
-    evthashtbl[idx] = 0;
+    evhashtbl[idx] = 0;
   } else {
-    hash = makeHash(evarray);
-    evthashtbl[idx] = hash;
+    evhashtbl[idx] = makeHash(evarray);
   }
+
+  hash_collision = check_hash_collisions();
 
   // Serial << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
   return;
@@ -265,10 +291,11 @@ void CBUSConfig::updateEvHashEntry(byte idx) {
 
 void CBUSConfig::clearEvHashTable(void) {
 
+  // zero in the hash table indicates that the corresponding event slot is free
   // Serial << F("> clearEvHashTable - clearing hash table") << endl;
 
   for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-    evthashtbl[i] = 0;
+    evhashtbl[i] = 0;
   }
 
   return;
@@ -283,11 +310,11 @@ void CBUSConfig::printEvHashTable(bool raw) {
   Serial << F("> Event hash table --") << endl;
 
   for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-    if (evthashtbl[i] > 0) {
+    if (evhashtbl[i] > 0) {
       if (raw)
-        Serial << evthashtbl[i] << endl;
+        Serial << evhashtbl[i] << endl;
       else
-        Serial << F("  -- ") << i << " - " << evthashtbl[i] << endl;
+        Serial << F("  -- ") << i << " - " << evhashtbl[i] << endl;
     }
   }
 
@@ -304,7 +331,7 @@ byte CBUSConfig::numEvents(void) {
   byte numevents = 0;
 
   for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-    if (evthashtbl[i] > 0) {
+    if (evhashtbl[i] != 0) {
       ++numevents;
     }
   }
@@ -319,7 +346,7 @@ byte CBUSConfig::numEvents(void) {
 byte CBUSConfig::getEvTableEntry(byte tindex) {
 
   if (tindex < EE_MAX_EVENTS) {
-    return evthashtbl[tindex];
+    return evhashtbl[tindex];
   } else {
     return 0;
   }
@@ -488,11 +515,11 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
 /// just the first four bytes -- NN and EN
 //
 
-void CBUSConfig::writeeventEEPROM(byte index, byte data[]) {
+void CBUSConfig::writeEvent(byte index, byte data[]) {
 
   int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
-  // Serial << F("> writeeventEEPROM, index = ") << index << F(", addr = ") << eeaddress << endl;
+  // Serial << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
   writeBytesEEPROM(eeaddress, data, 4);
 
   return;
@@ -507,7 +534,7 @@ void CBUSConfig::cleareventEEPROM(byte index) {
   byte tarray[4] = { 0xff, 0xff, 0xff, 0xff };
 
   // Serial << F("> clearing event at index = ") << index << endl;
-  writeeventEEPROM(index, tarray);
+  writeEvent(index, tarray);
 
   return;
 }
@@ -523,7 +550,7 @@ void CBUSConfig::resetEEPROM(void) {
     Serial << F("> clearing data from external EEPROM ...") << endl;
 
     for (unsigned int addr = 0; addr < 65535; addr++) {
-      writeEEPROM(addr, 0xFF);
+      writeEEPROM(addr, 0xff);
     }
   }
 
@@ -556,7 +583,6 @@ unsigned int CBUSConfig::freeSRAM(void) {
 
 //
 /// manually reset the module to factory defaults
-/// called from setup if the button is held during power up and mode is SLiM
 //
 
 void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
@@ -570,6 +596,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 
     Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
 
+    pbSwitch.reset();
     ledGrn.blink();
     ledYlw.blink();
 
@@ -637,9 +664,26 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 void CBUSConfig::loadNVs(void) {
 
   // load NVs from EEPROM into memory
-  FLiM =    EEPROM[0];
+  FLiM =     EEPROM[0];
   CANID =    EEPROM[1];
   nodeNum = (EEPROM[2] << 8) + EEPROM[3];
 
   return;
 }
+
+bool CBUSConfig::check_hash_collisions(void) {
+
+byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
+
+  for (byte i = 0; i < count - 1; i++) {
+    for (byte j = i + 1; j < count; j++) {
+      if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0) {
+        Serial << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
