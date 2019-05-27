@@ -168,7 +168,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
             if (evhashtbl[i] == tmphash) {
               // check the EEPROM for a match with the incoming NN and EN
               readEvent(i, tarray);
-              if ((tarray[0] << 8) + tarray[1] == nn && (tarray[2] << 8) + tarray[3] == en) {
+              if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en) {
                 // the stored NN and EN match this event, so no further checking is required
                 break;
               }
@@ -278,7 +278,7 @@ void CBUSConfig::makeEvHashTable(void) {
 
 void CBUSConfig::updateEvHashEntry(byte idx) {
 
-  byte evarray[4] = {};
+  byte evarray[4];
 
   // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
@@ -309,6 +309,7 @@ void CBUSConfig::clearEvHashTable(void) {
     evhashtbl[i] = 0;
   }
 
+  hash_collision = false;
   return;
 }
 
@@ -682,6 +683,10 @@ void CBUSConfig::loadNVs(void) {
   return;
 }
 
+//
+/// check whether there is a collision for any hash in the event hash table
+//
+
 bool CBUSConfig::check_hash_collisions(void) {
 
 byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
@@ -689,7 +694,8 @@ byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
   for (byte i = 0; i < count - 1; i++) {
     for (byte j = i + 1; j < count; j++) {
       if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0) {
-        Serial << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
+        // Serial << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
+        // return when first collision detected
         return true;
       }
     }
@@ -697,4 +703,3 @@ byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
 
   return false;
 }
-
