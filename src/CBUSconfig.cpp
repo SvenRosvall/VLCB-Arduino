@@ -129,8 +129,8 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
 
 byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
-  byte tarray[4], sarray[4];
-  byte tmphash, i;
+  byte tarray[4];
+  byte tmphash, i, j;
 
   // Serial << F("> looking for match with ") << nn << ", " << en << endl;
 
@@ -147,24 +147,35 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
     if (evhashtbl[i] == tmphash) {
       if (!hash_collision) {
-        // NN + EN hash matches and no hash collisions
+        // NN + EN hash matches and there are no hash collisions
         // no further checking is required
-        Serial << F("> unique match found at hash table index = ") << i << endl;
+        // Serial << F("> unique match found at hash table index = ") << i << endl;
       } else {
         // there is a potential hash collision so we have to check the slower way
         // first, check if this hash appears in the table more than once
         byte matches = 0;
-        for (byte j = 0; j < EE_MAX_EVENTS; j++) {
+        for (j = 0; j < EE_MAX_EVENTS; j++) {
           if (evhashtbl[j] == tmphash) {
             ++matches;
           }
         }
 
         if (matches > 1) {
-          // one or more collisions for this hash exist, check the very slow way
-          Serial << F("> this hash matches = ") << matches << endl;
+          // one or more collisions for this hash exist, so check the very slow way
+          // Serial << F("> this hash matches = ") << matches << endl;
+
+          for (i = 0; i < EE_MAX_EVENTS; i++) {
+            if (evhashtbl[i] == tmphash) {
+              // check the EEPROM for a match with the incoming NN and EN
+              readEvent(i, tarray);
+              if ((tarray[0] << 8) + tarray[1] == nn && (tarray[2] << 8) + tarray[3] == en) {
+                // the stored NN and EN match this event, so no further checking is required
+                break;
+              }
+            }
+          }
         } else {
-          // no collisions for this hash, no further checking is required
+          // no collisions for this specific hash, so no further checking is required
           break;
         }
       }
