@@ -51,12 +51,22 @@ extern CBUSConfig config;
 CBUS::CBUS() {};
 
 //
-/// register the user handler for event opcodes
+/// register the user handler for learned events
 //
 
 void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
   eventhandler = fptr;
 }
+
+//
+/// resgister the user handler for all CAN frames
+//
+
+void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg)) {
+  framehandler = fptr;
+}
+
+
 
 //
 /// assign the module parameter set
@@ -382,6 +392,18 @@ void CBUS::process(void) {
     opc = _msg.data[0];
     nn = (_msg.data[1] << 8) + _msg.data[2];
     en = (_msg.data[3] << 8) + _msg.data[4];
+
+    //
+    /// if registered, call the user handler with this new frame
+    //
+
+    if (framehandler != NULL)
+      (void)(*framehandler)(&_msg);
+
+    //
+    /// extract the CANID of the sending module
+    //
+
     remoteCANID = getCANID(_msg.id);
 
     //

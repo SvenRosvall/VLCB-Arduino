@@ -109,6 +109,7 @@ class CBUS {
     void checkCANenum(void);
     void indicateMode(byte mode);
     void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
+    void setFrameHandler(void (*fptr)(CANFrame *msg));
 
     unsigned long ascii_pair_to_byte(const char *pair);
     char *FrameToGridConnect(const CANFrame *frame, char dest[]);
@@ -125,6 +126,7 @@ class CBUS {
     unsigned char *_mname;
     byte numbuffers;
     void (*eventhandler)(byte index, CANFrame *msg);
+    void (*framehandler)(CANFrame *msg);
 
     bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
     unsigned long timeOutTimer, CANenumTime;
