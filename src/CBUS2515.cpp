@@ -59,6 +59,7 @@ CBUS2515::CBUS2515() {
   eventhandler = NULL;
   _csPin = 10;
   _intPin = 2;
+  _osc_freq = 16000000UL;
 }
 
 //
@@ -72,7 +73,7 @@ bool CBUS2515::begin(void) {
   _numMsgsSent = 0;
   _numMsgsRcvd = 0;
 
-  ACAN2515Settings settings(oscfreq, canbitrate);
+  ACAN2515Settings settings(_osc_freq, canbitrate);
 
   settings.mRequestedMode = ACAN2515Settings::NormalMode;
   settings.mReceiveBufferSize = numbuffers;
@@ -197,4 +198,13 @@ void CBUS2515::setPins(byte csPin, byte intPin) {
 
 void CBUS2515::setNumBuffers(byte num) {
   numbuffers = num;
+}
+
+//
+/// set the MCP2515 crystal frequency
+/// default is 16MHz but some modules have an 8MHz crystal
+//
+
+void CBUS2515::setOscFreq(unsigned long freq) {
+  _osc_freq = freq;
 }

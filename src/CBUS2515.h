@@ -53,7 +53,7 @@ static const byte MCP2515_CS = 10;                          // SPI chip select p
 static const byte MCP2515_INT = 2;                          // interrupt pin
 static const byte NUM_RECV_BUFFS = 4;                       // default value
 
-static const uint32_t oscfreq = 16UL * 1000UL * 1000UL;     // 16MHz crystal
+// static const uint32_t oscfreq = 16UL * 1000UL * 1000UL;     // 16MHz crystal
 static const uint32_t canbitrate = 125UL * 1000UL;          // 125Kb/s
 
 //
@@ -76,6 +76,11 @@ class CBUS2515 : public CBUS {
     void reset(void);
     void setNumBuffers(byte num);
     void setPins(byte CSpin, byte intPin);
+    void setOscFreq(unsigned long freq);
+
+private:
+    unsigned long _osc_freq;
+
 };
 
 #endif
