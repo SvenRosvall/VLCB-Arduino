@@ -41,7 +41,7 @@
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
-#include <CBUSdefs.h>
+#include <cbusdefs.h>
 
 static const unsigned int SW_TR_HOLD = 6000;       // CBUS push button hold time for SLiM/FLiM transition in millis
 
