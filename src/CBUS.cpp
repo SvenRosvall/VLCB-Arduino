@@ -45,12 +45,6 @@
 extern CBUSConfig config;
 
 //
-/// empty constructor
-//
-
-CBUS::CBUS() {};
-
-//
 /// register the user handler for learned events
 //
 
@@ -65,8 +59,6 @@ void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
 void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg)) {
   framehandler = fptr;
 }
-
-
 
 //
 /// assign the module parameter set
@@ -146,7 +138,7 @@ bool CBUS::sendCMDERR(byte cerrno) {
 }
 
 //
-/// is the an Extended CAN frame ?
+/// is this an Extended CAN frame ?
 //
 
 bool CBUS::isExt(CANFrame *amsg) {
@@ -331,7 +323,7 @@ void CBUS::process(void) {
   _ledGrn.run();
   _ledYlw.run();
 
-  // allow the CBUS some processing time
+  // allow the CBUS switch some processing time
   _sw.run();
 
   //
@@ -410,6 +402,13 @@ void CBUS::process(void) {
     /// format and display the frame data payload
     //
 
+    //
+    /// removed from library - saves 330 bytes of program space
+    /// can be optionally implemented in user code using the framehandler functionality
+    //
+
+    /*
+
     dstr[0] = 0;
     msgstr[0] = 0;
 
@@ -424,6 +423,7 @@ void CBUS::process(void) {
 
     sprintf(msgstr, "> CAN frame : CAN ID = [%3hd] len = [%1hd] opc = [0x%02hx] data = [%s] : (%8lu) ", remoteCANID, _msg.len, opc, dstr, millis());
     Serial << msgstr << endl;
+	*/
 
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
@@ -509,11 +509,9 @@ void CBUS::process(void) {
           if (index < config.EE_MAX_EVENTS) {
             // do the module-specific action for a CBUS accessory on/off message
             
-            if (eventhandler != NULL)
+            if (eventhandler != NULL) {
               (void)(*eventhandler)(index, &_msg);
-
-          } else {
-            // no matching event for this nn and en
+            }
           }
 
           break;
@@ -543,8 +541,6 @@ void CBUS::process(void) {
             // final param[8] = node flags is not sent here as the max message payload is 8 bytes (0-7)
             sendMessage(&_msg);
 
-          } else {
-            // Serial << F("> ignored, not in mode changing mode") << endl;
           }
 
           break;
@@ -625,7 +621,7 @@ void CBUS::process(void) {
             // Serial << F("> FLiM mode = ") << config.FLiM << F(", node number = ") << config.nodeNum << F(", CANID = ") << config.CANID << endl;
 
           } else {
-            Serial << F("> received SNN but not in transition") << endl;
+            // Serial << F("> received SNN but not in transition") << endl;
           }
 
           break;
@@ -662,18 +658,21 @@ void CBUS::process(void) {
             nvindex = _msg.data[3];
             // Serial << F("> NVRD for nn = ") << nn << F(", nv index = ") << nvindex << endl;
 
-            // respond with NVANS
-            memset(&_msg, 0, sizeof(_msg));
-            _msg.len = 5;
-            _msg.rtr = false;
-            _msg.ext = false;
-            _msg.data[0] = OPC_NVANS;
-            _msg.data[1] = highByte(config.nodeNum);
-            _msg.data[2] = lowByte(config.nodeNum);
-            _msg.data[3] = nvindex;
-            _msg.data[4] = config.readNV(nvindex);
-
-            sendMessage(&_msg);
+            if (nvindex > config.EE_NUM_NVS) {
+              sendCMDERR(10);
+            } else {
+             // respond with NVANS
+              memset(&_msg, 0, sizeof(_msg));
+              _msg.len = 5;
+              _msg.rtr = false;
+              _msg.ext = false;
+              _msg.data[0] = OPC_NVANS;
+              _msg.data[1] = highByte(config.nodeNum);
+              _msg.data[2] = lowByte(config.nodeNum);
+              _msg.data[3] = nvindex;
+              _msg.data[4] = config.readNV(nvindex);
+              sendMessage(&_msg);
+            }
           }
 
           break;
@@ -686,11 +685,14 @@ void CBUS::process(void) {
             nvval = _msg.data[4];
             // Serial << F("> NVSET for index = ") << nvindex << F(", val = ") << nvval << endl;
 
-            // update EEPROM for this NV -- NVs are indexed from 1, not zero
-            config.writeNV(nvindex, nvval);
-
-            // respond with WRACK
-            sendWRACK();
+            if (nvindex > config.EE_NUM_NVS) {
+              sendCMDERR(10);
+            } else {
+              // update EEPROM for this NV -- NVs are indexed from 1, not zero
+               config.writeNV(nvindex, nvval);
+              // respond with WRACK
+              sendWRACK();
+            }
           }
 
           break;
@@ -706,7 +708,7 @@ void CBUS::process(void) {
 
         case OPC_EVULN:
           // received EVULN -- unlearn an event, by event number
-          en = (_msg.data[3] << 8) + _msg.data[4];
+          // en = (_msg.data[3] << 8) + _msg.data[4];
           // Serial << F("> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
           // we must be in learn mode
@@ -1020,16 +1022,11 @@ void CBUS::process(void) {
           break;
 
         case OPC_BOOT:
-          // boot mode -- receive a file and store in eeprom for the bootloader to find on reset
-          if (nn == config.nodeNum) {
-            // Serial << F("> received BOOT (0x5c) opcode") << endl;
-          }
-
+          // boot mode 
           break;
 
         case OPC_RSTAT:
           // command station status -- not applicable to modules
-          // Serial << F("> RSTAT command station status query") << endl;
           break;
 
         case OPC_PNN:
@@ -1131,8 +1128,30 @@ void CBUS::checkCANenum(void) {
     _msg.data[1] = highByte(config.nodeNum);
     _msg.data[2] = lowByte(config.nodeNum);
     sendMessage(&_msg);
-
   }
+}
+
+//
+/// constructor for CANFrame class
+//
+
+CANFrame::CANFrame() {
+
+  // set the current CAN ID in the frame header
+  id = config.CANID;
+
+  // set the CBUS message priority - zeroes equate to higher priority
+  // bits 7 and 8 are the minor priority, so 11 = 'low'
+  bitSet(id, 7);
+  bitSet(id, 8);
+
+  // bits 9 and 10 are the major priority, so 01 = 'medium'
+  bitClear(id, 9);
+  bitSet(id, 10);
+
+  ext = false;
+  rtr = false;
+  len = 0;
 }
 
 //
@@ -1261,4 +1280,3 @@ unsigned long CBUS::ascii_pair_to_byte(const char *pair) {
 
   return result;
 }
-
