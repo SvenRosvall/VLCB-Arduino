@@ -35,8 +35,7 @@
 
 */
 
-#if !defined __CBUSSWITCH_H__
-#define __CBUSSWITCH_H__
+#pragma once
 
 #include <Arduino.h>            // for definition of byte datatype
 
@@ -51,7 +50,6 @@ class CBUSSwitch {
     bool stateChanged(void);
     bool getState(void);
     bool isPressed(void);
-    bool isDoubleClick(void);
     unsigned long getCurrentStateDuration(void);
     unsigned long getLastStateDuration(void);
     unsigned long getLastStateChangeTime(void);
@@ -64,12 +62,8 @@ class CBUSSwitch {
     byte _currentState;
     byte _lastState;
     byte _stateChanged;
-    bool _doubleClick;
     unsigned long _lastStateChangeTime;
     unsigned long _lastStateDuration;
     unsigned long _prevReleaseTime;
     unsigned long _prevStateDuration;
-
 };
-
-#endif

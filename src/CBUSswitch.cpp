@@ -54,12 +54,10 @@ void CBUSSwitch::reset(void) {
 
   _lastState = !_pressedState;
   _stateChanged = false;
-  _doubleClick = false;
   _lastStateChangeTime = 0UL;
   _lastStateDuration = 0UL;
   _prevReleaseTime = 0UL;
   _prevStateDuration = 0UL;
-
 }
 
 byte CBUSSwitch::readPin(byte pin) {
@@ -86,7 +84,6 @@ void CBUSSwitch::run(void) {
     _lastStateDuration = millis() - _lastStateChangeTime;
     _lastStateChangeTime = millis();
     _stateChanged = true;
-    _doubleClick = false;
 
     if (_currentState == _pressedState) {
       // Serial << F("  -- switch has been pressed") << endl;
@@ -98,12 +95,6 @@ void CBUSSwitch::run(void) {
 
       // Serial << F("  -- last state duration = ") << _lastStateDuration << endl;
       // Serial << F("  -- this release = ") << _lastStateChangeTime << F(", last release = ") << _prevReleaseTime << endl;
-
-      if ((_lastStateChangeTime - _prevReleaseTime) < 500 && \
-          (_lastStateDuration < 250) && (_prevStateDuration < 250)) {
-        // Serial << F("  -- double click !") << endl;
-        _doubleClick = true;
-      }
 
       // save release time
       _prevReleaseTime = _lastStateChangeTime;
@@ -137,12 +128,6 @@ bool CBUSSwitch::isPressed(void) {
   // is the switch pressed ?
   // Serial << F("  -- switch pressed ? = ") << (_currentState == _pressedState) << endl;
   return (_currentState == _pressedState);
-}
-
-bool CBUSSwitch::isDoubleClick(void) {
-
-  // was the last transition the release of the second click of a double-click sequence ?
-  return (_doubleClick);
 }
 
 unsigned long CBUSSwitch::getCurrentStateDuration(void) {
