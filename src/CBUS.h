@@ -35,8 +35,7 @@
 
 */
 
-#if !defined __CBUS_H__
-#define __CBUS_H__
+#pragma once
 
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
@@ -59,13 +58,17 @@ enum {
 /// CAN/CBUS message type
 //
 
-typedef struct {
-  unsigned long id;
-  bool ext;
-  bool rtr;
-  uint8_t len;
-  uint8_t data[8];
-} CANFrame;
+class CANFrame {
+
+  public:
+
+      CANFrame();
+      uint32_t id;
+      bool ext;
+      bool rtr;
+      uint8_t len;
+      uint8_t data[8];
+};
 
 //
 /// an abstract class to encapsulate CAN bus and CBUS processing
@@ -76,8 +79,6 @@ class CBUS {
 
   public:
     
-    CBUS();
-
     // these methods are pure virtual and must be implemented by the derived class
     // in addition, it is not possible to create an instance of this class
     
@@ -90,6 +91,7 @@ class CBUS {
     virtual void setPins(byte CSpin, byte intPin) = 0;
 
     // implementations of these methods are provided in the base class
+
     bool sendWRACK(void);
     bool sendCMDERR(byte cerrno);
     void CANenumeration(void);
@@ -135,5 +137,3 @@ class CBUS {
     byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
 
 };
-
-#endif
