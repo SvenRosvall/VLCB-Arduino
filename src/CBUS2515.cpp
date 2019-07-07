@@ -135,25 +135,16 @@ CANFrame CBUS2515::getNextMessage(void) {
 bool CBUS2515::sendMessage(CANFrame *msg) {
 
   // caller must populate the frame data
-  // we set the CAN ID and priority in the header here
-
+  // header is set by the CANFrame constructor
+  
   CANMessage message;
   bool _res;
 
-  message.id = config.CANID;
+  message.id = msg->id;
   message.len = msg->len;
   message.rtr = msg->rtr;
   message.ext = msg->ext;
   memcpy(message.data, msg->data, 8);
-
-  // set the CBUS message priority - zeroes equate to higher priority
-  // bits 7 and 8 are the minor priority, so 11 = 'low'
-  bitSet(message.id, 7);
-  bitSet(message.id, 8);
-
-  // bits 9 and 10 are the major priority, so 01 = 'medium'
-  bitClear(message.id, 9);
-  bitSet(message.id, 10);
 
   _res = can->tryToSend(message);
   _numMsgsSent++;
@@ -170,7 +161,6 @@ void CBUS2515::printStatus(void) {
   Serial << F("> CBUS status: ");
   Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << can->receiveErrorCounter() << \
          F(", transmit errors = ") << can->transmitErrorCounter() << endl;
-
   return;
 }
 
@@ -178,7 +168,6 @@ void CBUS2515::reset(void) {
 
   can->end();
   begin();
-  return;
 }
 
 //

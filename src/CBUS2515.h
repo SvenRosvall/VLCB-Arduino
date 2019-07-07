@@ -35,8 +35,7 @@
 
 */
 
-#if !defined __CBUS2515_H__
-#define __CBUS2515_H__
+#pragma once
 
 // header files
 
@@ -52,8 +51,6 @@
 static const byte MCP2515_CS = 10;                          // SPI chip select pin
 static const byte MCP2515_INT = 2;                          // interrupt pin
 static const byte NUM_RECV_BUFFS = 4;                       // default value
-
-// static const uint32_t oscfreq = 16UL * 1000UL * 1000UL;     // 16MHz crystal
 static const uint32_t canbitrate = 125UL * 1000UL;          // 125Kb/s
 
 //
@@ -82,5 +79,3 @@ private:
     unsigned long _osc_freq;
 
 };
-
-#endif
