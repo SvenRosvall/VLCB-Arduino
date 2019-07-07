@@ -39,8 +39,7 @@
 //
 //
 
-#if !defined __CBUSLED_H__
-#define __CBUSLED_H__
+#pragma once
 
 #define BLINK_RATE 500    // flash at 1Hz
 
@@ -71,6 +70,4 @@ class CBUSLED {
     unsigned long _lastTime;
     void _write(byte pin, bool state);
 };
-
-#endif
 
