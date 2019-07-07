@@ -189,7 +189,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 }
 
 //
-/// find an empty EEPROM event index - the hash table entry == 0
+/// find an empty EEPROM event slot - the hash table entry == 0
 //
 
 byte CBUSConfig::findEventSpace(void) {
@@ -244,6 +244,15 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
 
   // Serial << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
   return;
+}
+
+//
+/// return an event variable (EV) value given the event table index and EV number
+//
+
+byte CBUSConfig::getEventEVval(byte idx, byte evnum) {
+
+  return readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
 }
 
 //
@@ -570,7 +579,7 @@ void CBUSConfig::resetEEPROM(void) {
 }
 
 //
-/// reboot via watchdog timer
+/// reboot via watchdog timer - for AVR core chips
 //
 
 #include <avr/wdt.h>
@@ -583,7 +592,7 @@ void CBUSConfig::reboot(void) {
 }
 
 //
-/// get free SRAM
+/// get free SRAM - for AVR core chips
 //
 
 unsigned int CBUSConfig::freeSRAM(void) {

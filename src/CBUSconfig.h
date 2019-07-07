@@ -35,13 +35,12 @@
 
 */
 
-#if !defined __CBUSCONFIG_H__
-#define __CBUSCONFIG_H__
+#pragma once
 
 #include <Arduino.h>                // for definition of byte datatype
 
 #include <CBUSLED.h>
-#include <CBUSswitch.h>
+#include <CBUSSwitch.h>
 
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
@@ -54,7 +53,9 @@ enum {
   EEPROM_EXTERNAL = 1
 };
 
-// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
+//
+/// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
+//
 
 class CBUSConfig {
 
@@ -73,6 +74,7 @@ class CBUSConfig {
     void updateEvHashEntry(byte idx);
     void clearEvHashTable(void);
     bool check_hash_collisions(void);
+    byte getEventEVval(byte idx, byte evnum);
     
     byte readNV(byte idx);
     void writeNV(byte idx, byte val);
@@ -108,7 +110,4 @@ class CBUSConfig {
     byte CANID;
     bool FLiM;
     unsigned int nodeNum;
-
 };
-
-#endif
