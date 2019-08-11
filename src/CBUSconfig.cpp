@@ -413,7 +413,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
     r = Wire.endTransmission();
 
     if (r < 0) {
-      Serial << F("> readEEPROM: I2C write error = ") << r << endl;
+      // Serial << F("> readEEPROM: I2C write error = ") << r << endl;
     }
 
     Wire.requestFrom(EEPROM_I2C_ADDR, (uint8_t)1);
@@ -484,7 +484,7 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
     delay(5);
 
     if (r < 0) {
-      Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
+      // Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
     }
   } else {
     EEPROM[eeaddress] = data;
@@ -518,7 +518,7 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
     delay(5);
 
     if (r < 0) {
-      Serial << F("> writeBytesEEPROM: I2C write error = ") << r << endl;
+      // Serial << F("> writeBytesEEPROM: I2C write error = ") << r << endl;
     }
   } else {
 
@@ -615,7 +615,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     waittime = millis();
     bDone = false;
 
-    Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
+    // Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
 
     pbSwitch.reset();
     ledGrn.blink();
@@ -626,7 +626,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 
       // 30 sec timeout
       if ((millis() - waittime) > 30000) {
-        Serial << F("> timeout expired, reset not performed") << endl;
+        // Serial << F("> timeout expired, reset not performed") << endl;
         return;
       }
 
@@ -641,7 +641,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     }
 
     // do the reset
-    Serial << F("> performing module reset ...") <<  endl;
+    // Serial << F("> performing module reset ...") <<  endl;
 
     ledGrn.off();
     ledYlw.off();
@@ -649,7 +649,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     ledYlw.run();
 
     // clear the entire on-chip EEPROM
-    Serial << F("> clearing on-chip EEPROM ...") << endl;
+    // Serial << F("> clearing on-chip EEPROM ...") << endl;
 
     for (unsigned int j = 0; j < EEPROM.length(); j++) {
       EEPROM[j] = 0xff;
