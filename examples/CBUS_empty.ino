@@ -61,7 +61,7 @@
 // CBUS objects
 CBUS2515 CBUS;                      // CBUS object
 CBUSConfig config;                  // configuration object
-CBUSLED ledGrn, ledYlw;             // LED objects
+CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 
 // CBUS module parameters
@@ -72,6 +72,7 @@ unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
 void eventhandler(byte index, byte opc);
+void framehandler(CANFrame *msg);
 
 //
 /// setup - runs once at power on
@@ -127,6 +128,10 @@ void setup() {
   CBUS.setParams(params);
   CBUS.setName(mname);
 
+  // initialise CBUS LEDs
+  ledGrn.setPin(LED_GRN);
+  ledYlw.setPin(LED_YLW);
+
   // initialise CBUS switch
   pb_switch.setPin(SWITCH0, LOW);
 
@@ -138,21 +143,22 @@ void setup() {
     config.resetModule(ledGrn, ledYlw, pb_switch);
   }
 
-  // register our CBUS event handler, to receive event messages of learned events
+  // register our CBUS event handler, to receive event messages of learned accessory events
   CBUS.setEventHandler(eventhandler);
 
-  // set LED and switch pins and assign to CBUS
-  ledGrn.setPin(LED_GRN);
-  ledYlw.setPin(LED_YLW);
+  // register our CAN frame handler, to receive *every* CAN frame
+  CBUS.setFrameHandler(framehandler);
+
+  // assign switch and LEDs to CBUS
   CBUS.setLEDs(ledGrn, ledYlw);
   CBUS.setSwitch(pb_switch);
 
-  // set CBUS LEDs to indicate mode
+  // set CBUS LEDs to indicate the current mode
   CBUS.indicateMode(config.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(4);
-  CBUS.setPins(10, 2);
+  CBUS.setNumBuffers(4);            // not strictly required as this is the default, but shown as an example
+  CBUS.setPins(10, 2);              // not strictly required as this is the default, but shown as an example
   CBUS.begin();
 
   // end of setup
@@ -190,14 +196,30 @@ void loop() {
 
 void eventhandler(byte index, CANFrame *msg) {
 
-  // as an example, display the opcode and first EV of this event
+  // as an example, display the opcode and the first EV of this event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
+  Serial << F("> EV1 = ") << config.getEventEVval(index, 1) << endl;
+  return;
+}
 
-  byte ev = 1;
-  byte eeaddress = config.EE_EVENTS_START + (index * config.EE_BYTES_PER_EVENT) + 4 + (ev - 1);
-  Serial << F("> EV1 = ") << config.readEEPROM(eeaddress) << endl;
+//
+/// user-defined frame processing function
+/// called from the CBUS library for *every* CAN frame received
+/// it receives a pointer to the received CAN frame
+//
 
+void framehandler(CANFrame *msg) {
+
+  // as an example, format and display the received frame
+
+  Serial << "[ " << (msg->id & 0x7f) << "] [" << msg->len << "] [";
+
+  for (byte d = 0; d < msg->len; d++) {
+    Serial << " 0x" << _HEX(msg->data[d]);
+  }
+
+  Serial << " ]" << endl;
   return;
 }
 

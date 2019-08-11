@@ -57,8 +57,9 @@ extern CBUSConfig config;
 CBUS2515::CBUS2515() {
   numbuffers = NUM_RECV_BUFFS;
   eventhandler = NULL;
-  _csPin = 10;
-  _intPin = 2;
+  framehandler = NULL;
+  _csPin = MCP2515_CS;
+  _intPin = MCP2515_INT;
   _osc_freq = 16000000UL;
 }
 
@@ -105,7 +106,6 @@ bool CBUS2515::begin(void) {
 //
 
 bool CBUS2515::available(void) {
-
   return (can->available());
 }
 
@@ -116,6 +116,7 @@ bool CBUS2515::available(void) {
 CANFrame CBUS2515::getNextMessage(void) {
 
   CANMessage message;
+
   can->receive(message);
 
   _msg.id = message.id;
@@ -132,24 +133,23 @@ CANFrame CBUS2515::getNextMessage(void) {
 /// send a CBUS message
 //
 
-bool CBUS2515::sendMessage(CANFrame *msg) {
+bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext) {
 
-  // caller must populate the frame data
-  // header is set by the CANFrame constructor
-  
+  // caller must populate the message data
+  // this method will create the correct frame header (CAN ID and priority bits)
+  // rtr and ext default to false unless arguments are supplied - see method definition in .h
+
   CANMessage message;
-  bool _res;
 
+  makeHeader(msg);
   message.id = msg->id;
   message.len = msg->len;
-  message.rtr = msg->rtr;
-  message.ext = msg->ext;
-  memcpy(message.data, msg->data, 8);
+  message.rtr = rtr;
+  message.ext = ext;
+  memcpy(message.data, msg->data, msg->len);
 
-  _res = can->tryToSend(message);
   _numMsgsSent++;
-
-  return _res;
+  return can->tryToSend(message);
 }
 
 //
@@ -158,14 +158,18 @@ bool CBUS2515::sendMessage(CANFrame *msg) {
 
 void CBUS2515::printStatus(void) {
 
-  Serial << F("> CBUS status: ");
-  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << can->receiveErrorCounter() << \
-         F(", transmit errors = ") << can->transmitErrorCounter() << endl;
+  Serial << F("> CBUS status:");
+  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << \
+            can->receiveErrorCounter() << F(", transmit errors = ") << can->transmitErrorCounter() << endl;
   return;
 }
 
-void CBUS2515::reset(void) {
+//
+/// reset the MCP2515 transceiver
+/// NB not recommended as it tends to fragment the heap !!
+//
 
+void CBUS2515::reset(void) {
   can->end();
   begin();
 }
@@ -175,14 +179,13 @@ void CBUS2515::reset(void) {
 //
 
 void CBUS2515::setPins(byte csPin, byte intPin) {
-
   _csPin = csPin;
   _intPin = intPin;
 }
 
 //
 /// set the number of CAN frame receive buffers
-/// this can be tuned according to load and available memory
+/// this can be tuned according to bus load and available memory
 //
 
 void CBUS2515::setNumBuffers(byte num) {
