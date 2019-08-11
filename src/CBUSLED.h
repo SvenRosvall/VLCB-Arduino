@@ -41,7 +41,8 @@
 
 #pragma once
 
-#define BLINK_RATE 500    // flash at 1Hz
+#define BLINK_RATE 500    // flash at 1Hz, 500mS on, 500mS off
+#define PULSE_ON_TIME 50
 
 #include <Arduino.h>      // for definition of byte datatype
 #include <Streaming.h>
@@ -61,13 +62,14 @@ class CBUSLED {
     void toggle();
     void blink();
     void run();
+    void pulse();
 
   protected:
     byte _pin;
     bool _state;
     bool _blink;
-    byte _lastState;
-    unsigned long _lastTime;
+    bool _pulse;
+    unsigned long _lastTime, _pulseStart;
     void _write(byte pin, bool state);
 };
 

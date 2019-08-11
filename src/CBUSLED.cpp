@@ -44,9 +44,9 @@
 CBUSLED::CBUSLED() {
 
   _state = LOW;
-  _lastState = !_state;
   _blink = false;
-  _lastTime = 0L;
+  _pulse = false;
+  _lastTime = 0UL;
 }
 
 //  set the pin for this LED
@@ -68,7 +68,7 @@ bool CBUSLED::getState() {
 
 void CBUSLED::on(void) {
 
-  _state = true;
+  _state = HIGH;
   _blink = false;
 }
 
@@ -76,7 +76,7 @@ void CBUSLED::on(void) {
 
 void CBUSLED::off(void) {
 
-  _state = false;
+  _state = LOW;
   _blink = false;
 }
 
@@ -94,8 +94,17 @@ void CBUSLED::blink() {
   _blink = true;
 }
 
+// pulse the LED
+
+void CBUSLED::pulse() {
+
+  _pulse = true;
+  _state = HIGH;
+  _pulseStart = millis();
+}
+
 // actually operate the LED dependent upon its current state
-// must be called frequently from loop() if any LEDs are set to blink
+// must be called frequently from loop() if the LED is set to blink or pulse
 
 void CBUSLED::run() {
 
@@ -108,7 +117,15 @@ void CBUSLED::run() {
     }
   }
 
-  _write(_pin, _state ? HIGH : LOW);
+  // single pulse
+  if (_pulse) {
+    if (millis() - _pulseStart >= PULSE_ON_TIME) {
+      _pulse = false;
+      _state = LOW;
+    }
+  }
+
+  _write(_pin, _state);
 }
 
 // write to the physical pin
