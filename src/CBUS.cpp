@@ -106,10 +106,7 @@ bool CBUS::sendWRACK(void) {
 
   // send a write acknowledgement response
 
-  memset(&_msg, 0, sizeof(_msg));
   _msg.len = 3;
-  _msg.ext = false;
-  _msg.rtr = false;
   _msg.data[0] = OPC_WRACK;
   _msg.data[1] = highByte(config.nodeNum);
   _msg.data[2] = lowByte(config.nodeNum);
@@ -125,10 +122,7 @@ bool CBUS::sendCMDERR(byte cerrno) {
 
   // send a command error response
 
-  memset(&_msg, 0, sizeof(_msg));
   _msg.len = 4;
-  _msg.ext = false;
-  _msg.rtr = false;
   _msg.data[0] = OPC_CMDERR;
   _msg.data[1] = highByte(config.nodeNum);
   _msg.data[2] = lowByte(config.nodeNum);
@@ -180,11 +174,8 @@ void CBUS::CANenumeration(void) {
     }
 
     // send zero-length RTR frame
-    memset(&_msg, 0, sizeof(_msg));
-    _msg.rtr = true;
-    _msg.ext = false;
     _msg.len = 0;
-    sendMessage(&_msg);
+    sendMessage(&_msg, false, true);
 
     // Serial << F("> enumeration cycle initiated") << endl;
   }
@@ -205,9 +196,6 @@ void CBUS::initFLiM(void) {
   timeOutTimer = millis();
 
   // send RQNN message with current NN, which may be zero if a virgin/SLiM node
-  memset(&_msg, 0, sizeof(_msg));
-  _msg.rtr = false;
-  _msg.ext = false;
   _msg.len = 3;
   _msg.data[0] = OPC_RQNN;
   _msg.data[1] = highByte(config.nodeNum);
@@ -227,23 +215,13 @@ void CBUS::revertSLiM(void) {
   // Serial << F("> reverting to SLiM mode") << endl;
 
   // send NNREL message
-  memset(&_msg, 0, sizeof(_msg));
   _msg.len = 3;
-  _msg.rtr = false;
-  _msg.ext = false;
   _msg.data[0] = OPC_NNREL;
   _msg.data[1] = highByte(config.nodeNum);
   _msg.data[2] = lowByte(config.nodeNum);
 
   sendMessage(&_msg);
-
-  // set CANID and NN to zero
-  config.setFLiM(0);
-  config.setCANID(0);
-  config.setNodeNum(0);
-
-  // set indicator LEDs for SLiM mode
-  indicateMode(config.FLiM);
+  setSLiM();
   return;
 }
 
@@ -377,7 +355,7 @@ void CBUS::process(void) {
     // at least one CAN frame is available in the reception buffer
     // retrieve the next one
 
-    memset(&_msg, 0, sizeof(CANFrame));
+    // memset(&_msg, 0, sizeof(CANFrame));
     _msg = getNextMessage();
 
     // extract OPC, NN, EN, remote CANID
@@ -427,13 +405,8 @@ void CBUS::process(void) {
 
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
-      
       // Serial << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
-
       // send an empty message to show our CANID
-      memset(&_msg, 0, sizeof(_msg));
-      _msg.rtr = false;
-      _msg.ext = false;
       _msg.len = 0;
       sendMessage(&_msg);
       continue;
@@ -456,11 +429,12 @@ void CBUS::process(void) {
         ++enums;
 
         // is there a clash with my current CANID ?
-        if (remoteCANID == config.CANID) {
-          // Serial << F("> !!! there was a clash with my current CANID !!!") << endl;
-        }
+        // ignore - the module will choose an unused one at the end of enumeration
+        // if (remoteCANID == config.CANID) {
+        // Serial << F("> !!! there was a clash with my current CANID !!!") << endl;
+        // }
 
-        // store this response in the results array
+        // store this response in the responses array
         if (remoteCANID > 0) {
           bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
           // Serial << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
@@ -508,7 +482,6 @@ void CBUS::process(void) {
 
           if (index < config.EE_MAX_EVENTS) {
             // do the module-specific action for a CBUS accessory on/off message
-            
             if (eventhandler != NULL) {
               (void)(*eventhandler)(index, &_msg);
             }
@@ -517,7 +490,8 @@ void CBUS::process(void) {
           break;
 
         case OPC_RQNP:
-          // RQNP message - request for node paramters -- does not contain a NN or EN
+          // RQNP message - request for node paramters -- does not contain a NN or EN, so only respond if we
+          // are in transition to FLiM
           // Serial << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
 
           // only respond if we are in transition to FLiM mode
@@ -526,10 +500,7 @@ void CBUS::process(void) {
             // Serial << F("> responding to RQNP with PARAMS") << endl;
 
             // respond with PARAMS message
-            memset(&_msg, 0, sizeof(_msg));
             _msg.len = 8;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_PARAMS;    // opcode
             _msg.data[1] = _mparams[1];     // manf code -- MERG
             _msg.data[2] = _mparams[2];     // minor code ver
@@ -564,10 +535,7 @@ void CBUS::process(void) {
 
               paran = _msg.data[3];
 
-              memset(&_msg, 0, sizeof(_msg));
               _msg.len = 5;
-              _msg.rtr = false;
-              _msg.ext = false;
               _msg.data[0] = OPC_PARAN;
               _msg.data[1] = highByte(config.nodeNum);
               _msg.data[2] = lowByte(config.nodeNum);
@@ -598,10 +566,7 @@ void CBUS::process(void) {
             config.setNodeNum((_msg.data[1] << 8) + _msg.data[2]);
 
             // respond with NNACK
-            memset(&_msg, 0, sizeof(_msg));
             _msg.len = 3;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_NNACK;
             _msg.data[1] = highByte(config.nodeNum);
             _msg.data[2] = lowByte(config.nodeNum);
@@ -662,10 +627,7 @@ void CBUS::process(void) {
               sendCMDERR(10);
             } else {
              // respond with NVANS
-              memset(&_msg, 0, sizeof(_msg));
               _msg.len = 5;
-              _msg.rtr = false;
-              _msg.ext = false;
               _msg.data[0] = OPC_NVANS;
               _msg.data[1] = highByte(config.nodeNum);
               _msg.data[2] = lowByte(config.nodeNum);
@@ -743,7 +705,7 @@ void CBUS::process(void) {
         case OPC_NNULN:
           // received NNULN -- exit from learn mode
 
-          if (nn == config.nodeNum && bLearn == true) {
+          if (nn == config.nodeNum) {
             bLearn = false;
             // Serial << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
           }
@@ -760,10 +722,7 @@ void CBUS::process(void) {
             // Serial << F("> replying to RQEVN with stored events = ") << evnum << endl;
 
             // respond with 0x74 NUMEV
-            memset(&_msg, 0, sizeof(_msg));
             _msg.len = 4;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_NUMEV;
             _msg.data[1] = highByte(config.nodeNum);
             _msg.data[2] = lowByte(config.nodeNum);
@@ -790,10 +749,7 @@ void CBUS::process(void) {
                 // construct and send a ENRSP message
 
                 // Serial << F("> sending ENRSP reply for event index = ") << i << endl;
-                memset(&_msg, 0, sizeof(_msg));
                 _msg.len = 8;
-                _msg.rtr = false;
-                _msg.ext = false;
                 _msg.data[0] = OPC_ENRSP;                                                      // response opcode
                 _msg.data[1] = highByte(config.nodeNum);                                              // my NN hi
                 _msg.data[2] = lowByte(config.nodeNum);                                               // my NN lo
@@ -827,10 +783,7 @@ void CBUS::process(void) {
 
               byte evval = ((byte)config.readEEPROM(config.EE_EVENTS_START + (eventidx * config.EE_BYTES_PER_EVENT) + 4 + (evvaridx - 1)));
               // Serial << F("> evval = ") << evval << endl;
-              memset(&_msg, 0, sizeof(_msg));
               _msg.len = 6;
-              _msg.rtr = false;
-              _msg.ext = false;
               _msg.data[0] = OPC_NEVAL;
               _msg.data[1] = highByte(config.nodeNum);
               _msg.data[2] = lowByte(config.nodeNum);
@@ -887,10 +840,8 @@ void CBUS::process(void) {
             }
 
             // Serial << F("> responding to to NNEVN with EVNLF, free event table slots = ") << free_slots << endl;
-            memset(&_msg, 0, sizeof(_msg));
+            // memset(&_msg, 0, sizeof(_msg));
             _msg.len = 4;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_EVNLF;
             _msg.data[1] = highByte(config.nodeNum);
             _msg.data[2] = lowByte(config.nodeNum);
@@ -910,10 +861,7 @@ void CBUS::process(void) {
 
           if (config.nodeNum > 0) {
             // Serial << ("> responding with PNN message") << endl;
-            memset(&_msg, 0, sizeof(_msg));
             _msg.len = 6;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_PNN;
             _msg.data[1] = highByte(config.nodeNum);
             _msg.data[2] = lowByte(config.nodeNum);
@@ -939,10 +887,7 @@ void CBUS::process(void) {
 
           if (nn == config.nodeNum) {
             // respond with NAME
-            memset(&_msg, 0, sizeof(_msg));
             _msg.len = 8;
-            _msg.rtr = false;
-            _msg.ext = false;
             _msg.data[0] = OPC_NAME;
             memcpy(_msg.data + 1, _mname, 7);
             sendMessage(&_msg);
@@ -1005,7 +950,7 @@ void CBUS::process(void) {
               sendWRACK();
 
             } else {
-              Serial << F("> no free event storage, index = ") << index << endl;
+              // Serial << F("> no free event storage, index = ") << index << endl;
               // // TODO  should we flash the yellow LED ??
               // respond with CMDERR
               sendCMDERR(10);
@@ -1119,16 +1064,32 @@ void CBUS::checkCANenum(void) {
     // store the new CAN ID
     config.setCANID(selected_id);
 
-    // send NNACK to FCU
-    memset(&_msg, 0, sizeof(_msg));
-    _msg.rtr = false;
-    _msg.ext = false;
+    // send NNACK
     _msg.len = 3;
     _msg.data[0] = OPC_NNACK;
     _msg.data[1] = highByte(config.nodeNum);
     _msg.data[2] = lowByte(config.nodeNum);
     sendMessage(&_msg);
   }
+}
+
+//
+/// utility to create a CAN header
+//
+
+void CBUS::makeHeader(CANFrame *msg) {
+
+  // set the current CAN ID in the frame header
+  msg->id = config.CANID;
+
+  // set the CBUS message priority - zeroes equate to higher priority
+  // bits 7 and 8 are the minor priority, so 11 = 'low'
+  bitSet(msg->id, 7);
+  bitSet(msg->id, 8);
+
+  // bits 9 and 10 are the major priority, so 01 = 'medium'
+  bitClear(msg->id, 9);
+  bitSet(msg->id, 10);
 }
 
 //
@@ -1152,131 +1113,4 @@ CANFrame::CANFrame() {
   ext = false;
   rtr = false;
   len = 0;
-}
-
-//
-/// GridConnect utilities
-/// work in progress, not currently used
-//
-
-//
-/// convert to and from GridConnect format
-//
-
-char *CBUS::FrameToGridConnect(const CANFrame *frame, char dest[]) {
-
-  // example :SB020N520104;
-
-  byte index = 0;
-  char tbuff[4] = {};
-
-  dest[0] = ':';
-
-  // standard or extended frame
-  if ((frame->id & 0x80000000) == 0x80000000) {
-    dest[1] = 'X';
-    index = 8;
-  } else {
-    dest[1] = 'S';
-    index = 6;
-  }
-
-  // FIXME: TODO header
-  dest[2] = '-';
-  dest[3] = '-';
-  dest[4] = '-';
-  dest[5] = '-';
-
-  // normal or RTR frame
-  if ((frame->id & 0x40000000) == 0x40000000) {
-    dest[index] = 'R';
-  } else {
-    dest[index] = 'N';
-  }
-
-  dest[index + 1] = '\0';
-
-  // data bytes
-  for (byte i = 0; i < frame->len; i++) {
-    sprintf(tbuff, "%02X", frame->data[i]);
-    strcat(dest, tbuff);
-  }
-
-  strcat(dest, ";");
-  return dest;
-}
-
-CANFrame *CBUS::GridConnectToFrame(const char string[], CANFrame *msg) {
-
-  byte index = 0;
-
-  memset(msg, 0, sizeof(CANFrame));
-
-  // extended or standard frame
-  if (string[1] == 'X') {
-
-    // parse four two-digit hex-encoded blocks into bytes
-    msg->id  = ascii_pair_to_byte(string + 2) << 24;
-    msg->id += ascii_pair_to_byte(string + 4) << 16;
-    msg->id += ascii_pair_to_byte(string + 6) << 8;
-    msg->id += ascii_pair_to_byte(string + 8) << 0;
-
-    // set EXT header bit
-    msg->id |= 0x80000000;
-    index = 10;
-
-  } else if (string[1] == 'S') {
-
-    // parse two two-digit hex-encoded blocks into bytes
-    msg->id  = ascii_pair_to_byte(string + 2) << 4;
-    msg->id |= ascii_pair_to_byte(string + 3) << 0;
-
-    index = 5;
-
-  } else {
-    Serial << F("> GridConnectToFrame: unexpected char, not X or S") << endl;
-  }
-
-  if (string[index] == 'N') {
-    ++index;
-  } else if (string[index] == 'R') {
-
-    // set the RTR header bit
-    msg->id |= 0x40000000;
-    ++index;
-  } else {
-    Serial << F("> GridConnectToFrame: unexpected char, not N or R") << endl;
-  }
-
-  // get the data
-  byte i;
-
-  for (i = 0; string[index] != ';'; index += 2, i++) {
-    msg->data[i] = ascii_pair_to_byte(string + index);
-  }
-
-  msg->len = i;
-
-  return msg;
-}
-
-
-unsigned long CBUS::ascii_pair_to_byte(const char *pair) {
-
-  unsigned char* data = (unsigned char*)pair;
-  unsigned long result;
-
-  if (data[1] < 'A') {
-    result = data[1] - '0';
-  } else {
-    result = data[1] - 'A' + 10;
-  }
-
-  if (data[0] < 'A') {
-    result += (data[0] - '0') << 4;
-  } else {
-    result += (data[0] - 'A' + 10) << 4;
-  }
-
-  return result;
 }

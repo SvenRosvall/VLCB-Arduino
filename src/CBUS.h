@@ -40,7 +40,7 @@
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
-#include <cbusdefs.h>
+#include <CBUSdefs.h>
 
 static const unsigned int SW_TR_HOLD = 6000;       // CBUS push button hold time for SLiM/FLiM transition in millis
 
@@ -80,15 +80,13 @@ class CBUS {
   public:
     
     // these methods are pure virtual and must be implemented by the derived class
-    // in addition, it is not possible to create an instance of this class
+    // as a consequence, it is not possible to create an instance of this class
     
     virtual bool begin(void) = 0;
     virtual bool available(void) = 0;
     virtual CANFrame getNextMessage(void) = 0;
-    virtual bool sendMessage(CANFrame *msg) = 0;
+    virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false) = 0;
     virtual void reset(void) = 0;
-    virtual void setNumBuffers(byte num) = 0;
-    virtual void setPins(byte CSpin, byte intPin) = 0;
 
     // implementations of these methods are provided in the base class
 
@@ -96,7 +94,6 @@ class CBUS {
     bool sendCMDERR(byte cerrno);
     void CANenumeration(void);
     byte getCANID(unsigned long header);
-    void printStatus(void);
     bool isExt(CANFrame *msg);
     bool isRTR(CANFrame *msg);
     void process(void);
@@ -112,21 +109,16 @@ class CBUS {
     void indicateMode(byte mode);
     void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
     void setFrameHandler(void (*fptr)(CANFrame *msg));
-
-    unsigned long ascii_pair_to_byte(const char *pair);
-    char *FrameToGridConnect(const CANFrame *frame, char dest[]);
-    CANFrame *GridConnectToFrame(const char string[], CANFrame *msg);
+    void makeHeader(CANFrame *msg);
 
   protected:
     CANFrame _msg;
-    byte _csPin, _intPin;
     unsigned int _numMsgsSent, _numMsgsRcvd;
     byte _lastErr;
     CBUSLED _ledGrn, _ledYlw;
     CBUSSwitch _sw;
     unsigned char *_mparams;
     unsigned char *_mname;
-    byte numbuffers;
     void (*eventhandler)(byte index, CANFrame *msg);
     void (*framehandler)(CANFrame *msg);
 
