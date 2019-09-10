@@ -53,11 +53,20 @@ void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
 }
 
 //
-/// resgister the user handler for all CAN frames
+/// register the user handler for all CAN frame
+/// note overloaded version with user array of opcodes to match
 //
 
 void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg)) {
   framehandler = fptr;
+  _opcodes = NULL;
+  _num_opcodes = 0;
+}
+
+void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes) {
+  framehandler = fptr;
+  _opcodes = opcodes;
+  _num_opcodes = num_opcodes;
 }
 
 //
@@ -367,8 +376,19 @@ void CBUS::process(void) {
     /// if registered, call the user handler with this new frame
     //
 
-    if (framehandler != NULL)
-      (void)(*framehandler)(&_msg);
+    if (framehandler != NULL) {
+
+      // check if incoming opcode is in the user list, if list length > 0
+      if (_num_opcodes > 0) {
+        for (byte i = 0; i < _num_opcodes; i++) {
+          if (opc == _opcodes[i]) {
+            (void)(*framehandler)(&_msg);
+          }
+        }
+      } else {
+        (void)(*framehandler)(&_msg);
+      }
+    }
 
     //
     /// extract the CANID of the sending module

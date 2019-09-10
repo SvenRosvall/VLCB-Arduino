@@ -109,6 +109,7 @@ class CBUS {
     void indicateMode(byte mode);
     void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
     void setFrameHandler(void (*fptr)(CANFrame *msg));
+    void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes);
     void makeHeader(CANFrame *msg);
 
   protected:
@@ -121,7 +122,8 @@ class CBUS {
     unsigned char *_mname;
     void (*eventhandler)(byte index, CANFrame *msg);
     void (*framehandler)(CANFrame *msg);
-
+    byte *_opcodes;
+    byte _num_opcodes;
     bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
     unsigned long timeOutTimer, CANenumTime;
     char msgstr[64], dstr[64];
