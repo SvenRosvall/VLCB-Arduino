@@ -184,7 +184,7 @@ void CBUS::CANenumeration(void) {
 
     // send zero-length RTR frame
     _msg.len = 0;
-    sendMessage(&_msg, false, true);
+    sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
 
     // Serial << F("> enumeration cycle initiated") << endl;
   }
@@ -304,7 +304,14 @@ void CBUS::indicateMode(byte mode) {
 void CBUS::process(void) {
 
   static byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
+  static bool enumeration_required = false;
   unsigned int nn = 0, en = 0, j = 0, opc;
+
+  // start bus enumeration if required
+  if (enumeration_required) {
+    enumeration_required = false;
+    CANenumeration();
+  }
 
   // allow LEDs to update
   _ledGrn.run();
@@ -367,10 +374,24 @@ void CBUS::process(void) {
     // memset(&_msg, 0, sizeof(CANFrame));
     _msg = getNextMessage();
 
-    // extract OPC, NN, EN, remote CANID
+    // extract OPC, NN, EN
     opc = _msg.data[0];
     nn = (_msg.data[1] << 8) + _msg.data[2];
     en = (_msg.data[3] << 8) + _msg.data[4];
+
+    //
+    /// extract the CANID of the sending module
+    //
+
+    remoteCANID = getCANID(_msg.id);
+
+    //
+    /// set flag is we find a CANID conflict with the frame source
+    //
+
+    if (remoteCANID == config.CANID) {
+      enumeration_required = true;
+    }
 
     //
     /// if registered, call the user handler with this new frame
@@ -391,10 +412,10 @@ void CBUS::process(void) {
     }
 
     //
-    /// extract the CANID of the sending module
+    /// pulse the green LED
     //
 
-    remoteCANID = getCANID(_msg.id);
+    _ledGrn.pulse();
 
     //
     /// format and display the frame data payload

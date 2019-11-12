@@ -40,7 +40,7 @@
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
-#include <CBUSdefs.h>
+#include <cbusdefs.h>
 
 static const unsigned int SW_TR_HOLD = 6000;       // CBUS push button hold time for SLiM/FLiM transition in millis
 
@@ -129,5 +129,6 @@ class CBUS {
     char msgstr[64], dstr[64];
     byte enums = 0, selected_id;
     byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
+    bool enumeration_required;
 
 };
