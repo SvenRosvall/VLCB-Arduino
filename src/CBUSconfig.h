@@ -40,7 +40,7 @@
 #include <Arduino.h>                // for definition of byte datatype
 
 #include <CBUSLED.h>
-#include <CBUSSwitch.h>
+#include <CBUSswitch.h>
 
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
