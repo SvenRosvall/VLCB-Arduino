@@ -46,7 +46,10 @@ void CBUSSwitch::setPin(byte pin, byte pressedState = LOW) {
 
   _pin = pin;
   _pressedState = pressedState;
-  pinMode(_pin, INPUT_PULLUP);
+
+  if (_pressedState == LOW)
+    pinMode(_pin, INPUT_PULLUP);
+
   reset();
 }
 
