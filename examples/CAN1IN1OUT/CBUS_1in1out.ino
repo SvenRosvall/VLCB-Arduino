@@ -155,8 +155,9 @@ void setup() {
   CBUS.indicateMode(config.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(2);
-  CBUS.setPins(10, 2);
+  CBUS.setNumBuffers(2);         // more buffers = more memory used, fewer = less
+  CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
+  CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   CBUS.begin();
 
   // configure the module switch, attached to pin 7, active low
