@@ -705,6 +705,8 @@ void CBUS::process(void) {
           if (nn == config.nodeNum) {
             // Serial << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
             bLearn = true;
+            // set bit 5 in parameter 8
+            bitSet(_mparams[8], 5);
           }
 
           break;
@@ -749,6 +751,8 @@ void CBUS::process(void) {
           if (nn == config.nodeNum) {
             bLearn = false;
             // Serial << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
+            // clear bit 5 in parameter 8
+            bitClear(_mparams[8], 5);
           }
 
           break;
