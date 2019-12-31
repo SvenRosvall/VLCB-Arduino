@@ -130,7 +130,8 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
 byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
   byte tarray[4];
-  byte tmphash, i, j;
+  byte tmphash, i, j, matches;
+  bool confirmed = false;
 
   // Serial << F("> looking for match with ") << nn << ", " << en << endl;
 
@@ -147,14 +148,12 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
     if (evhashtbl[i] == tmphash) {
       if (!hash_collision) {
-        // NN + EN hash matches and there are no hash collisions
-        // no further checking is required
-        // Serial << F("> unique match found at hash table index = ") << i << endl;
+        // NN + EN hash matches and there are no hash collisions in the local has table
       } else {
-        // there is a potential hash collision so we have to check the slower way
+        // there is a potential hash collision, so we have to check the slower way
         // first, check if this hash appears in the table more than once
-        byte matches = 0;
-        for (j = 0; j < EE_MAX_EVENTS; j++) {
+
+        for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++) {
           if (evhashtbl[j] == tmphash) {
             ++matches;
           }
@@ -170,6 +169,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
               readEvent(i, tarray);
               if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en) {
                 // the stored NN and EN match this event, so no further checking is required
+                confirmed = true;
                 break;
               }
             }
@@ -181,6 +181,18 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
       }
 
       break;
+    }
+  }
+
+  // finally, there may be a collision with an event that we haven't seen before
+  // so we still need to check the candidate match to be certain, if we haven't done so already
+
+  if (i < EE_MAX_EVENTS && !confirmed) {
+    readEvent(i, tarray);
+    if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)) {
+      // the stored NN and EN do not match this event
+      // Serial << F("> hash result does not match stored event") << endl;
+      i = EE_MAX_EVENTS
     }
   }
 
