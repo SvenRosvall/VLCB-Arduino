@@ -192,7 +192,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
     if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)) {
       // the stored NN and EN do not match this event
       // Serial << F("> hash result does not match stored event") << endl;
-      i = EE_MAX_EVENTS
+      i = EE_MAX_EVENTS;
     }
   }
 
