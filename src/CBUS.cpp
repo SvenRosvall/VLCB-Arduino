@@ -386,14 +386,6 @@ void CBUS::process(void) {
     remoteCANID = getCANID(_msg.id);
 
     //
-    /// set flag is we find a CANID conflict with the frame source
-    //
-
-    if (remoteCANID == config.CANID) {
-      enumeration_required = true;
-    }
-
-    //
     /// if registered, call the user handler with this new frame
     //
 
@@ -451,6 +443,15 @@ void CBUS::process(void) {
       _msg.len = 0;
       sendMessage(&_msg);
       continue;
+    }
+
+    //
+    /// set flag if we find a CANID conflict with the frame's producer
+    /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
+    //
+
+    if (remoteCANID == config.CANID && _msg.len > 0) {
+      enumeration_required = true;
     }
 
     // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
