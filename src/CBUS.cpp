@@ -104,7 +104,7 @@ void CBUS::setSLiM(void) {
 
 byte CBUS::getCANID(unsigned long header) {
 
-  return (header & 0x7f);
+  return ((header >> 5) & 0x7f);
 }
 
 //
@@ -409,33 +409,6 @@ void CBUS::process(void) {
 
     _ledGrn.pulse();
 
-    //
-    /// format and display the frame data payload
-    //
-
-    //
-    /// removed from library - saves 330 bytes of program space
-    /// can be optionally implemented in user code using the framehandler functionality
-    //
-
-    /*
-
-    dstr[0] = 0;
-    msgstr[0] = 0;
-
-    for (byte b = 0; b < 8; b++) {
-      if (b < _msg.len) {
-        sprintf(msgstr, "0x%02hx ", _msg.data[b]);
-        strcat(dstr, msgstr);
-      } else {
-        strcat(dstr, "     ");
-      }
-    }
-
-    sprintf(msgstr, "> CAN frame : CAN ID = [%3hd] len = [%1hd] opc = [0x%02hx] data = [%s] : (%8lu) ", remoteCANID, _msg.len, opc, dstr, millis());
-    Serial << msgstr << endl;
-	*/
-
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
       // Serial << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
@@ -451,6 +424,7 @@ void CBUS::process(void) {
     //
 
     if (remoteCANID == config.CANID && _msg.len > 0) {
+    	Serial << F("> CAN id clash, enumeration required") << endl;
       enumeration_required = true;
     }
 
@@ -643,7 +617,11 @@ void CBUS::process(void) {
 
           if (nn == config.nodeNum) {
             // Serial << F("> setting my CANID to ") << CANID << endl;
-            config.setCANID(_msg.data[3]);
+            if (_msg.data[3] < 1 || _msg.data[3] > 99) {
+              sendCMDERR(7);
+            } else {
+              config.setCANID(_msg.data[3]);
+            }
           }
 
           break;
@@ -1125,17 +1103,27 @@ void CBUS::checkCANenum(void) {
 
 void CBUS::makeHeader(CANFrame *msg) {
 
-  // set the current CAN ID in the frame header
-  msg->id = config.CANID;
+  uint16_t t = 0;
+
+  // Serial << F("> makeHeader() - CANID = ") << config.CANID << endl;
+
+  // set the CANID
+  t = config.CANID & 0x7f;
 
   // set the CBUS message priority - zeroes equate to higher priority
   // bits 7 and 8 are the minor priority, so 11 = 'low'
-  bitSet(msg->id, 7);
-  bitSet(msg->id, 8);
+  bitSet(t, 7);
+  bitSet(t, 8);
 
   // bits 9 and 10 are the major priority, so 01 = 'medium'
-  bitClear(msg->id, 9);
-  bitSet(msg->id, 10);
+  bitClear(t, 9);
+  bitSet(t, 10);
+
+  // copy the temporary value, shifting left by 5 bits to 'left justify' in the frame header
+  // Serial << F("> makeHeader() - t = ") << t << endl;
+  msg->id = (t << 5);
+  // Serial << F("> makeHeader() - ") << msg->id << endl;
+  // Serial << F("> makeHeader() - CANID = ") << ((msg->id >> 5) & 0x7f) << endl;
 }
 
 //
