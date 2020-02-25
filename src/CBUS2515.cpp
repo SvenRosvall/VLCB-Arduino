@@ -123,7 +123,9 @@ CANFrame CBUS2515::getNextMessage(void) {
   _msg.len = message.len;
   _msg.rtr = message.rtr;
   _msg.ext = message.ext;
-  memcpy(_msg.data, message.data, 8);
+  memcpy(_msg.data, message.data, message.len);
+
+  // Serial << F("> getNextMessage() - CANID = ") << ((_msg.id >> 5) & 0x7f) << endl;
 
   ++_numMsgsRcvd;
   return _msg;
