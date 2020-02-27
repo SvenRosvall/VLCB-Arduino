@@ -104,7 +104,7 @@ void CBUS::setSLiM(void) {
 
 byte CBUS::getCANID(unsigned long header) {
 
-  return ((header >> 5) & 0x7f);
+  return header & 0x7f;
 }
 
 //
@@ -1105,10 +1105,8 @@ void CBUS::makeHeader(CANFrame *msg) {
 
   uint16_t t = 0;
 
-  // Serial << F("> makeHeader() - CANID = ") << config.CANID << endl;
-
   // set the CANID
-  t = config.CANID & 0x7f;
+  t = config.CANID;
 
   // set the CBUS message priority - zeroes equate to higher priority
   // bits 7 and 8 are the minor priority, so 11 = 'low'
@@ -1119,11 +1117,8 @@ void CBUS::makeHeader(CANFrame *msg) {
   bitClear(t, 9);
   bitSet(t, 10);
 
-  // copy the temporary value, shifting left by 5 bits to 'left justify' in the frame header
-  // Serial << F("> makeHeader() - t = ") << t << endl;
-  msg->id = (t << 5);
-  // Serial << F("> makeHeader() - ") << msg->id << endl;
-  // Serial << F("> makeHeader() - CANID = ") << ((msg->id >> 5) & 0x7f) << endl;
+  // copy the temporary value
+  msg->id = t;
 }
 
 //
