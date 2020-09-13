@@ -56,8 +56,13 @@ bool hash_collision = false;
 
 void CBUSConfig::begin(void) {
 
-    makeEvHashTable();
-    loadNVs();
+#ifdef ESP32
+  int eeprom_size = EE_EVENTS_START + (EE_MAX_EVENTS * EE_BYTES_PER_EVENT);
+  EEPROM.begin(eeprom_size);
+#endif
+
+  makeEvHashTable();
+  loadNVs();
 }
 
 //
@@ -99,7 +104,12 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 void CBUSConfig::setFLiM(bool f) {
 
   FLiM = f;
-  EEPROM[0] = f;
+  // EEPROM[0] = f;
+  EEPROM.write(0, f);
+
+#ifdef ESP32
+  EEPROM.commit();
+#endif
 }
 
 //
@@ -109,7 +119,12 @@ void CBUSConfig::setFLiM(bool f) {
 void CBUSConfig::setCANID(byte canid) {
 
   CANID = canid;
-  EEPROM[1] = canid;
+  // EEPROM[1] = canid;
+  EEPROM.write(1, canid);
+
+#ifdef ESP32
+  EEPROM.commit();
+#endif
 }
 
 //
@@ -119,8 +134,14 @@ void CBUSConfig::setCANID(byte canid) {
 void CBUSConfig::setNodeNum(unsigned int nn) {
 
   nodeNum = nn;
-  EEPROM[2] = highByte(nodeNum);
-  EEPROM[3] = lowByte(nodeNum);
+  // EEPROM[2] = highByte(nodeNum);
+  // EEPROM[3] = lowByte(nodeNum);
+  EEPROM.write(2, highByte(nodeNum));
+  EEPROM.write(3, lowByte(nodeNum));
+
+#ifdef ESP32
+  EEPROM.commit();
+#endif
 }
 
 //
@@ -392,7 +413,8 @@ byte CBUSConfig::getEvTableEntry(byte tindex) {
 
 byte CBUSConfig::readNV(byte idx) {
 
-  return (EEPROM[EE_NVS_START + (idx - 1)]);
+  // return (EEPROM[EE_NVS_START + (idx - 1)]);
+  return (EEPROM.read(EE_NVS_START + (idx - 1)));
 }
 
 //
@@ -402,7 +424,13 @@ byte CBUSConfig::readNV(byte idx) {
 
 void CBUSConfig::writeNV(byte idx, byte val) {
 
-  EEPROM[EE_NVS_START + (idx - 1)] = val;
+  // EEPROM[EE_NVS_START + (idx - 1)] = val;
+  EEPROM.write(EE_NVS_START + (idx - 1), val);
+
+#ifdef ESP32
+  EEPROM.commit();
+#endif
+
   return;
 }
 
@@ -433,7 +461,8 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
     if (Wire.available()) rdata = Wire.read();
 
   } else {
-    rdata = EEPROM[eeaddress];
+    // rdata = EEPROM[eeaddress];
+    rdata = EEPROM.read(eeaddress);
   }
 
   return rdata;
@@ -469,7 +498,8 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
   } else {
   
     for (count = 0; count < nbytes; count++) {
-      dest[count] = EEPROM[eeaddress + count];
+      // dest[count] = EEPROM[eeaddress + count];
+      dest[count] = EEPROM.read(eeaddress + count);
     }
   }
 
@@ -499,7 +529,11 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
       // Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
     }
   } else {
-    EEPROM[eeaddress] = data;
+    // EEPROM[eeaddress] = data;
+    EEPROM.write(eeaddress, data);
+#ifdef ESP32
+    EEPROM.commit();
+#endif
   }
 
   return;
@@ -535,8 +569,12 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
   } else {
 
     for (byte i = 0; i < numbytes; i++) {
-      EEPROM[eeaddress + i] = src[i];
+      // EEPROM[eeaddress + i] = src[i];
+      EEPROM.write(eeaddress + i, src[i]);
     }
+#ifdef ESP32
+    EEPROM.commit();
+#endif
   }
 
   return;
@@ -591,27 +629,41 @@ void CBUSConfig::resetEEPROM(void) {
 }
 
 //
-/// reboot via watchdog timer - for AVR core chips
+/// reboot the processor
 //
 
+#ifdef __AVR__
 #include <avr/wdt.h>
+#endif
 
 void CBUSConfig::reboot(void) {
 
+#ifdef __AVR__
+  // AVR chips set the watchdog timer and spin
   wdt_disable();
   wdt_enable(WDTO_15MS);
   while (1) {}
+#endif
+
+#ifdef ESP32
+  ESP.restart();
+#endif
 }
 
 //
-/// get free SRAM - for AVR core chips
+/// get free RAM
 //
 
 unsigned int CBUSConfig::freeSRAM(void) {
-
+#ifdef __AVR__
   extern int __heap_start, *__brkval;
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+#endif
+
+#ifdef ESP32
+  return ESP.getFreeHeap();
+#endif
 }
 
 //
@@ -664,18 +716,32 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     // Serial << F("> clearing on-chip EEPROM ...") << endl;
 
     for (unsigned int j = 0; j < EEPROM.length(); j++) {
-      EEPROM[j] = 0xff;
+      // EEPROM[j] = 0xff;
+      EEPROM.write(j, 0xff);
     }
+
+    #ifdef ESP32
+      EEPROM.commit();
+    #endif
 
     // clear the external I2C EEPROM of learned events
     resetEEPROM();
 
     // set the node identity defaults
     // we set a NN and CANID of zero in SLiM as we're a consumer-only node
-    EEPROM[0] = 0x00;                             // SLiM
-    EEPROM[1] = 0x00;                             // CANID
-    EEPROM[2] = 0x00;                             // NN hi
-    EEPROM[3] = 0x00;                             // NN lo
+    // EEPROM[0] = 0x00;                             // SLiM
+    // EEPROM[1] = 0x00;                             // CANID
+    // EEPROM[2] = 0x00;                             // NN hi
+    // EEPROM[3] = 0x00;                             // NN lo
+
+    EEPROM.write(0, 0);
+    EEPROM.write(1, 0);
+    EEPROM.write(2, 0);
+    EEPROM.write(3, 0);
+
+    #ifdef ESP32
+    EEPROM.commit();
+    #endif
 
     FLiM = false;
     nodeNum = 0;
@@ -697,10 +763,12 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 void CBUSConfig::loadNVs(void) {
 
   // load NVs from EEPROM into memory
-  FLiM =     EEPROM[0];
-  CANID =    EEPROM[1];
-  nodeNum = (EEPROM[2] << 8) + EEPROM[3];
-
+  // FLiM =     EEPROM[0];
+  // CANID =    EEPROM[1];
+  // nodeNum = (EEPROM[2] << 8) + EEPROM[3];
+  FLiM =        EEPROM.read(0);
+  CANID =       EEPROM.read(1);
+  nodeNum =     (EEPROM.read(2) << 8) + EEPROM.read(3);
   return;
 }
 
