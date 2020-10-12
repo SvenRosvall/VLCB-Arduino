@@ -628,10 +628,14 @@ void CBUSConfig::resetEEPROM(void) {
 void CBUSConfig::reboot(void) {
 
 #ifdef __AVR__
-  // AVR chips set the watchdog timer and spin
-  wdt_disable();
-  wdt_enable(WDTO_15MS);
-  while (1) {}
+  #ifdef __AVR_XMEGA__      // for AVR128DA28
+    CCP = (uint8_t)CCP_IOREG_gc;
+    RSTCTRL.SWRR = 1;
+  #else                     // for ATMega328P
+    wdt_disable();
+    wdt_enable(WDTO_15MS);
+    while (1) {}
+  #endif
 #endif
 
 #ifdef ESP32
@@ -724,14 +728,11 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     EEPROM.write(1, 0);     // CANID
     EEPROM.write(2, 0);     // NN hi
     EEPROM.write(3, 0);     // NN lo
+    EEPROM.write(5, 99);    // set reset indicator
 
     #ifdef ESP32
     EEPROM.commit();
     #endif
-
-    FLiM = false;
-    nodeNum = 0;
-    CANID = 0;
 
     // zero NVs (NVs number from one, not zero)
     for (byte i = 0; i < EE_NUM_NVS; i++) {
