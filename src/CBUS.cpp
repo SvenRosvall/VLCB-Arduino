@@ -907,15 +907,14 @@ void CBUS::process(void) {
 
         case OPC_RQMN:
           // request for node module name, excluding "CAN" prefix
-          // Serial << F("> RQMN for nn = ") << nn << endl;
+          // sent during module transition, so no node number check
+          // Serial << F("> RQMN received") << endl;
 
-          if (nn == config.nodeNum) {
-            // respond with NAME
-            _msg.len = 8;
-            _msg.data[0] = OPC_NAME;
-            memcpy(_msg.data + 1, _mname, 7);
-            sendMessage(&_msg);
-          }
+          // respond with NAME
+          _msg.len = 8;
+          _msg.data[0] = OPC_NAME;
+          memcpy(_msg.data + 1, _mname, 7);
+          sendMessage(&_msg);
 
           break;
 
