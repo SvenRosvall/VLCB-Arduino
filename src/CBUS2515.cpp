@@ -47,9 +47,6 @@
 // CAN bus controller specific object - for MCP2515/25625
 ACAN2515 *can;
 
-// CBUS configuration object, declared externally
-extern CBUSConfig config;
-
 //
 /// constructor
 //
@@ -87,7 +84,8 @@ bool CBUS2515::begin(void) {
 
   // instantiate CAN bus object
   can = new ACAN2515(_csPin, SPI, _intPin);
-
+  canp = can;
+  
   // Serial << F("> initialising CAN controller") << endl;
   ret = can->begin(settings, [] {can->isr();});
 
@@ -98,7 +96,6 @@ bool CBUS2515::begin(void) {
     Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
     return false;
   }
-
 }
 
 //
@@ -166,11 +163,11 @@ void CBUS2515::printStatus(void) {
 
 //
 /// reset the MCP2515 transceiver
-/// NB not recommended as it tends to fragment the heap !!
 //
 
 void CBUS2515::reset(void) {
   can->end();
+  delete can;
   begin();
 }
 

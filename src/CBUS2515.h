@@ -42,9 +42,6 @@
 #include <CBUS.h>               // abstract base class
 #include <CBUS2515.h>           // header for this class
 #include <ACAN2515.h>           // ACAN2515 library
-#include <CBUSconfig.h>         // CBUS config class
-#include <CBUSLED.h>            // CBUS LED class
-#include <CBUSswitch.h>         // CBUS switch class
 
 // constants
 
@@ -77,6 +74,8 @@ class CBUS2515 : public CBUS {
     // they are not declared or implemented by the base CBUS class
     void printStatus(void);
     void setOscFreq(unsigned long freq);
+
+    ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 
 private:
     unsigned long _osc_freq;
