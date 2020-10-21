@@ -51,6 +51,7 @@ void CBUSSwitch::setPin(byte pin, byte pressedState = LOW) {
     pinMode(_pin, INPUT_PULLUP);
 
   reset();
+  _currentState = readPin(_pin);  
 }
 
 void CBUSSwitch::reset(void) {
