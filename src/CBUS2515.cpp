@@ -85,7 +85,7 @@ bool CBUS2515::begin(void) {
   // instantiate CAN bus object
   can = new ACAN2515(_csPin, SPI, _intPin);
   canp = can;
-  
+
   // Serial << F("> initialising CAN controller") << endl;
   ret = can->begin(settings, [] {can->isr();});
 
@@ -157,7 +157,7 @@ void CBUS2515::printStatus(void) {
 
   Serial << F("> CBUS status:");
   Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << \
-            can->receiveErrorCounter() << F(", transmit errors = ") << can->transmitErrorCounter() << endl;
+         can->receiveErrorCounter() << F(", transmit errors = ") << can->transmitErrorCounter() << endl;
   return;
 }
 

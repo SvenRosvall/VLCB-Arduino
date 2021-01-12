@@ -98,6 +98,28 @@ void setup() {
   config.setEEPROMtype(EEPROM_INTERNAL);
   config.begin();
 
+  // set LED and switch pins and assign to CBUS
+  ledGrn.setPin(LED_GRN);
+  ledYlw.setPin(LED_YLW);
+  pb_switch.setPin(SWITCH0, LOW);
+
+  CBUS.setLEDs(ledGrn, ledYlw);
+  CBUS.setSwitch(pb_switch);
+
+  // module reset - if switch is depressed at startup and module is in SLiM mode
+  pb_switch.run();
+
+  if (pb_switch.isPressed() && !config.FLiM) {
+    Serial << F("> switch was pressed at startup in SLiM mode") << endl;
+    config.resetModule(ledGrn, ledYlw, pb_switch);
+  }
+
+  // opportunity to set default NVs after module reset
+  if (EEPROM.read(5) == 99) {
+    Serial << F("> module has been reset") << endl;
+    EEPROM.write(5, 0);
+  }
+
   Serial << F("> mode = ") << ((config.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID;
   Serial << F(", NN = ") << config.nodeNum << endl;
 
@@ -131,25 +153,8 @@ void setup() {
   CBUS.setParams(params);
   CBUS.setName(mname);
 
-  // initialise CBUS switch
-  pb_switch.setPin(SWITCH0, LOW);
-
-  // module reset - if switch is depressed at startup and module is in SLiM mode
-  pb_switch.run();
-
-  if (pb_switch.isPressed() && !config.FLiM) {
-    Serial << F("> switch was pressed at startup in SLiM mode") << endl;
-    config.resetModule(ledGrn, ledYlw, pb_switch);
-  }
-
   // register our CBUS event handler, to receive event messages of learned events
   CBUS.setEventHandler(eventhandler);
-
-  // set LED and switch pins and assign to CBUS
-  ledGrn.setPin(LED_GRN);
-  ledYlw.setPin(LED_YLW);
-  CBUS.setLEDs(ledGrn, ledYlw);
-  CBUS.setSwitch(pb_switch);
 
   // set CBUS LEDs to indicate mode
   CBUS.indicateMode(config.FLiM);
@@ -204,7 +209,7 @@ void loop() {
   /// you can just watch for this event in FCU or JMRI, or teach it to another CBUS consumer module
   //
 
-  if (moduleSwitch.stateChanged() && moduleSwitch.getCurrentStateDuration() > 500) {
+  if (moduleSwitch.stateChanged()) {
 
     CANFrame msg;
     msg.id = config.CANID;
@@ -240,10 +245,7 @@ void eventhandler(byte index, CANFrame *msg) {
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 
   // read the value of the first event variable (EV) associated with this learned event
-
-  byte ev = 1;
-  int eeaddress = config.EE_EVENTS_START + (index * config.EE_BYTES_PER_EVENT) + 4 + (ev - 1);
-  byte evval = config.readEEPROM(eeaddress);
+  byte ev1 = config.getEventEVval(index, 1);
   Serial << F("> EV1 = ") << evval << endl;
 
   // set the LED according to the opcode of the received event, if the first EV equals 1

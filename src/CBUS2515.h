@@ -57,29 +57,29 @@ static const uint32_t canbitrate = 125UL * 1000UL;          // 125Kb/s - fixed f
 
 class CBUS2515 : public CBUS {
 
-  public:
+public:
 
-    CBUS2515();
+  CBUS2515();
 
-    // these methods are declared virtual in the base class and must be implemented by the derived class
-    bool begin(void);
-    bool available(void);
-    CANFrame getNextMessage(void);
-    bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false);    // note default arguments
-    void reset(void);
-    void setNumBuffers(byte num);
-    void setPins(byte CSpin, byte intPin);
+  // these methods are declared virtual in the base class and must be implemented by the derived class
+  bool begin(void);
+  bool available(void);
+  CANFrame getNextMessage(void);
+  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false);    // note default arguments
+  void reset(void);
+  void setNumBuffers(byte num);
+  void setPins(byte CSpin, byte intPin);
 
-    // these methods are specific to this implementation
-    // they are not declared or implemented by the base CBUS class
-    void printStatus(void);
-    void setOscFreq(unsigned long freq);
+  // these methods are specific to this implementation
+  // they are not declared or implemented by the base CBUS class
+  void printStatus(void);
+  void setOscFreq(unsigned long freq);
 
-    ACAN2515 *canp;   // pointer to CAN object so user code can access its members
+  ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 
 private:
-    unsigned long _osc_freq;
-    byte _csPin, _intPin;
-    byte numbuffers;
+  unsigned long _osc_freq;
+  byte _csPin, _intPin;
+  byte numbuffers;
 
 };
