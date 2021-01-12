@@ -101,6 +101,7 @@ void CBUSLED::pulse() {
   _pulse = true;
   _state = HIGH;
   _pulseStart = millis();
+  run();
 }
 
 // actually operate the LED dependent upon its current state

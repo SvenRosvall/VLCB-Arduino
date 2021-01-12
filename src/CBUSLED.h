@@ -53,23 +53,23 @@
 
 class CBUSLED {
 
-  public:
-    CBUSLED();
-    void setPin(byte pin);
-    bool getState();
-    void on();
-    void off();
-    void toggle();
-    void blink();
-    void run();
-    void pulse();
+public:
+  CBUSLED();
+  void virtual setPin(byte pin);
+  bool getState();
+  void on();
+  void off();
+  void toggle();
+  void blink();
+  virtual void run();
+  void pulse();
 
-  protected:
-    byte _pin;
-    bool _state;
-    bool _blink;
-    bool _pulse;
-    unsigned long _lastTime, _pulseStart;
-    void _write(byte pin, bool state);
+protected:
+  byte _pin;
+  bool _state;
+  bool _blink;
+  bool _pulse;
+  unsigned long _lastTime, _pulseStart;
+  virtual void _write(byte pin, bool state);
 };
 
