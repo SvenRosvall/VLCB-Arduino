@@ -60,14 +60,14 @@ enum {
 
 class CANFrame {
 
-  public:
+public:
 
-      CANFrame();
-      uint32_t id;
-      bool ext;
-      bool rtr;
-      uint8_t len;
-      uint8_t data[8];
+  CANFrame();
+  uint32_t id;
+  bool ext;
+  bool rtr;
+  uint8_t len;
+  uint8_t data[8];
 };
 
 //
@@ -77,58 +77,58 @@ class CANFrame {
 
 class CBUS {
 
-  public:
-    
-    // these methods are pure virtual and must be implemented by the derived class
-    // as a consequence, it is not possible to create an instance of this class
-    
-    virtual bool begin(void) = 0;
-    virtual bool available(void) = 0;
-    virtual CANFrame getNextMessage(void) = 0;
-    virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false) = 0;
-    virtual void reset(void) = 0;
+public:
 
-    // implementations of these methods are provided in the base class
+  // these methods are pure virtual and must be implemented by the derived class
+  // as a consequence, it is not possible to create an instance of this class
 
-    bool sendWRACK(void);
-    bool sendCMDERR(byte cerrno);
-    void CANenumeration(void);
-    byte getCANID(unsigned long header);
-    bool isExt(CANFrame *msg);
-    bool isRTR(CANFrame *msg);
-    void process(void);
-    void initFLiM(void);
-    void revertSLiM(void);
-    void setSLiM(void);
-    void renegotiate(void);
-    void setLEDs(CBUSLED ledGrn, CBUSLED ledYlw);
-    void setSwitch(CBUSSwitch sw);
-    void setParams(unsigned char *mparams);
-    void setName(unsigned char *mname);
-    void checkCANenum(void);
-    void indicateMode(byte mode);
-    void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
-    void setFrameHandler(void (*fptr)(CANFrame *msg));
-    void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes);
-    void makeHeader(CANFrame *msg);
+  virtual bool begin(void) = 0;
+  virtual bool available(void) = 0;
+  virtual CANFrame getNextMessage(void) = 0;
+  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false) = 0;
+  virtual void reset(void) = 0;
 
-  protected:
-    CANFrame _msg;
-    unsigned int _numMsgsSent, _numMsgsRcvd;
-    byte _lastErr;
-    CBUSLED _ledGrn, _ledYlw;
-    CBUSSwitch _sw;
-    unsigned char *_mparams;
-    unsigned char *_mname;
-    void (*eventhandler)(byte index, CANFrame *msg);
-    void (*framehandler)(CANFrame *msg);
-    byte *_opcodes;
-    byte _num_opcodes;
-    bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
-    unsigned long timeOutTimer, CANenumTime;
-    char msgstr[64], dstr[64];
-    byte enums = 0, selected_id;
-    byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
-    bool enumeration_required;
+  // implementations of these methods are provided in the base class
+
+  bool sendWRACK(void);
+  bool sendCMDERR(byte cerrno);
+  void CANenumeration(void);
+  byte getCANID(unsigned long header);
+  bool isExt(CANFrame *msg);
+  bool isRTR(CANFrame *msg);
+  void process(void);
+  void initFLiM(void);
+  void revertSLiM(void);
+  void setSLiM(void);
+  void renegotiate(void);
+  void setLEDs(CBUSLED ledGrn, CBUSLED ledYlw);
+  void setSwitch(CBUSSwitch sw);
+  void setParams(unsigned char *mparams);
+  void setName(unsigned char *mname);
+  void checkCANenum(void);
+  void indicateMode(byte mode);
+  void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
+  void setFrameHandler(void (*fptr)(CANFrame *msg));
+  void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes);
+  void makeHeader(CANFrame *msg);
+
+protected:
+  CANFrame _msg;
+  unsigned long _numMsgsSent, _numMsgsRcvd;
+  byte _lastErr;
+  CBUSLED _ledGrn, _ledYlw;
+  CBUSSwitch _sw;
+  unsigned char *_mparams;
+  unsigned char *_mname;
+  void (*eventhandler)(byte index, CANFrame *msg);
+  void (*framehandler)(CANFrame *msg);
+  byte *_opcodes;
+  byte _num_opcodes;
+  bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
+  unsigned long timeOutTimer, CANenumTime;
+  char msgstr[64], dstr[64];
+  byte enums = 0, selected_id;
+  byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
+  bool enumeration_required;
 
 };
