@@ -75,7 +75,8 @@ class CBUSConfig {
     void clearEvHashTable(void);
     bool check_hash_collisions(void);
     byte getEventEVval(byte idx, byte evnum);
-    
+    void writeEventEV(byte idx, byte evnum, byte evval);
+
     byte readNV(byte idx);
     void writeNV(byte idx, byte val);
     void loadNVs(void);

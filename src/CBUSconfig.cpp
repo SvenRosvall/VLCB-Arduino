@@ -169,6 +169,8 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
         // there is a potential hash collision, so we have to check the slower way
         // first, check if this hash appears in the table more than once
 
+        // Serial << F("> there are hash collisions") << endl;
+
         for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++) {
           if (evhashtbl[j] == tmphash) {
             ++matches;
@@ -240,7 +242,7 @@ byte CBUSConfig::findEventSpace(void) {
 
 byte CBUSConfig::makeHash(byte tarr[]) {
 
-  unsigned char hash;
+  byte hash = 0;
   unsigned int nn, en;
 
   // make a hash from a 4-byte NN + EN event
@@ -281,6 +283,15 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
 byte CBUSConfig::getEventEVval(byte idx, byte evnum) {
 
   return readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
+}
+
+//
+/// write an event variable
+//
+
+void CBUSConfig::writeEventEV(byte idx, byte evnum, byte evval) {
+
+  writeEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum, evval);
 }
 
 //
@@ -488,7 +499,7 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
 
     // Serial << F("> readBytesEEPROM: read ") << count << F(" bytes from EEPROM in ") << micros() - t1 << F("us") << endl;
   } else {
-  
+
     for (count = 0; count < nbytes; count++) {
       dest[count] = EEPROM.read(eeaddress + count);
     }
@@ -628,14 +639,14 @@ void CBUSConfig::resetEEPROM(void) {
 void CBUSConfig::reboot(void) {
 
 #ifdef __AVR__
-  #ifdef __AVR_XMEGA__      // for AVR128DA28
-    CCP = (uint8_t)CCP_IOREG_gc;
-    RSTCTRL.SWRR = 1;
-  #else                     // for ATMega328P
-    wdt_disable();
-    wdt_enable(WDTO_15MS);
-    while (1) {}
-  #endif
+#ifdef __AVR_XMEGA__      // for AVR128DA28
+  CCP = (uint8_t)CCP_IOREG_gc;
+  RSTCTRL.SWRR = 1;
+#else                     // for ATMega328P
+  wdt_disable();
+  wdt_enable(WDTO_15MS);
+  while (1) {}
+#endif
 #endif
 
 #ifdef ESP32
@@ -665,82 +676,82 @@ unsigned int CBUSConfig::freeSRAM(void) {
 
 void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
 
-    bool bDone;
-    unsigned long waittime;
+  bool bDone;
+  unsigned long waittime;
 
-    // start timeout timer
-    waittime = millis();
-    bDone = false;
+  // start timeout timer
+  waittime = millis();
+  bDone = false;
 
-    // Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
+  // Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
 
-    pbSwitch.reset();
-    ledGrn.blink();
-    ledYlw.blink();
+  pbSwitch.reset();
+  ledGrn.blink();
+  ledYlw.blink();
 
-    // wait for a further (5 sec) button press -- as a 'safety' mechanism
-    while (!bDone) {
+  // wait for a further (5 sec) button press -- as a 'safety' mechanism
+  while (!bDone) {
 
-      // 30 sec timeout
-      if ((millis() - waittime) > 30000) {
-        // Serial << F("> timeout expired, reset not performed") << endl;
-        return;
-      }
-
-      pbSwitch.run();
-      ledGrn.run();
-      ledYlw.run();
-
-      // wait until switch held for a further 5 secs
-      if (pbSwitch.isPressed() && pbSwitch.getCurrentStateDuration() > 5000) {
-        bDone = true;
-      }
+    // 30 sec timeout
+    if ((millis() - waittime) > 30000) {
+      // Serial << F("> timeout expired, reset not performed") << endl;
+      return;
     }
 
-    // do the reset
-    // Serial << F("> performing module reset ...") <<  endl;
-
-    ledGrn.off();
-    ledYlw.off();
+    pbSwitch.run();
     ledGrn.run();
     ledYlw.run();
 
-    // clear the on-chip EEPROM 
-    // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
-
-    // Serial << F("> clearing on-chip EEPROM ...") << endl;
-
-    for (unsigned int j = 10; j < EEPROM.length(); j++) {
-      EEPROM.write(j, 0xff);
+    // wait until switch held for a further 5 secs
+    if (pbSwitch.isPressed() && pbSwitch.getCurrentStateDuration() > 5000) {
+      bDone = true;
     }
+  }
 
-    #ifdef ESP32
-      EEPROM.commit();
-    #endif
+  // do the reset
+  // Serial << F("> performing module reset ...") <<  endl;
 
-    // clear the external I2C EEPROM of learned events
-    resetEEPROM();
+  ledGrn.off();
+  ledYlw.off();
+  ledGrn.run();
+  ledYlw.run();
 
-    // set the node identity defaults
-    // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
+  // clear the on-chip EEPROM
+  // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
 
-    EEPROM.write(0, 0);     // SLiM
-    EEPROM.write(1, 0);     // CANID
-    EEPROM.write(2, 0);     // NN hi
-    EEPROM.write(3, 0);     // NN lo
-    EEPROM.write(5, 99);    // set reset indicator
+  // Serial << F("> clearing on-chip EEPROM ...") << endl;
 
-    #ifdef ESP32
-    EEPROM.commit();
-    #endif
+  for (unsigned int j = 10; j < EEPROM.length(); j++) {
+    EEPROM.write(j, 0xff);
+  }
 
-    // zero NVs (NVs number from one, not zero)
-    for (byte i = 0; i < EE_NUM_NVS; i++) {
-      writeNV(i + 1, 0);
-    }
+#ifdef ESP32
+  EEPROM.commit();
+#endif
 
-    // reset complete - reboot the module
-    reboot();
+  // clear the external I2C EEPROM of learned events
+  resetEEPROM();
+
+  // set the node identity defaults
+  // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
+
+  EEPROM.write(0, 0);     // SLiM
+  EEPROM.write(1, 0);     // CANID
+  EEPROM.write(2, 0);     // NN hi
+  EEPROM.write(3, 0);     // NN lo
+  EEPROM.write(5, 99);    // set reset indicator
+
+#ifdef ESP32
+  EEPROM.commit();
+#endif
+
+  // zero NVs (NVs number from one, not zero)
+  for (byte i = 0; i < EE_NUM_NVS; i++) {
+    writeNV(i + 1, 0);
+  }
+
+  // reset complete - reboot the module
+  reboot();
 }
 
 //
@@ -762,7 +773,7 @@ void CBUSConfig::loadNVs(void) {
 
 bool CBUSConfig::check_hash_collisions(void) {
 
-byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
+  byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
 
   for (byte i = 0; i < count - 1; i++) {
     for (byte j = i + 1; j < count; j++) {
