@@ -39,7 +39,7 @@
 class CBUSParams
 {
 public:
-  CBUSParams(CBUSConfig config)
+  CBUSParams(CBUSConfig const & config)
     : params(new unsigned char[21])
   {
     params[0] = 20;
