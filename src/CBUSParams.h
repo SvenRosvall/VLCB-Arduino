@@ -35,61 +35,60 @@
 */
 
 #include <CBUSConfig.h>
+#include <cbusdefs.h>               // MERG CBUS constants
 
 class CBUSParams
 {
 public:
   CBUSParams(CBUSConfig const & config)
-    : params(new unsigned char[21])
   {
-    params[0] = 20;
-    params[1] = MANU_MERG;
+    params[0] = 20;                     //  0 num params = 20
+    params[1] = MANU_MERG;              //  1 manf = MERG, 165
     params[4] = config.EE_MAX_EVENTS;   //  4 num events
     params[5] = config.EE_NUM_EVS;      //  5 num evs per event
     params[6] = config.EE_NUM_NVS;      //  6 num NVs
-    params[9] = 0x32;
-    params[10] = PB_CAN;
+    params[10] = PB_CAN;                // CAN implementation of CBUS
     params[11] = 0x00;
     params[12] = 0x00;
     params[13] = 0x00;
     params[14] = 0x00;
-    params[15] = '3';
-    params[16] = '2';
-    params[17] = '8';
-    params[18] = 'P';
-    params[19] = CPUM_ATMEL;
+    initProcessorParams();
   }
 
   void setVersion(char major, char minor, char beta)
   {
-    params[7] = major;
-    params[2] = minor;
-    params[20] = beta;
+    params[7] = major;                //  7 code major version
+    params[2] = minor;                //  2 code minor version
+    params[20] = beta;                // 20 code beta version
   }
 
   void setModuleId(byte id)
   {
-    params[3] = id;
+    params[3] = id;                   //  3 module id
   }
 
   void setFlags(byte flags)
   {
-    params[8] = flags;
+    params[8] = flags;                //  8 flags - FLiM, consumer/producer
   }
 
+  // Optional: use this to override processor info that is set by default.
   void setProcessor(byte manufacturer, byte id, char const * name)
   {
-    params[9] = id;
-    params[19] = manufacturer;
-    strncpy(params + 15, name, 4);
+    params[9] = id;                  //  9 processor id
+    params[19] = manufacturer;       // 19 processor manufacturer
+    strncpy(params + 15, name, 4);   // 15-18 processor version
   }
 
   unsigned char * getParams()
   {
     return params;
   }
+
 private:
-  // Memory for the params is allocated on the heap and handed over to CBUS.setParams().
-  // This memory will never be freed.
-  unsigned char * params;
+  // Initializes processor specific parameters based on pre-defined macros in Arduino IDE.
+  static void initProcessorParams();
+
+  // Memory for the params is allocated on global memory and handed over to CBUS.setParams().
+  static unsigned char params[21];
 };
