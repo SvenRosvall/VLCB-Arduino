@@ -67,6 +67,7 @@ void CBUSConfig::begin(void) {
 //
 /// set the EEPROM type for event storage - on-chip or external I2C bus device
 /// NVs are always stored in the on-chip EEPROM
+/// external EEPROM must use 16-bit addresses !!
 //
 
 bool CBUSConfig::setEEPROMtype(byte type) {
@@ -219,7 +220,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 }
 
 //
-/// find an empty EEPROM event slot - the hash table entry == 0
+/// find the first empty EEPROM event slot - the hash table entry == 0
 //
 
 byte CBUSConfig::findEventSpace(void) {
@@ -240,7 +241,7 @@ byte CBUSConfig::findEventSpace(void) {
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
 
-byte CBUSConfig::makeHash(byte tarr[]) {
+byte CBUSConfig::makeHash(byte tarr[4]) {
 
   byte hash = 0;
   unsigned int nn, en;
@@ -367,14 +368,14 @@ void CBUSConfig::clearEvHashTable(void) {
 
 void CBUSConfig::printEvHashTable(bool raw) {
 
-  Serial << F("> Event hash table --") << endl;
+  Serial << F("> Event hash table - ") << hash_collision << endl;
 
   for (byte i = 0; i < EE_MAX_EVENTS; i++) {
     if (evhashtbl[i] > 0) {
       if (raw)
         Serial << evhashtbl[i] << endl;
       else
-        Serial << F("  -- ") << i << " - " << evhashtbl[i] << endl;
+        Serial << i << " - " << evhashtbl[i] << endl;
     }
   }
 
@@ -473,6 +474,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
 
 //
 /// read a number of bytes from EEPROM
+/// external EEPROM must use 16-bit addresses !!
 //
 
 byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) {
@@ -542,6 +544,7 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
 
 //
 /// write a number of bytes to EEPROM
+/// external EEPROM must use 16-bit addresses !!
 //
 
 void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes) {
@@ -620,7 +623,7 @@ void CBUSConfig::resetEEPROM(void) {
 
     // Serial << F("> clearing data from external EEPROM ...") << endl;
 
-    for (unsigned int addr = 0; addr < 65535; addr++) {
+    for (unsigned int addr = 0; addr < 32767; addr++) {
       writeEEPROM(addr, 0xff);
     }
   }
@@ -636,19 +639,50 @@ void CBUSConfig::resetEEPROM(void) {
 #include <avr/wdt.h>
 #endif
 
-void CBUSConfig::reboot(void) {
+#ifndef AVR_RESET_METHOD
+#define AVR_RESET_METHOD 3     // default to the original preferred AVR method
+#endif
 
+void (*rebootFunc)(void) = 0;  // just causes a jump to address zero - not a full chip reset
+
+void CBUSConfig::reboot(void) {
+ 
 #ifdef __AVR__
-#ifdef __AVR_XMEGA__      // for AVR128DA28
+
+// for newer AVR Xmega, e.g. AVR-DA
+#ifdef __AVR_XMEGA__
   CCP = (uint8_t)CCP_IOREG_gc;
   RSTCTRL.SWRR = 1;
-#else                     // for ATMega328P
+#else
+
+// for older AVR Mega, e.g. Uno, Nano, Mega
+#if AVR_RESET_METHOD == 1      // 1. the preferred way
+#warning "Using reset method 1"
   wdt_disable();
   wdt_enable(WDTO_15MS);
   while (1) {}
 #endif
+
+#if AVR_RESET_METHOD == 2      // 2. a variation on the watchdog method
+#warning "Using reset method 2"
+  wdt_enable(WDTO_15MS);
+  while (1) {}
 #endif
 
+#if AVR_RESET_METHOD == 3      // 3. a dirty way
+#warning "Using reset method 3"
+  asm volatile ("jmp 0");
+#endif
+
+#if AVR_RESET_METHOD == 4      // 4. another dirty way
+#warning "Using reset method 4"
+  rebootFunc();
+#endif
+
+#endif  // which AVR
+#endif  // AVR
+
+// for ESP32
 #ifdef ESP32
   ESP.restart();
 #endif
@@ -674,8 +708,11 @@ unsigned int CBUSConfig::freeSRAM(void) {
 /// manually reset the module to factory defaults
 //
 
-void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
 
+void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
+	
+  /// standard implementation of resetModule()
+	
   bool bDone;
   unsigned long waittime;
 
@@ -715,10 +752,17 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
   ledYlw.off();
   ledGrn.run();
   ledYlw.run();
+  
+  resetModule();
 
-  // clear the on-chip EEPROM
+}
+
+void CBUSConfig::resetModule(void) {
+	
+  /// implementation of resetModule() without CBUSswitch or CBUSLEDs
+	
+  // clear the entire on-chip EEPROM
   // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
-
   // Serial << F("> clearing on-chip EEPROM ...") << endl;
 
   for (unsigned int j = 10; j < EEPROM.length(); j++) {
@@ -750,10 +794,11 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
     writeNV(i + 1, 0);
   }
 
-  // reset complete - reboot the module
+  // reset complete
   reboot();
 }
 
+//
 //
 /// load NVs from EEPROM
 //

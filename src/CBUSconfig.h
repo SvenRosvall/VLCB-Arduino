@@ -85,6 +85,7 @@ class CBUSConfig {
     void writeEvent(byte index, byte data[]);
     void cleareventEEPROM(byte index);
     void resetModule(CBUSLED green, CBUSLED yellow, CBUSSwitch sw);
+    void resetModule(void);  
 
     byte readEEPROM(unsigned int eeaddress);
     void writeEEPROM(unsigned int eeaddress, byte data);
