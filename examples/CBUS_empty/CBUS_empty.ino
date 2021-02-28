@@ -67,7 +67,7 @@ CBUSSwitch pb_switch;               // switch object
 // CBUS module parameters
 unsigned char params[21];
 
-// module name
+// module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
@@ -128,12 +128,14 @@ void setup() {
   CBUS.setParams(params);
   CBUS.setName(mname);
 
-  // initialise CBUS LEDs
+  // set LED and switch pins and assign to CBUS
   ledGrn.setPin(LED_GRN);
   ledYlw.setPin(LED_YLW);
+  CBUS.setLEDs(ledGrn, ledYlw);
 
   // initialise CBUS switch
   pb_switch.setPin(SWITCH0, LOW);
+  CBUS.setSwitch(pb_switch);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
   pb_switch.run();
@@ -143,15 +145,11 @@ void setup() {
     config.resetModule(ledGrn, ledYlw, pb_switch);
   }
 
-  // register our CBUS event handler, to receive event messages of learned accessory events
+  // register our CBUS event handler, to receive event messages of learned events
   CBUS.setEventHandler(eventhandler);
 
   // register our CAN frame handler, to receive *every* CAN frame
   CBUS.setFrameHandler(framehandler);
-
-  // assign switch and LEDs to CBUS
-  CBUS.setLEDs(ledGrn, ledYlw);
-  CBUS.setSwitch(pb_switch);
 
   // set CBUS LEDs to indicate the current mode
   CBUS.indicateMode(config.FLiM);

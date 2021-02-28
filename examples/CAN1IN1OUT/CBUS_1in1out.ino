@@ -61,7 +61,7 @@
 // CBUS objects
 CBUS2515 CBUS;                      // CBUS object
 CBUSConfig config;                  // configuration object
-CBUSLED ledGrn, ledYlw;             // LED objects
+CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 
 // module objects
@@ -71,7 +71,7 @@ CBUSLED moduleLED;                  // an example LED as output
 // CBUS module parameters
 unsigned char params[21];
 
-// module name
+// module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
@@ -97,28 +97,6 @@ void setup() {
   // initialise and load configuration
   config.setEEPROMtype(EEPROM_INTERNAL);
   config.begin();
-
-  // set LED and switch pins and assign to CBUS
-  ledGrn.setPin(LED_GRN);
-  ledYlw.setPin(LED_YLW);
-  pb_switch.setPin(SWITCH0, LOW);
-
-  CBUS.setLEDs(ledGrn, ledYlw);
-  CBUS.setSwitch(pb_switch);
-
-  // module reset - if switch is depressed at startup and module is in SLiM mode
-  pb_switch.run();
-
-  if (pb_switch.isPressed() && !config.FLiM) {
-    Serial << F("> switch was pressed at startup in SLiM mode") << endl;
-    config.resetModule(ledGrn, ledYlw, pb_switch);
-  }
-
-  // opportunity to set default NVs after module reset
-  if (EEPROM.read(5) == 99) {
-    Serial << F("> module has been reset") << endl;
-    EEPROM.write(5, 0);
-  }
 
   Serial << F("> mode = ") << ((config.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID;
   Serial << F(", NN = ") << config.nodeNum << endl;
@@ -152,6 +130,29 @@ void setup() {
   // assign to CBUS
   CBUS.setParams(params);
   CBUS.setName(mname);
+
+  // set LED and switch pins and assign to CBUS
+  ledGrn.setPin(LED_GRN);
+  ledYlw.setPin(LED_YLW);
+  CBUS.setLEDs(ledGrn, ledYlw);
+
+  // initialise CBUS switch
+  pb_switch.setPin(SWITCH0, LOW);
+  CBUS.setSwitch(pb_switch);
+
+  // module reset - if switch is depressed at startup and module is in SLiM mode
+  pb_switch.run();
+
+  if (pb_switch.isPressed() && !config.FLiM) {
+    Serial << F("> switch was pressed at startup in SLiM mode") << endl;
+    config.resetModule(ledGrn, ledYlw, pb_switch);
+  }
+
+  // opportunity to set default NVs after module reset
+  if (EEPROM.read(5) == 99) {
+    Serial << F("> module has been reset") << endl;
+    EEPROM.write(5, 0);
+  }
 
   // register our CBUS event handler, to receive event messages of learned events
   CBUS.setEventHandler(eventhandler);
