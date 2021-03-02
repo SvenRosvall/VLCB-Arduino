@@ -77,7 +77,7 @@ public:
   {
     params[9] = id;                  //  9 processor id
     params[19] = manufacturer;       // 19 processor manufacturer
-    strncpy(params + 15, name, 4);   // 15-18 processor version
+    memcpy(params + 15, name, 4);   // 15-18 processor version
   }
 
   unsigned char * getParams()
