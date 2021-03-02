@@ -303,8 +303,7 @@ void CBUS::indicateMode(byte mode) {
 
 void CBUS::process(void) {
 
-  static bool enumeration_required = false;
-  static byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
+  byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
   byte tarray[4];
   unsigned int nn = 0, en = 0, j = 0, opc;
 
