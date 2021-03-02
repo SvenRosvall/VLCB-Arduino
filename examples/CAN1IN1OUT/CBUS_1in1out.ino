@@ -53,39 +53,40 @@
 #include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
 #include <CBUSconfig.h>             // module configuration
+#include <CBUSParams.h>             // CBUS parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 
-// local header
-#include "defs.h"
+// constants
+const byte VER_MAJ = 1;                  // code major version
+const char VER_MIN = 'a';                // code minor version
+const byte VER_BETA = 0;                 // code beta sub-version
+const byte MODULE_ID = 99;               // CBUS module type
+
+const byte LED_GRN = 4;                  // CBUS green SLiM LED pin
+const byte LED_YLW = 5;                  // CBUS yellow FLiM LED pin
+const byte SWITCH0 = 6;                  // CBUS push button switch pin
 
 // CBUS objects
 CBUS2515 CBUS;                      // CBUS object
 CBUSConfig config;                  // configuration object
-CBUSLED ledGrn, ledYlw;             // LED objects
+CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 
 // module objects
 CBUSSwitch moduleSwitch;            // an example switch as input
 CBUSLED moduleLED;                  // an example LED as output
 
-// CBUS module parameters
-unsigned char params[21];
-
-// module name
+// module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
 void eventhandler(byte index, byte opc);
 
 //
-/// setup - runs once at power on
+/// setup CBUS - runs once at power on from setup()
 //
-
-void setup() {
-
-  Serial.begin (115200);
-  Serial << endl << endl << F("> ** CBUS empty module v1 ** ") << __FILE__ << endl;
-
+void setupCBUS()
+{
   // set config layout parameters
   config.EE_NVS_START = 10;
   config.EE_NUM_NVS = 10;
@@ -98,17 +99,33 @@ void setup() {
   config.setEEPROMtype(EEPROM_INTERNAL);
   config.begin();
 
-  // set LED and switch pins and assign to CBUS
+  Serial << F("> mode = ") << ((config.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID;
+  Serial << F(", NN = ") << config.nodeNum << endl;
+
+  // show code version and copyright notice
+  printConfig();
+
+  // set module parameters
+  CBUSParams params(config);
+  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setModuleId(MODULE_ID);
+  params.setFlags(PF_FLiM | PF_COMBI);
+
+  // assign to CBUS
+  CBUS.setParams(params.getParams());
+  CBUS.setName(mname);
+
+  // set CBUS LED pins and assign to CBUS
   ledGrn.setPin(LED_GRN);
   ledYlw.setPin(LED_YLW);
-  pb_switch.setPin(SWITCH0, LOW);
-
   CBUS.setLEDs(ledGrn, ledYlw);
+
+  // initialise CBUS switch and assign to CBUS
+  pb_switch.setPin(SWITCH0, LOW);
+  pb_switch.run();
   CBUS.setSwitch(pb_switch);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
-  pb_switch.run();
-
   if (pb_switch.isPressed() && !config.FLiM) {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
     config.resetModule(ledGrn, ledYlw, pb_switch);
@@ -119,39 +136,6 @@ void setup() {
     Serial << F("> module has been reset") << endl;
     EEPROM.write(5, 0);
   }
-
-  Serial << F("> mode = ") << ((config.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID;
-  Serial << F(", NN = ") << config.nodeNum << endl;
-
-  // show code version and copyright notice
-  printConfig();
-
-  // set module parameters
-  params[0] = 20;                     //  0 num params = 10
-  params[1] = 0xa5;                   //  1 manf = MERG, 165
-  params[2] = VER_MIN;                //  2 code minor version
-  params[3] = MODULE_ID;              //  3 module id, 99 = undefined
-  params[4] = config.EE_MAX_EVENTS;   //  4 num events
-  params[5] = config.EE_NUM_EVS;      //  5 num evs per event
-  params[6] = config.EE_NUM_NVS;      //  6 num NVs
-  params[7] = VER_MAJ;                //  7 code major version
-  params[8] = 0x07;                   //  8 flags = 7, FLiM, consumer/producer
-  params[9] = 0x32;                   //  9 processor id = 50
-  params[10] = PB_CAN;                // 10 interface protocol = CAN, 1
-  params[11] = 0x00;
-  params[12] = 0x00;
-  params[13] = 0x00;
-  params[14] = 0x00;
-  params[15] = '3';
-  params[16] = '2';
-  params[17] = '8';
-  params[18] = 'P';
-  params[19] = CPUM_ATMEL;
-  params[20] = VER_BETA;
-
-  // assign to CBUS
-  CBUS.setParams(params);
-  CBUS.setName(mname);
 
   // register our CBUS event handler, to receive event messages of learned events
   CBUS.setEventHandler(eventhandler);
@@ -164,6 +148,18 @@ void setup() {
   CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   CBUS.begin();
+}
+
+//
+/// setup - runs once at power on
+//
+
+void setup()
+{
+  Serial.begin (115200);
+  Serial << endl << endl << F("> ** CBUS 1 in 1 out v1 ** ") << __FILE__ << endl;
+
+  setupCBUS();
 
   // configure the module switch, attached to pin 7, active low
   moduleSwitch.setPin(7, LOW);
@@ -200,14 +196,21 @@ void loop() {
   moduleSwitch.run();
   moduleLED.run();
 
-  //
-  /// test for switch input
-  /// as an example, it must be have been pressed or released for at least half a second
-  /// then send a long CBUS event with opcode ACON for on and ACOF for off
-  /// event number (EN) is 1
+  // Check if smich changed and do any processing for this change.
+  processModuleSwitchChange();
 
-  /// you can just watch for this event in FCU or JMRI, or teach it to another CBUS consumer module
-  //
+  // bottom of loop()
+}
+
+//
+/// test for switch input
+/// as an example, it must be have been pressed or released for at least half a second
+/// then send a long CBUS event with opcode ACON for on and ACOF for off
+/// event number (EN) is 1
+
+/// you can just watch for this event in FCU or JMRI, or teach it to another CBUS consumer module
+//
+void processModuleSwitchChange() {
 
   if (moduleSwitch.stateChanged()) {
 
@@ -226,10 +229,6 @@ void loop() {
       Serial << F("> error sending CBUS message") << endl;
     }
   }
-
-  //
-  /// bottom of loop()
-  //
 }
 
 //
@@ -240,28 +239,29 @@ void loop() {
 
 void eventhandler(byte index, CANFrame *msg) {
 
-  // as an example, control an LED if the first EV equals 1
+  // as an example, control an LED
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 
   // read the value of the first event variable (EV) associated with this learned event
-  byte ev1 = config.getEventEVval(index, 1);
+  byte evval = config.getEventEVval(index, 1);
   Serial << F("> EV1 = ") << evval << endl;
 
-  // set the LED according to the opcode of the received event, if the first EV equals 1
-  // we use the blink() method of the LED object as an example
+  // set the LED according to the opcode of the received event, if the first EV equals 0
+  // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
 
-  if (evval == 1) {
-    if (msg->data[0] == OPC_ACON) {
+  if (msg->data[0] == OPC_ACON) {
+    if (evval == 0) {
       Serial << F("> switching the LED on") << endl;
+      moduleLED.on();
+    } else if (evval == 1) {
+      Serial << F("> switching the LED to blink") << endl;
       moduleLED.blink();
-    } else if (msg->data[0] == OPC_ACOF) {
-      Serial << F("> switching the LED off") << endl;
-      moduleLED.off();
     }
+  } else if (msg->data[0] == OPC_ACOF) {
+    Serial << F("> switching the LED off") << endl;
+    moduleLED.off();
   }
-
-  return;
 }
 
 //
@@ -276,7 +276,6 @@ void printConfig(void) {
 
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
-  return;
 }
 
 //
@@ -309,9 +308,7 @@ void processSerialInput(void) {
 
         // EEPROM learned event data table
         Serial << F("> stored events ") << endl;
-
-        sprintf(msgstr, "  max events = %d, EVs per event = %d, bytes per event = %d", config.EE_MAX_EVENTS, config.EE_NUM_EVS, config.EE_BYTES_PER_EVENT);
-        Serial << msgstr << endl;
+        Serial << F("  max events = ") << config.EE_MAX_EVENTS << F(" EVs per event = ") << config.EE_NUM_EVS << F(" bytes per event = ") << config.EE_BYTES_PER_EVENT << endl;
 
         for (byte j = 0; j < config.EE_MAX_EVENTS; j++) {
           if (config.getEvTableEntry(j) != 0) {
@@ -364,7 +361,8 @@ void processSerialInput(void) {
         Serial << F("  --------------------") << endl;
 
         for (byte j = 1; j <= config.EE_NUM_NVS; j++) {
-          sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, config.readNV(j), config.readNV(j));
+          byte v = config.readNV(j);
+          sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
           Serial << msgstr << endl;
         }
 
