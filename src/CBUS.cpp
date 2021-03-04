@@ -95,7 +95,10 @@ void CBUS::setSLiM(void) {
   config.setNodeNum(0);
   config.setFLiM(false);
   config.setCANID(0);
-  indicateMode(config.FLiM);
+
+  if (UI) {
+    indicateMode(config.FLiM);
+  }
 }
 
 //
@@ -164,31 +167,27 @@ bool CBUS::isRTR(CANFrame *amsg) {
 
 void CBUS::CANenumeration(void) {
 
-  // initiate CAN bus enumeration cycle, either due to ENUM opcode or user button press
+  // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
-  if (config.FLiM) {
+  // Serial << F("> beginning self-enumeration cycle") << endl;
 
-    // Serial << F("> beginning self-enumeration cycle") << endl;
+  // set global variables
+  bCANenum = true;                  // we are enumerating
+  CANenumTime = millis();           // the cycle start time
+  bCANenumComplete = false;         // the 100ms cycle has not completed
+  selected_id = 1;
+  enums = 0;                        // number of zero-length messages received
 
-    // set global variables
-    bCANenum = true;                  // we are enumerating
-    CANenumTime = millis();           // the cycle start time
-    bCANenumComplete = false;         // the 100ms cycle has not completed
-    selected_id = 1;
-    enums = 0;                        // number of zero-length messages received
-
-    // clear the results array (16 bytes * 8 bits = 128 bits)
-    for (byte i = 0; i < 16; i++) {
-      enum_responses[i] = 0;
-    }
-
-    // send zero-length RTR frame
-    _msg.len = 0;
-    sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
-
-    // Serial << F("> enumeration cycle initiated") << endl;
+  // clear the results array (16 bytes * 8 bits = 128 bits)
+  for (byte i = 0; i < 16; i++) {
+    enum_responses[i] = 0;
   }
 
+  // send zero-length RTR frame
+  _msg.len = 0;
+  sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
+
+  // Serial << F("> enumeration cycle initiated") << endl;
   return;
 }
 
@@ -200,7 +199,10 @@ void CBUS::initFLiM(void) {
 
   // Serial << F("> initiating FLiM negotation") << endl;
 
-  indicateMode(MODE_CHANGING);
+  if (UI) {
+    indicateMode(MODE_CHANGING);
+  }
+
   bModeChanging = true;
   timeOutTimer = millis();
 
@@ -249,6 +251,7 @@ void CBUS::renegotiate(void) {
 
 void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
 
+  UI = true;
   _ledGrn = green;
   _ledYlw = yellow;
 
@@ -261,6 +264,7 @@ void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
 
 void CBUS::setSwitch(CBUSSwitch sw) {
 
+  UI = true;
   _sw = sw;
 }
 
@@ -272,39 +276,35 @@ void CBUS::indicateMode(byte mode) {
 
   // Serial << F("> indicating mode = ") << mode << endl;
 
-  switch (mode) {
+  if (UI) {
+    switch (mode) {
 
-  case MODE_FLIM:
-    _ledYlw.on();
-    _ledGrn.off();
-    break;
+    case MODE_FLIM:
+      _ledYlw.on();
+      _ledGrn.off();
+      break;
 
-  case MODE_SLIM:
-    _ledYlw.off();
-    _ledGrn.on();
-    break;
+    case MODE_SLIM:
+      _ledYlw.off();
+      _ledGrn.on();
+      break;
 
-  case MODE_CHANGING:
-    _ledYlw.blink();
-    _ledGrn.off();
-    break;
+    case MODE_CHANGING:
+      _ledYlw.blink();
+      _ledGrn.off();
+      break;
 
-  default:
-    break;
-
+    default:
+      break;
+    }
   }
-
-  // _ledYlw.run();
-  // _ledGrn.run();
-
 }
 
 /// main CBUS message processing procedure
 
 void CBUS::process(void) {
 
-  static bool enumeration_required = false;
-  static byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
+  byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
   byte tarray[4];
   unsigned int nn = 0, en = 0, j = 0, opc;
 
@@ -314,55 +314,57 @@ void CBUS::process(void) {
     CANenumeration();
   }
 
-  // allow LEDs to update
-  _ledGrn.run();
-  _ledYlw.run();
+  if (UI) {
+    // allow LEDs to update
+    _ledGrn.run();
+    _ledYlw.run();
 
-  // allow the CBUS switch some processing time
-  _sw.run();
+    // allow the CBUS switch some processing time
+    _sw.run();
 
-  //
-  /// use LEDs to indicate that the user can release the switch
-  //
+    //
+    /// use LEDs to indicate that the user can release the switch
+    //
 
-  if (_sw.isPressed() && _sw.getCurrentStateDuration() > SW_TR_HOLD) {
-    indicateMode(MODE_CHANGING);
-  }
+    if (_sw.isPressed() && _sw.getCurrentStateDuration() > SW_TR_HOLD) {
+      indicateMode(MODE_CHANGING);
+    }
 
-  //
-  /// handle switch state changes
-  //
+    //
+    /// handle switch state changes
+    //
 
-  if (_sw.stateChanged()) {
+    if (_sw.stateChanged()) {
 
-    // has switch been released ?
-    if (!_sw.isPressed()) {
+      // has switch been released ?
+      if (!_sw.isPressed()) {
 
-      // how long was it pressed for ?
-      unsigned long press_time = _sw.getLastStateDuration();
+        // how long was it pressed for ?
+        unsigned long press_time = _sw.getLastStateDuration();
 
-      // long hold > 6 secs
-      if (press_time > SW_TR_HOLD) {
-        // initiate mode change
-        if (!config.FLiM) {
-          initFLiM();
-        } else {
-          revertSLiM();
+        // long hold > 6 secs
+        if (press_time > SW_TR_HOLD) {
+          // initiate mode change
+          if (!config.FLiM) {
+            initFLiM();
+          } else {
+            revertSLiM();
+          }
         }
-      }
 
-      // short 1-2 secs
-      if (press_time >= 1000 && press_time < 2000) {
-        renegotiate();
-      }
+        // short 1-2 secs
+        if (press_time >= 1000 && press_time < 2000) {
+          renegotiate();
+        }
 
-      // very short < 0.5 sec
-      if (press_time < 500 && config.FLiM) {
-        CANenumeration();
-      }
+        // very short < 0.5 sec
+        if (press_time < 500 && config.FLiM) {
+          CANenumeration();
+        }
 
-    } else {
-      // do any switch release processing here
+      } else {
+        // do any switch release processing here
+      }
     }
   }
 
@@ -415,7 +417,9 @@ void CBUS::process(void) {
     /// pulse the green LED
     //
 
-    _ledGrn.pulse();
+    if (UI) {
+      _ledGrn.pulse();
+    }
 
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
@@ -540,10 +544,6 @@ void CBUS::process(void) {
 
         break;
 
-      case OPC_PARAMS:
-        // another node sending a PARAMS response
-        break;
-
       case OPC_RQNPN:
         // RQNPN message -- request parameter by index number
         // index 0 = number of params available;
@@ -575,10 +575,6 @@ void CBUS::process(void) {
 
         break;
 
-      case OPC_PARAN:
-        // another node responding to FCU with a parameter
-        break;
-
       case OPC_SNN:
         // received SNN - set node number
         // Serial << F("> received SNN with NN = ") << nn << endl;
@@ -602,7 +598,10 @@ void CBUS::process(void) {
           // we are now in FLiM mode - update the configuration
           bModeChanging = false;
           config.setFLiM(true);
-          indicateMode(config.FLiM);
+
+          if (UI) {
+            indicateMode(config.FLiM);
+          }
 
           // enumerate the CAN bus to allocate a free CAN ID
           CANenumeration();
@@ -613,10 +612,6 @@ void CBUS::process(void) {
           // Serial << F("> received SNN but not in transition") << endl;
         }
 
-        break;
-
-      case OPC_NNACK:
-        // NNACK -- this is another node responding to SNN
         break;
 
       case OPC_CANID:
@@ -858,10 +853,6 @@ void CBUS::process(void) {
 
         break;
 
-      case OPC_NEVAL:
-        // this is another node responding to REVAL
-        break;
-
       case OPC_NNEVN:
         // request for number of free event slots
 
@@ -887,10 +878,6 @@ void CBUS::process(void) {
 
         break;
 
-      case OPC_EVNLF:
-        // another node responding to NNEVN
-        break;
-
       case OPC_QNN:
         // this is probably a config recreate -- respond with PNN if we have a node number
         // Serial << F("> QNN received") << endl;
@@ -909,14 +896,6 @@ void CBUS::process(void) {
 
         break;
 
-      case OPC_NVANS:
-        // another node responding to NVRD
-        break;
-
-      case OPC_WRACK:
-        // another node sending a write ack
-        break;
-
       case OPC_RQMN:
         // request for node module name, excluding "CAN" prefix
         // sent during module transition, so no node number check
@@ -932,18 +911,6 @@ void CBUS::process(void) {
           sendMessage(&_msg);
         }
 
-        break;
-
-      case OPC_RQNN:
-        // request for NN from another node
-        break;
-
-      case OPC_NUMEV:
-        // a node is responding to a RQEVN request with a NUMEV reply
-        break;
-
-      case OPC_ENRSP:
-        //  a node is responding to a NERD request with a ENRSP reply
         break;
 
       case OPC_EVLRN:
@@ -1015,10 +982,6 @@ void CBUS::process(void) {
         // command station status -- not applicable to modules
         break;
 
-      case OPC_PNN:
-        // a node responding to QNN
-        break;
-
       case OPC_ARST:
         // system reset
         config.reboot();
@@ -1044,7 +1007,10 @@ void CBUS::process(void) {
   if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
 
     // Serial << F("> timeout expired, FLiM = ") << FLiM << F(", mode change = ") << bModeChanging << endl;
-    indicateMode(config.FLiM);
+    if (UI) {
+      indicateMode(config.FLiM);
+    }
+
     bModeChanging = false;
   }
 
