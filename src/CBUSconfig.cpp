@@ -42,13 +42,22 @@
 
 #include <Wire.h>
 #include <Streaming.h>
+
+#ifdef __SAM3X8E__
+#include <DueFlashStorage.h>            // use Due eeprom emulation library, will overwrite every time program is uploaded !
+#else
 #include <EEPROM.h>
+#endif
 
 #include "CBUSconfig.h"
 
 // the event hash table
 byte evhashtbl[64];
 bool hash_collision = false;
+
+#ifdef __SAM3X8E__
+DueFlashStorage dueFlashStorage;
+#endif
 
 //
 /// initialise and set default values
@@ -104,7 +113,12 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 void CBUSConfig::setFLiM(bool f) {
 
   FLiM = f;
+
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(0, f);
+#else
   EEPROM.write(0, f);
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -118,7 +132,12 @@ void CBUSConfig::setFLiM(bool f) {
 void CBUSConfig::setCANID(byte canid) {
 
   CANID = canid;
+
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(1, canid);
+#else
   EEPROM.write(1, canid);
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -132,8 +151,14 @@ void CBUSConfig::setCANID(byte canid) {
 void CBUSConfig::setNodeNum(unsigned int nn) {
 
   nodeNum = nn;
+
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(2, highByte(nodeNum));
+  dueFlashStorage.write(3, lowByte(nodeNum));
+#else
   EEPROM.write(2, highByte(nodeNum));
   EEPROM.write(3, lowByte(nodeNum));
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -375,7 +400,7 @@ void CBUSConfig::printEvHashTable(bool raw) {
       if (raw)
         Serial << evhashtbl[i] << endl;
       else
-        Serial << i << " - " << evhashtbl[i] << endl;
+        Serial << i << " -" << evhashtbl[i];
     }
   }
 
@@ -420,7 +445,11 @@ byte CBUSConfig::getEvTableEntry(byte tindex) {
 
 byte CBUSConfig::readNV(byte idx) {
 
+#ifdef __SAM3X8E__
+  return (dueFlashStorage.read(EE_NVS_START + (idx - 1)));
+#else
   return (EEPROM.read(EE_NVS_START + (idx - 1)));
+#endif
 }
 
 //
@@ -430,7 +459,11 @@ byte CBUSConfig::readNV(byte idx) {
 
 void CBUSConfig::writeNV(byte idx, byte val) {
 
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(EE_NVS_START + (idx - 1), val);
+#else
   EEPROM.write(EE_NVS_START + (idx - 1), val);
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -466,7 +499,11 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
     if (Wire.available()) rdata = Wire.read();
 
   } else {
+#ifdef __SAM3X8E__
+    rdata = dueFlashStorage.read(eeaddress);
+#else
     rdata = EEPROM.read(eeaddress);
+#endif
   }
 
   return rdata;
@@ -503,7 +540,11 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
   } else {
 
     for (count = 0; count < nbytes; count++) {
+#ifdef __SAM3X8E__
+      dest[count] = dueFlashStorage.read(eeaddress + count);
+#else
       dest[count] = EEPROM.read(eeaddress + count);
+#endif
     }
   }
 
@@ -533,7 +574,12 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
       // Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
     }
   } else {
+#ifdef __SAM3X8E__
+    dueFlashStorage.write(eeaddress, data);
+#else
     EEPROM.write(eeaddress, data);
+#endif
+
 #ifdef ESP32
     EEPROM.commit();
 #endif
@@ -573,8 +619,13 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
   } else {
 
     for (byte i = 0; i < numbytes; i++) {
+#ifdef __SAM3X8E__
+      dueFlashStorage.write(eeaddress + i, src[i]);
+#else
       EEPROM.write(eeaddress + i, src[i]);
+#endif
     }
+
 #ifdef ESP32
     EEPROM.commit();
 #endif
@@ -640,13 +691,13 @@ void CBUSConfig::resetEEPROM(void) {
 #endif
 
 #ifndef AVR_RESET_METHOD
-#define AVR_RESET_METHOD 3     // default to the original preferred AVR method
+#define AVR_RESET_METHOD 3     // don't use watchdog timer method as it's unreliable on some boards
 #endif
 
 void (*rebootFunc)(void) = 0;  // just causes a jump to address zero - not a full chip reset
 
 void CBUSConfig::reboot(void) {
- 
+
 #ifdef __AVR__
 
 // for newer AVR Xmega, e.g. AVR-DA
@@ -686,6 +737,11 @@ void CBUSConfig::reboot(void) {
 #ifdef ESP32
   ESP.restart();
 #endif
+
+// for Arduino Due
+#ifdef __SAM3X8E__
+  rstc_start_software_reset(RSTC);
+#endif
 }
 
 //
@@ -702,17 +758,21 @@ unsigned int CBUSConfig::freeSRAM(void) {
 #ifdef ESP32
   return ESP.getFreeHeap();
 #endif
+
+#ifdef __SAM3X8E__
+  // TODO
+  return 0;
+#endif
 }
 
 //
 /// manually reset the module to factory defaults
 //
 
-
 void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
-	
+
   /// standard implementation of resetModule()
-	
+
   bool bDone;
   unsigned long waittime;
 
@@ -752,22 +812,28 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
   ledYlw.off();
   ledGrn.run();
   ledYlw.run();
-  
+
   resetModule();
 
 }
 
 void CBUSConfig::resetModule(void) {
-	
+
   /// implementation of resetModule() without CBUSswitch or CBUSLEDs
-	
+
   // clear the entire on-chip EEPROM
   // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
   // Serial << F("> clearing on-chip EEPROM ...") << endl;
 
+#ifdef __SAM3X8E__
+  for (unsigned int j = 10; j < 1024; j++) {
+    dueFlashStorage.write(j, 0xff);
+  }
+#else
   for (unsigned int j = 10; j < EEPROM.length(); j++) {
     EEPROM.write(j, 0xff);
   }
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -779,11 +845,19 @@ void CBUSConfig::resetModule(void) {
   // set the node identity defaults
   // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
 
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(0, 0);     // SLiM
+  dueFlashStorage.write(1, 0);     // CANID
+  dueFlashStorage.write(2, 0);     // NN hi
+  dueFlashStorage.write(3, 0);     // NN lo
+  dueFlashStorage.write(5, 99);    // set reset indicator
+#else
   EEPROM.write(0, 0);     // SLiM
   EEPROM.write(1, 0);     // CANID
   EEPROM.write(2, 0);     // NN hi
   EEPROM.write(3, 0);     // NN lo
   EEPROM.write(5, 99);    // set reset indicator
+#endif
 
 #ifdef ESP32
   EEPROM.commit();
@@ -806,9 +880,16 @@ void CBUSConfig::resetModule(void) {
 void CBUSConfig::loadNVs(void) {
 
   // load NVs from EEPROM into memory
+#ifdef __SAM3X8E__
+  FLiM =        dueFlashStorage.read(0);
+  CANID =       dueFlashStorage.read(1);
+  nodeNum =     (dueFlashStorage.read(2) << 8) + dueFlashStorage.read(3);
+#else
   FLiM =        EEPROM.read(0);
   CANID =       EEPROM.read(1);
   nodeNum =     (EEPROM.read(2) << 8) + EEPROM.read(3);
+#endif
+
   return;
 }
 
