@@ -1,3 +1,4 @@
+<img align="right" src="arduino_cbus_logo.png"  width="150" height="75">
 
 # Arduino library for MERG CBUS running over CAN bus
 
