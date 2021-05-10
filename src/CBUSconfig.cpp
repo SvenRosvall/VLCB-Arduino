@@ -45,8 +45,15 @@
 
 #ifdef __SAM3X8E__
 #include <DueFlashStorage.h>            // use Due eeprom emulation library, will overwrite every time program is uploaded !
+extern "C" char* sbrk(int incr);
 #else
 #include <EEPROM.h>
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
+#include "pico/stdlib.h"
+#include "hardware/watchdog.h"
+extern "C" char* sbrk(int incr);
 #endif
 
 #include "CBUSconfig.h"
@@ -67,6 +74,10 @@ void CBUSConfig::begin(void) {
 
 #ifdef ESP32
   EEPROM.begin(EE_EVENTS_START + (EE_MAX_EVENTS * EE_BYTES_PER_EVENT));
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
+  EEPROM.begin(1024);
 #endif
 
   makeEvHashTable();
@@ -123,6 +134,10 @@ void CBUSConfig::setFLiM(bool f) {
 #ifdef ESP32
   EEPROM.commit();
 #endif
+
+#ifdef ARDUINO_ARCH_RP2040
+  EEPROM.commit();
+#endif
 }
 
 //
@@ -140,6 +155,10 @@ void CBUSConfig::setCANID(byte canid) {
 #endif
 
 #ifdef ESP32
+  EEPROM.commit();
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
   EEPROM.commit();
 #endif
 }
@@ -161,6 +180,10 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
 #endif
 
 #ifdef ESP32
+  EEPROM.commit();
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
   EEPROM.commit();
 #endif
 }
@@ -327,6 +350,7 @@ void CBUSConfig::writeEventEV(byte idx, byte evnum, byte evval) {
 void CBUSConfig::makeEvHashTable(void) {
 
   byte evarray[4];
+  const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
   // Serial << F("> creating event hash table") << endl;
 
@@ -334,7 +358,8 @@ void CBUSConfig::makeEvHashTable(void) {
 
     readEvent(idx, evarray);
 
-    if (evarray[0] == 0xff) {
+    // empty slots have all four bytes set to 0xff
+    if (memcmp(evarray, unused_entry, 4) == 0) {
       evhashtbl[idx] = 0;
     } else {
       evhashtbl[idx] = makeHash(evarray);
@@ -353,12 +378,13 @@ void CBUSConfig::makeEvHashTable(void) {
 void CBUSConfig::updateEvHashEntry(byte idx) {
 
   byte evarray[4];
+  const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
   // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
 
-  // empty slots have first byte set to 0xff
-  if (evarray[0] == 0xff) {
+  // empty slots have all four bytes set to 0xff
+  if (memcmp(evarray, unused_entry, 4) == 0) {
     evhashtbl[idx] = 0;
   } else {
     evhashtbl[idx] = makeHash(evarray);
@@ -466,6 +492,10 @@ void CBUSConfig::writeNV(byte idx, byte val) {
 #endif
 
 #ifdef ESP32
+  EEPROM.commit();
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
   EEPROM.commit();
 #endif
 
@@ -583,6 +613,10 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
 #ifdef ESP32
     EEPROM.commit();
 #endif
+
+#ifdef ARDUINO_ARCH_RP2040
+    EEPROM.commit();
+#endif
   }
 
   return;
@@ -629,6 +663,10 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
 #ifdef ESP32
     EEPROM.commit();
 #endif
+
+#ifdef ARDUINO_ARCH_RP2040
+    EEPROM.commit();
+#endif
   }
 
   return;
@@ -656,10 +694,10 @@ void CBUSConfig::writeEvent(byte index, byte data[]) {
 
 void CBUSConfig::cleareventEEPROM(byte index) {
 
-  byte tarray[4] = { 0xff, 0xff, 0xff, 0xff };
+  byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
 
   // Serial << F("> clearing event at index = ") << index << endl;
-  writeEvent(index, tarray);
+  writeEvent(index, unused_entry);
 
   return;
 }
@@ -742,6 +780,14 @@ void CBUSConfig::reboot(void) {
 #ifdef __SAM3X8E__
   rstc_start_software_reset(RSTC);
 #endif
+
+// for Raspberry Pi Pico using arduino-pico core
+#ifdef ARDUINO_ARCH_RP2040
+  watchdog_enable(100, 0);
+  watchdog_update();
+  watchdog_reboot(0, 0, 0);
+  while (1);
+#endif
 }
 
 //
@@ -760,8 +806,13 @@ unsigned int CBUSConfig::freeSRAM(void) {
 #endif
 
 #ifdef __SAM3X8E__
-  // TODO
-  return 0;
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
 #endif
 }
 
@@ -839,6 +890,10 @@ void CBUSConfig::resetModule(void) {
   EEPROM.commit();
 #endif
 
+#ifdef ARDUINO_ARCH_RP2040
+  EEPROM.commit();
+#endif
+
   // clear the external I2C EEPROM of learned events
   resetEEPROM();
 
@@ -860,6 +915,10 @@ void CBUSConfig::resetModule(void) {
 #endif
 
 #ifdef ESP32
+  EEPROM.commit();
+#endif
+
+#ifdef ARDUINO_ARCH_RP2040
   EEPROM.commit();
 #endif
 
