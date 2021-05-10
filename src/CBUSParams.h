@@ -34,7 +34,7 @@
 
 */
 
-#include <CBUSConfig.h>
+#include <CBUSconfig.h>
 #include <cbusdefs.h>               // MERG CBUS constants
 
 class CBUSParams
