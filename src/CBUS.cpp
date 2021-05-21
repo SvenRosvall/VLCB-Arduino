@@ -36,7 +36,7 @@
 */
 
 // 3rd party libraries
-#include <Streaming.h>
+// #include <Streaming.h>
 
 // CBUS library
 #include <CBUS.h>
@@ -314,7 +314,10 @@ void CBUS::process(void) {
     CANenumeration();
   }
 
+  // process switch operations if the module is configured with one
+
   if (UI) {
+
     // allow LEDs to update
     _ledGrn.run();
     _ledYlw.run();
@@ -982,10 +985,10 @@ void CBUS::process(void) {
         // command station status -- not applicable to modules
         break;
 
-      case OPC_ARST:
-        // system reset
-        config.reboot();
-        break;
+      // case OPC_ARST:
+      // system reset ... this is not what I thought it meant !
+      // config.reboot();
+      // break;
 
       default:
         // unknown or unhandled OPC

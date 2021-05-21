@@ -36,9 +36,9 @@
 
 #include <CBUSParams.h>
 
-static unsigned char CBUSParams::params[21];
+unsigned char CBUSParams::params[21];
 
-static void CBUSParams::initProcessorParams()
+void CBUSParams::initProcessorParams()
 {
   params[9] = 50;
   params[19] = CPUM_ATMEL;
