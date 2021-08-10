@@ -48,26 +48,26 @@
 static const byte MCP2515_CS = 10;                          // SPI chip select pin
 static const byte MCP2515_INT = 2;                          // interrupt pin
 static const byte NUM_RECV_BUFFS = 4;                       // default value
-static const uint32_t canbitrate = 125UL * 1000UL;          // 125Kb/s - fixed for CBUS
+static const uint32_t CANBITRATE = 125000UL;                // 125Kb/s - fixed for CBUS
 
 //
 /// an implementation of the absract base CBUS class
 /// to support the MCP2515/25625 CAN controllers
 //
 
-class CBUS2515 : public CBUS {
+class CBUS2515 : public CBUSbase {
 
 public:
 
   CBUS2515();
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
-  bool begin(void);
+  bool begin(bool poll = false);    // note default arg
   bool available(void);
   CANFrame getNextMessage(void);
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false);    // note default arguments
+  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);    // note default arguments
   void reset(void);
-  void setNumBuffers(byte num);
+  void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
   void setPins(byte CSpin, byte intPin);
 
   // these methods are specific to this implementation
@@ -80,6 +80,6 @@ public:
 private:
   unsigned long _osc_freq;
   byte _csPin, _intPin;
-  byte numbuffers;
-
+  byte _num_rx_buffers, _num_tx_buffers;
+  bool _poll;
 };
