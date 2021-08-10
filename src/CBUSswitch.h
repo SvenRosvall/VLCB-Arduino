@@ -43,27 +43,27 @@
 
 class CBUSSwitch {
 
-  public:
-    void setPin(byte pin, byte pressedState);
-    void run(void);
-    void reset(void);
-    bool stateChanged(void);
-    bool getState(void);
-    bool isPressed(void);
-    unsigned long getCurrentStateDuration(void);
-    unsigned long getLastStateDuration(void);
-    unsigned long getLastStateChangeTime(void);
-    void resetCurrentDuration(void);
+public:
+  void setPin(byte pin, byte pressedState);
+  void run(void);
+  void reset(void);
+  bool stateChanged(void);
+  bool getState(void);
+  bool isPressed(void);
+  unsigned long getCurrentStateDuration(void);
+  unsigned long getLastStateDuration(void);
+  unsigned long getLastStateChangeTime(void);
+  void resetCurrentDuration(void);
 
-  protected:
-    byte readPin(byte pin);
-    byte _pin;
-    byte _pressedState;
-    byte _currentState;
-    byte _lastState;
-    byte _stateChanged;
-    unsigned long _lastStateChangeTime;
-    unsigned long _lastStateDuration;
-    unsigned long _prevReleaseTime;
-    unsigned long _prevStateDuration;
+protected:
+  byte readPin(byte pin);
+  byte _pin;
+  byte _pressedState;
+  byte _currentState;
+  byte _lastState;
+  byte _stateChanged;
+  unsigned long _lastStateChangeTime;
+  unsigned long _lastStateDuration;
+  unsigned long _prevReleaseTime;
+  unsigned long _prevStateDuration;
 };

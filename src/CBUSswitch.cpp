@@ -35,7 +35,7 @@
 
 */
 
-#include <Streaming.h>
+// #include <Streaming.h>
 #include "CBUSswitch.h"
 
 //
@@ -51,7 +51,7 @@ void CBUSSwitch::setPin(byte pin, byte pressedState = LOW) {
     pinMode(_pin, INPUT_PULLUP);
 
   reset();
-  _currentState = readPin(_pin);  
+  _currentState = readPin(_pin);
 }
 
 void CBUSSwitch::reset(void) {
