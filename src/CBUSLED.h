@@ -45,7 +45,7 @@
 #define PULSE_ON_TIME 50
 
 #include <Arduino.h>      // for definition of byte datatype
-#include <Streaming.h>
+// #include <Streaming.h>
 
 //
 /// class to encapsulate a non-blocking LED
