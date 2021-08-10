@@ -36,7 +36,7 @@
 */
 
 // 3rd party libraries
-// #include <Streaming.h>
+#include <Streaming.h>
 
 // CBUS library
 #include <CBUS.h>
@@ -44,26 +44,29 @@
 // CBUS configuration object, declared externally
 extern CBUSConfig config;
 
+// forward function declarations
+void makeHeader_impl(CANFrame *msg, byte priority = 0x0b);
+
 //
 /// register the user handler for learned events
 //
 
-void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
+void CBUSbase::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
   eventhandler = fptr;
+}
+
+// overloaded form which receives the opcode on/off state and the first event variable
+
+void CBUSbase::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
+  eventhandlerex = fptr;
 }
 
 //
 /// register the user handler for CAN frames
-/// note overloaded version with user array of opcodes to match
+/// default args in .h declaration for opcodes array (NULL) and size (0)
 //
 
-void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg)) {
-  framehandler = fptr;
-  _opcodes = NULL;
-  _num_opcodes = 0;
-}
-
-void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes) {
+void CBUSbase::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
   framehandler = fptr;
   _opcodes = opcodes;
   _num_opcodes = num_opcodes;
@@ -73,7 +76,7 @@ void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_
 /// assign the module parameter set
 //
 
-void CBUS::setParams(unsigned char *mparams) {
+void CBUSbase::setParams(unsigned char *mparams) {
   _mparams = mparams;
 }
 
@@ -81,7 +84,7 @@ void CBUS::setParams(unsigned char *mparams) {
 /// assign the module name
 //
 
-void CBUS::setName(unsigned char *mname) {
+void CBUSbase::setName(unsigned char *mname) {
   _mname = mname;
 }
 
@@ -89,23 +92,21 @@ void CBUS::setName(unsigned char *mname) {
 /// set module to SLiM mode
 //
 
-void CBUS::setSLiM(void) {
+void CBUSbase::setSLiM(void) {
 
   bModeChanging = false;
   config.setNodeNum(0);
   config.setFLiM(false);
   config.setCANID(0);
 
-  if (UI) {
-    indicateMode(config.FLiM);
-  }
+  indicateMode(config.FLiM);
 }
 
 //
 /// extract CANID from CAN frame header
 //
 
-byte CBUS::getCANID(unsigned long header) {
+byte CBUSbase::getCANID(unsigned long header) {
 
   return header & 0x7f;
 }
@@ -114,7 +115,7 @@ byte CBUS::getCANID(unsigned long header) {
 /// send a WRACK (write acknowledge) message
 //
 
-bool CBUS::sendWRACK(void) {
+bool CBUSbase::sendWRACK(void) {
 
   // send a write acknowledgement response
 
@@ -130,7 +131,7 @@ bool CBUS::sendWRACK(void) {
 /// send a CMDERR (command error) message
 //
 
-bool CBUS::sendCMDERR(byte cerrno) {
+bool CBUSbase::sendCMDERR(byte cerrno) {
 
   // send a command error response
 
@@ -147,7 +148,7 @@ bool CBUS::sendCMDERR(byte cerrno) {
 /// is this an Extended CAN frame ?
 //
 
-bool CBUS::isExt(CANFrame *amsg) {
+bool CBUSbase::isExt(CANFrame *amsg) {
 
   return (amsg->ext);
 }
@@ -156,7 +157,7 @@ bool CBUS::isExt(CANFrame *amsg) {
 /// is this a Remote frame ?
 //
 
-bool CBUS::isRTR(CANFrame *amsg) {
+bool CBUSbase::isRTR(CANFrame *amsg) {
 
   return (amsg->rtr);
 }
@@ -165,7 +166,7 @@ bool CBUS::isRTR(CANFrame *amsg) {
 /// if in FLiM mode, initiate a CAN ID enumeration cycle
 //
 
-void CBUS::CANenumeration(void) {
+void CBUSbase::CANenumeration(void) {
 
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
@@ -174,14 +175,7 @@ void CBUS::CANenumeration(void) {
   // set global variables
   bCANenum = true;                  // we are enumerating
   CANenumTime = millis();           // the cycle start time
-  bCANenumComplete = false;         // the 100ms cycle has not completed
-  selected_id = 1;
-  enums = 0;                        // number of zero-length messages received
-
-  // clear the results array (16 bytes * 8 bits = 128 bits)
-  for (byte i = 0; i < 16; i++) {
-    enum_responses[i] = 0;
-  }
+  memset(enum_responses, 0, sizeof(enum_responses));
 
   // send zero-length RTR frame
   _msg.len = 0;
@@ -195,13 +189,11 @@ void CBUS::CANenumeration(void) {
 /// initiate the transition from SLiM to FLiM mode
 //
 
-void CBUS::initFLiM(void) {
+void CBUSbase::initFLiM(void) {
 
   // Serial << F("> initiating FLiM negotation") << endl;
 
-  if (UI) {
-    indicateMode(MODE_CHANGING);
-  }
+  indicateMode(MODE_CHANGING);
 
   bModeChanging = true;
   timeOutTimer = millis();
@@ -221,7 +213,7 @@ void CBUS::initFLiM(void) {
 /// revert from FLiM to SLiM mode
 //
 
-void CBUS::revertSLiM(void) {
+void CBUSbase::revertSLiM(void) {
 
   // Serial << F("> reverting to SLiM mode") << endl;
 
@@ -240,7 +232,7 @@ void CBUS::revertSLiM(void) {
 /// change or re-confirm node number
 //
 
-void CBUS::renegotiate(void) {
+void CBUSbase::renegotiate(void) {
 
   initFLiM();
 }
@@ -249,7 +241,7 @@ void CBUS::renegotiate(void) {
 /// assign the two CBUS LED objects
 //
 
-void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
+void CBUSbase::setLEDs(CBUSLED green, CBUSLED yellow) {
 
   UI = true;
   _ledGrn = green;
@@ -262,7 +254,7 @@ void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
 /// assign the CBUS pushbutton switch object
 //
 
-void CBUS::setSwitch(CBUSSwitch sw) {
+void CBUSbase::setSwitch(CBUSSwitch sw) {
 
   UI = true;
   _sw = sw;
@@ -272,7 +264,7 @@ void CBUS::setSwitch(CBUSSwitch sw) {
 /// set the CBUS LEDs to indicate the current mode
 //
 
-void CBUS::indicateMode(byte mode) {
+void CBUSbase::indicateMode(byte mode) {
 
   // Serial << F("> indicating mode = ") << mode << endl;
 
@@ -302,10 +294,9 @@ void CBUS::indicateMode(byte mode) {
 
 /// main CBUS message processing procedure
 
-void CBUS::process(void) {
+void CBUSbase::process(byte num_messages) {
 
-  byte remoteCANID = 0, nvindex = 0, nvval = 0, evnum = 0, evindex = 0, evval = 0;
-  byte tarray[4];
+  byte remoteCANID = 0, nvindex = 0, evindex = 0, evval = 0;
   unsigned int nn = 0, en = 0, j = 0, opc;
 
   // start bus enumeration if required
@@ -372,11 +363,11 @@ void CBUS::process(void) {
   }
 
   // get received CAN frames from buffer
-  // process at most 5 messages per run so we don't become unresponsive under load
+  // process by default 3 messages per run so the user's application code doesn't appear unresponsive under load
 
   byte mcount = 0;
 
-  while (available() && mcount < 5) {
+  while (available() && mcount < num_messages) {
 
     ++mcount;
 
@@ -450,29 +441,30 @@ void CBUS::process(void) {
     }
 
     // are we enumerating CANIDs ?
-    if (bCANenum && !bCANenumComplete) {
+    // if (bCANenum && !bCANenumComplete) {
+    if (bCANenum && _msg.len == 0) {
 
       //  a frame with zero-length message is an ENUM response
-      if (_msg.len == 0) {
+      //if (_msg.len == 0) {
 
-        // enumeratiom timer is still running -- process the CANID of this frame
-        // Serial << F("> zero - length frame from CANID = ") << remoteCANID << endl;
-        ++enums;
+      // enumeratiom timer is still running -- process the CANID of this frame
+      // Serial << F("> zero - length frame from CANID = ") << remoteCANID << endl;
+      // ++enums;
 
-        // is there a clash with my current CANID ?
-        // ignore - the module will choose an unused one at the end of enumeration
-        // if (remoteCANID == config.CANID) {
-        // Serial << F("> !!! there was a clash with my current CANID !!!") << endl;
-        // }
+      // is there a clash with my current CANID ?
+      // ignore - the module will choose an unused one at the end of enumeration
+      // if (remoteCANID == config.CANID) {
+      // Serial << F("> !!! there was a clash with my current CANID !!!") << endl;
+      // }
 
-        // store this response in the responses array
-        if (remoteCANID > 0) {
-          bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
-          // Serial << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
-        }
-
-        continue;
+      // store this response in the responses array
+      if (remoteCANID > 0) {
+        bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
+        // Serial << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
       }
+
+      continue;
+      //}
     }
 
     //
@@ -491,31 +483,24 @@ void CBUS::process(void) {
       case OPC_ACON2:
       case OPC_ACON3:
 
-      case OPC_ACOF:
-      case OPC_ACOF1:
-      case OPC_ACOF2:
-      case OPC_ACOF3:
-
       case OPC_ASON:
       case OPC_ASON1:
       case OPC_ASON2:
       case OPC_ASON3:
+
+      case OPC_ACOF:
+      case OPC_ACOF1:
+      case OPC_ACOF2:
+      case OPC_ACOF3:
 
       case OPC_ASOF:
       case OPC_ASOF1:
       case OPC_ASOF2:
       case OPC_ASOF3:
 
-        // accessory on or off
-        // try to find a matching stored event -- match on: nn, en
-
-        index = config.findExistingEvent(nn, en);
-
-        if (index < config.EE_MAX_EVENTS) {
-          // do the module-specific action for a CBUS accessory on/off message
-          if (eventhandler != NULL) {
-            (void)(*eventhandler)(index, &_msg);
-          }
+        // lookup this accessory event in the event table and call the user's registered callback function
+        if (eventhandler || eventhandlerex) {
+          processAccessoryEvent(nn, en, (opc % 2 == 0));
         }
 
         break;
@@ -564,8 +549,8 @@ void CBUS::process(void) {
 
             _msg.len = 5;
             _msg.data[0] = OPC_PARAN;
-            _msg.data[1] = highByte(config.nodeNum);
-            _msg.data[2] = lowByte(config.nodeNum);
+            // _msg.data[1] = highByte(config.nodeNum);
+            // _msg.data[2] = lowByte(config.nodeNum);
             _msg.data[3] = paran;
             _msg.data[4] = _mparams[paran];
             sendMessage(&_msg);
@@ -601,10 +586,7 @@ void CBUS::process(void) {
           // we are now in FLiM mode - update the configuration
           bModeChanging = false;
           config.setFLiM(true);
-
-          if (UI) {
-            indicateMode(config.FLiM);
-          }
+          indicateMode(config.FLiM);
 
           // enumerate the CAN bus to allocate a free CAN ID
           CANenumeration();
@@ -646,19 +628,15 @@ void CBUS::process(void) {
         // received NVRD -- read NV by index
         if (nn == config.nodeNum) {
 
-          nvindex = _msg.data[3];
-          // Serial << F("> NVRD for nn = ") << nn << F(", nv index = ") << nvindex << endl;
-
           if (nvindex > config.EE_NUM_NVS) {
             sendCMDERR(10);
           } else {
             // respond with NVANS
             _msg.len = 5;
             _msg.data[0] = OPC_NVANS;
-            _msg.data[1] = highByte(config.nodeNum);
-            _msg.data[2] = lowByte(config.nodeNum);
-            _msg.data[3] = nvindex;
-            _msg.data[4] = config.readNV(nvindex);
+            // _msg.data[1] = highByte(config.nodeNum);
+            // _msg.data[2] = lowByte(config.nodeNum);
+            _msg.data[4] = config.readNV(_msg.data[3]);
             sendMessage(&_msg);
           }
         }
@@ -669,15 +647,11 @@ void CBUS::process(void) {
         // received NVSET -- set NV by index
         if (nn == config.nodeNum) {
 
-          nvindex = _msg.data[3];
-          nvval = _msg.data[4];
-          // Serial << F("> NVSET for index = ") << nvindex << F(", val = ") << nvval << endl;
-
-          if (nvindex > config.EE_NUM_NVS) {
+          if (_msg.data[3] > config.EE_NUM_NVS) {
             sendCMDERR(10);
           } else {
             // update EEPROM for this NV -- NVs are indexed from 1, not zero
-            config.writeNV(nvindex, nvval);
+            config.writeNV( _msg.data[3], _msg.data[4]);
             // respond with WRACK
             sendWRACK();
           }
@@ -721,7 +695,7 @@ void CBUS::process(void) {
             sendWRACK();
 
           } else {
-            // Serial << F("> did not find event to delete") << endl;
+            // Serial << F("> did not find event to unlearn") << endl;
             // respond with CMDERR
             sendCMDERR(10);
           }
@@ -748,15 +722,12 @@ void CBUS::process(void) {
 
         if (nn == config.nodeNum) {
 
-          evnum = config.numEvents();
-          // Serial << F("> replying to RQEVN with stored events = ") << evnum << endl;
-
           // respond with 0x74 NUMEV
           _msg.len = 4;
           _msg.data[0] = OPC_NUMEV;
-          _msg.data[1] = highByte(config.nodeNum);
-          _msg.data[2] = lowByte(config.nodeNum);
-          _msg.data[3] = evnum;
+          // _msg.data[1] = highByte(config.nodeNum);
+          // _msg.data[2] = lowByte(config.nodeNum);
+          _msg.data[3] = config.numEvents();
 
           sendMessage(&_msg);
         }
@@ -768,8 +739,6 @@ void CBUS::process(void) {
         // Serial << F("> NERD : request all stored events for nn = ") << nn << endl;
 
         if (nn == config.nodeNum) {
-
-          evnum = 0;
           _msg.len = 8;
           _msg.data[0] = OPC_ENRSP;                       // response opcode
           _msg.data[1] = highByte(config.nodeNum);        // my NN hi
@@ -781,14 +750,9 @@ void CBUS::process(void) {
               // it's a valid stored event
 
               // read the event data from EEPROM
-              config.readEvent(i, tarray);
-
               // construct and send a ENRSP message
-              _msg.data[3] = tarray[0];     // event NNhi
-              _msg.data[4] = tarray[1];     // event NNlo
-              _msg.data[5] = tarray[2];     // event ENhi
-              _msg.data[6] = tarray[3];     // event ENlo
-              _msg.data[7] = i;             // event table index
+              config.readEvent(i, &_msg.data[3]);
+              _msg.data[7] = i;                           // event table index
 
               // Serial << F("> sending ENRSP reply for event index = ") << i << endl;
               sendMessage(&_msg);
@@ -806,25 +770,13 @@ void CBUS::process(void) {
 
         if (nn == config.nodeNum) {
 
-          byte eventidx = _msg.data[3];      // stored event index, from 0
-          byte evvaridx = _msg.data[4];      // event var index, from 1
-
-          // Serial << F("> REVAL -- request event variable for nn = ") << nn << F(", eventidx = ") << eventidx << F(", evvaridx = ") << evvaridx << endl;
-
-          if (config.getEvTableEntry(eventidx) != 0) {
-
-            // byte evval = ((byte)config.readEEPROM(config.EE_EVENTS_START + (eventidx * config.EE_BYTES_PER_EVENT) + 4 + (evvaridx - 1)));
-            byte evval = config.getEventEVval(eventidx, evvaridx);
-            // Serial << F("> evval = ") << evval << endl;
+          if (config.getEvTableEntry(_msg.data[3]) != 0) {
 
             _msg.len = 6;
             _msg.data[0] = OPC_NEVAL;
-            _msg.data[1] = highByte(config.nodeNum);
-            _msg.data[2] = lowByte(config.nodeNum);
-            _msg.data[3] = eventidx;
-            _msg.data[4] = evvaridx;
-            _msg.data[5] = evval;
-
+            // _msg.data[1] = highByte(config.nodeNum);
+            // _msg.data[2] = lowByte(config.nodeNum);
+            _msg.data[5] = config.getEventEVval(_msg.data[3], _msg.data[4]);
             sendMessage(&_msg);
           } else {
 
@@ -863,6 +815,7 @@ void CBUS::process(void) {
 
           byte free_slots = 0;
 
+          // count free slots using the event hash table
           for (byte i = 0; i < config.EE_MAX_EVENTS; i++) {
             if (config.getEvTableEntry(i) == 0) {
               ++free_slots;
@@ -873,8 +826,8 @@ void CBUS::process(void) {
           // memset(&_msg, 0, sizeof(_msg));
           _msg.len = 4;
           _msg.data[0] = OPC_EVNLF;
-          _msg.data[1] = highByte(config.nodeNum);
-          _msg.data[2] = lowByte(config.nodeNum);
+          // _msg.data[1] = highByte(config.nodeNum);
+          // _msg.data[2] = lowByte(config.nodeNum);
           _msg.data[3] = free_slots;
           sendMessage(&_msg);
         }
@@ -941,15 +894,11 @@ void CBUS::process(void) {
           if (index < config.EE_MAX_EVENTS) {
 
             // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-            // Serial << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (EE_EVENTS_START + (index * EE_BYTES_PER_EVENT)) << endl;
+            // Serial << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (config.EE_EVENTS_START + (index * config.EE_BYTES_PER_EVENT)) << endl;
 
             // don't repeat this for subsequent EVs
             if (evindex < 2) {
-              tarray[0] = highByte(nn);
-              tarray[1] = lowByte(nn);
-              tarray[2] = highByte(en);
-              tarray[3] = lowByte(en);
-              config.writeEvent(index, tarray);
+              config.writeEvent(index, &_msg.data[1]);
             }
 
             config.writeEventEV(index, evindex, evval);
@@ -982,13 +931,20 @@ void CBUS::process(void) {
         break;
 
       case OPC_RSTAT:
-        // command station status -- not applicable to modules
+        // command station status -- not applicable to accessory modules
         break;
 
       // case OPC_ARST:
       // system reset ... this is not what I thought it meant !
       // config.reboot();
       // break;
+
+      case OPC_LMSG:
+        // CBUS long message
+        if (longMessageHandler != NULL) {
+          longMessageHandler->processReceivedMessageFragment(&_msg);
+        }
+        break;
 
       default:
         // unknown or unhandled OPC
@@ -1000,6 +956,7 @@ void CBUS::process(void) {
     }
   }  // while messages available
 
+
   // check CAN bus enumeration timer
   checkCANenum();
 
@@ -1010,10 +967,7 @@ void CBUS::process(void) {
   if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
 
     // Serial << F("> timeout expired, FLiM = ") << FLiM << F(", mode change = ") << bModeChanging << endl;
-    if (UI) {
-      indicateMode(config.FLiM);
-    }
-
+    indicateMode(config.FLiM);
     bModeChanging = false;
   }
 
@@ -1026,13 +980,16 @@ void CBUS::process(void) {
   return;
 }
 
-void CBUS::checkCANenum(void) {
+void CBUSbase::checkCANenum(void) {
 
   //
   /// check the 100ms CAN enumeration cycle timer
   //
 
-  if (bCANenum && !bCANenumComplete && (millis() - CANenumTime) >= 100) {
+  byte selected_id = 1;     // default if no responses from other modules
+
+  // if (bCANenum && !bCANenumComplete && (millis() - CANenumTime) >= 100) {
+  if (bCANenum && (millis() - CANenumTime) >= 100) {
 
     // enumeration timer has expired -- stop enumeration and process the responses
 
@@ -1042,16 +999,16 @@ void CBUS::checkCANenum(void) {
     // iterate through the 128 bit field
     for (byte i = 0; i < 16; i++) {
 
+      // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
+      if (enum_responses[i] == 0xff) {
+        continue;
+      }
+
       // for each bit in the byte
       for (byte b = 0; b < 8; b++) {
 
         // ignore first bit of first byte -- CAN ID zero is not used for nodes
         if (i == 0 && b == 0) {
-          continue;
-        }
-
-        // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
-        if (enum_responses[i] == 0xff) {
           continue;
         }
 
@@ -1067,7 +1024,7 @@ void CBUS::checkCANenum(void) {
 
     // Serial << F("> enumeration responses = ") << enums << F(", lowest available CAN id = ") << selected_id << endl;
 
-    bCANenumComplete = true;
+    // bCANenumComplete = true;
     bCANenum = false;
     CANenumTime = 0UL;
 
@@ -1084,48 +1041,73 @@ void CBUS::checkCANenum(void) {
 }
 
 //
-/// utility to create a CAN header
+/// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
 
-void CBUS::makeHeader(CANFrame *msg) {
+void CBUSbase::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
 
-  uint16_t t = 0;
+  // should really test whether neither event handler has been registered, but it's a very unlikely scenario
 
-  // set the CANID
-  t = config.CANID;
+  // try to find a matching stored event -- match on nn, en
+  byte index = config.findExistingEvent(nn, en);
 
-  // set the CBUS message priority - zeroes equate to higher priority
-  // bits 7 and 8 are the minor priority, so 11 = 'low'
-  bitSet(t, 7);
-  bitSet(t, 8);
+  // call any registered event handler
 
-  // bits 9 and 10 are the major priority, so 01 = 'medium'
-  bitClear(t, 9);
-  bitSet(t, 10);
-
-  // copy the temporary value
-  msg->id = t;
+  if (index < config.EE_MAX_EVENTS) {
+    if (eventhandler != NULL) {
+      (void)(*eventhandler)(index, & _msg);
+    } else if (eventhandlerex != NULL) {
+      (void)(*eventhandlerex)(index, & _msg, is_on_event, \
+                              ((config.EE_NUM_EVS > 0) ? config.getEventEVval(index, 1) : 0) \
+                             );
+    }
+  }
 }
 
 //
-/// constructor for CANFrame class
+/// set the long message handler object to receive long message frames
 //
 
-CANFrame::CANFrame() {
+void CBUSbase::setLongMessageHandler(CBUSLongMessage *handler) {
+  longMessageHandler = handler;
+}
 
-  // set the current CAN ID in the frame header
-  id = config.CANID;
+//
+/// utility method to populate a CBUS message header
+//
+
+void CBUSbase::makeHeader(CANFrame *msg, byte priority) {
+
+  makeHeader_impl(msg, priority);
+  return;
+}
+
+//
+/// actual implementation of the makeHeader method
+/// so it can be called directly or as a CBUS class method
+/// priority = 1011 as default argument
+//
+
+void makeHeader_impl(CANFrame *msg, byte priority) {
+
+  // set the CBUS CANID
+  msg->id = config.CANID;
 
   // set the CBUS message priority - zeroes equate to higher priority
-  // bits 7 and 8 are the minor priority, so 11 = 'low'
-  bitSet(id, 7);
-  bitSet(id, 8);
 
-  // bits 9 and 10 are the major priority, so 01 = 'medium'
-  bitClear(id, 9);
-  bitSet(id, 10);
+  // default value is 1011 = 0x0b
 
-  ext = false;
-  rtr = false;
-  len = 0;
+  // bits 9 and 10 are the major priority, so 10 = normal
+  // bits 7 and 8 are the minor priority, so 11 = lowest
+
+  // set - number |= 1UL << n;
+  // clear - number &= ~(1UL << n);
+  // check/read - bit = (number >> n) & 1U;
+
+  bitWrite(msg->id, 10, bitRead(priority, 3));
+  bitWrite(msg->id, 9, bitRead(priority, 2));
+  bitWrite(msg->id, 8, bitRead(priority, 1));
+  bitWrite(msg->id, 7, bitRead(priority, 0));
+
+  return;
 }
