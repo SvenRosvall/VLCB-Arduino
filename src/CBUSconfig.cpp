@@ -59,7 +59,8 @@ extern "C" char* sbrk(int incr);
 #include "CBUSconfig.h"
 
 // the event hash table
-byte evhashtbl[64];
+//byte evhashtbl[64];
+byte *evhashtbl;
 bool hash_collision = false;
 
 #ifdef __SAM3X8E__
@@ -213,7 +214,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
     if (evhashtbl[i] == tmphash) {
       if (!hash_collision) {
-        // NN + EN hash matches and there are no hash collisions in the local has table
+        // NN + EN hash matches and there are no hash collisions in the hash table
       } else {
         // there is a potential hash collision, so we have to check the slower way
         // first, check if this hash appears in the table more than once
@@ -303,8 +304,9 @@ byte CBUSConfig::makeHash(byte tarr[4]) {
   hash = nn ^ (nn >> 8);
   hash = 7 * hash + (en ^ (en >> 8));
 
-  // ensure it is within bounds
+  // ensure it is within bounds and non-zero
   hash %= HASH_LENGTH;
+  hash = (hash == 0) ? 255 : hash;
 
   // Serial << F("> makeHash - hash of nn = ") << nn << F(", en = ") << en << F(", = ") << hash << endl;
   return hash;
@@ -353,6 +355,8 @@ void CBUSConfig::makeEvHashTable(void) {
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
   // Serial << F("> creating event hash table") << endl;
+
+  evhashtbl = (byte *)malloc(EE_MAX_EVENTS * sizeof(byte));
 
   for (byte idx = 0; idx < EE_MAX_EVENTS; idx++) {
 
@@ -426,7 +430,7 @@ void CBUSConfig::printEvHashTable(bool raw) {
       if (raw)
         Serial << evhashtbl[i] << endl;
       else
-        Serial << i << " -" << evhashtbl[i];
+        Serial << i << " - " << evhashtbl[i] << endl;
     }
   }
 
@@ -746,25 +750,25 @@ void CBUSConfig::reboot(void) {
 
 // for older AVR Mega, e.g. Uno, Nano, Mega
 #if AVR_RESET_METHOD == 1      // 1. the preferred way
-#warning "Using reset method 1"
+// #warning "Using reset method 1"
   wdt_disable();
   wdt_enable(WDTO_15MS);
   while (1) {}
 #endif
 
 #if AVR_RESET_METHOD == 2      // 2. a variation on the watchdog method
-#warning "Using reset method 2"
+// #warning "Using reset method 2"
   wdt_enable(WDTO_15MS);
   while (1) {}
 #endif
 
 #if AVR_RESET_METHOD == 3      // 3. a dirty way
-#warning "Using reset method 3"
+// #warning "Using reset method 3"
   asm volatile ("jmp 0");
 #endif
 
 #if AVR_RESET_METHOD == 4      // 4. another dirty way
-#warning "Using reset method 4"
+// #warning "Using reset method 4"
   rebootFunc();
 #endif
 
@@ -958,10 +962,8 @@ void CBUSConfig::loadNVs(void) {
 
 bool CBUSConfig::check_hash_collisions(void) {
 
-  byte count = sizeof(evhashtbl) / sizeof(evhashtbl[0]);
-
-  for (byte i = 0; i < count - 1; i++) {
-    for (byte j = i + 1; j < count; j++) {
+  for (byte i = 0; i < EE_MAX_EVENTS - 1; i++) {
+    for (byte j = i + 1; j < EE_MAX_EVENTS; j++) {
       if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0) {
         // Serial << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
         // return when first collision detected
