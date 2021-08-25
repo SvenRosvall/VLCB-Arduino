@@ -86,7 +86,7 @@ bool CBUS2515::begin(bool poll) {
   settings.mTransmitBuffer2Size = _num_tx_buffers;
 
   // start SPI
-  // SPI.begin();
+  SPI.begin();
 
   // instantiate CAN bus object
   // if in polling mode, the interrupt pin and ISR not used
