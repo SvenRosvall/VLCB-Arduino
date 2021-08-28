@@ -73,7 +73,7 @@ DueFlashStorage dueFlashStorage;
 
 void CBUSConfig::begin(void) {
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.begin(EE_EVENTS_START + (EE_MAX_EVENTS * EE_BYTES_PER_EVENT));
 #endif
 
@@ -132,7 +132,7 @@ void CBUSConfig::setFLiM(bool f) {
   EEPROM.write(0, f);
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
@@ -155,7 +155,7 @@ void CBUSConfig::setCANID(byte canid) {
   EEPROM.write(1, canid);
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
@@ -180,7 +180,7 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
   EEPROM.write(3, lowByte(nodeNum));
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
@@ -495,7 +495,7 @@ void CBUSConfig::writeNV(byte idx, byte val) {
   EEPROM.write(EE_NVS_START + (idx - 1), val);
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
@@ -614,7 +614,7 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
     EEPROM.write(eeaddress, data);
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
     EEPROM.commit();
 #endif
 
@@ -664,7 +664,7 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
 #endif
     }
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
     EEPROM.commit();
 #endif
 
@@ -776,7 +776,7 @@ void CBUSConfig::reboot(void) {
 #endif  // AVR
 
 // for ESP32
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   ESP.restart();
 #endif
 
@@ -805,7 +805,7 @@ unsigned int CBUSConfig::freeSRAM(void) {
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   return ESP.getFreeHeap();
 #endif
 
@@ -890,7 +890,7 @@ void CBUSConfig::resetModule(void) {
   }
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
@@ -918,7 +918,7 @@ void CBUSConfig::resetModule(void) {
   EEPROM.write(5, 99);    // set reset indicator
 #endif
 
-#ifdef ESP32
+#if defined ESP32 || defined ESP8266
   EEPROM.commit();
 #endif
 
