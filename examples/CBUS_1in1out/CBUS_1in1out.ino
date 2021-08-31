@@ -132,9 +132,9 @@ void setupCBUS()
   }
 
   // opportunity to set default NVs after module reset
-  if (EEPROM.read(5) == 99) {
+  if (config.readEEPROM(5) == 99) {
     Serial << F("> module has been reset") << endl;
-    EEPROM.write(5, 0);
+    config.writeEEPROM(5, 0);
   }
 
   // register our CBUS event handler, to receive event messages of learned events
