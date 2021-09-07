@@ -48,7 +48,7 @@ uint32_t crc32(const char *s, size_t n);
 
 //
 /// constructor
-/// receives a reference to a CBUS object which provides the message sending capability
+/// receives a pointer to a CBUS object which provides the message sending capability
 //
 
 CBUSLongMessage::CBUSLongMessage(CBUSbase *cbus_object_ptr) {
@@ -57,6 +57,9 @@ CBUSLongMessage::CBUSLongMessage(CBUSbase *cbus_object_ptr) {
 	_send_priority = DEFAULT_PRIORITY;
 	_msg_delay = LONG_MESSAGE_DEFAULT_DELAY;
 	_receive_timeout = LONG_MESSAGE_RECEIVE_TIMEOUT;
+	_send_buffer_index = 0;
+	_send_buffer_len = 0;
+	_num_stream_ids = 0;
 	_cbus_object_ptr->setLongMessageHandler(this);
 }
 
@@ -64,15 +67,15 @@ CBUSLongMessage::CBUSLongMessage(CBUSbase *cbus_object_ptr) {
 /// subscribe to a range of stream IDs
 //
 
-void CBUSLongMessage::subscribe(byte *stream_ids, const byte num_stream_ids, byte *receive_buffer, const unsigned int receive_buff_len, void (*messagehandler)(byte *msg, unsigned int msg_len, byte stream_id, byte status)) {
+void CBUSLongMessage::subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buff_len, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status)) {
 
 	_stream_ids = stream_ids;
 	_num_stream_ids = num_stream_ids;
-	_receive_buffer = receive_buffer;
+	_receive_buffer = (byte *)receive_buffer;
 	_receive_buff_len = receive_buff_len;
 	_messagehandler = messagehandler;
 
-	Serial << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
+	// Serial << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 	return;
 }
 
@@ -82,7 +85,7 @@ void CBUSLongMessage::subscribe(byte *stream_ids, const byte num_stream_ids, byt
 /// the remainder of the message is sent in chunks from the process() method
 //
 
-bool CBUSLongMessage::sendLongMessage(const byte *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
+bool CBUSLongMessage::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
 
 	CANFrame frame;
 
@@ -108,7 +111,7 @@ bool CBUSLongMessage::sendLongMessage(const byte *msg, const unsigned int msg_le
 	frame.data[4] = lowByte(msg_len);
 	frame.data[5] = 0;																																// CRC - not currently implemented
 	frame.data[6] = 0;
-	frame.data[7] = 0;																																// flags - not currently used
+	frame.data[7] = 0;																																// flags - not currently handled
 
 	bool ret = sendMessageFragment(&frame, _send_priority);														// send the header packet
 	++_send_sequence_num;																															// increment the sending sequence number - it's fine if it wraps around
@@ -118,12 +121,13 @@ bool CBUSLongMessage::sendLongMessage(const byte *msg, const unsigned int msg_le
 }
 
 //
-/// the process method is called regularly from the main CBUS loop
-/// we use this to send the individual fragments of an outgoing message
+/// the process method is called regularly from the user's loop function
+/// we use this to send the individual fragments of an outgoing message and check the message receive timeout
 //
 
-void CBUSLongMessage::process(void) {
+bool CBUSLongMessage::process(void) {
 
+	bool ret = true;
 	byte i;
 	CANFrame frame;
 
@@ -135,6 +139,8 @@ void CBUSLongMessage::process(void) {
 		_is_receiving = false;
 		_incoming_message_length = 0;
 		_incoming_bytes_received = 0;
+
+		// timeout error status is surfaced to the user's handler function
 	}
 
 	/// send the next outgoing fragment, after a configurable delay to avoid flooding the bus
@@ -145,7 +151,7 @@ void CBUSLongMessage::process(void) {
 
 		memset(&frame.data, 0, sizeof(frame.data));
 		frame.data[1] = _send_stream_id;
-		frame.data[2] = _send_sequence_num++;
+		frame.data[2] = _send_sequence_num;
 
 		/// only the last fragment is potentially less than 5 bytes long
 
@@ -155,11 +161,13 @@ void CBUSLongMessage::process(void) {
 			++_send_buffer_index;
 		}
 
-		sendMessageFragment(&frame, _send_priority);																			// send the data packet
-		// Serial << F("> L: process: sent message fragment, size = ") << i << F(", send buffer len = ") << _send_buffer_len << F(", index now = ") << _send_buffer_index << endl;
+		ret = sendMessageFragment(&frame, _send_priority);																			// send the data packet
+		// Serial << F("> L: process: sent message fragment, seq = ") << _send_sequence_num << F(", size = ") << i << endl;
+
+		++_send_sequence_num;
 	}
 
-	return;
+	return ret;
 }
 
 //
@@ -171,7 +179,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 
 	/// handle a received message fragment
 
-	Serial << F("> L: processing received long message packet, message length = ") << _incoming_message_length << F(", rcvd so far = ") << _incoming_bytes_received << endl;
+	// Serial << F("> L: processing received long message packet, message length = ") << _incoming_message_length << F(", rcvd so far = ") << _incoming_bytes_received << endl;
 
 	_last_fragment_received = millis();
 
@@ -190,7 +198,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 					memset(_receive_buffer, 0, _receive_buff_len);
 					_receive_buffer_index = 0;
 					_expected_next_receive_sequence_num = 0;
-					Serial << F("> L: received header packet for stream id = ") << _receive_stream_id << F(", message length = ") << _incoming_message_length << F(", user buffer len = ") << _receive_buff_len << endl;
+					// Serial << F("> L: received header packet for stream id = ") << _receive_stream_id << F(", message length = ") << _incoming_message_length << F(", user buffer len = ") << _receive_buff_len << endl;
 					break;
 				}
 			}
@@ -202,7 +210,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 
 			if (frame->data[2] == _expected_next_receive_sequence_num) {										// and it's the expected sequence id
 
-				Serial << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
+				// Serial << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
 
 				// for each of the maximum five payload bytes, up to the total message length and the user buffer length
 				for (j = 0; j < 5; j++) {
@@ -214,7 +222,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 
 					// if we have read the entire message
 					if (_incoming_bytes_received >= _incoming_message_length) {
-						Serial << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
+						// Serial << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
 						(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
 						_receive_buffer_index = 0;
 						memset(_receive_buffer, 0, _receive_buff_len);
@@ -222,7 +230,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 
 						// if the user buffer is full
 					} else if (_receive_buffer_index >= _receive_buff_len ) {
-						Serial << F("> L: user buffer is full") << endl;
+						// Serial << F("> L: user buffer is full") << endl;
 						(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_INCOMPLETE);
 						_receive_buffer_index = 0;
 						memset(_receive_buffer, 0, _receive_buff_len);
@@ -238,7 +246,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 			}
 
 		} else {																																					// probably another stream in progress - we'll ignore it as we don't support concurrent streams
-			Serial << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
+			// Serial << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
 		}
 
 	}	// it's a continuation fragment
@@ -249,11 +257,11 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 	/// finally, once the message has been completely received ...
 
 	if (_incoming_message_length > 0 && _incoming_bytes_received >= _incoming_message_length) {
-		Serial << F("> L: message is complete") << endl;
+		// Serial << F("> L: message is complete") << endl;
 
 		// surface any final fragment to the user's code
 		if (_receive_buffer_index > 0) {
-			Serial << F("> L: surfacing final fragment") << endl;
+			// Serial << F("> L: surfacing final fragment") << endl;
 			(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
 		}
 
@@ -316,7 +324,7 @@ uint32_t crc32(const char *s, size_t n) {
 
 	uint32_t crc = 0xFFFFFFFF;
 
-	Serial << F("> calculating crc32 for msg = |") << s << F("|") << endl;
+	// Serial << F("> calculating crc32 for msg = |") << s << F("|") << endl;
 
 	for (size_t i = 0; i < n; i++) {
 		char ch = s[i];
@@ -328,8 +336,7 @@ uint32_t crc32(const char *s, size_t n) {
 		}
 	}
 
-	Serial << F("> crc32 = ") << crc << endl;
-
+	// Serial << F("> crc32 = ") << crc << endl;
 	return ~crc;
 }
 

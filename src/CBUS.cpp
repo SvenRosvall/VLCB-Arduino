@@ -934,10 +934,10 @@ void CBUSbase::process(byte num_messages) {
         // command station status -- not applicable to accessory modules
         break;
 
-      // case OPC_ARST:
-      // system reset ... this is not what I thought it meant !
-      // config.reboot();
-      // break;
+        // case OPC_ARST:
+        // system reset ... this is not what I thought it meant !
+        // config.reboot();
+        // break;
 
       case OPC_LMSG:
         // CBUS long message
@@ -955,7 +955,6 @@ void CBUSbase::process(byte num_messages) {
       // Serial << F("> oops ... zero - length frame ?? ") << endl;
     }
   }  // while messages available
-
 
   // check CAN bus enumeration timer
   checkCANenum();

@@ -37,6 +37,8 @@
 
 #pragma once
 
+#include <SPI.h>
+
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
@@ -98,7 +100,7 @@ public:
   // these methods are pure virtual and must be implemented by the derived class
   // as a consequence, it is not possible to create an instance of this class
 
-  virtual bool begin(bool poll = false) = 0;
+  virtual bool begin(bool poll = false, SPIClass spi = SPI) = 0;
   virtual bool available(void) = 0;
   virtual CANFrame getNextMessage(void) = 0;
   virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) = 0;
@@ -126,9 +128,10 @@ public:
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
-  void setLongMessageHandler(CBUSLongMessage *handler);
   void makeHeader(CANFrame *msg, byte priority = DEFAULT_PRIORITY);
   void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
+
+  void setLongMessageHandler(CBUSLongMessage *handler);
 
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
@@ -147,6 +150,7 @@ protected:                                          // protected members become 
   unsigned long timeOutTimer, CANenumTime;
   bool enumeration_required;
   bool UI = false;
+
   CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
 };
 
@@ -159,9 +163,9 @@ class CBUSLongMessage {
 public:
 
   CBUSLongMessage(CBUSbase *cbus_object_ptr);
-  bool sendLongMessage(const byte *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
-  void subscribe(byte *stream_ids, const byte num_stream_ids, byte *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(byte *fragment, unsigned int fragment_len, byte stream_id, byte status));
-  void process(void);
+  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
+  void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
+  bool process(void);
   void processReceivedMessageFragment(const CANFrame *frame);
   bool is_sending(void);
   void setDelay(byte delay_in_millis);
@@ -179,7 +183,6 @@ private:
   _incoming_bytes_received, _receive_timeout, _send_sequence_num, _expected_next_receive_sequence_num;
   unsigned long _last_fragment_sent, _last_fragment_received;
 
-  void (*_messagehandler)(byte *fragment, unsigned int fragment_len, byte stream_id, byte status);        // user callback function to receive long message fragments
+  void (*_messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);        // user callback function to receive long message fragments
   CBUSbase *_cbus_object_ptr;
 };
-
