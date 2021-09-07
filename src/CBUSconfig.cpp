@@ -59,7 +59,6 @@ extern "C" char* sbrk(int incr);
 #include "CBUSconfig.h"
 
 // the event hash table
-//byte evhashtbl[64];
 byte *evhashtbl;
 bool hash_collision = false;
 
@@ -974,3 +973,54 @@ bool CBUSConfig::check_hash_collisions(void) {
 
   return false;
 }
+
+//
+/// architecture-neutral methods to read and write the microcontroller's on-chip EEPROM (or emulation)
+/// as EEPROM.h is not available for all, and a post-write commit may or may not be required
+//
+
+void CBUSConfig::setChipEEPROMVal(unsigned int eeaddress, byte val) {
+
+#ifdef __SAM3X8E__
+  dueFlashStorage.write(eeaddress, val);
+#else
+  EEPROM.write(eeaddress, val);
+#endif
+
+#if defined ESP32 || defined ESP8266 || defined ARDUINO_ARCH_RP2040
+  EEPROM.commit();
+#endif
+}
+
+///
+
+byte CBUSConfig::getChipEEPROMVal(unsigned int eeaddress) {
+
+#ifdef __SAM3X8E__
+  return dueFlashStorage.read(eeaddress);
+#else
+  return EEPROM.read(eeaddress);
+#endif
+}
+
+//
+/// a group of methods to get and set the reset flag
+/// the resetModule method writes the value 99 to EEPROM address 5 when a module reset has been performed
+/// this can be tested at module startup for e.g. setting default NVs or creating producer events
+//ƒ
+
+void CBUSConfig::setResetFlag(void) {
+
+  setChipEEPROMVal(99, 5);
+}
+
+void CBUSConfig::clearResetFlag(void) {
+
+  setChipEEPROMVal(99, 0);
+}
+
+bool CBUSConfig::isResetFlagSet(void) {
+
+  return (getChipEEPROMVal(99) == 5);
+}
+
