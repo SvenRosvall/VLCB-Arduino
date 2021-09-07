@@ -138,7 +138,7 @@ void setupCBUS()
   CBUS.indicateMode(config.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(2);         // more buffers = more memory used, fewer = less
+  CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   CBUS.begin();

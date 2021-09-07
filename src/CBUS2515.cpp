@@ -52,15 +52,14 @@ ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
 //
 
 CBUS2515::CBUS2515() {
-  _num_rx_buffers = NUM_RECV_BUFFS;
-  _num_tx_buffers = 0;
+  _num_rx_buffers = NUM_RX_BUFFS;
+  _num_tx_buffers = NUM_TX_BUFFS;
   eventhandler = NULL;
   eventhandlerex = NULL;
   framehandler = NULL;
   _csPin = MCP2515_CS;
   _intPin = MCP2515_INT;
-  _osc_freq = 16000000UL;
-  _poll = false;
+  _osc_freq = OSCFREQ;
 }
 
 //
@@ -68,7 +67,7 @@ CBUS2515::CBUS2515() {
 /// default poll arg is set to false, so as not to break existing code
 //
 
-bool CBUS2515::begin(bool poll) {
+bool CBUS2515::begin(bool poll, SPIClass spi) {
 
   uint16_t ret;
   bool retval = false;
@@ -82,19 +81,19 @@ bool CBUS2515::begin(bool poll) {
   settings.mRequestedMode = ACAN2515Settings::NormalMode;
   settings.mReceiveBufferSize = _num_rx_buffers;
   settings.mTransmitBuffer0Size = _num_tx_buffers;
-  settings.mTransmitBuffer1Size = _num_tx_buffers;
-  settings.mTransmitBuffer2Size = _num_tx_buffers;
+  settings.mTransmitBuffer1Size = 0;
+  settings.mTransmitBuffer2Size = 0;
 
   // start SPI
-  SPI.begin();
+  spi.begin();
 
   // instantiate CAN bus object
   // if in polling mode, the interrupt pin and ISR not used
   if (_poll) {
-    can = new ACAN2515(_csPin, SPI, 255);
+    can = new ACAN2515(_csPin, spi, 255);
     ret = can->begin(settings, NULL);
   } else {
-    can = new ACAN2515(_csPin, SPI, _intPin);
+    can = new ACAN2515(_csPin, spi, _intPin);
     ret = can->begin(settings, [] {can->isr();});
   }
 
@@ -105,10 +104,6 @@ bool CBUS2515::begin(bool poll) {
     retval = true;
   } else {
     // Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
-  }
-
-  if (_poll) {
-    canp->poll();
   }
 
   return retval;
@@ -136,10 +131,6 @@ CANFrame CBUS2515::getNextMessage(void) {
 
   CANMessage message;       // ACAN2515 frame class
 
-  if (_poll) {
-    canp->poll();
-  }
-
   canp->receive(message);
 
   _msg.id = message.id;
@@ -165,10 +156,6 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 
   CANMessage message;       // ACAN2515 frame class
   bool ret = false;
-
-  if (_poll) {
-    canp->poll();
-  }
 
   makeHeader(msg, priority);                      // default priority unless user overrides
   message.id = msg->id;
