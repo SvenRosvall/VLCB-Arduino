@@ -198,55 +198,62 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 					memset(_receive_buffer, 0, _receive_buff_len);
 					_receive_buffer_index = 0;
 					_expected_next_receive_sequence_num = 0;
+					_sender_canid = (frame->id & 0x7f);
 					// Serial << F("> L: received header packet for stream id = ") << _receive_stream_id << F(", message length = ") << _incoming_message_length << F(", user buffer len = ") << _receive_buff_len << endl;
 					break;
 				}
 			}
 		}
 
-	} else {																																						// we're part way through receiving a message
+	} else {																																							// we're part way through receiving a message
 
-		if (frame->data[1] == _receive_stream_id) {																				// it's the same stream id
+		if ((frame->id & 0x7f) == _sender_canid) {																					// it's the same sender CANID
 
-			if (frame->data[2] == _expected_next_receive_sequence_num) {										// and it's the expected sequence id
+			if (frame->data[1] == _receive_stream_id) {																			  // it's the same stream id
 
-				// Serial << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
+				if (frame->data[2] == _expected_next_receive_sequence_num) {										// and it's the expected sequence id
 
-				// for each of the maximum five payload bytes, up to the total message length and the user buffer length
-				for (j = 0; j < 5; j++) {
+					// Serial << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
 
-					_receive_buffer[_receive_buffer_index] = frame->data[j + 3];								// take the next byte
-					++_receive_buffer_index;																										// increment the buffer index
-					++_incoming_bytes_received;
-					// Serial << F("> L: processing received data byte = ") << (char)frame->data[j + 3] << endl;
+					// for each of the maximum five payload bytes, up to the total message length and the user buffer length
+					for (j = 0; j < 5; j++) {
 
-					// if we have read the entire message
-					if (_incoming_bytes_received >= _incoming_message_length) {
-						// Serial << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
-						(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
-						_receive_buffer_index = 0;
-						memset(_receive_buffer, 0, _receive_buff_len);
-						break;
+						_receive_buffer[_receive_buffer_index] = frame->data[j + 3];								// take the next byte
+						++_receive_buffer_index;																										// increment the buffer index
+						++_incoming_bytes_received;
+						// Serial << F("> L: processing received data byte = ") << (char)frame->data[j + 3] << endl;
 
-						// if the user buffer is full
-					} else if (_receive_buffer_index >= _receive_buff_len ) {
-						// Serial << F("> L: user buffer is full") << endl;
-						(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_INCOMPLETE);
-						_receive_buffer_index = 0;
-						memset(_receive_buffer, 0, _receive_buff_len);
+						// if we have read the entire message
+						if (_incoming_bytes_received >= _incoming_message_length) {
+							// Serial << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
+							(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
+							_receive_buffer_index = 0;
+							memset(_receive_buffer, 0, _receive_buff_len);
+							break;
+
+							// if the user buffer is full
+						} else if (_receive_buffer_index >= _receive_buff_len ) {
+							// Serial << F("> L: user buffer is full") << endl;
+							(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_INCOMPLETE);
+							_receive_buffer_index = 0;
+							memset(_receive_buffer, 0, _receive_buff_len);
+						}
 					}
+
+				} else {																																				// it's the wrong sequence id
+					Serial << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
+					(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_SEQUENCE_ERROR);
+					_incoming_message_length = 0;
+					_incoming_bytes_received = 0;
+					_is_receiving = false;
 				}
 
-			} else {																																				// it's the wrong sequence id
-				Serial << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
-				(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_SEQUENCE_ERROR);
-				_incoming_message_length = 0;
-				_incoming_bytes_received = 0;
-				_is_receiving = false;
+			} else {																																					// probably another stream in progress - we'll ignore it as we don't support concurrent streams
+				// Serial << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
 			}
 
-		} else {																																					// probably another stream in progress - we'll ignore it as we don't support concurrent streams
-			// Serial << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
+		} else {																																						// a different sender CANID - ignore the fragment
+			// Serial << F("> L: ignoring fragment from unexpected CANID") << endl;
 		}
 
 	}	// it's a continuation fragment

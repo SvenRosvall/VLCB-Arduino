@@ -177,8 +177,7 @@ private:
 
   bool _is_receiving;
   byte *_send_buffer, *_receive_buffer;
-  byte _send_stream_id, _receive_stream_id, *_stream_ids, _num_stream_ids, _send_priority;
-  byte _msg_delay;
+  byte _send_stream_id, _receive_stream_id, *_stream_ids, _num_stream_ids, _send_priority, _msg_delay, _sender_canid;
   unsigned int _send_buffer_len, _incoming_message_length, _receive_buff_len, _receive_buffer_index, _send_buffer_index, _incoming_message_crc, \
   _incoming_bytes_received, _receive_timeout, _send_sequence_num, _expected_next_receive_sequence_num;
   unsigned long _last_fragment_sent, _last_fragment_received;
