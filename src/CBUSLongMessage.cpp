@@ -42,13 +42,13 @@
 //
 
 #include <CBUS.h>
-#include <Streaming.h>
+// #include <Streaming.h>
 
 uint32_t crc32(const char *s, size_t n);
 
 //
 /// constructor
-/// receives a pointer to a CBUS object which provides the message sending capability
+/// receives a pointer to a CBUS object which provides the CAN message handling capability
 //
 
 CBUSLongMessage::CBUSLongMessage(CBUSbase *cbus_object_ptr) {
@@ -92,7 +92,7 @@ bool CBUSLongMessage::sendLongMessage(const void *msg, const unsigned int msg_le
 	// Serial << F("> L: sending message header packet, stream id = ") << stream_id << F(", message length = ") << msg_len << F(", first char = ") << (char)msg[0] << endl;
 
 	if (is_sending()) {
-		Serial << F("> L: ERROR: there is already a message is progress") << endl;
+		// Serial << F("> L: ERROR: there is already a message is progress") << endl;
 		return false;
 	}
 
@@ -134,7 +134,7 @@ bool CBUSLongMessage::process(void) {
 	/// check receive timeout
 
 	if (_is_receiving && (millis() - _last_fragment_received >= _receive_timeout)) {
-		Serial << F("> L: ERROR: timed out waiting for continuation packet") << endl;
+		// Serial << F("> L: ERROR: timed out waiting for continuation packet") << endl;
 		(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_TIMEOUT_ERROR);
 		_is_receiving = false;
 		_incoming_message_length = 0;
@@ -231,7 +231,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 							memset(_receive_buffer, 0, _receive_buff_len);
 							break;
 
-							// if the user buffer is full
+							// if the user buffer is full, give the user what we have so far
 						} else if (_receive_buffer_index >= _receive_buff_len ) {
 							// Serial << F("> L: user buffer is full") << endl;
 							(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_INCOMPLETE);
@@ -241,7 +241,7 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 					}
 
 				} else {																																				// it's the wrong sequence id
-					Serial << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
+					// Serial << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
 					(void)(*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id, CBUS_LONG_MESSAGE_SEQUENCE_ERROR);
 					_incoming_message_length = 0;
 					_incoming_bytes_received = 0;
@@ -306,6 +306,11 @@ bool CBUSLongMessage::sendMessageFragment(CANFrame * frame, const byte priority)
 	return (_cbus_object_ptr->sendMessage(frame, false, false, priority));
 }
 
+//
+/// set the delay between send fragments, to avoid flooding the bus and other modules
+/// overrides the default value
+//
+
 void CBUSLongMessage::setDelay(byte delay_in_millis) {
 
 	_msg_delay = delay_in_millis;
@@ -313,7 +318,9 @@ void CBUSLongMessage::setDelay(byte delay_in_millis) {
 }
 
 //
-/// set the delay between send fragments
+/// set the receive timeout
+/// if an expected next fragment is not received, the user's handler function
+/// will be called with the message so far assembled and an error status
 /// overrides the default value
 //
 
