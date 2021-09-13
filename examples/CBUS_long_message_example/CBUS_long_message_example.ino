@@ -57,30 +57,33 @@
 #include <cbusdefs.h>               // MERG CBUS constants
 
 // constants
-const byte VER_MAJ = 1;                  // code major version
-const char VER_MIN = 'a';                // code minor version
-const byte VER_BETA = 0;                 // code beta sub-version
-const byte MODULE_ID = 99;               // CBUS module type
+const byte VER_MAJ = 1;             // code major version
+const char VER_MIN = 'a';           // code minor version
+const byte VER_BETA = 0;            // code beta sub-version
+const byte MODULE_ID = 97;          // CBUS module type
 
-const byte LED_GRN = 4;                  // CBUS green SLiM LED pin
-const byte LED_YLW = 5;                  // CBUS yellow FLiM LED pin
-const byte SWITCH0 = 6;                  // CBUS push button switch pin
+const byte LED_GRN = 4;             // CBUS green SLiM LED pin
+const byte LED_YLW = 5;             // CBUS yellow FLiM LED pin
+const byte SWITCH0 = 6;             // CBUS push button switch pin
 
 // CBUS objects
 CBUS2515 CBUS;                      // CBUS object
 CBUSConfig config;                  // configuration object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
-
-// module objects
-CBUSSwitch moduleSwitch;            // an example switch as input
-CBUSLED moduleLED;                  // an example LED as output
+CBUSLongMessage lmsg(&CBUS);        // CBUS RFC0005 long message object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
+unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
 
 // forward function declarations
 void eventhandler(byte index, byte opc);
+void framehandler(CANFrame *msg);
+void longmessagehandler(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);
+
+// long message variables
+byte streams[] = {1, 2, 3};         // streams to subscribe to
+char lmsg_out[32], lmsg_in[32];     // message buffers
 
 //
 /// setup CBUS - runs once at power on from setup()
@@ -132,22 +135,22 @@ void setupCBUS() {
     config.resetModule(ledGrn, ledYlw, pb_switch);
   }
 
-  // opportunity to set default NVs after module reset
-  if (config.isResetFlagSet()) {
-    Serial << F("> module has been reset") << endl;
-    config.clearResetFlag();
-  }
-
   // register our CBUS event handler, to receive event messages of learned events
   CBUS.setEventHandler(eventhandler);
 
-  // set CBUS LEDs to indicate mode
+  // register our CAN frame handler, to receive *every* CAN frame
+  CBUS.setFrameHandler(framehandler);
+
+  // subscribe to long message streams and register our handler function
+  lmsg.subscribe(streams, sizeof(streams) / sizeof(byte), lmsg_in, 32, longmessagehandler);
+
+  // set CBUS LEDs to indicate the current mode
   CBUS.indicateMode(config.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
+  CBUS.setNumBuffers(4, 2);         // more buffers = more memory used, fewer = less
+  CBUS.setOscFreq(16000000UL);      // select the crystal frequency of the CAN module
+  CBUS.setPins(10, 2);              // select pins for CAN bus CE and interrupt connections
   CBUS.begin();
 }
 
@@ -158,15 +161,9 @@ void setupCBUS() {
 void setup() {
 
   Serial.begin (115200);
-  Serial << endl << endl << F("> ** CBUS 1 in 1 out v1 ** ") << __FILE__ << endl;
+  Serial << endl << endl << F("> ** CBUS Arduino long message example module ** ") << __FILE__ << endl;
 
   setupCBUS();
-
-  // configure the module switch, attached to pin 7, active low
-  moduleSwitch.setPin(7, LOW);
-
-  // configure the module LED, attached to pin 8 via a 1K resistor
-  moduleLED.setPin(8);
 
   // end of setup
   Serial << F("> ready") << endl << endl;
@@ -185,29 +182,24 @@ void loop() {
   CBUS.process();
 
   //
+  /// do RFC0005 CBUS long message processing
+  //
+
+  if (!lmsg.process()) {
+    Serial << F("> error in long message processing") << endl;
+  }
+
+  //
   /// process console commands
   //
 
   processSerialInput();
 
   //
-  /// give the switch and LED code some time to run
-  //
-
-  moduleSwitch.run();
-  moduleLED.run();
-
-  //
-  /// Check if smich changed and do any processing for this change.
-  //
-
-  processModuleSwitchChange();
-
-  //
   /// check CAN message buffers
   //
 
-  if (CBUS.canp->CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
+  if (CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
     Serial << F("> receive buffer overflow") << endl;
   }
 
@@ -219,40 +211,15 @@ void loop() {
   /// check CAN bus state
   //
 
-  if ((byte s = CBUS.canp->errorFlagRegister()) != 0) {
-    Serial << F("> error flag register is non-zero") << endl;
+  byte err;
+
+  if ((err = CBUS.canp->errorFlagRegister()) != 0) {
+    Serial << F("> error flag register = ") << err << endl;
   }
 
-  // bottom of loop()
-}
-
-//
-/// test for switch input
-/// as an example, it must be have been pressed or released for at least half a second
-/// then send a long CBUS event with opcode ACON for on and ACOF for off
-/// event number (EN) is 1
-
-/// you can just watch for this event in FCU or JMRI, or teach it to another CBUS consumer module
-//
-void processModuleSwitchChange() {
-
-  if (moduleSwitch.stateChanged()) {
-
-    CANFrame msg;
-    msg.id = config.CANID;
-    msg.len = 5;
-    msg.data[0] = (moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF);
-    msg.data[1] = highByte(config.nodeNum);
-    msg.data[2] = lowByte(config.nodeNum);
-    msg.data[3] = 0;
-    msg.data[4] = 1;            // event number (EN) = 1
-
-    if (CBUS.sendMessage(&msg)) {
-      Serial << F("> sent CBUS message") << endl;
-    } else {
-      Serial << F("> error sending CBUS message") << endl;
-    }
-  }
+  //
+  /// bottom of loop()
+  //
 }
 
 //
@@ -263,29 +230,48 @@ void processModuleSwitchChange() {
 
 void eventhandler(byte index, CANFrame *msg) {
 
-  // as an example, control an LED
+  // as an example, display the opcode and the first EV of this event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
+  Serial << F("> EV1 = ") << config.getEventEVval(index, 1) << endl;
+  return;
+}
 
-  // read the value of the first event variable (EV) associated with this learned event
-  byte evval = config.getEventEVval(index, 1);
-  Serial << F("> EV1 = ") << evval << endl;
+//
+/// user-defined frame processing function
+/// called from the CBUS library for *every* CAN frame received
+/// it receives a pointer to the received CAN frame
+//
 
-  // set the LED according to the opcode of the received event, if the first EV equals 0
-  // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
+void framehandler(CANFrame *msg) {
 
-  if (msg->data[0] == OPC_ACON) {
-    if (evval == 0) {
-      Serial << F("> switching the LED on") << endl;
-      moduleLED.on();
-    } else if (evval == 1) {
-      Serial << F("> switching the LED to blink") << endl;
-      moduleLED.blink();
-    }
-  } else if (msg->data[0] == OPC_ACOF) {
-    Serial << F("> switching the LED off") << endl;
-    moduleLED.off();
+  // as an example, format and display the received frame
+
+  Serial << "[ " << (msg->id & 0x7f) << "] [" << msg->len << "] [";
+
+  for (byte d = 0; d < msg->len; d++) {
+    Serial << " 0x" << _HEX(msg->data[d]);
   }
+
+  Serial << " ]" << endl;
+  return;
+}
+
+//
+/// long message receive handler function
+/// called once the user buffer is full, or the message has been completely received
+//
+
+void longmessagehandler(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status) {
+
+  // display the message
+  // this will be the complete message if shorter than the provided buffer, or the final fragment if longer
+
+  if (status == CBUS_LONG_MESSAGE_COMPLETE) {
+    Serial << F("> received long message, stream = ") << stream_id << F(", len = ") << fragment_len << F(", msg = |") << (char *) fragment << F("|") << endl;
+  }
+
+  return;
 }
 
 //
@@ -300,6 +286,7 @@ void printConfig(void) {
 
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
+  return;
 }
 
 //
@@ -418,6 +405,17 @@ void processSerialInput(void) {
     case 'm':
       // free memory
       Serial << F("> free SRAM = ") << config.freeSRAM() << F(" bytes") << endl;
+      break;
+
+    case 'l':
+      // send a long message with stream ID = 2
+      uev = Serial.readBytesUntil('\n', lmsg_out, 32);
+      lmsg.sendLongMessage(lmsg_out, uev, 2);
+      break;
+
+    case 'd':
+      Serial << F("> tx buffer = ") << CBUS.canp->transmitBufferSize(0) << F(", ") <<  CBUS.canp->transmitBufferCount(0) << F(", ") << CBUS.canp->transmitBufferPeakCount(0) << endl;
+      Serial << F("> rx buffer = ") << CBUS.canp->receiveBufferSize() << F(", ") << CBUS.canp->receiveBufferCount() << F(", ") << CBUS.canp->receiveBufferPeakCount() << endl;
       break;
 
     case '\r':

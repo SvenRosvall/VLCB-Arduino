@@ -42,13 +42,16 @@
 #include <CBUS.h>               // abstract base class
 #include <CBUS2515.h>           // header for this class
 #include <ACAN2515.h>           // ACAN2515 library
+#include <SPI.h>
 
 // constants
 
 static const byte MCP2515_CS = 10;                          // SPI chip select pin
 static const byte MCP2515_INT = 2;                          // interrupt pin
-static const byte NUM_RECV_BUFFS = 4;                       // default value
+static const byte NUM_RX_BUFFS = 4;                         // default value
+static const byte NUM_TX_BUFFS = 2;                         // default value
 static const uint32_t CANBITRATE = 125000UL;                // 125Kb/s - fixed for CBUS
+static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency default
 
 //
 /// an implementation of the absract base CBUS class
@@ -62,16 +65,16 @@ public:
   CBUS2515();
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
-  bool begin(bool poll = false);    // note default arg
+  bool begin(bool poll = false, SPIClass spi = SPI);    // note default args
   bool available(void);
   CANFrame getNextMessage(void);
   bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);    // note default arguments
   void reset(void);
-  void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
-  void setPins(byte CSpin, byte intPin);
 
   // these methods are specific to this implementation
   // they are not declared or implemented by the base CBUS class
+  void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
+  void setPins(byte CSpin, byte intPin);
   void printStatus(void);
   void setOscFreq(unsigned long freq);
 
