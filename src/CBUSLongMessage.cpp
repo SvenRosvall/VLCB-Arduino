@@ -44,6 +44,7 @@
 #include <CBUS.h>
 #include <Streaming.h>
 
+uint16_t crc16(uint8_t *data_p, uint16_t length);
 uint32_t crc32(const char *s, size_t n);
 
 //
@@ -103,7 +104,7 @@ bool CBUSLongMessage::sendLongMessage(const void *msg, const unsigned int msg_le
 	frame.data[2] = _send_sequence_num;																								// sequence number, 0 = header packet
 	frame.data[3] = highByte(msg_len);																								// the message length
 	frame.data[4] = lowByte(msg_len);
-	frame.data[5] = 0;																																// CRC - not currently implemented
+	frame.data[5] = 0;																																// CRC - not implemented for lite version
 	frame.data[6] = 0;
 	frame.data[7] = 0;																																// flags - 0 = standard data message
 
@@ -328,30 +329,6 @@ void CBUSLongMessage::setTimeout(unsigned int timeout_in_millis) {
 	return;
 }
 
-//
-/// calculate CRC32 for the given message
-//
-
-uint32_t crc32(const char *s, size_t n) {
-
-	uint32_t crc = 0xFFFFFFFF;
-
-	// Serial << F("> calculating crc32 for msg = |") << s << F("|") << endl;
-
-	for (size_t i = 0; i < n; i++) {
-		char ch = s[i];
-		for (size_t j = 0; j < 8; j++) {
-			uint32_t b = (ch ^ crc) & 1;
-			crc >>= 1;
-			if (b) crc = crc ^ 0xEDB88320;
-			ch >>= 1;
-		}
-	}
-
-	// Serial << F("> crc32 = ") << crc << endl;
-	return ~crc;
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -415,6 +392,7 @@ bool CBUSLongMessageEx::allocateContexts(byte num_receive_contexts, unsigned int
 bool CBUSLongMessageEx::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
 
 	byte i;
+	uint16_t msg_crc = 0;
 	CANFrame frame;
 
 	Serial << F("> Lex: sending message header packet, stream id = ") << stream_id << F(", message length = ") << msg_len << endl;
@@ -450,13 +428,18 @@ bool CBUSLongMessageEx::sendLongMessage(const void *msg, const unsigned int msg_
 	_send_context[i]->send_priority = priority;
 	_send_context[i]->send_buffer_index = 0;
 
+	// calc CRC
+	if (_use_crc) {
+		msg_crc = crc16((uint8_t *)msg, msg_len);
+	}
+
 	// send the first fragment which forms the header message
 	frame.data[1] = _send_context[i]->send_stream_id;																	// the stream id
 	frame.data[2] = 0;																																// sequence number, 0 = header packet
 	frame.data[3] = highByte(_send_context[i]->send_buffer_len);										  // the message length
 	frame.data[4] = lowByte(_send_context[i]->send_buffer_len);
-	frame.data[5] = 0;																																// CRC - not currently implemented
-	frame.data[6] = 0;
+	frame.data[5] = highByte(msg_crc);																							  // CRC, zero if not implemented
+	frame.data[6] = lowByte(msg_crc);
 	frame.data[7] = 0;																																// flags - 0 = standard data message
 
 	bool ret = sendMessageFragment(&frame, _send_context[i]->send_priority);					// send the header packet
@@ -570,7 +553,8 @@ byte CBUSLongMessageEx::is_sending(void) {
 
 void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 
-	byte i, j;
+	byte i, j, status;
+	uint16_t tmpcrc = 0;
 
 	Serial << F("> Lex: handling incoming message fragment") << endl;
 	Serial.flush();
@@ -652,7 +636,20 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 			// if we have consumed the entire message, surface it to the user's handler
 			if (_receive_context[i]->incoming_bytes_received >= _receive_context[i]->incoming_message_length) {
 				Serial << F("> Lex: message data has been fully consumed") << endl;
-				(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
+
+				if (_use_crc && _receive_context[i]->incoming_message_crc != 0) {
+					Serial << F("> Lex: calculating CRC16") << endl;
+					tmpcrc = crc16((uint8_t *)_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index);
+				}
+
+				if (_receive_context[i]->incoming_message_crc != tmpcrc) {
+					Serial << F("> Lex: message CRC error, expected = ") << _receive_context[i]->incoming_message_crc << F(", calculated = ") << tmpcrc << endl;
+					status = CBUS_LONG_MESSAGE_CRC_ERROR;
+				} else {
+					status = CBUS_LONG_MESSAGE_COMPLETE;
+				}
+
+				(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, status);
 				_receive_context[i]->in_use = false;
 				break;
 
@@ -670,5 +667,75 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 	}
 
 	return;
+}
+
+//
+/// set whether to calculate and compare a CRC of the message
+//
+
+void CBUSLongMessageEx::use_crc(bool use_crc) {
+
+	_use_crc = use_crc;
+	return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//////// CRC implementations
+
+uint32_t crc32(const byte *s, size_t n) {
+
+	uint32_t crc = 0xFFFFFFFF;
+
+	for (size_t i = 0; i < n; i++) {
+		uint8_t ch = s[i];
+		for (size_t j = 0; j < 8; j++) {
+			uint32_t b = (ch ^ crc) & 1;
+			crc >>= 1;
+			if (b) crc = crc ^ 0xEDB88320;
+			ch >>= 1;
+		}
+	}
+
+	return ~crc;
+}
+
+/*
+//                                      16   12   5
+// this is the CCITT CRC 16 polynomial X  + X  + X  + 1.
+// This works out to be 0x1021, but the way the algorithm works
+// lets us use 0x8408 (the reverse of the bit pattern).  The high
+// bit is always assumed to be set, thus we only use 16 bits to
+// represent the 17 bit value.
+*/
+
+// http://stjarnhimlen.se/snippets/crc-16.c
+
+#define POLY 0x8408
+
+uint16_t crc16(uint8_t *data_p, uint16_t length) {
+
+	uint8_t i;
+	uint16_t data;
+	uint16_t crc = 0xffff;
+
+	if (length == 0) {
+		return (~crc);
+	}
+
+	do {
+		for (i = 0, data = (uint16_t)0xff & *data_p++;
+		     i < 8;
+		     i++, data >>= 1) {
+			if ((crc & 0x0001) ^ (data & 0x0001))
+				crc = (crc >> 1) ^ POLY;
+			else  crc >>= 1;
+		}
+	} while (--length);
+
+	crc = ~crc;
+	data = crc;
+	crc = (crc << 8) | (data >> 8 & 0xff);
+
+	return (crc);
 }
 

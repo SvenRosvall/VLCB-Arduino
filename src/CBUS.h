@@ -71,7 +71,8 @@ enum {
   CBUS_LONG_MESSAGE_COMPLETE,
   CBUS_LONG_MESSAGE_SEQUENCE_ERROR,
   CBUS_LONG_MESSAGE_TIMEOUT_ERROR,
-  CBUS_LONG_MESSAGE_CRC_ERROR
+  CBUS_LONG_MESSAGE_CRC_ERROR,
+  CBUS_LONG_MESSAGE_TRUNCATED
 };
 
 //
@@ -228,9 +229,11 @@ public:
   void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
   virtual void processReceivedMessageFragment(const CANFrame *frame);
   byte is_sending(void);
+  void use_crc(bool use_crc);
 
 private:
 
+  bool _use_crc = false;
   byte _num_receive_contexts = NUM_EX_CONTEXTS, _num_send_contexts = NUM_EX_CONTEXTS;
   receive_context_t **_receive_context = NULL;
   send_context_t **_send_context = NULL;
