@@ -402,9 +402,6 @@ bool CBUSLongMessageEx::allocateContexts(byte num_receive_contexts, unsigned int
 		_send_context[i]->in_use = false;
 	}
 
-	// make sure CBUS uses this derived class to handle incoming messages, not the base class
-	_cbus_object_ptr->setLongMessageHandler(this);
-
 	Serial << F("> Lex: allocated send and receive contexts ok") << endl;
 	return true;
 }
@@ -487,11 +484,11 @@ bool CBUSLongMessageEx::process(void) {
 	for (i = 0; i < _num_receive_contexts; i++) {
 		if (_receive_context[i]->in_use && (millis() - _receive_context[i]->last_fragment_received >= _receive_timeout)) {
 
-			Serial << F("> Lex: ERROR: timed out waiting for continuation packet in context = ") << i << endl;
+			Serial << F("> Lex: ERROR: timed out waiting for continuation packet in context = ") << i << F(", timeout = ") << _receive_timeout << endl;
 			(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_TIMEOUT_ERROR);
 			_receive_context[i]->in_use = false;
-			_receive_context[i]->incoming_message_length = 0;
-			_receive_context[i]->incoming_bytes_received = 0;
+			// _receive_context[i]->incoming_message_length = 0;
+			// _receive_context[i]->incoming_bytes_received = 0;
 		}
 	}
 
@@ -517,15 +514,14 @@ bool CBUSLongMessageEx::process(void) {
 		ret = sendMessageFragment(&frame, _send_context[context]->send_priority);																												// send the data packet
 		Serial << F("> Lex: process: sent message fragment, seq = ") << _send_context[context]->send_sequence_num << F(", size = ") << i << F(", ret  = ") << ret << endl;
 
-		++_send_context[context]->send_sequence_num;
-
 		// release context once message content exhausted
 		if (_send_context[context]->send_buffer_index >= _send_context[context]->send_buffer_len) {
 			_send_context[context]->in_use = false;
 			_send_context[context]->send_buffer_len = 0;
 			free(_send_context[context]->buffer);
-			Serial << F("> Lex: message complete, context released");
+			Serial << F("> Lex: message complete, context released") << endl;
 		} else {
+			++_send_context[context]->send_sequence_num;
 			_send_context[context]->last_fragment_sent = millis();
 		}
 	}
@@ -582,12 +578,12 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 	if (frame->data[2] == 0) {																												  // sequence zero = a header packet with start of new stream
 		if (frame->data[7] == 0) {																												// flags = 0, standard message
 
-			Serial << F("> Lex: this is a header packet") << endl;
+			Serial << F("> Lex: this is a data message header packet") << endl;
 
 			for (i = 0; i < _num_stream_ids; i++) {
 				if (_stream_ids[i] == frame->data[1]) {																				// are we subscribed to this stream id ?
 
-					Serial << F("> Lex: we are subscribed to stream ID = ") << frame->data[1] << endl;
+					Serial << F("> Lex: we are subscribed to this stream ID = ") << frame->data[1] << endl;
 
 					// find a free receive context
 					for (i = 0; i < _num_receive_contexts; i++) {
@@ -597,9 +593,8 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 						}
 					}
 
-					if (i >= _num_receive_contexts) {
-						Serial << F("> Lex: unable to find free receive context for new message") << endl;
-					} else {
+					if (i < _num_receive_contexts) {
+						_receive_context[i]->in_use = true;
 						_receive_context[i]->receive_stream_id = frame->data[1];
 						_receive_context[i]->incoming_message_length = (frame->data[3] << 8) + frame->data[4];
 						_receive_context[i]->incoming_message_crc = (frame->data[5] << 8) + frame->data[6];
@@ -608,14 +603,17 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 						_receive_context[i]->receive_buffer_index = 0;
 						_receive_context[i]->expected_next_receive_sequence_num = 1;
 						_receive_context[i]->sender_canid = (frame->id & 0x7f);
+						_receive_context[i]->last_fragment_received = millis();
 						Serial << F("> Lex: received header packet for stream id = ") << _receive_context[i]->receive_stream_id << F(", message length = ") << _receive_context[i]->incoming_message_length << endl;
+					} else {
+						Serial << F("> Lex: unable to find free receive context for new message") << endl;
 					}
 
 					break;
 				}
 			}
 		} else {
-			Serial << F("> Lex: not handling sequence 0 message with non-zero flags") << endl;
+			Serial << F("> Lex: not handling header packet with non-zero flags") << endl;
 		}
 	} else {																																					// continuation packet
 
@@ -623,7 +621,7 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 
 		// find a matching receive context, using the stream ID and sender CANID
 		for (i = 0; i < _num_receive_contexts; i++) {
-			if (_receive_context[i]->receive_stream_id == frame->data[1] && _receive_context[i]->sender_canid == (frame->id & 0x7f)) {
+			if (_receive_context[i]->in_use && _receive_context[i]->receive_stream_id == frame->data[1] && _receive_context[i]->sender_canid == (frame->id & 0x7f)) {
 				Serial << F("> Lex: found matching receive context = ") << i << endl;
 				break;
 			}
@@ -639,34 +637,29 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 		if (frame->data[2] != _receive_context[i]->expected_next_receive_sequence_num) {
 			Serial << F("> Lex: ERROR: expected receive sequence num = ") << _receive_context[i]->expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
 			(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_SEQUENCE_ERROR);
-			_receive_context[i]->incoming_message_length = 0;
-			_receive_context[i]->incoming_bytes_received = 0;
 			_receive_context[i]->in_use = false;
 			return;
 		}
 
-		// take up to 5 bytes of message data from this fragment
+		// consume up to 5 bytes of message data from this fragment
 		for (j = 0; j < 5; j++) {
-			Serial << F("> Lex: processing received data byte = ") << (char)frame->data[j + 3] << endl;
+			Serial << F("> Lex: consuming received data byte = ") << (char)frame->data[j + 3] << endl;
 			_receive_context[i]->buffer[_receive_context[i]->receive_buffer_index] = frame->data[j + 3];
 			++_receive_context[i]->receive_buffer_index;
 			++_receive_context[i]->incoming_bytes_received;
+			_receive_context[i]->last_fragment_received = millis();
 
 			// if we have consumed the entire message, surface it to the user's handler
 			if (_receive_context[i]->incoming_bytes_received >= _receive_context[i]->incoming_message_length) {
 				Serial << F("> Lex: message data has been fully consumed") << endl;
 				(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_COMPLETE);
-				_receive_context[i]->receive_buffer_index = 0;
-				memset(_receive_context[i]->buffer, 0, _receive_buffer_len);
 				_receive_context[i]->in_use = false;
 				break;
 
 				// if the buffer is now full, give the user what we have with an error status
 			} else if (_receive_context[i]->receive_buffer_index >= _receive_buffer_len ) {
-				Serial << F("> Lex: user buffer is full") << endl;
-				(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_INCOMPLETE);
-				_receive_context[i]->receive_buffer_index = 0;
-				memset(_receive_context[i]->buffer, 0, _receive_buffer_len);
+				Serial << F("> Lex: buffer is now full, message truncated") << endl;
+				(void)(*_messagehandler)(_receive_context[i]->buffer, _receive_context[i]->receive_buffer_index, _receive_context[i]->receive_stream_id, CBUS_LONG_MESSAGE_TRUNCATED);
 				_receive_context[i]->in_use = false;
 				break;
 			}
@@ -675,5 +668,7 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 		// increment the expected next sequence number for this stream context
 		++_receive_context[i]->expected_next_receive_sequence_num;
 	}
+
+	return;
 }
 
