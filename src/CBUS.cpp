@@ -106,7 +106,7 @@ void CBUSbase::setSLiM(void) {
 /// extract CANID from CAN frame header
 //
 
-byte CBUSbase::getCANID(unsigned long header) {
+inline byte CBUSbase::getCANID(unsigned long header) {
 
   return header & 0x7f;
 }
@@ -441,21 +441,7 @@ void CBUSbase::process(byte num_messages) {
     }
 
     // are we enumerating CANIDs ?
-    // if (bCANenum && !bCANenumComplete) {
     if (bCANenum && _msg.len == 0) {
-
-      //  a frame with zero-length message is an ENUM response
-      //if (_msg.len == 0) {
-
-      // enumeratiom timer is still running -- process the CANID of this frame
-      // Serial << F("> zero - length frame from CANID = ") << remoteCANID << endl;
-      // ++enums;
-
-      // is there a clash with my current CANID ?
-      // ignore - the module will choose an unused one at the end of enumeration
-      // if (remoteCANID == config.CANID) {
-      // Serial << F("> !!! there was a clash with my current CANID !!!") << endl;
-      // }
 
       // store this response in the responses array
       if (remoteCANID > 0) {
@@ -464,7 +450,6 @@ void CBUSbase::process(byte num_messages) {
       }
 
       continue;
-      //}
     }
 
     //
@@ -934,12 +919,12 @@ void CBUSbase::process(byte num_messages) {
         // command station status -- not applicable to accessory modules
         break;
 
-        // case OPC_ARST:
-        // system reset ... this is not what I thought it meant !
-        // config.reboot();
-        // break;
+      // case OPC_ARST:
+      // system reset ... this is not what I thought it meant !
+      // config.reboot();
+      // break;
 
-      case OPC_LMSG:
+      case OPC_DTXC:
         // CBUS long message
         if (longMessageHandler != NULL) {
           longMessageHandler->processReceivedMessageFragment(&_msg);
