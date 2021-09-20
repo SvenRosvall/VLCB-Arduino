@@ -37,12 +37,20 @@
 
 #pragma once
 
+#include <SPI.h>
+
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
 #include <cbusdefs.h>
 
-static const unsigned int SW_TR_HOLD = 6000;       // CBUS push button hold time for SLiM/FLiM transition in millis
+#define SW_TR_HOLD 6000U                   // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
+#define DEFAULT_PRIORITY 0xB               // default CBUS messages priority. 1011 = 2|3 = normal/low
+#define LONG_MESSAGE_DEFAULT_DELAY 20      // delay in milliseconds between sending successive long message fragments
+#define LONG_MESSAGE_RECEIVE_TIMEOUT 5000  // timeout waiting for next long message packet
+#define NUM_EX_CONTEXTS 4                  // number of send and receive contexts for extended implementation = number of concurrent messages
+#define EX_BUFFER_LEN 64                   // size of extended send and receive buffers
+#define OPC_DTXC 0xe9                      // temp opcode for CBUS long message
 
 //
 /// CBUS modes
@@ -55,19 +63,30 @@ enum {
 };
 
 //
+/// CBUS long message status codes
+//
+
+enum {
+  CBUS_LONG_MESSAGE_INCOMPLETE = 0,
+  CBUS_LONG_MESSAGE_COMPLETE,
+  CBUS_LONG_MESSAGE_SEQUENCE_ERROR,
+  CBUS_LONG_MESSAGE_TIMEOUT_ERROR,
+  CBUS_LONG_MESSAGE_CRC_ERROR,
+  CBUS_LONG_MESSAGE_TRUNCATED
+};
+
+//
 /// CAN/CBUS message type
 //
 
 class CANFrame {
 
 public:
-
-  CANFrame();
   uint32_t id;
   bool ext;
   bool rtr;
   uint8_t len;
-  uint8_t data[8];
+  uint8_t data[8] = {};
 };
 
 //
@@ -75,17 +94,19 @@ public:
 /// it must be implemented by a derived subclass
 //
 
-class CBUS {
+class CBUSLongMessage;      // forward reference
+
+class CBUSbase {
 
 public:
 
   // these methods are pure virtual and must be implemented by the derived class
   // as a consequence, it is not possible to create an instance of this class
 
-  virtual bool begin(void) = 0;
+  virtual bool begin(bool poll = false, SPIClass spi = SPI) = 0;
   virtual bool available(void) = 0;
   virtual CANFrame getNextMessage(void) = 0;
-  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false) = 0;
+  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) = 0;
   virtual void reset(void) = 0;
 
   // implementations of these methods are provided in the base class
@@ -96,7 +117,7 @@ public:
   byte getCANID(unsigned long header);
   bool isExt(CANFrame *msg);
   bool isRTR(CANFrame *msg);
-  void process(void);
+  void process(byte num_messages = 3);
   void initFLiM(void);
   void revertSLiM(void);
   void setSLiM(void);
@@ -108,27 +129,113 @@ public:
   void checkCANenum(void);
   void indicateMode(byte mode);
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
-  void setFrameHandler(void (*fptr)(CANFrame *msg));
-  void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes, byte num_opcodes);
-  void makeHeader(CANFrame *msg);
+  void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
+  void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
+  void makeHeader(CANFrame *msg, byte priority = DEFAULT_PRIORITY);
+  void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
 
-protected:
+  void setLongMessageHandler(CBUSLongMessage *handler);
+
+protected:                                          // protected members become private in derived classes
   CANFrame _msg;
-  unsigned long _numMsgsSent, _numMsgsRcvd;
-  byte _lastErr;
+  unsigned int _numMsgsSent, _numMsgsRcvd;
   CBUSLED _ledGrn, _ledYlw;
   CBUSSwitch _sw;
   unsigned char *_mparams;
   unsigned char *_mname;
   void (*eventhandler)(byte index, CANFrame *msg);
+  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
   void (*framehandler)(CANFrame *msg);
   byte *_opcodes;
   byte _num_opcodes;
-  bool bModeChanging, bCANenum, bLearn, bCANenumComplete;
+  byte enum_responses[16];                          // 128 bits for storing CAN ID enumeration results
+  bool bModeChanging, bCANenum, bLearn;
   unsigned long timeOutTimer, CANenumTime;
-  char msgstr[64], dstr[64];
-  byte enums = 0, selected_id;
-  byte enum_responses[16];               // 128 bits for storing CAN ID enumeration results
   bool enumeration_required;
   bool UI = false;
+
+  CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
 };
+
+//
+/// a basic class to send and receive CBUS long messages per MERG RFC 0005
+/// handles a single message, sending and receiving
+/// suitable for small microcontrollers with limited memory
+//
+
+class CBUSLongMessage {
+
+public:
+
+  CBUSLongMessage(CBUSbase *cbus_object_ptr);
+  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
+  void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
+  bool process(void);
+  virtual void processReceivedMessageFragment(const CANFrame *frame);
+  bool is_sending(void);
+  void setDelay(byte delay_in_millis);
+  void setTimeout(unsigned int timeout_in_millis);
+
+protected:
+
+  bool sendMessageFragment(CANFrame *frame, const byte priority);
+
+  bool _is_receiving = false;
+  byte *_send_buffer, *_receive_buffer;
+  byte _send_stream_id = 0, _receive_stream_id = 0, *_stream_ids = NULL, _num_stream_ids = 0, _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY, _sender_canid = 0;
+  unsigned int _send_buffer_len = 0, _incoming_message_length = 0, _receive_buffer_len = 0, _receive_buffer_index = 0, _send_buffer_index = 0, _incoming_message_crc = 0, \
+                                  _incoming_bytes_received = 0, _receive_timeout = LONG_MESSAGE_RECEIVE_TIMEOUT, _send_sequence_num = 0, _expected_next_receive_sequence_num = 0;
+  unsigned long _last_fragment_sent = 0UL, _last_fragment_received = 0UL;
+
+  void (*_messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);        // user callback function to receive long message fragments
+  CBUSbase *_cbus_object_ptr;
+};
+
+
+//// extended support for multiple concurrent long messages
+
+// send and receive contexts
+
+typedef struct _receive_context_t {
+  bool in_use;
+  byte receive_stream_id, sender_canid;
+  byte *buffer;
+  unsigned int receive_buffer_index, incoming_bytes_received, incoming_message_length, expected_next_receive_sequence_num, incoming_message_crc;
+  unsigned long last_fragment_received;
+} receive_context_t;
+
+typedef struct _send_context_t {
+  bool in_use;
+  byte send_stream_id, send_priority, msg_delay;
+  byte *buffer;
+  unsigned int send_buffer_len, send_buffer_index, send_sequence_num;
+  unsigned long last_fragment_sent;
+} send_context_t;
+
+//
+/// a derived class to extend the base long message class to handle multiple concurrent messages, sending and receiving
+//
+
+class CBUSLongMessageEx : public CBUSLongMessage {
+
+public:
+
+  CBUSLongMessageEx(CBUSbase *cbus_object_ptr)
+    : CBUSLongMessage(cbus_object_ptr) {}         // derived class constructor calls the base class constructor
+
+  bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
+  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
+  bool process(void);
+  void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
+  virtual void processReceivedMessageFragment(const CANFrame *frame);
+  byte is_sending(void);
+  void use_crc(bool use_crc);
+
+private:
+
+  bool _use_crc = false;
+  byte _num_receive_contexts = NUM_EX_CONTEXTS, _num_send_contexts = NUM_EX_CONTEXTS;
+  receive_context_t **_receive_context = NULL;
+  send_context_t **_send_context = NULL;
+};
+
