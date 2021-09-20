@@ -51,7 +51,19 @@ ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
 /// constructor
 //
 
-CBUS2515::CBUS2515() {
+CBUS2515::CBUS2515()
+{
+  initMembers();
+}
+
+CBUS2515::CBUS2515(CBUSConfig & config)
+  : CBUSbase(config)
+{
+  initMembers();
+}
+
+void CBUS2515::initMembers()
+{
   _num_rx_buffers = NUM_RX_BUFFS;
   _num_tx_buffers = NUM_TX_BUFFS;
   eventhandler = NULL;
