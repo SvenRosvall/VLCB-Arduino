@@ -207,7 +207,7 @@ void loop() {
   /// check CAN message buffers
   //
 
-  if (CBUS.canp->CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
+  if (CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
     Serial << F("> receive buffer overflow") << endl;
   }
 
@@ -219,7 +219,8 @@ void loop() {
   /// check CAN bus state
   //
 
-  if ((byte s = CBUS.canp->errorFlagRegister()) != 0) {
+  byte s = CBUS.canp->errorFlagRegister();
+  if (s != 0) {
     Serial << F("> error flag register is non-zero") << endl;
   }
 
