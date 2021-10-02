@@ -41,12 +41,27 @@
 // CBUS library
 #include <CBUS.h>
 
-// CBUS configuration object, declared externally
-extern CBUSConfig config;
-
 // forward function declarations
-void makeHeader_impl(CANFrame *msg, byte priority = 0x0b);
+void makeHeader_impl(CANFrame *msg, uint32_t id, byte priority = 0x0b);
 
+//
+//// Construct a CBUS object with an external CBUSConfig object "config" that is defined
+//// in user code
+//
+CBUSbase::CBUSbase()
+{
+  extern CBUSConfig config;
+  this->config = config;
+}
+
+//
+//// Construct a CBUS object with a CBUSConfig object that the user provides.
+//// Note that this CBUSConfig object must have a lifetime longer than the CBUS object.
+//
+CBUSbase::CBUSbase(CBUSConfig &extConfig)
+{
+  config = extConfig;
+}
 //
 /// register the user handler for learned events
 //
@@ -1062,7 +1077,7 @@ void CBUSbase::setLongMessageHandler(CBUSLongMessage *handler) {
 
 void CBUSbase::makeHeader(CANFrame *msg, byte priority) {
 
-  makeHeader_impl(msg, priority);
+  makeHeader_impl(msg, config.CANID, priority);
   return;
 }
 
@@ -1072,10 +1087,10 @@ void CBUSbase::makeHeader(CANFrame *msg, byte priority) {
 /// priority = 1011 as default argument
 //
 
-void makeHeader_impl(CANFrame *msg, byte priority) {
+void makeHeader_impl(CANFrame *msg, uint32_t id, byte priority) {
 
   // set the CBUS CANID
-  msg->id = config.CANID;
+  msg->id = id;
 
   // set the CBUS message priority - zeroes equate to higher priority
 
@@ -1088,10 +1103,10 @@ void makeHeader_impl(CANFrame *msg, byte priority) {
   // clear - number &= ~(1UL << n);
   // check/read - bit = (number >> n) & 1U;
 
-  bitWrite(msg->id, 10, bitRead(priority, 3));
-  bitWrite(msg->id, 9, bitRead(priority, 2));
-  bitWrite(msg->id, 8, bitRead(priority, 1));
-  bitWrite(msg->id, 7, bitRead(priority, 0));
+  bitWrite(id, 10, bitRead(priority, 3));
+  bitWrite(id, 9, bitRead(priority, 2));
+  bitWrite(id, 8, bitRead(priority, 1));
+  bitWrite(id, 7, bitRead(priority, 0));
 
   return;
 }
