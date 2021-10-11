@@ -99,6 +99,8 @@ class CBUSLongMessage;      // forward reference
 class CBUSbase {
 
 public:
+  CBUSbase();
+  CBUSbase(CBUSConfig &extConfig);
 
   // these methods are pure virtual and must be implemented by the derived class
   // as a consequence, it is not possible to create an instance of this class
@@ -141,6 +143,7 @@ protected:                                          // protected members become 
   unsigned int _numMsgsSent, _numMsgsRcvd;
   CBUSLED _ledGrn, _ledYlw;
   CBUSSwitch _sw;
+  CBUSConfig &config;
   unsigned char *_mparams;
   unsigned char *_mname;
   void (*eventhandler)(byte index, CANFrame *msg);
