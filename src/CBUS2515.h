@@ -63,10 +63,14 @@ class CBUS2515 : public CBUSbase {
 public:
 
   CBUS2515();
-  CBUS2515(CBUSConfig &);
+  CBUS2515(CBUSConfig *the_config);
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
-  bool begin(bool poll = false, SPIClass spi = SPI);    // note default args
+#ifdef ARDUINO_ARCH_RP2040
+  bool begin(bool poll = false, SPIClassRP2040 spi = SPI);    // note default args
+#else
+  bool begin(bool poll = false, SPIClass spi = SPI);
+#endif
   bool available(void);
   CANFrame getNextMessage(void);
   bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);    // note default arguments
@@ -75,9 +79,14 @@ public:
   // these methods are specific to this implementation
   // they are not declared or implemented by the base CBUS class
   void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
-  void setPins(byte CSpin, byte intPin);
   void printStatus(void);
   void setOscFreq(unsigned long freq);
+
+#ifdef ARDUINO_ARCH_RP2040
+  void setPins(byte cs_pin, byte int_pin, byte mosi_pin, byte miso_pin, byte sck_pin);
+#else
+  void setPins(byte cs_pin, byte int_pin);
+#endif
 
   ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 

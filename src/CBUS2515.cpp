@@ -51,19 +51,16 @@ ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
 /// constructor
 //
 
-CBUS2515::CBUS2515()
-{
+CBUS2515::CBUS2515() {
   initMembers();
 }
 
-CBUS2515::CBUS2515(CBUSConfig & config)
-  : CBUSbase(config)
-{
+CBUS2515::CBUS2515(CBUSConfig *the_config) : CBUSbase(the_config) {
   initMembers();
 }
 
-void CBUS2515::initMembers()
-{
+void CBUS2515::initMembers() {
+
   _num_rx_buffers = NUM_RX_BUFFS;
   _num_tx_buffers = NUM_TX_BUFFS;
   eventhandler = NULL;
@@ -79,8 +76,12 @@ void CBUS2515::initMembers()
 /// default poll arg is set to false, so as not to break existing code
 //
 
-bool CBUS2515::begin(bool poll, SPIClass spi) {
-
+#ifdef ARDUINO_ARCH_RP2040
+bool CBUS2515::begin(bool poll, SPIClassRP2040 spi)
+#else
+bool CBUS2515::begin(bool poll, SPIClass spi)
+#endif
+{
   uint16_t ret;
   bool retval = false;
 
@@ -93,8 +94,14 @@ bool CBUS2515::begin(bool poll, SPIClass spi) {
   settings.mRequestedMode = ACAN2515Settings::NormalMode;
   settings.mReceiveBufferSize = _num_rx_buffers;
   settings.mTransmitBuffer0Size = _num_tx_buffers;
+
+#if defined ESP8266
+  settings.mTransmitBuffer1Size = 1;      // ESP8266 doesn't like new of zero bytes
+  settings.mTransmitBuffer2Size = 1;
+#else
   settings.mTransmitBuffer1Size = 0;
   settings.mTransmitBuffer2Size = 0;
+#endif
 
   // start SPI
   spi.begin();
@@ -208,9 +215,24 @@ void CBUS2515::reset(void) {
 /// set the CS and interrupt pins - option to override defaults
 //
 
-void CBUS2515::setPins(byte csPin, byte intPin) {
-  _csPin = csPin;
-  _intPin = intPin;
+#ifdef ARDUINO_ARCH_RP2040
+void CBUS2515::setPins(byte cs_pin, byte int_pin, byte mosi_pin, byte miso_pin, byte sck_pin)
+#else
+void CBUS2515::setPins(byte cs_pin, byte int_pin)
+#endif
+{
+
+#ifdef ARDUINO_ARCH_RP2040
+  spi.setTx(mosi_pin);
+  spi.setRX(miso_pin);
+  spi.setSCK(sck_pin);
+  spi.setCS(cs_pin);
+  _csPin = cs_pin;
+  _intPin = int_pin;
+#else
+  _csPin = cs_pin;
+  _intPin = int_pin;
+#endif
 }
 
 //
