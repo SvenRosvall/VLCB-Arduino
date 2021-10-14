@@ -77,7 +77,7 @@ void CBUSConfig::begin(void) {
 #endif
 
 #ifdef ARDUINO_ARCH_RP2040
-  EEPROM.begin(1024);
+  EEPROM.begin(4096);
 #endif
 
   makeEvHashTable();
@@ -92,29 +92,27 @@ void CBUSConfig::begin(void) {
 
 bool CBUSConfig::setEEPROMtype(byte type) {
 
-  bool r;
+  bool ret = true;
 
   if (type == EEPROM_EXTERNAL) {
     Wire.begin();
     Wire.beginTransmission(EEPROM_I2C_ADDR);
-    byte r = Wire.endTransmission();
+    byte result = Wire.endTransmission();
 
-    if (r == 0) {
+    if (result == 0) {
       eeprom_type = EEPROM_EXTERNAL;
       // Serial << F("> external EEPROM selected") << endl;
-      r = true;
     } else {
       // Serial << F("> external EEPROM not found") << endl;
       eeprom_type = EEPROM_INTERNAL;
-      r = false;
+      ret = false;
     }
   } else {
     eeprom_type = EEPROM_INTERNAL;
     // Serial << F("> internal EEPROM selected") << endl;
-    r = true;
   }
 
-  return r;
+  return ret;
 }
 
 //
@@ -706,7 +704,7 @@ void CBUSConfig::cleareventEEPROM(byte index) {
 }
 
 //
-/// clear all event data in EEPROM
+/// clear all event data in external EEPROM chip
 //
 
 void CBUSConfig::resetEEPROM(void) {
@@ -715,7 +713,7 @@ void CBUSConfig::resetEEPROM(void) {
 
     // Serial << F("> clearing data from external EEPROM ...") << endl;
 
-    for (unsigned int addr = 0; addr < 32767; addr++) {
+    for (unsigned int addr = 0; addr < 4096; addr++) {
       writeEEPROM(addr, 0xff);
     }
   }
@@ -786,9 +784,7 @@ void CBUSConfig::reboot(void) {
 
 // for Raspberry Pi Pico using arduino-pico core
 #ifdef ARDUINO_ARCH_RP2040
-  watchdog_enable(100, 0);
-  watchdog_update();
-  watchdog_reboot(0, 0, 0);
+  watchdog_enable(100, 1);      // set watchdog timeout to 100ms and allow to expire
   while (1);
 #endif
 }
@@ -1011,16 +1007,16 @@ byte CBUSConfig::getChipEEPROMVal(unsigned int eeaddress) {
 
 void CBUSConfig::setResetFlag(void) {
 
-  setChipEEPROMVal(99, 5);
+  setChipEEPROMVal(5, 99);
 }
 
 void CBUSConfig::clearResetFlag(void) {
 
-  setChipEEPROMVal(99, 0);
+  setChipEEPROMVal(5, 0);
 }
 
 bool CBUSConfig::isResetFlagSet(void) {
 
-  return (getChipEEPROMVal(99) == 5);
+  return (getChipEEPROMVal(5) == 99);
 }
 
