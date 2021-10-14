@@ -96,4 +96,8 @@ private:
   byte _csPin, _intPin;
   byte _num_rx_buffers, _num_tx_buffers;
   bool _poll;
+
+#ifdef ARDUINO_ARCH_RP2040
+  byte _mosi_pin, _miso_pin, _sck_pin;
+#endif
 };
