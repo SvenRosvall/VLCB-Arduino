@@ -42,7 +42,7 @@
 #include <CBUS.h>
 
 // forward function declarations
-void makeHeader_impl(CANFrame *msg, uint32_t id, byte priority = 0x0b);
+void makeHeader_impl(CANFrame *msg, byte id, byte priority = 0x0b);
 
 //
 /// construct a CBUS object with an external CBUSConfig object "config" that is defined
@@ -1053,8 +1053,6 @@ void CBUSbase::checkCANenum(void) {
 
 void CBUSbase::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
 
-  // should really test whether neither event handler has been registered, but it's a very unlikely scenario
-
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);
 
@@ -1092,29 +1090,12 @@ void CBUSbase::makeHeader(CANFrame *msg, byte priority) {
 //
 /// actual implementation of the makeHeader method
 /// so it can be called directly or as a CBUS class method
-/// priority = 1011 as default argument
+/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CBUS priority) + (7 bits of CBUS CAN ID)
+/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
 //
 
-void makeHeader_impl(CANFrame *msg, uint32_t id, byte priority) {
+void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 
-  // set the CBUS CANID
-  msg->id = id;
-
-  // set the CBUS message priority - zeroes equate to higher priority
-
-  // default value is 1011 = 0x0b
-
-  // bits 9 and 10 are the major priority, so 10 = normal
-  // bits 7 and 8 are the minor priority, so 11 = lowest
-
-  // set - number |= 1UL << n;
-  // clear - number &= ~(1UL << n);
-  // check/read - bit = (number >> n) & 1U;
-
-  bitWrite(id, 10, bitRead(priority, 3));
-  bitWrite(id, 9, bitRead(priority, 2));
-  bitWrite(id, 8, bitRead(priority, 1));
-  bitWrite(id, 7, bitRead(priority, 0));
-
+  msg->id = (priority << 7) + (id & 0x7f);
   return;
 }
