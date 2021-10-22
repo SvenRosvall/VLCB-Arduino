@@ -123,10 +123,11 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
     ret = can->begin(settings, [] {can->isr();});
   }
 
+  // save pointer to CAN object so the user can access other parts of the library API
+  canp = can;
+
   if (ret == 0) {
     // Serial << F("> CAN controller initialised ok") << endl;
-    // save pointer to CAN object so the user can access other parts of the library API
-    canp = can;
     retval = true;
   } else {
     // Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
