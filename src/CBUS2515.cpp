@@ -193,6 +193,11 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 
   ret = canp->tryToSend(message);
   _numMsgsSent += ret;
+
+  if (UI) {
+    _ledGrn.pulse();
+  }
+
   return ret;
 }
 
