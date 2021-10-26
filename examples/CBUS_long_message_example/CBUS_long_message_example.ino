@@ -67,8 +67,8 @@ const byte LED_YLW = 5;             // CBUS yellow FLiM LED pin
 const byte SWITCH0 = 6;             // CBUS push button switch pin
 
 // CBUS objects
-CBUS2515 CBUS;                      // CBUS object
-CBUSConfig config;                  // configuration object
+CBUSConfig modconfig;               // configuration object
+CBUS2515 CBUS(&modconfig);          // CBUS object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 CBUSLongMessage lmsg(&CBUS);        // CBUS RFC0005 long message object
@@ -92,25 +92,25 @@ char lmsg_out[32], lmsg_in[32];     // message buffers
 void setupCBUS() {
 
   // set config layout parameters
-  config.EE_NVS_START = 10;
-  config.EE_NUM_NVS = 10;
-  config.EE_EVENTS_START = 50;
-  config.EE_MAX_EVENTS = 32;
-  config.EE_NUM_EVS = 1;
-  config.EE_BYTES_PER_EVENT = (config.EE_NUM_EVS + 4);
+  modconfig.EE_NVS_START = 10;
+  modconfig.EE_NUM_NVS = 10;
+  modconfig.EE_EVENTS_START = 50;
+  modconfig.EE_MAX_EVENTS = 32;
+  modconfig.EE_NUM_EVS = 1;
+  modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
 
   // initialise and load configuration
-  config.setEEPROMtype(EEPROM_INTERNAL);
-  config.begin();
+  modconfig.setEEPROMtype(EEPROM_INTERNAL);
+  modconfig.begin();
 
-  Serial << F("> mode = ") << ((config.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID;
-  Serial << F(", NN = ") << config.nodeNum << endl;
+  Serial << F("> mode = ") << ((modconfig.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
+  Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice
   printConfig();
 
   // set module parameters
-  CBUSParams params(config);
+  CBUSParams params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);
@@ -130,9 +130,9 @@ void setupCBUS() {
   CBUS.setSwitch(pb_switch);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
-  if (pb_switch.isPressed() && !config.FLiM) {
+  if (pb_switch.isPressed() && !modconfig.FLiM) {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
-    config.resetModule(ledGrn, ledYlw, pb_switch);
+    modconfig.resetModule(ledGrn, ledYlw, pb_switch);
   }
 
   // register our CBUS event handler, to receive event messages of learned events
@@ -145,7 +145,7 @@ void setupCBUS() {
   lmsg.subscribe(streams, sizeof(streams) / sizeof(byte), lmsg_in, 32, longmessagehandler);
 
   // set CBUS LEDs to indicate the current mode
-  CBUS.indicateMode(config.FLiM);
+  CBUS.indicateMode(modconfig.FLiM);
 
   // configure and start CAN bus and CBUS message processing
   CBUS.setNumBuffers(4, 2);         // more buffers = more memory used, fewer = less
@@ -233,7 +233,7 @@ void eventhandler(byte index, CANFrame *msg) {
   // as an example, display the opcode and the first EV of this event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
-  Serial << F("> EV1 = ") << config.getEventEVval(index, 1) << endl;
+  Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
   return;
 }
 
@@ -311,7 +311,7 @@ void processSerialInput(void) {
 
       // node identity
       Serial << F("> CBUS node configuration") << endl;
-      Serial << F("> mode = ") << (config.FLiM ? "FLiM" : "SLiM") << F(", CANID = ") << config.CANID << F(", node number = ") << config.nodeNum << endl;
+      Serial << F("> mode = ") << (modconfig.FLiM ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
       Serial << endl;
       break;
 
@@ -319,20 +319,20 @@ void processSerialInput(void) {
 
       // EEPROM learned event data table
       Serial << F("> stored events ") << endl;
-      Serial << F("  max events = ") << config.EE_MAX_EVENTS << F(" EVs per event = ") << config.EE_NUM_EVS << F(" bytes per event = ") << config.EE_BYTES_PER_EVENT << endl;
+      Serial << F("  max events = ") << modconfig.EE_MAX_EVENTS << F(" EVs per event = ") << modconfig.EE_NUM_EVS << F(" bytes per event = ") << modconfig.EE_BYTES_PER_EVENT << endl;
 
-      for (byte j = 0; j < config.EE_MAX_EVENTS; j++) {
-        if (config.getEvTableEntry(j) != 0) {
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++) {
+        if (modconfig.getEvTableEntry(j) != 0) {
           ++uev;
         }
       }
 
-      Serial << F("  stored events = ") << uev << F(", free = ") << (config.EE_MAX_EVENTS - uev) << endl;
-      Serial << F("  using ") << (uev * config.EE_BYTES_PER_EVENT) << F(" of ") << (config.EE_MAX_EVENTS * config.EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
+      Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig.EE_MAX_EVENTS - uev) << endl;
+      Serial << F("  using ") << (uev * modconfig.EE_BYTES_PER_EVENT) << F(" of ") << (modconfig.EE_MAX_EVENTS * modconfig.EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
 
       Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
 
-      for (byte j = 0; j < (config.EE_NUM_EVS); j++) {
+      for (byte j = 0; j < (modconfig.EE_NUM_EVS); j++) {
         sprintf(dstr, "EV%03d | ", j + 1);
         Serial << dstr;
       }
@@ -342,19 +342,19 @@ void processSerialInput(void) {
       Serial << F(" --------------------------------------------------------------") << endl;
 
       // for each event data line
-      for (byte j = 0; j < config.EE_MAX_EVENTS; j++) {
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++) {
 
-        if (config.getEvTableEntry(j) != 0) {
+        if (modconfig.getEvTableEntry(j) != 0) {
           sprintf(dstr, "  %03d  | ", j);
           Serial << dstr;
 
           // for each data byte of this event
-          for (byte e = 0; e < (config.EE_NUM_EVS + 4); e++) {
-            sprintf(dstr, " 0x%02hx | ", config.readEEPROM(config.EE_EVENTS_START + (j * config.EE_BYTES_PER_EVENT) + e));
+          for (byte e = 0; e < (modconfig.EE_NUM_EVS + 4); e++) {
+            sprintf(dstr, " 0x%02hx | ", modconfig.readEEPROM(modconfig.EE_EVENTS_START + (j * modconfig.EE_BYTES_PER_EVENT) + e));
             Serial << dstr;
           }
 
-          sprintf(dstr, "%4d |", config.getEvTableEntry(j));
+          sprintf(dstr, "%4d |", modconfig.getEvTableEntry(j));
           Serial << dstr << endl;
         }
       }
@@ -371,8 +371,8 @@ void processSerialInput(void) {
       Serial << F("   NV   Val") << endl;
       Serial << F("  --------------------") << endl;
 
-      for (byte j = 1; j <= config.EE_NUM_NVS; j++) {
-        byte v = config.readNV(j);
+      for (byte j = 1; j <= modconfig.EE_NUM_NVS; j++) {
+        byte v = modconfig.readNV(j);
         sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
         Serial << msgstr << endl;
       }
@@ -389,7 +389,7 @@ void processSerialInput(void) {
 
     case 'h':
       // event hash table
-      config.printEvHashTable(false);
+      modconfig.printEvHashTable(false);
       break;
 
     case 'y':
@@ -399,12 +399,12 @@ void processSerialInput(void) {
 
     case '*':
       // reboot
-      config.reboot();
+      modconfig.reboot();
       break;
 
     case 'm':
       // free memory
-      Serial << F("> free SRAM = ") << config.freeSRAM() << F(" bytes") << endl;
+      Serial << F("> free SRAM = ") << modconfig.freeSRAM() << F(" bytes") << endl;
       break;
 
     case 'l':

@@ -103,6 +103,13 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
   settings.mTransmitBuffer2Size = 0;
 #endif
 
+#ifdef ARDUINO_ARCH_RP2040
+  spi.setTX(_mosi_pin);
+  spi.setRX(_miso_pin);
+  spi.setSCK(_sck_pin);
+  spi.setCS(_csPin);
+#endif
+
   // start SPI
   spi.begin();
 
@@ -116,10 +123,11 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
     ret = can->begin(settings, [] {can->isr();});
   }
 
+  // save pointer to CAN object so the user can access other parts of the library API
+  canp = can;
+
   if (ret == 0) {
     // Serial << F("> CAN controller initialised ok") << endl;
-    // save pointer to CAN object so the user can access other parts of the library API
-    canp = can;
     retval = true;
   } else {
     // Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
@@ -185,6 +193,11 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 
   ret = canp->tryToSend(message);
   _numMsgsSent += ret;
+
+  if (UI) {
+    _ledGrn.pulse();
+  }
+
   return ret;
 }
 
@@ -207,7 +220,7 @@ void CBUS2515::printStatus(void) {
 
 void CBUS2515::reset(void) {
   canp->end();
-  delete can;
+  delete canp;
   begin();
 }
 
@@ -223,16 +236,13 @@ void CBUS2515::setPins(byte cs_pin, byte int_pin)
 {
 
 #ifdef ARDUINO_ARCH_RP2040
-  spi.setTx(mosi_pin);
-  spi.setRX(miso_pin);
-  spi.setSCK(sck_pin);
-  spi.setCS(cs_pin);
-  _csPin = cs_pin;
-  _intPin = int_pin;
-#else
-  _csPin = cs_pin;
-  _intPin = int_pin;
+  _mosi_pin = mosi_pin;
+  _miso_pin = miso_pin;
+  _sck_pin = sck_pin;
 #endif
+
+  _csPin = cs_pin;
+  _intPin = int_pin;
 }
 
 //
