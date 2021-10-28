@@ -45,7 +45,7 @@
 void makeHeader_impl(CANFrame *msg, byte id, byte priority = 0x0b);
 
 //
-/// construct a CBUS object with an external CBUSConfig object "config" that is defined
+/// construct a CBUS object with an external CBUSConfig object named "config" that is defined
 /// in user code
 //
 
@@ -572,13 +572,14 @@ void CBUSbase::process(byte num_messages) {
           // Serial << F("> buf[1] = ") << _msg.data[1] << ", buf[2] = " << _msg.data[2] << endl;
 
           // save the NN
-          module_config->setNodeNum((_msg.data[1] << 8) + _msg.data[2]);
+          // module_config->setNodeNum((_msg.data[1] << 8) + _msg.data[2]);
+          module_config->setNodeNum(nn);
 
           // respond with NNACK
           _msg.len = 3;
           _msg.data[0] = OPC_NNACK;
-          _msg.data[1] = highByte(module_config->nodeNum);
-          _msg.data[2] = lowByte(module_config->nodeNum);
+          // _msg.data[1] = highByte(module_config->nodeNum);
+          // _msg.data[2] = lowByte(module_config->nodeNum);
 
           sendMessage(&_msg);
 
@@ -1023,11 +1024,15 @@ void CBUSbase::checkCANenum(void) {
         if (bitRead(enum_responses[i], b) == 0) {
           selected_id = ((i * 16) + b);
           // Serial << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
-          i = 16; // ugh ... but probably better than a goto :)
+          // i = 16; // ugh ... but probably better than a goto :)
+          // but using a goto saves 4 bytes of program size ;)
+          goto check_done;
           break;
         }
       }
     }
+
+check_done:
 
     // Serial << F("> enumeration responses = ") << enums << F(", lowest available CAN id = ") << selected_id << endl;
 
