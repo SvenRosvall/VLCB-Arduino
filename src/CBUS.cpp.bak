@@ -484,10 +484,21 @@ void CBUSbase::process(byte num_messages) {
       case OPC_ACON2:
       case OPC_ACON3:
 
+      case OPC_ASON:
+      case OPC_ASON1:
+      case OPC_ASON2:
+      case OPC_ASON3:
+
       case OPC_ACOF:
       case OPC_ACOF1:
       case OPC_ACOF2:
       case OPC_ACOF3:
+
+      case OPC_ASOF:
+      case OPC_ASOF1:
+      case OPC_ASOF2:
+      case OPC_ASOF3:
+	  
 	  
 	  case OPC_ARON:
 	  case OPC_AROF:
@@ -495,23 +506,6 @@ void CBUSbase::process(byte num_messages) {
         // lookup this accessory event in the event table and call the user's registered callback function
         if (eventhandler || eventhandlerex) {
           processAccessoryEvent(nn, en, (opc % 2 == 0));
-        }
-
-        break;
-
-      case OPC_ASON:
-      case OPC_ASON1:
-      case OPC_ASON2:
-      case OPC_ASON3:
-
-      case OPC_ASOF:
-      case OPC_ASOF1:
-      case OPC_ASOF2:
-      case OPC_ASOF3:
-
-        // lookup this accessory event in the event table and call the user's registered callback function
-        if (eventhandler || eventhandlerex) {
-          processAccessoryEvent(0, en, (opc % 2 == 0));
         }
 
         break;
