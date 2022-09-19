@@ -461,7 +461,8 @@ void CBUSbase::process(byte num_messages) {
 
       // store this response in the responses array
       if (remoteCANID > 0) {
-        bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
+        // fix to correctly record the received CANID
+        bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
         // Serial << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
       }
 
