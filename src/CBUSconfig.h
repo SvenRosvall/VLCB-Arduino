@@ -50,8 +50,28 @@ static const byte EEPROM_I2C_ADDR = 0x50;
 
 enum {
   EEPROM_INTERNAL = 0,
-  EEPROM_EXTERNAL = 1
+  EEPROM_EXTERNAL = 1,
+  EEPROM_USES_FLASH
 };
+
+#ifdef __AVR_XMEGA__
+#include <Flash.h>
+
+#define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
+#define FLASH_PAGE_SIZE 512
+#define NUM_FLASH_PAGES 4
+
+typedef struct _flash_page {
+  bool dirty;
+  uint8_t data[FLASH_PAGE_SIZE];
+} flash_page_t;
+
+void flash_cache_page(const byte page);
+bool flash_writeback_page(const byte page);
+bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16_t number);
+byte flash_read_byte(const uint16_t address);
+void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest);
+#endif
 
 //
 /// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
@@ -60,6 +80,7 @@ enum {
 class CBUSConfig {
 
 public:
+  CBUSConfig();
   void begin(void);
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
@@ -105,10 +126,10 @@ public:
   void setChipEEPROMVal(unsigned int eeaddress, byte val);
 
   bool setEEPROMtype(byte type);
+  void setExtEEPROMAddress(byte address);
   unsigned int freeSRAM(void);
   void reboot(void);
 
-  byte eeprom_type;
   unsigned int EE_EVENTS_START;
   byte EE_MAX_EVENTS;
   byte EE_NUM_EVS;
@@ -119,4 +140,6 @@ public:
   byte CANID;
   bool FLiM;
   unsigned int nodeNum;
+  byte eeprom_type;
+  byte external_address;
 };

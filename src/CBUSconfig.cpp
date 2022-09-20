@@ -43,6 +43,8 @@
 #include <Wire.h>
 #include <Streaming.h>
 
+#include "CBUSconfig.h"
+
 #ifdef __SAM3X8E__
 #include <DueFlashStorage.h>            // use Due eeprom emulation library, will overwrite every time program is uploaded !
 extern "C" char* sbrk(int incr);
@@ -56,7 +58,10 @@ extern "C" char* sbrk(int incr);
 extern "C" char* sbrk(int incr);
 #endif
 
-#include "CBUSconfig.h"
+#ifdef __AVR_XMEGA__
+flash_page_t cache_page;                // flash page cache
+byte curr_page_num = 0;
+#endif
 
 // the event hash table
 byte *evhashtbl;
@@ -67,18 +72,53 @@ DueFlashStorage dueFlashStorage;
 #endif
 
 //
+/// ctor
+//
+
+CBUSConfig::CBUSConfig() {
+  eeprom_type = EEPROM_INTERNAL;
+  external_address = external_address;
+}
+
+//
 /// initialise and set default values
 //
 
 void CBUSConfig::begin(void) {
 
+  EE_BYTES_PER_EVENT = EE_NUM_EVS + 4;
+
+  if (eeprom_type == EEPROM_INTERNAL) {
+
+    // these devices require an explicit begin with the desired emulated size
+
 #if defined ESP32 || defined ESP8266
-  EEPROM.begin(EE_EVENTS_START + (EE_MAX_EVENTS * EE_BYTES_PER_EVENT));
+    EEPROM.begin(EE_EVENTS_START + (EE_MAX_EVENTS * EE_BYTES_PER_EVENT));
 #endif
 
 #ifdef ARDUINO_ARCH_RP2040
-  EEPROM.begin(4096);
+    EEPROM.begin(4096);
 #endif
+
+  }
+
+  if (eeprom_type == EEPROM_USES_FLASH) {
+
+#ifdef __AVR_XMEGA__
+
+    // check flash is writable
+    byte check = Flash.checkWritable();
+
+    if (check == FLASHWRITE_OK) {
+      // Serial << F("> flash is writable, PROGMEM_SIZE = ") << PROGMEM_SIZE << endl;
+    } else {
+      Serial << F("> flash is not writable, ret = ") << check << endl;
+    }
+
+    // cache the first page into memory
+    flash_cache_page(0);
+#endif
+  }
 
   makeEvHashTable();
   loadNVs();
@@ -93,26 +133,46 @@ void CBUSConfig::begin(void) {
 bool CBUSConfig::setEEPROMtype(byte type) {
 
   bool ret = true;
+  byte result;
+  eeprom_type = EEPROM_INTERNAL;
 
-  if (type == EEPROM_EXTERNAL) {
+  switch (type) {
+  case EEPROM_EXTERNAL:
+    // test accessibility of external EEPROM chip
     Wire.begin();
-    Wire.beginTransmission(EEPROM_I2C_ADDR);
-    byte result = Wire.endTransmission();
+    Wire.beginTransmission(external_address);
+    result = Wire.endTransmission();
 
     if (result == 0) {
-      eeprom_type = EEPROM_EXTERNAL;
+      eeprom_type = type;
       // Serial << F("> external EEPROM selected") << endl;
     } else {
       // Serial << F("> external EEPROM not found") << endl;
       eeprom_type = EEPROM_INTERNAL;
       ret = false;
     }
-  } else {
+    break;
+
+  case EEPROM_USES_FLASH:
+
+#ifdef __AVR_XMEGA__
+    eeprom_type = EEPROM_USES_FLASH;
+#else
     eeprom_type = EEPROM_INTERNAL;
     // Serial << F("> internal EEPROM selected") << endl;
+#endif
+    break;
   }
 
   return ret;
+}
+
+//
+/// set the bus address of an external EEPROM chip
+//
+
+void CBUSConfig::setExtEEPROMAddress(byte address) {
+  external_address = address;
 }
 
 //
@@ -122,20 +182,8 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 void CBUSConfig::setFLiM(bool f) {
 
   FLiM = f;
-
-#ifdef __SAM3X8E__
-  dueFlashStorage.write(0, f);
-#else
-  EEPROM.write(0, f);
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
+  writeEEPROM(0, f);
+  return;
 }
 
 //
@@ -145,20 +193,8 @@ void CBUSConfig::setFLiM(bool f) {
 void CBUSConfig::setCANID(byte canid) {
 
   CANID = canid;
-
-#ifdef __SAM3X8E__
-  dueFlashStorage.write(1, canid);
-#else
-  EEPROM.write(1, canid);
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
+  writeEEPROM(1, canid);
+  return;
 }
 
 //
@@ -168,22 +204,9 @@ void CBUSConfig::setCANID(byte canid) {
 void CBUSConfig::setNodeNum(unsigned int nn) {
 
   nodeNum = nn;
-
-#ifdef __SAM3X8E__
-  dueFlashStorage.write(2, highByte(nodeNum));
-  dueFlashStorage.write(3, lowByte(nodeNum));
-#else
-  EEPROM.write(2, highByte(nodeNum));
-  EEPROM.write(3, lowByte(nodeNum));
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
+  writeEEPROM(2, highByte(nodeNum));
+  writeEEPROM(3, lowByte(nodeNum));
+  return;
 }
 
 //
@@ -275,7 +298,7 @@ byte CBUSConfig::findEventSpace(void) {
 
   for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++) {
     if (evhashtbl[evidx] == 0)  {
-      // Serial << F("> found empty location at index = ") << evidx << endl;
+      // Serial << F("> found unused location at index = ") << evidx << endl;
       break;
     }
   }
@@ -466,42 +489,29 @@ byte CBUSConfig::getEvTableEntry(byte tindex) {
 }
 
 //
-/// read an NV value from local EEPROM
+/// read an NV value from EEPROM
 /// note that NVs number from 1, not 0
 //
 
 byte CBUSConfig::readNV(byte idx) {
 
-#ifdef __SAM3X8E__
-  return (dueFlashStorage.read(EE_NVS_START + (idx - 1)));
-#else
-  return (EEPROM.read(EE_NVS_START + (idx - 1)));
-#endif
+  return (readEEPROM(EE_NVS_START + (idx - 1)));
 }
 
 //
-/// write an NV value to local EEPROM
+/// write an NV value to EEPROM
 /// note that NVs number from 1, not 0
 //
 
 void CBUSConfig::writeNV(byte idx, byte val) {
 
-#ifdef __SAM3X8E__
-  dueFlashStorage.write(EE_NVS_START + (idx - 1), val);
-#else
-  EEPROM.write(EE_NVS_START + (idx - 1), val);
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
-
+  writeEEPROM(EE_NVS_START + (idx - 1), val);
   return;
 }
+
+//
+/// generic EEPROM access methods
+//
 
 //
 /// read a single byte from EEPROM
@@ -514,9 +524,11 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
 
   // Serial << F("> readEEPROM, addr = ") << eeaddress << endl;
 
-  if (eeprom_type == EEPROM_EXTERNAL) {
+  switch (eeprom_type) {
 
-    Wire.beginTransmission(EEPROM_I2C_ADDR);
+  case EEPROM_EXTERNAL:
+
+    Wire.beginTransmission(external_address);
     Wire.write((int)(eeaddress >> 8));    // MSB
     Wire.write((int)(eeaddress & 0xFF));  // LSB
     r = Wire.endTransmission();
@@ -525,16 +537,21 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
       // Serial << F("> readEEPROM: I2C write error = ") << r << endl;
     }
 
-    Wire.requestFrom(EEPROM_I2C_ADDR, (uint8_t)1);
+    Wire.requestFrom(external_address, (uint8_t)1);
 
     if (Wire.available()) rdata = Wire.read();
+    break;
 
-  } else {
-#ifdef __SAM3X8E__
-    rdata = dueFlashStorage.read(eeaddress);
-#else
-    rdata = EEPROM.read(eeaddress);
+  case EEPROM_INTERNAL:
+    rdata = getChipEEPROMVal(eeaddress);
+    break;
+
+  case EEPROM_USES_FLASH:
+#ifdef __AVR_XMEGA__
+    rdata = Flash.readByte(FLASH_AREA_BASE_ADDRESS + eeaddress);
+    // Serial << F("> read byte = ") << rdata << F(" from address = ") << eeaddress << endl;
 #endif
+    break;
   }
 
   return rdata;
@@ -550,9 +567,10 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
   int r = 0;
   byte count = 0;
 
-  if (eeprom_type == EEPROM_EXTERNAL) {
+  switch (eeprom_type) {
 
-    Wire.beginTransmission(EEPROM_I2C_ADDR);
+  case EEPROM_EXTERNAL:
+    Wire.beginTransmission(external_address);
     Wire.write((int)(eeaddress >> 8));    // MSB
     Wire.write((int)(eeaddress & 0xFF));  // LSB
     r = Wire.endTransmission();
@@ -561,22 +579,28 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
       // Serial << F("> readBytesEEPROM: I2C write error = ") << r << endl;
     }
 
-    Wire.requestFrom((uint8_t)EEPROM_I2C_ADDR, (uint8_t)nbytes);
+    Wire.requestFrom((uint8_t)external_address, (uint8_t)nbytes);
 
     while (Wire.available() && count < nbytes) {
       dest[count++] = Wire.read();
     }
 
     // Serial << F("> readBytesEEPROM: read ") << count << F(" bytes from EEPROM in ") << micros() - t1 << F("us") << endl;
-  } else {
+    break;
 
+  case EEPROM_INTERNAL:
     for (count = 0; count < nbytes; count++) {
-#ifdef __SAM3X8E__
-      dest[count] = dueFlashStorage.read(eeaddress + count);
-#else
-      dest[count] = EEPROM.read(eeaddress + count);
-#endif
+      dest[count] = getChipEEPROMVal(eeaddress + count);
     }
+    break;
+
+  case EEPROM_USES_FLASH:
+#ifdef __AVR_XMEGA__
+    for (count = 0; count < nbytes; count++) {
+      dest[count] = Flash.readByte(FLASH_AREA_BASE_ADDRESS + eeaddress + count);
+    }
+#endif
+    break;
   }
 
   return count;
@@ -592,9 +616,10 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
 
   // Serial << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
 
-  if (eeprom_type == EEPROM_EXTERNAL) {
+  switch (eeprom_type) {
 
-    Wire.beginTransmission(EEPROM_I2C_ADDR);
+  case EEPROM_EXTERNAL:
+    Wire.beginTransmission(external_address);
     Wire.write((int)(eeaddress >> 8)); // MSB
     Wire.write((int)(eeaddress & 0xFF)); // LSB
     Wire.write(data);
@@ -604,20 +629,17 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
     if (r < 0) {
       // Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
     }
-  } else {
-#ifdef __SAM3X8E__
-    dueFlashStorage.write(eeaddress, data);
-#else
-    EEPROM.write(eeaddress, data);
-#endif
+    break;
 
-#if defined ESP32 || defined ESP8266
-    EEPROM.commit();
-#endif
+  case EEPROM_INTERNAL:
+    setChipEEPROMVal(eeaddress, data);
+    break;
 
-#ifdef ARDUINO_ARCH_RP2040
-    EEPROM.commit();
+  case EEPROM_USES_FLASH:
+#ifdef __AVR_XMEGA__
+    flash_write_bytes(eeaddress, &data, 1);
 #endif
+    break;
   }
 
   return;
@@ -635,9 +657,9 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
 
   int r = 0;
 
-  if (eeprom_type == EEPROM_EXTERNAL) {
-
-    Wire.beginTransmission(EEPROM_I2C_ADDR);
+  switch (eeprom_type) {
+  case EEPROM_EXTERNAL:
+    Wire.beginTransmission(external_address);
     Wire.write((int)(eeaddress >> 8));   // MSB
     Wire.write((int)(eeaddress & 0xFF)); // LSB
 
@@ -651,28 +673,23 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
     if (r < 0) {
       // Serial << F("> writeBytesEEPROM: I2C write error = ") << r << endl;
     }
-  } else {
+    break;
 
+  case EEPROM_INTERNAL:
     for (byte i = 0; i < numbytes; i++) {
-#ifdef __SAM3X8E__
-      dueFlashStorage.write(eeaddress + i, src[i]);
-#else
-      EEPROM.write(eeaddress + i, src[i]);
-#endif
+      setChipEEPROMVal(eeaddress + i, src[i]);
     }
+    break;
 
-#if defined ESP32 || defined ESP8266
-    EEPROM.commit();
+  case EEPROM_USES_FLASH:
+#ifdef __AVR_XMEGA__
+    flash_write_bytes(eeaddress, src, numbytes);
 #endif
-
-#ifdef ARDUINO_ARCH_RP2040
-    EEPROM.commit();
-#endif
+    break;
   }
 
   return;
 }
-
 
 //
 /// write (or clear) an event to EEPROM
@@ -713,9 +730,17 @@ void CBUSConfig::resetEEPROM(void) {
 
     // Serial << F("> clearing data from external EEPROM ...") << endl;
 
-    for (unsigned int addr = 0; addr < 4096; addr++) {
+    for (unsigned int addr = 10; addr < 4096; addr++) {
       writeEEPROM(addr, 0xff);
     }
+  } else if (eeprom_type == EEPROM_USES_FLASH) {
+#ifdef __AVR_XMEGA__
+    for (byte i = 0; i < 4; i++) {
+      memset(cache_page.data, 0xff, FLASH_PAGE_SIZE);
+      cache_page.dirty = true;
+      flash_writeback_page(i);
+    }
+#endif
   }
 
   return;
@@ -741,8 +766,9 @@ void CBUSConfig::reboot(void) {
 
 // for newer AVR Xmega, e.g. AVR-DA
 #ifdef __AVR_XMEGA__
-  CCP = (uint8_t)CCP_IOREG_gc;
-  RSTCTRL.SWRR = 1;
+  _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
+  // CCP = (uint8_t)CCP_IOREG_gc;
+  // RSTCTRL.SWRR = 1;
 #else
 
 // for older AVR Mega, e.g. Uno, Nano, Mega
@@ -871,55 +897,29 @@ void CBUSConfig::resetModule(void) {
 
   /// implementation of resetModule() without CBUSswitch or CBUSLEDs
 
-  // clear the entire on-chip EEPROM
-  // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
-  // Serial << F("> clearing on-chip EEPROM ...") << endl;
+  if (eeprom_type == EEPROM_INTERNAL) {
 
-#ifdef __SAM3X8E__
-  for (unsigned int j = 10; j < 1024; j++) {
-    dueFlashStorage.write(j, 0xff);
+    // clear the entire on-chip EEPROM
+    // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
+    // Serial << F("> clearing on-chip EEPROM ...") << endl;
+
+    for (unsigned int j = 10; j < EEPROM.length(); j++) {
+      setChipEEPROMVal(j, 0xff);
+    }
+
+  } else {
+    // clear the external I2C EEPROM of learned events
+    resetEEPROM();
   }
-#else
-  for (unsigned int j = 10; j < EEPROM.length(); j++) {
-    EEPROM.write(j, 0xff);
-  }
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
-
-  // clear the external I2C EEPROM of learned events
-  resetEEPROM();
 
   // set the node identity defaults
   // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
 
-#ifdef __SAM3X8E__
-  dueFlashStorage.write(0, 0);     // SLiM
-  dueFlashStorage.write(1, 0);     // CANID
-  dueFlashStorage.write(2, 0);     // NN hi
-  dueFlashStorage.write(3, 0);     // NN lo
-  dueFlashStorage.write(5, 99);    // set reset indicator
-#else
-  EEPROM.write(0, 0);     // SLiM
-  EEPROM.write(1, 0);     // CANID
-  EEPROM.write(2, 0);     // NN hi
-  EEPROM.write(3, 0);     // NN lo
-  EEPROM.write(5, 99);    // set reset indicator
-#endif
-
-#if defined ESP32 || defined ESP8266
-  EEPROM.commit();
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
-  EEPROM.commit();
-#endif
+  writeEEPROM(0, 0);     // SLiM
+  writeEEPROM(1, 0);     // CANID
+  writeEEPROM(2, 0);     // NN hi
+  writeEEPROM(3, 0);     // NN lo
+  setResetFlag();        // set reset indicator
 
   // zero NVs (NVs number from one, not zero)
   for (byte i = 0; i < EE_NUM_NVS; i++) {
@@ -932,22 +932,14 @@ void CBUSConfig::resetModule(void) {
 
 //
 //
-/// load NVs from EEPROM
+/// load node identity from EEPROM
 //
 
 void CBUSConfig::loadNVs(void) {
 
-  // load NVs from EEPROM into memory
-#ifdef __SAM3X8E__
-  FLiM =        dueFlashStorage.read(0);
-  CANID =       dueFlashStorage.read(1);
-  nodeNum =     (dueFlashStorage.read(2) << 8) + dueFlashStorage.read(3);
-#else
-  FLiM =        EEPROM.read(0);
-  CANID =       EEPROM.read(1);
-  nodeNum =     (EEPROM.read(2) << 8) + EEPROM.read(3);
-#endif
-
+  FLiM =     readEEPROM(0);
+  CANID =    readEEPROM(1);
+  nodeNum =  (readEEPROM(2) << 8) + readEEPROM(3);
   return;
 }
 
@@ -1007,16 +999,151 @@ byte CBUSConfig::getChipEEPROMVal(unsigned int eeaddress) {
 
 void CBUSConfig::setResetFlag(void) {
 
-  setChipEEPROMVal(5, 99);
+  writeEEPROM(5, 99);
 }
 
 void CBUSConfig::clearResetFlag(void) {
 
-  setChipEEPROMVal(5, 0);
+  writeEEPROM(5, 0);
 }
 
 bool CBUSConfig::isResetFlagSet(void) {
 
-  return (getChipEEPROMVal(5) == 99);
+  return (readEEPROM(5) == 99);
 }
+
+//
+/// flash routines for AVR-Dx devices
+/// we allocate 2048 bytes at the far end of flash, and cache the data of one of four 512 byte pages (0-3)
+/// dirty pages must be erased and written back before moving on
+//
+
+#ifdef __AVR_XMEGA__
+
+// cache a page of flash into memory
+
+void flash_cache_page(const byte page) {
+
+  const uint32_t address_base = FLASH_AREA_BASE_ADDRESS + (page * FLASH_PAGE_SIZE);
+
+  // Serial << F("> flash_cache_page, page = ") << page << endl;
+
+  for (unsigned int a = 0; a < FLASH_PAGE_SIZE; a++) {
+    cache_page.data[a] = Flash.readByte(address_base + a);
+  }
+
+  cache_page.dirty = false;
+  return;
+}
+
+// write out a cached page to flash
+
+bool flash_writeback_page(const byte page) {
+
+  bool ret = true;
+  uint32_t address;
+
+  // Serial << F("> flash_writeback_page, page = ") << curr_page_num << F(", dirty = ") << cache_page.dirty << endl;
+
+  if (cache_page.dirty) {
+    address = FLASH_AREA_BASE_ADDRESS + (FLASH_PAGE_SIZE * page);
+
+    // erase the existing page of flash memory
+    ret = Flash.erasePage(address, 1);
+
+    if (ret != FLASHWRITE_OK) {
+      Serial.printf(F("error erasing flash page\r\n"));
+    }
+
+    // write the nexw data
+    ret = Flash.writeBytes(address, cache_page.data, FLASH_PAGE_SIZE);
+
+    if (ret != FLASHWRITE_OK) {
+      Serial.printf(F("error writing flash data\r\n"));
+    }
+
+    cache_page.dirty = false;
+  }
+
+  return ret;
+}
+
+// write one or more bytes into the page cache, handling crossing a page boundary
+// address is the index into the flash area (0-2047), not the absolute memory address
+
+bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16_t number) {
+
+  bool ret = true;
+
+  // Serial << F("> flash_write_bytes: address = ") << address << F(", data = ") << *data << F(", length = ") << length << endl;
+
+  if (address >= (FLASH_PAGE_SIZE * NUM_FLASH_PAGES)) {
+    Serial.printf(F("cache page address = %u is out of bounds\r\n"), address);
+  }
+
+  // calculate page number, 0-3
+  byte new_page_num = address / FLASH_PAGE_SIZE;
+
+  // Serial << F("> curr page = ") << curr_page_num << F(", new = ") << new_page_num << endl;
+
+  // erase and write back current page if cache page number is changing
+  if (new_page_num != curr_page_num) {
+    flash_writeback_page(curr_page_num);                // write back current cache page
+    curr_page_num = new_page_num;                       // set new cache page num
+    flash_cache_page(curr_page_num);                    // cache the new page data from flash
+    cache_page.dirty = false;                           // set flag
+  }
+
+  // calculate the address offset into the page cache buffer
+  uint16_t buffer_index = address % FLASH_PAGE_SIZE;
+
+  // write data into cached page buffer
+  for (uint16_t a = 0; a < number; a++) {
+
+    // we are crossing a page boundary ...
+    if (buffer_index >= FLASH_PAGE_SIZE) {
+      Serial.printf(F("crossing page boundary\r\n"));
+      cache_page.dirty = true;
+      flash_writeback_page(curr_page_num);              // write back current cache page
+      ++curr_page_num;                                  // increment the page number -- should really handle end of flash area
+      flash_cache_page(curr_page_num);                  // cache the new page data from flash
+      buffer_index = 0;                                 // set cache buffer index to zero
+    }
+
+    cache_page.data[buffer_index + a] = data[a];
+  }
+
+  // set page dirty flag
+  cache_page.dirty = true;
+
+  // write the cache page to flash
+  flash_writeback_page(curr_page_num);
+
+  return ret;
+}
+
+// read one byte from flash
+// not via cache
+
+byte flash_read_byte(uint32_t address) {
+
+  return Flash.readByte(address);
+}
+
+// read multiple bytes from flash
+// address is internal address map offset
+// not through cache
+
+void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest) {
+
+  uint32_t base_address = FLASH_AREA_BASE_ADDRESS + address;
+
+  for (uint32_t a = 0; a < number; a++) {
+    dest[a] = flash_read_byte(base_address + a);
+  }
+
+  return;
+}
+
+#endif
 
