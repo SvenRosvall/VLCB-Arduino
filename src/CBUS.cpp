@@ -489,9 +489,9 @@ void CBUSbase::process(byte num_messages) {
       case OPC_ACOF1:
       case OPC_ACOF2:
       case OPC_ACOF3:
-	  
-	  case OPC_ARON:
-	  case OPC_AROF:
+
+      case OPC_ARON:
+      case OPC_AROF:
 
         // lookup this accessory event in the event table and call the user's registered callback function
         if (eventhandler || eventhandlerex) {
@@ -944,12 +944,11 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_AREQ:
         // AREQ message - request for node state, only producer nodes
-				
-		if ((_msg.data[1] == highByte(config.nodeNum)) && (_msg.data[2] == lowByte(config.nodeNum)))
-		{
-			(void)(*eventhandler)(0, &_msg);
-		}
-		
+
+        if ((_msg.data[1] == highByte(module_config->nodeNum)) && (_msg.data[2] == lowByte(module_config->nodeNum))) {
+          (void)(*eventhandler)(0, &_msg);
+        }
+
         break;
 
       case OPC_BOOT:
