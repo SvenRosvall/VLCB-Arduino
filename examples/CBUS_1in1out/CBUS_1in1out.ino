@@ -80,7 +80,9 @@ CBUSLED moduleLED;                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte index, byte opc);
+void eventhandler(byte, CANFrame *);
+void processSerialInput(void);
+void printConfig(void);
 
 //
 /// setup CBUS - runs once at power on from setup()
