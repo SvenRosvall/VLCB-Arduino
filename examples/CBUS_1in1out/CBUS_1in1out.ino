@@ -83,6 +83,7 @@ unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 void eventhandler(byte, CANFrame *);
 void processSerialInput(void);
 void printConfig(void);
+void processModuleSwitchChange(void);
 
 //
 /// setup CBUS - runs once at power on from setup()
