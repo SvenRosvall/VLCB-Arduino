@@ -151,7 +151,11 @@ void setupCBUS() {
   CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  CBUS.begin();
+  
+  if (!CBUS.begin())
+  {
+    Serial << F("> error starting CBUS") << endl;
+  }
 }
 
 //
