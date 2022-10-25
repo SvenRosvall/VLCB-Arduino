@@ -77,9 +77,11 @@ CBUSLongMessage lmsg(&CBUS);        // CBUS RFC0005 long message object
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
 
 // forward function declarations
-void eventhandler(byte index, byte opc);
-void framehandler(CANFrame *msg);
-void longmessagehandler(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);
+void eventhandler(byte, CANFrame *);
+void framehandler(CANFrame *);
+void processSerialInput(void);
+void printConfig(void);
+void longmessagehandler(void *, const unsigned int, const byte, const byte);
 
 // long message variables
 byte streams[] = {1, 2, 3};         // streams to subscribe to

@@ -76,8 +76,10 @@ CBUSSwitch pb_switch;               // switch object
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
-void eventhandler(byte index, byte opc);
-void framehandler(CANFrame *msg);
+void eventhandler(byte, CANFrame *);
+void framehandler(CANFrame *);
+void processSerialInput(void);
+void printConfig(void);
 
 //
 /// setup CBUS - runs once at power on from setup()
