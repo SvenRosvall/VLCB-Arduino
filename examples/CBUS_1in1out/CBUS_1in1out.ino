@@ -83,6 +83,7 @@ unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 void eventhandler(byte, CANFrame *);
 void processSerialInput(void);
 void printConfig(void);
+void processModuleSwitchChange(void);
 
 //
 /// setup CBUS - runs once at power on from setup()
@@ -150,7 +151,11 @@ void setupCBUS() {
   CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  CBUS.begin();
+  
+  if (!CBUS.begin())
+  {
+    Serial << F("> error starting CBUS") << endl;
+  }
 }
 
 //
