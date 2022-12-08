@@ -77,7 +77,8 @@ DueFlashStorage dueFlashStorage;
 
 CBUSConfig::CBUSConfig() {
   eeprom_type = EEPROM_INTERNAL;
-  external_address = external_address;
+  // external_address = external_address;
+  I2Cbus = &Wire;
 }
 
 //
@@ -139,15 +140,15 @@ bool CBUSConfig::setEEPROMtype(byte type) {
   switch (type) {
   case EEPROM_EXTERNAL:
     // test accessibility of external EEPROM chip
-    Wire.begin();
-    Wire.beginTransmission(external_address);
-    result = Wire.endTransmission();
+    I2Cbus->begin();
+    I2Cbus->beginTransmission(external_address);
+    result = I2Cbus->endTransmission();
 
     if (result == 0) {
       eeprom_type = type;
-      // Serial << F("> external EEPROM selected") << endl;
+      Serial << F("> external EEPROM selected") << endl;
     } else {
-      // Serial << F("> external EEPROM not found") << endl;
+      Serial << F("> external EEPROM not found") << endl;
       eeprom_type = EEPROM_INTERNAL;
       ret = false;
     }
@@ -159,7 +160,7 @@ bool CBUSConfig::setEEPROMtype(byte type) {
     eeprom_type = EEPROM_USES_FLASH;
 #else
     eeprom_type = EEPROM_INTERNAL;
-    // Serial << F("> internal EEPROM selected") << endl;
+    Serial << F("> internal EEPROM selected") << endl;
 #endif
     break;
   }
@@ -171,8 +172,9 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 /// set the bus address of an external EEPROM chip
 //
 
-void CBUSConfig::setExtEEPROMAddress(byte address) {
+void CBUSConfig::setExtEEPROMAddress(byte address, TwoWire *bus) {
   external_address = address;
+  I2Cbus = bus;
 }
 
 //
@@ -528,18 +530,18 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
 
   case EEPROM_EXTERNAL:
 
-    Wire.beginTransmission(external_address);
-    Wire.write((int)(eeaddress >> 8));    // MSB
-    Wire.write((int)(eeaddress & 0xFF));  // LSB
-    r = Wire.endTransmission();
+    I2Cbus->beginTransmission(external_address);
+    I2Cbus->write((int)(eeaddress >> 8));    // MSB
+    I2Cbus->write((int)(eeaddress & 0xFF));  // LSB
+    r = I2Cbus->endTransmission();
 
     if (r < 0) {
       // Serial << F("> readEEPROM: I2C write error = ") << r << endl;
     }
 
-    Wire.requestFrom(external_address, (uint8_t)1);
+    I2Cbus->requestFrom(external_address, (uint8_t)1);
 
-    if (Wire.available()) rdata = Wire.read();
+    if (I2Cbus->available()) rdata = I2Cbus->read();
     break;
 
   case EEPROM_INTERNAL:
@@ -570,19 +572,19 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
   switch (eeprom_type) {
 
   case EEPROM_EXTERNAL:
-    Wire.beginTransmission(external_address);
-    Wire.write((int)(eeaddress >> 8));    // MSB
-    Wire.write((int)(eeaddress & 0xFF));  // LSB
-    r = Wire.endTransmission();
+    I2Cbus->beginTransmission(external_address);
+    I2Cbus->write((int)(eeaddress >> 8));    // MSB
+    I2Cbus->write((int)(eeaddress & 0xFF));  // LSB
+    r = I2Cbus->endTransmission();
 
     if (r < 0) {
       // Serial << F("> readBytesEEPROM: I2C write error = ") << r << endl;
     }
 
-    Wire.requestFrom((uint8_t)external_address, (uint8_t)nbytes);
+    I2Cbus->requestFrom((uint8_t)external_address, (uint8_t)nbytes);
 
-    while (Wire.available() && count < nbytes) {
-      dest[count++] = Wire.read();
+    while (I2Cbus->available() && count < nbytes) {
+      dest[count++] = I2Cbus->read();
     }
 
     // Serial << F("> readBytesEEPROM: read ") << count << F(" bytes from EEPROM in ") << micros() - t1 << F("us") << endl;
@@ -619,11 +621,11 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
   switch (eeprom_type) {
 
   case EEPROM_EXTERNAL:
-    Wire.beginTransmission(external_address);
-    Wire.write((int)(eeaddress >> 8)); // MSB
-    Wire.write((int)(eeaddress & 0xFF)); // LSB
-    Wire.write(data);
-    r = Wire.endTransmission();
+    I2Cbus->beginTransmission(external_address);
+    I2Cbus->write((int)(eeaddress >> 8)); // MSB
+    I2Cbus->write((int)(eeaddress & 0xFF)); // LSB
+    I2Cbus->write(data);
+    r = I2Cbus->endTransmission();
     delay(5);
 
     if (r < 0) {
@@ -659,15 +661,15 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
 
   switch (eeprom_type) {
   case EEPROM_EXTERNAL:
-    Wire.beginTransmission(external_address);
-    Wire.write((int)(eeaddress >> 8));   // MSB
-    Wire.write((int)(eeaddress & 0xFF)); // LSB
+    I2Cbus->beginTransmission(external_address);
+    I2Cbus->write((int)(eeaddress >> 8));   // MSB
+    I2Cbus->write((int)(eeaddress & 0xFF)); // LSB
 
     for (byte i = 0; i < numbytes; i++) {
-      Wire.write(src[i]);
+      I2Cbus->write(src[i]);
     }
 
-    r = Wire.endTransmission();
+    r = I2Cbus->endTransmission();
     delay(5);
 
     if (r < 0) {
@@ -896,21 +898,27 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 void CBUSConfig::resetModule(void) {
 
   /// implementation of resetModule() without CBUSswitch or CBUSLEDs
+  uint32_t t = millis();
+  Serial << F("> resetting EEPROM") << endl;
 
   if (eeprom_type == EEPROM_INTERNAL) {
 
     // clear the entire on-chip EEPROM
     // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
     // Serial << F("> clearing on-chip EEPROM ...") << endl;
-
+#ifdef __SAM3X8E__
+#else
     for (unsigned int j = 10; j < EEPROM.length(); j++) {
+      if (j % 250 == 0) Serial << j << endl;
       setChipEEPROMVal(j, 0xff);
     }
-
+#endif
   } else {
     // clear the external I2C EEPROM of learned events
     resetEEPROM();
   }
+
+  Serial << F("> setting SLiM config") << endl;
 
   // set the node identity defaults
   // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
@@ -925,6 +933,8 @@ void CBUSConfig::resetModule(void) {
   for (byte i = 0; i < EE_NUM_NVS; i++) {
     writeNV(i + 1, 0);
   }
+
+  Serial << F("> complete in ") << (millis() - t) << F(", rebooting ... ") << endl;
 
   // reset complete
   reboot();

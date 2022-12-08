@@ -38,6 +38,7 @@
 #pragma once
 
 #include <Arduino.h>                // for definition of byte datatype
+#include <Wire.h>
 
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
@@ -126,7 +127,7 @@ public:
   void setChipEEPROMVal(unsigned int eeaddress, byte val);
 
   bool setEEPROMtype(byte type);
-  void setExtEEPROMAddress(byte address);
+  void setExtEEPROMAddress(byte address, TwoWire *bus = &Wire);
   unsigned int freeSRAM(void);
   void reboot(void);
 
@@ -142,4 +143,5 @@ public:
   unsigned int nodeNum;
   byte eeprom_type;
   byte external_address;
+  TwoWire *I2Cbus;
 };
