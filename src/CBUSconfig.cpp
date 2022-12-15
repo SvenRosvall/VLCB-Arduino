@@ -541,7 +541,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
       // Serial << F("> readEEPROM: I2C write error = ") << r << endl;
     }
 
-    I2Cbus->requestFrom(external_address, (uint8_t)1);
+    I2Cbus->requestFrom((int)external_address, (int)1);
 
     if (I2Cbus->available()) rdata = I2Cbus->read();
     break;
@@ -584,7 +584,7 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
       // Serial << F("> readBytesEEPROM: I2C write error = ") << r << endl;
     }
 
-    I2Cbus->requestFrom((uint8_t)external_address, (uint8_t)nbytes);
+    I2Cbus->requestFrom((int)external_address, (int)nbytes);
 
     while (I2Cbus->available() && count < nbytes) {
       dest[count++] = I2Cbus->read();
