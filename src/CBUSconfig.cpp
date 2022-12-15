@@ -58,7 +58,8 @@ extern "C" char* sbrk(int incr);
 extern "C" char* sbrk(int incr);
 #endif
 
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
 flash_page_t cache_page;                // flash page cache
 byte curr_page_num = 0;
 #endif
@@ -105,8 +106,8 @@ void CBUSConfig::begin(void) {
 
   if (eeprom_type == EEPROM_USES_FLASH) {
 
-#ifdef __AVR_XMEGA__
-
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     // check flash is writable
     byte check = Flash.checkWritable();
 
@@ -156,7 +157,8 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 
   case EEPROM_USES_FLASH:
 
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     eeprom_type = EEPROM_USES_FLASH;
 #else
     eeprom_type = EEPROM_INTERNAL;
@@ -549,7 +551,8 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
     break;
 
   case EEPROM_USES_FLASH:
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     rdata = Flash.readByte(FLASH_AREA_BASE_ADDRESS + eeaddress);
     // Serial << F("> read byte = ") << rdata << F(" from address = ") << eeaddress << endl;
 #endif
@@ -597,7 +600,8 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
     break;
 
   case EEPROM_USES_FLASH:
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     for (count = 0; count < nbytes; count++) {
       dest[count] = Flash.readByte(FLASH_AREA_BASE_ADDRESS + eeaddress + count);
     }
@@ -638,7 +642,8 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
     break;
 
   case EEPROM_USES_FLASH:
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     flash_write_bytes(eeaddress, &data, 1);
 #endif
     break;
@@ -684,7 +689,8 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
     break;
 
   case EEPROM_USES_FLASH:
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     flash_write_bytes(eeaddress, src, numbytes);
 #endif
     break;
@@ -736,7 +742,8 @@ void CBUSConfig::resetEEPROM(void) {
       writeEEPROM(addr, 0xff);
     }
   } else if (eeprom_type == EEPROM_USES_FLASH) {
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
     for (byte i = 0; i < 4; i++) {
       memset(cache_page.data, 0xff, FLASH_PAGE_SIZE);
       cache_page.dirty = true;
@@ -767,7 +774,8 @@ void CBUSConfig::reboot(void) {
 #ifdef __AVR__
 
 // for newer AVR Xmega, e.g. AVR-DA
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
   _PROTECTED_WRITE(RSTCTRL.SWRR, 1);
   // CCP = (uint8_t)CCP_IOREG_gc;
   // RSTCTRL.SWRR = 1;
@@ -1028,8 +1036,8 @@ bool CBUSConfig::isResetFlagSet(void) {
 /// dirty pages must be erased and written back before moving on
 //
 
-#ifdef __AVR_XMEGA__
-
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
 // cache a page of flash into memory
 
 void flash_cache_page(const byte page) {

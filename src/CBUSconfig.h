@@ -55,7 +55,8 @@ enum {
   EEPROM_USES_FLASH
 };
 
-#ifdef __AVR_XMEGA__
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
 #include <Flash.h>
 
 #define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
