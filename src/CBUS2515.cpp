@@ -112,7 +112,7 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
 
   // start SPI
   spi.begin();
-  
+
   // instantiate CAN bus object
   // if in polling mode, the interrupt pin and ISR not used
   if (_poll) {
@@ -127,10 +127,10 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
   canp = can;
 
   if (ret == 0) {
-    // Serial << F("> CAN controller initialised ok") << endl;
+    // DEBUG_SERIAL << F("> CAN controller initialised ok") << endl;
     retval = true;
   } else {
-    // Serial << F("> error initialising CAN controller, error code = ") << ret << endl;
+    // DEBUG_SERIAL << F("> error initialising CAN controller, error code = ") << ret << endl;
   }
 
   return retval;
@@ -207,10 +207,16 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 
 void CBUS2515::printStatus(void) {
 
-  Serial << F("> CBUS status:");
-  Serial << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << \
-         canp->receiveErrorCounter() << F(", transmit errors = ") << canp->transmitErrorCounter() << F(", error flag = ") \
-         << canp->errorFlagRegister() << endl;
+  // removed so that no libraries produce serial output
+  // can be implemented in user's sketch
+
+  /*
+    DEBUG_SERIAL << F("> CBUS status:");
+    DEBUG_SERIAL << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << endl;
+           // canp->receiveErrorCounter() << F(", transmit errors = ") << canp->transmitErrorCounter() << F(", error flag = ")
+           // << canp->errorFlagRegister()
+           // << endl;
+   */
   return;
 }
 
