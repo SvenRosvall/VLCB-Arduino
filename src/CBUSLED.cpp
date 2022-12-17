@@ -133,6 +133,6 @@ void CBUSLED::run() {
 
 void CBUSLED::_write(byte pin, bool state) {
 
-  // Serial << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
+  // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
   digitalWrite(pin, state);
 }

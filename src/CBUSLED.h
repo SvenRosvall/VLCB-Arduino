@@ -41,8 +41,12 @@
 
 #pragma once
 
+#ifndef DEBUG_SERIAL
+#define DEBUG_SERIAL Serial
+#endif
+
 #define BLINK_RATE 500    // flash at 1Hz, 500mS on, 500mS off
-#define PULSE_ON_TIME 50
+#define PULSE_ON_TIME 5
 
 #include <Arduino.h>      // for definition of byte datatype
 // #include <Streaming.h>
