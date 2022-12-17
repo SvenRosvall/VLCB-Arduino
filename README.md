@@ -1,11 +1,9 @@
 
 # Arduino library for MERG CBUS running over CAN bus
 
-It contains everything required to implement a FLiM CBUS module that can be configured
-using FCU or JMRI.
+Together with the other CBUS libraries, it provides everything required to implement a FLiM CBUS module that can be configured using FCU or JMRI.
 
-This library contains an abstract base class that must be implemented by a concrete subclass, 
-depending on the processor and CAN controller to be used, e.g. CBUS2515, CBUSESP32, etc.
+This library contains an abstract base class that must be implemented by a concrete subclass, depending on the processor and CAN controller to be used, e.g. CBUS2515, CBUSESP32, etc.
 
 ## Documentation
 
