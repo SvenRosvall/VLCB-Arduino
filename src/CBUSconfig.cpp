@@ -822,7 +822,7 @@ void CBUSConfig::reboot(void) {
 
 // for Raspberry Pi Pico using arduino-pico core
 #ifdef ARDUINO_ARCH_RP2040
-  watchdog_enable(1, 1);      // set watchdog timeout to 100ms and allow to expire
+  watchdog_enable(100, 1);      // set watchdog timeout to 100ms and allow to expire
   while (1);
 #endif
 }
