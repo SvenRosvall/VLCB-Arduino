@@ -64,10 +64,6 @@ flash_page_t cache_page;                // flash page cache
 byte curr_page_num = 0;
 #endif
 
-// the event hash table
-byte *evhashtbl;
-bool hash_collision = false;
-
 #ifdef __SAM3X8E__
 DueFlashStorage dueFlashStorage;
 #endif
@@ -78,7 +74,6 @@ DueFlashStorage dueFlashStorage;
 
 CBUSConfig::CBUSConfig() {
   eeprom_type = EEPROM_INTERNAL;
-  // external_address = external_address;
   I2Cbus = &Wire;
 }
 
@@ -112,9 +107,9 @@ void CBUSConfig::begin(void) {
     byte check = Flash.checkWritable();
 
     if (check == FLASHWRITE_OK) {
-      // Serial << F("> flash is writable, PROGMEM_SIZE = ") << PROGMEM_SIZE << endl;
+      // DEBUG_SERIAL << F("> flash is writable, PROGMEM_SIZE = ") << PROGMEM_SIZE << endl;
     } else {
-      Serial << F("> flash is not writable, ret = ") << check << endl;
+      // DEBUG_SERIAL << F("> flash is not writable, ret = ") << check << endl;
     }
 
     // cache the first page into memory
@@ -147,9 +142,9 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 
     if (result == 0) {
       eeprom_type = type;
-      Serial << F("> external EEPROM selected") << endl;
+      // DEBUG_SERIAL << F("> external EEPROM selected") << endl;
     } else {
-      Serial << F("> external EEPROM not found") << endl;
+      // DEBUG_SERIAL << F("> external EEPROM not found") << endl;
       eeprom_type = EEPROM_INTERNAL;
       ret = false;
     }
@@ -162,7 +157,7 @@ bool CBUSConfig::setEEPROMtype(byte type) {
     eeprom_type = EEPROM_USES_FLASH;
 #else
     eeprom_type = EEPROM_INTERNAL;
-    Serial << F("> internal EEPROM selected") << endl;
+    // DEBUG_SERIAL << F("> internal EEPROM selected") << endl;
 #endif
     break;
   }
@@ -223,7 +218,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
   byte tmphash, i, j, matches;
   bool confirmed = false;
 
-  // Serial << F("> looking for match with ") << nn << ", " << en << endl;
+  // DEBUG_SERIAL << F("> looking for match with ") << nn << ", " << en << endl;
 
   tarray[0] = highByte(nn);
   tarray[1] = lowByte(nn);
@@ -232,7 +227,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
   // calc the hash of the incoming event to match
   tmphash = makeHash(tarray);
-  // Serial << F("> event hash = ") << tmphash << endl;
+  // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
   for (i = 0; i < EE_MAX_EVENTS; i++) {
 
@@ -243,7 +238,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
         // there is a potential hash collision, so we have to check the slower way
         // first, check if this hash appears in the table more than once
 
-        // Serial << F("> there are hash collisions") << endl;
+        // DEBUG_SERIAL << F("> there are hash collisions") << endl;
 
         for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++) {
           if (evhashtbl[j] == tmphash) {
@@ -253,7 +248,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 
         if (matches > 1) {
           // one or more collisions for this hash exist, so check the very slow way
-          // Serial << F("> this hash matches = ") << matches << endl;
+          // DEBUG_SERIAL << F("> this hash matches = ") << matches << endl;
 
           for (i = 0; i < EE_MAX_EVENTS; i++) {
             if (evhashtbl[i] == tmphash) {
@@ -283,12 +278,12 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
     readEvent(i, tarray);
     if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)) {
       // the stored NN and EN do not match this event
-      // Serial << F("> hash result does not match stored event") << endl;
+      // DEBUG_SERIAL << F("> hash result does not match stored event") << endl;
       i = EE_MAX_EVENTS;
     }
   }
 
-  // if (i >= EE_MAX_EVENTS) Serial << F("> unable to find matching event") << endl;
+  // if (i >= EE_MAX_EVENTS) DEBUG_SERIAL << F("> unable to find matching event") << endl;
   return i;
 }
 
@@ -302,7 +297,7 @@ byte CBUSConfig::findEventSpace(void) {
 
   for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++) {
     if (evhashtbl[evidx] == 0)  {
-      // Serial << F("> found unused location at index = ") << evidx << endl;
+      // DEBUG_SERIAL << F("> found unused location at index = ") << evidx << endl;
       break;
     }
   }
@@ -332,7 +327,7 @@ byte CBUSConfig::makeHash(byte tarr[4]) {
   hash %= HASH_LENGTH;
   hash = (hash == 0) ? 255 : hash;
 
-  // Serial << F("> makeHash - hash of nn = ") << nn << F(", en = ") << en << F(", = ") << hash << endl;
+  // DEBUG_SERIAL << F("> makeHash - hash of nn = ") << nn << F(", en = ") << en << F(", = ") << hash << endl;
   return hash;
 }
 
@@ -347,7 +342,7 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
     tarr[i] = readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
   }
 
-  // Serial << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
+  // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
   return;
 }
 
@@ -378,7 +373,7 @@ void CBUSConfig::makeEvHashTable(void) {
   byte evarray[4];
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
-  // Serial << F("> creating event hash table") << endl;
+  // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
   evhashtbl = (byte *)malloc(EE_MAX_EVENTS * sizeof(byte));
 
@@ -420,7 +415,7 @@ void CBUSConfig::updateEvHashEntry(byte idx) {
 
   hash_collision = check_hash_collisions();
 
-  // Serial << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
+  // DEBUG_SERIAL << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
   return;
 }
 
@@ -431,7 +426,7 @@ void CBUSConfig::updateEvHashEntry(byte idx) {
 void CBUSConfig::clearEvHashTable(void) {
 
   // zero in the hash table indicates that the corresponding event slot is free
-  // Serial << F("> clearEvHashTable - clearing hash table") << endl;
+  // DEBUG_SERIAL << F("> clearEvHashTable - clearing hash table") << endl;
 
   for (byte i = 0; i < EE_MAX_EVENTS; i++) {
     evhashtbl[i] = 0;
@@ -447,18 +442,25 @@ void CBUSConfig::clearEvHashTable(void) {
 
 void CBUSConfig::printEvHashTable(bool raw) {
 
-  Serial << F("> Event hash table - ") << hash_collision << endl;
+  // removed so that no libraries produce serial output
+  // can be implemented in user's sketch
+  (void)raw;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-    if (evhashtbl[i] > 0) {
-      if (raw)
-        Serial << evhashtbl[i] << endl;
-      else
-        Serial << i << " - " << evhashtbl[i] << endl;
+  /*
+    DEBUG_SERIAL << F("> Event hash table - ") << hash_collision << endl;
+
+    for (byte i = 0; i < EE_MAX_EVENTS; i++) {
+      if (evhashtbl[i] > 0) {
+        if (raw)
+          DEBUG_SERIAL << evhashtbl[i] << endl;
+        else
+          DEBUG_SERIAL << i << " - " << evhashtbl[i] << endl;
+      }
     }
-  }
 
-  Serial << endl;
+    DEBUG_SERIAL << endl;
+  */
+
   return;
 }
 
@@ -526,7 +528,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
   byte rdata = 0;
   int r = 0;
 
-  // Serial << F("> readEEPROM, addr = ") << eeaddress << endl;
+  // DEBUG_SERIAL << F("> readEEPROM, addr = ") << eeaddress << endl;
 
   switch (eeprom_type) {
 
@@ -538,7 +540,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
     r = I2Cbus->endTransmission();
 
     if (r < 0) {
-      // Serial << F("> readEEPROM: I2C write error = ") << r << endl;
+      // DEBUG_SERIAL << F("> readEEPROM: I2C write error = ") << r << endl;
     }
 
     I2Cbus->requestFrom((int)external_address, (int)1);
@@ -554,7 +556,7 @@ byte CBUSConfig::readEEPROM(unsigned int eeaddress) {
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
     rdata = Flash.readByte(FLASH_AREA_BASE_ADDRESS + eeaddress);
-    // Serial << F("> read byte = ") << rdata << F(" from address = ") << eeaddress << endl;
+    // DEBUG_SERIAL << F("> read byte = ") << rdata << F(" from address = ") << eeaddress << endl;
 #endif
     break;
   }
@@ -581,7 +583,7 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
     r = I2Cbus->endTransmission();
 
     if (r < 0) {
-      // Serial << F("> readBytesEEPROM: I2C write error = ") << r << endl;
+      // DEBUG_SERIAL << F("> readBytesEEPROM: I2C write error = ") << r << endl;
     }
 
     I2Cbus->requestFrom((int)external_address, (int)nbytes);
@@ -590,7 +592,7 @@ byte CBUSConfig::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[
       dest[count++] = I2Cbus->read();
     }
 
-    // Serial << F("> readBytesEEPROM: read ") << count << F(" bytes from EEPROM in ") << micros() - t1 << F("us") << endl;
+    // DEBUG_SERIAL << F("> readBytesEEPROM: read ") << count << F(" bytes from EEPROM in ") << micros() - t1 << F("us") << endl;
     break;
 
   case EEPROM_INTERNAL:
@@ -620,7 +622,7 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
 
   int r = 0;
 
-  // Serial << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
+  // DEBUG_SERIAL << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
 
   switch (eeprom_type) {
 
@@ -633,7 +635,7 @@ void CBUSConfig::writeEEPROM(unsigned int eeaddress, byte data) {
     delay(5);
 
     if (r < 0) {
-      // Serial << F("> writeEEPROM: I2C write error = ") << r << endl;
+      // DEBUG_SERIAL << F("> writeEEPROM: I2C write error = ") << r << endl;
     }
     break;
 
@@ -678,7 +680,7 @@ void CBUSConfig::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numby
     delay(5);
 
     if (r < 0) {
-      // Serial << F("> writeBytesEEPROM: I2C write error = ") << r << endl;
+      // DEBUG_SERIAL << F("> writeBytesEEPROM: I2C write error = ") << r << endl;
     }
     break;
 
@@ -708,7 +710,7 @@ void CBUSConfig::writeEvent(byte index, byte data[]) {
 
   int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
-  // Serial << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
+  // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
   writeBytesEEPROM(eeaddress, data, 4);
 
   return;
@@ -722,7 +724,7 @@ void CBUSConfig::cleareventEEPROM(byte index) {
 
   byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
 
-  // Serial << F("> clearing event at index = ") << index << endl;
+  // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
   writeEvent(index, unused_entry);
 
   return;
@@ -736,7 +738,7 @@ void CBUSConfig::resetEEPROM(void) {
 
   if (eeprom_type == EEPROM_EXTERNAL) {
 
-    // Serial << F("> clearing data from external EEPROM ...") << endl;
+    // DEBUG_SERIAL << F("> clearing data from external EEPROM ...") << endl;
 
     for (unsigned int addr = 10; addr < 4096; addr++) {
       writeEEPROM(addr, 0xff);
@@ -820,7 +822,7 @@ void CBUSConfig::reboot(void) {
 
 // for Raspberry Pi Pico using arduino-pico core
 #ifdef ARDUINO_ARCH_RP2040
-  watchdog_enable(100, 1);      // set watchdog timeout to 100ms and allow to expire
+  watchdog_enable(1, 1);      // set watchdog timeout to 100ms and allow to expire
   while (1);
 #endif
 }
@@ -866,7 +868,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
   waittime = millis();
   bDone = false;
 
-  // Serial << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
+  // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
 
   pbSwitch.reset();
   ledGrn.blink();
@@ -877,7 +879,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 
     // 30 sec timeout
     if ((millis() - waittime) > 30000) {
-      // Serial << F("> timeout expired, reset not performed") << endl;
+      // DEBUG_SERIAL << F("> timeout expired, reset not performed") << endl;
       return;
     }
 
@@ -892,7 +894,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
   }
 
   // do the reset
-  // Serial << F("> performing module reset ...") <<  endl;
+  // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
 
   ledGrn.off();
   ledYlw.off();
@@ -906,18 +908,18 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 void CBUSConfig::resetModule(void) {
 
   /// implementation of resetModule() without CBUSswitch or CBUSLEDs
-  uint32_t t = millis();
-  Serial << F("> resetting EEPROM") << endl;
+  // uint32_t t = millis();
+  // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
 
   if (eeprom_type == EEPROM_INTERNAL) {
 
     // clear the entire on-chip EEPROM
     // !! note we don't clear the first ten locations (0-9), so that they can be used across resets
-    // Serial << F("> clearing on-chip EEPROM ...") << endl;
+    // DEBUG_SERIAL << F("> clearing on-chip EEPROM ...") << endl;
 #ifdef __SAM3X8E__
 #else
     for (unsigned int j = 10; j < EEPROM.length(); j++) {
-      if (j % 250 == 0) Serial << j << endl;
+      // if (j % 250 == 0) DEBUG_SERIAL << j << endl;
       setChipEEPROMVal(j, 0xff);
     }
 #endif
@@ -926,7 +928,7 @@ void CBUSConfig::resetModule(void) {
     resetEEPROM();
   }
 
-  Serial << F("> setting SLiM config") << endl;
+  // DEBUG_SERIAL << F("> setting SLiM config") << endl;
 
   // set the node identity defaults
   // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
@@ -942,7 +944,7 @@ void CBUSConfig::resetModule(void) {
     writeNV(i + 1, 0);
   }
 
-  Serial << F("> complete in ") << (millis() - t) << F(", rebooting ... ") << endl;
+  // DEBUG_SERIAL << F("> complete in ") << (millis() - t) << F(", rebooting ... ") << endl;
 
   // reset complete
   reboot();
@@ -970,7 +972,7 @@ bool CBUSConfig::check_hash_collisions(void) {
   for (byte i = 0; i < EE_MAX_EVENTS - 1; i++) {
     for (byte j = i + 1; j < EE_MAX_EVENTS; j++) {
       if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0) {
-        // Serial << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
+        // DEBUG_SERIAL << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
         // return when first collision detected
         return true;
       }
@@ -1044,7 +1046,7 @@ void flash_cache_page(const byte page) {
 
   const uint32_t address_base = FLASH_AREA_BASE_ADDRESS + (page * FLASH_PAGE_SIZE);
 
-  // Serial << F("> flash_cache_page, page = ") << page << endl;
+  // DEBUG_SERIAL << F("> flash_cache_page, page = ") << page << endl;
 
   for (unsigned int a = 0; a < FLASH_PAGE_SIZE; a++) {
     cache_page.data[a] = Flash.readByte(address_base + a);
@@ -1061,7 +1063,7 @@ bool flash_writeback_page(const byte page) {
   bool ret = true;
   uint32_t address;
 
-  // Serial << F("> flash_writeback_page, page = ") << curr_page_num << F(", dirty = ") << cache_page.dirty << endl;
+  // DEBUG_SERIAL << F("> flash_writeback_page, page = ") << curr_page_num << F(", dirty = ") << cache_page.dirty << endl;
 
   if (cache_page.dirty) {
     address = FLASH_AREA_BASE_ADDRESS + (FLASH_PAGE_SIZE * page);
@@ -1070,14 +1072,14 @@ bool flash_writeback_page(const byte page) {
     ret = Flash.erasePage(address, 1);
 
     if (ret != FLASHWRITE_OK) {
-      Serial.printf(F("error erasing flash page\r\n"));
+      // DEBUG_SERIAL.printf(F("error erasing flash page\r\n"));
     }
 
     // write the nexw data
     ret = Flash.writeBytes(address, cache_page.data, FLASH_PAGE_SIZE);
 
     if (ret != FLASHWRITE_OK) {
-      Serial.printf(F("error writing flash data\r\n"));
+      // DEBUG_SERIAL.printf(F("error writing flash data\r\n"));
     }
 
     cache_page.dirty = false;
@@ -1093,16 +1095,16 @@ bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16
 
   bool ret = true;
 
-  // Serial << F("> flash_write_bytes: address = ") << address << F(", data = ") << *data << F(", length = ") << length << endl;
+  // DEBUG_SERIAL << F("> flash_write_bytes: address = ") << address << F(", data = ") << *data << F(", length = ") << length << endl;
 
   if (address >= (FLASH_PAGE_SIZE * NUM_FLASH_PAGES)) {
-    Serial.printf(F("cache page address = %u is out of bounds\r\n"), address);
+    // DEBUG_SERIAL.printf(F("cache page address = %u is out of bounds\r\n"), address);
   }
 
   // calculate page number, 0-3
   byte new_page_num = address / FLASH_PAGE_SIZE;
 
-  // Serial << F("> curr page = ") << curr_page_num << F(", new = ") << new_page_num << endl;
+  // DEBUG_SERIAL << F("> curr page = ") << curr_page_num << F(", new = ") << new_page_num << endl;
 
   // erase and write back current page if cache page number is changing
   if (new_page_num != curr_page_num) {
@@ -1120,7 +1122,7 @@ bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16
 
     // we are crossing a page boundary ...
     if (buffer_index >= FLASH_PAGE_SIZE) {
-      Serial.printf(F("crossing page boundary\r\n"));
+      // DEBUG_SERIAL.printf(F("crossing page boundary\r\n"));
       cache_page.dirty = true;
       flash_writeback_page(curr_page_num);              // write back current cache page
       ++curr_page_num;                                  // increment the page number -- should really handle end of flash area
