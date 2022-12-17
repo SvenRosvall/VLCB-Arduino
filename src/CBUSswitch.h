@@ -37,6 +37,10 @@
 
 #pragma once
 
+#ifndef DEBUG_SERIAL
+#define DEBUG_SERIAL Serial
+#endif
+
 #include <Arduino.h>            // for definition of byte datatype
 
 // non-blocking switch class

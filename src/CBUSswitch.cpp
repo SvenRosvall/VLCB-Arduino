@@ -80,8 +80,8 @@ void CBUSSwitch::run(void) {
   if (_currentState != _lastState) {
 
     // yes - state has changed since last call to this method
-    // Serial << endl << F("  -- switch state has changed state from ") << _lastState << " to " << _currentState << endl;
-    // Serial << F("  -- last state change at ") << _lastStateChangeTime << ", diff = " << millis() - _lastStateChangeTime << endl;
+    // DEBUG_SERIAL << endl << F("  -- switch state has changed state from ") << _lastState << " to " << _currentState << endl;
+    // DEBUG_SERIAL << F("  -- last state change at ") << _lastStateChangeTime << ", diff = " << millis() - _lastStateChangeTime << endl;
 
     _lastState = _currentState;
     _prevStateDuration = _lastStateDuration;
@@ -90,15 +90,15 @@ void CBUSSwitch::run(void) {
     _stateChanged = true;
 
     if (_currentState == _pressedState) {
-      // Serial << F("  -- switch has been pressed") << endl;
+      // DEBUG_SERIAL << F("  -- switch has been pressed") << endl;
     } else {
-      // Serial << F("  -- switch has been released") << endl;
+      // DEBUG_SERIAL << F("  -- switch has been released") << endl;
 
       // double-click detection
       // two clicks of less than 250ms, less than 500ms apart
 
-      // Serial << F("  -- last state duration = ") << _lastStateDuration << endl;
-      // Serial << F("  -- this release = ") << _lastStateChangeTime << F(", last release = ") << _prevReleaseTime << endl;
+      // DEBUG_SERIAL << F("  -- last state duration = ") << _lastStateDuration << endl;
+      // DEBUG_SERIAL << F("  -- this release = ") << _lastStateChangeTime << F(", last release = ") << _prevReleaseTime << endl;
 
       // save release time
       _prevReleaseTime = _lastStateChangeTime;
@@ -116,42 +116,42 @@ void CBUSSwitch::run(void) {
 bool CBUSSwitch::stateChanged(void) {
 
   // has switch state changed ?
-  // Serial << F("  -- switch state changed = ") << _stateChanged << endl;
+  // DEBUG_SERIAL << F("  -- switch state changed = ") << _stateChanged << endl;
   return _stateChanged;
 }
 
 bool CBUSSwitch::getState(void) {
 
   // return the current switch state read
-  // Serial << F("  -- switch state = ") << _currentState << endl;
+  // DEBUG_SERIAL << F("  -- switch state = ") << _currentState << endl;
   return _currentState;
 }
 
 bool CBUSSwitch::isPressed(void) {
 
   // is the switch pressed ?
-  // Serial << F("  -- switch pressed ? = ") << (_currentState == _pressedState) << endl;
+  // DEBUG_SERIAL << F("  -- switch pressed ? = ") << (_currentState == _pressedState) << endl;
   return (_currentState == _pressedState);
 }
 
 unsigned long CBUSSwitch::getCurrentStateDuration(void) {
 
   // how long has the switch been in its current state ?
-  // Serial << F("  -- current state duration = ") << (millis() - _lastStateChangeTime) << endl;
+  // DEBUG_SERIAL << F("  -- current state duration = ") << (millis() - _lastStateChangeTime) << endl;
   return (millis() - _lastStateChangeTime);
 }
 
 unsigned long CBUSSwitch::getLastStateDuration(void) {
 
   // how long was the last state active for ?
-  // Serial << F("  -- last state duration = ") << _lastStateDuration << endl;
+  // DEBUG_SERIAL << F("  -- last state duration = ") << _lastStateDuration << endl;
   return _lastStateDuration;
 }
 
 unsigned long CBUSSwitch::getLastStateChangeTime(void) {
 
   // when was the last state change ?
-  // Serial << F("  -- last state change at ") << _lastStateChangeTime << endl;
+  // DEBUG_SERIAL << F("  -- last state change at ") << _lastStateChangeTime << endl;
   return _lastStateChangeTime;
 }
 
