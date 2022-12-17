@@ -37,6 +37,10 @@
 
 #pragma once
 
+#ifndef DEBUG_SERIAL
+#define DEBUG_SERIAL Serial
+#endif
+
 #include <SPI.h>
 
 #include <CBUSLED.h>
@@ -142,9 +146,10 @@ public:
 
   void setLongMessageHandler(CBUSLongMessage *handler);
 
+  unsigned int _numMsgsSent, _numMsgsRcvd;
+
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
-  unsigned int _numMsgsSent, _numMsgsRcvd;
   CBUSLED _ledGrn, _ledYlw;
   CBUSSwitch _sw;
   CBUSConfig *module_config;
