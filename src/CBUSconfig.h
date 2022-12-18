@@ -145,4 +145,6 @@ public:
   byte eeprom_type;
   byte external_address;
   TwoWire *I2Cbus;
+  byte *evhashtbl;
+  bool hash_collision;
 };
