@@ -45,7 +45,7 @@
 void makeHeader_impl(CANFrame *msg, byte id, byte priority = 0x0b);
 
 //
-/// construct a CBUS object with an external CBUSConfig object "config" that is defined
+/// construct a CBUS object with an external CBUSConfig object named "config" that is defined
 /// in user code
 //
 
@@ -186,7 +186,7 @@ void CBUSbase::CANenumeration(void) {
 
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
-  // Serial << F("> beginning self-enumeration cycle") << endl;
+  // DEBUG_SERIAL << F("> beginning self-enumeration cycle") << endl;
 
   // set global variables
   bCANenum = true;                  // we are enumerating
@@ -197,7 +197,7 @@ void CBUSbase::CANenumeration(void) {
   _msg.len = 0;
   sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
 
-  // Serial << F("> enumeration cycle initiated") << endl;
+  // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
   return;
 }
 
@@ -207,7 +207,7 @@ void CBUSbase::CANenumeration(void) {
 
 void CBUSbase::initFLiM(void) {
 
-  // Serial << F("> initiating FLiM negotation") << endl;
+  // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
 
   indicateMode(MODE_CHANGING);
 
@@ -221,7 +221,7 @@ void CBUSbase::initFLiM(void) {
   _msg.data[2] = lowByte(module_config->nodeNum);
   sendMessage(&_msg);
 
-  // Serial << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
+  // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
   return;
 }
 
@@ -231,7 +231,7 @@ void CBUSbase::initFLiM(void) {
 
 void CBUSbase::revertSLiM(void) {
 
-  // Serial << F("> reverting to SLiM mode") << endl;
+  // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
 
   // send NNREL message
   _msg.len = 3;
@@ -282,7 +282,7 @@ void CBUSbase::setSwitch(CBUSSwitch sw) {
 
 void CBUSbase::indicateMode(byte mode) {
 
-  // Serial << F("> indicating mode = ") << mode << endl;
+  // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
 
   if (UI) {
     switch (mode) {
@@ -433,7 +433,7 @@ void CBUSbase::process(byte num_messages) {
 
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
-      // Serial << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
+      // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
       // send an empty message to show our CANID
       _msg.len = 0;
       sendMessage(&_msg);
@@ -446,13 +446,13 @@ void CBUSbase::process(byte num_messages) {
     //
 
     if (remoteCANID == module_config->CANID && _msg.len > 0) {
-      // Serial << F("> CAN id clash, enumeration required") << endl;
+      // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
       enumeration_required = true;
     }
 
     // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
     if (_msg.ext) {
-      // Serial << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
+      // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
       continue;
     }
 
@@ -461,8 +461,9 @@ void CBUSbase::process(byte num_messages) {
 
       // store this response in the responses array
       if (remoteCANID > 0) {
-        bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
-        // Serial << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
+        // fix to correctly record the received CANID
+        bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
+        // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
       }
 
       continue;
@@ -484,20 +485,13 @@ void CBUSbase::process(byte num_messages) {
       case OPC_ACON2:
       case OPC_ACON3:
 
-      case OPC_ASON:
-      case OPC_ASON1:
-      case OPC_ASON2:
-      case OPC_ASON3:
-
       case OPC_ACOF:
       case OPC_ACOF1:
       case OPC_ACOF2:
       case OPC_ACOF3:
 
-      case OPC_ASOF:
-      case OPC_ASOF1:
-      case OPC_ASOF2:
-      case OPC_ASOF3:
+      case OPC_ARON:
+      case OPC_AROF:
 
         // lookup this accessory event in the event table and call the user's registered callback function
         if (eventhandler || eventhandlerex) {
@@ -506,15 +500,32 @@ void CBUSbase::process(byte num_messages) {
 
         break;
 
+      case OPC_ASON:
+      case OPC_ASON1:
+      case OPC_ASON2:
+      case OPC_ASON3:
+
+      case OPC_ASOF:
+      case OPC_ASOF1:
+      case OPC_ASOF2:
+      case OPC_ASOF3:
+
+        // lookup this accessory event in the event table and call the user's registered callback function
+        if (eventhandler || eventhandlerex) {
+          processAccessoryEvent(0, en, (opc % 2 == 0));
+        }
+
+        break;
+
       case OPC_RQNP:
         // RQNP message - request for node paramters -- does not contain a NN or EN, so only respond if we
         // are in transition to FLiM
-        // Serial << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
+        // DEBUG_SERIAL << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
 
         // only respond if we are in transition to FLiM mode
         if (bModeChanging == true) {
 
-          // Serial << F("> responding to RQNP with PARAMS") << endl;
+          // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
           // respond with PARAMS message
           _msg.len = 8;
@@ -542,7 +553,7 @@ void CBUSbase::process(byte num_messages) {
 
           byte paran = _msg.data[3];
 
-          // Serial << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
+          // DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
 
           if (paran <= _mparams[0]) {
 
@@ -557,7 +568,7 @@ void CBUSbase::process(byte num_messages) {
             sendMessage(&_msg);
 
           } else {
-            // Serial << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
+            // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
             sendCMDERR(9);
           }
         }
@@ -566,23 +577,24 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_SNN:
         // received SNN - set node number
-        // Serial << F("> received SNN with NN = ") << nn << endl;
+        // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
         if (bModeChanging) {
-          // Serial << F("> buf[1] = ") << _msg.data[1] << ", buf[2] = " << _msg.data[2] << endl;
+          // DEBUG_SERIAL << F("> buf[1] = ") << _msg.data[1] << ", buf[2] = " << _msg.data[2] << endl;
 
           // save the NN
-          module_config->setNodeNum((_msg.data[1] << 8) + _msg.data[2]);
+          // module_config->setNodeNum((_msg.data[1] << 8) + _msg.data[2]);
+          module_config->setNodeNum(nn);
 
           // respond with NNACK
           _msg.len = 3;
           _msg.data[0] = OPC_NNACK;
-          _msg.data[1] = highByte(module_config->nodeNum);
-          _msg.data[2] = lowByte(module_config->nodeNum);
+          // _msg.data[1] = highByte(module_config->nodeNum);
+          // _msg.data[2] = lowByte(module_config->nodeNum);
 
           sendMessage(&_msg);
 
-          // Serial << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
+          // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
           // we are now in FLiM mode - update the configuration
           bModeChanging = false;
@@ -592,20 +604,20 @@ void CBUSbase::process(byte num_messages) {
           // enumerate the CAN bus to allocate a free CAN ID
           CANenumeration();
 
-          // Serial << F("> FLiM mode = ") << module_config->FLiM << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
+          // DEBUG_SERIAL << F("> FLiM mode = ") << module_config->FLiM << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
         } else {
-          // Serial << F("> received SNN but not in transition") << endl;
+          // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;
         }
 
         break;
 
       case OPC_CANID:
         // CAN -- set CANID
-        // Serial << F("> CANID for nn = ") << nn << F(" with new CANID = ") << _msg.data[3] << endl;
+        // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << _msg.data[3] << endl;
 
         if (nn == module_config->nodeNum) {
-          // Serial << F("> setting my CANID to ") << _msg.data[3] << endl;
+          // DEBUG_SERIAL << F("> setting my CANID to ") << _msg.data[3] << endl;
           if (_msg.data[3] < 1 || _msg.data[3] > 99) {
             sendCMDERR(7);
           } else {
@@ -617,11 +629,11 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_ENUM:
         // received ENUM -- start CAN bus self-enumeration
-        // Serial << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
-        // Serial << F("> my nn = ") << module_config->nodeNum << endl;
+        // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
+        // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
 
         if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !bCANenum) {
-          // Serial << F("> initiating enumeration") << endl;
+          // DEBUG_SERIAL << F("> initiating enumeration") << endl;
           CANenumeration();
         }
 
@@ -648,7 +660,7 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_NVSET:
         // received NVSET -- set NV by index
-        // Serial << F("> received NVSET for nn = ") << nn << endl;
+        // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
         if (nn == module_config->nodeNum) {
 
@@ -659,7 +671,7 @@ void CBUSbase::process(byte num_messages) {
             module_config->writeNV( _msg.data[3], _msg.data[4]);
             // respond with WRACK
             sendWRACK();
-            // Serial << F("> set NV ok") << endl;
+            // DEBUG_SERIAL << F("> set NV ok") << endl;
           }
         }
 
@@ -667,11 +679,11 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_NNLRN:
         // received NNLRN -- place into learn mode
-        // Serial << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
+        // DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
 
         if (nn == module_config->nodeNum) {
           bLearn = true;
-          // Serial << F("> set lean mode ok") << endl;
+          // DEBUG_SERIAL << F("> set lean mode ok") << endl;
           // set bit 5 in parameter 8
           bitSet(_mparams[8], 5);
         }
@@ -681,19 +693,19 @@ void CBUSbase::process(byte num_messages) {
       case OPC_EVULN:
         // received EVULN -- unlearn an event, by event number
         // en = (_msg.data[3] << 8) + _msg.data[4];
-        // Serial << F("> EVULN for nn = ") << nn << F(", en = ") << en << endl;
+        // DEBUG_SERIAL << F("> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
         // we must be in learn mode
         if (bLearn == true) {
 
-          // Serial << F("> searching for existing event to unlearn") << endl;
+          // DEBUG_SERIAL << F("> searching for existing event to unlearn") << endl;
 
           // search for this NN and EN pair
           index = module_config->findExistingEvent(nn, en);
 
           if (index < module_config->EE_MAX_EVENTS) {
 
-            // Serial << F("> deleting event at index = ") << index << F(", evs ") << endl;
+            // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
             module_config->cleareventEEPROM(j);
 
             // update hash table
@@ -703,7 +715,7 @@ void CBUSbase::process(byte num_messages) {
             sendWRACK();
 
           } else {
-            // Serial << F("> did not find event to unlearn") << endl;
+            // DEBUG_SERIAL << F("> did not find event to unlearn") << endl;
             // respond with CMDERR
             sendCMDERR(10);
           }
@@ -717,7 +729,7 @@ void CBUSbase::process(byte num_messages) {
 
         if (nn == module_config->nodeNum) {
           bLearn = false;
-          // Serial << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
+          // DEBUG_SERIAL << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
           // clear bit 5 in parameter 8
           bitClear(_mparams[8], 5);
         }
@@ -726,7 +738,7 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_RQEVN:
         // received RQEVN -- request for number of stored events
-        // Serial << F("> RQEVN -- number of stored events for nn = ") << nn << endl;
+        // DEBUG_SERIAL << F("> RQEVN -- number of stored events for nn = ") << nn << endl;
 
         if (nn == module_config->nodeNum) {
 
@@ -744,7 +756,7 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_NERD:
         // request for all stored events
-        // Serial << F("> NERD : request all stored events for nn = ") << nn << endl;
+        // DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
 
         if (nn == module_config->nodeNum) {
           _msg.len = 8;
@@ -762,7 +774,7 @@ void CBUSbase::process(byte num_messages) {
               module_config->readEvent(i, &_msg.data[3]);
               _msg.data[7] = i;                           // event table index
 
-              // Serial << F("> sending ENRSP reply for event index = ") << i << endl;
+              // DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
               sendMessage(&_msg);
               delay(10);
 
@@ -788,7 +800,7 @@ void CBUSbase::process(byte num_messages) {
             sendMessage(&_msg);
           } else {
 
-            // Serial << F("> request for invalid event index") << endl;
+            // DEBUG_SERIAL << F("> request for invalid event index") << endl;
             sendCMDERR(6);
           }
 
@@ -801,7 +813,7 @@ void CBUSbase::process(byte num_messages) {
 
         if (bLearn == true && nn == module_config->nodeNum) {
 
-          // Serial << F("> NNCLR -- clear all events") << endl;
+          // DEBUG_SERIAL << F("> NNCLR -- clear all events") << endl;
 
           for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++) {
             module_config->cleareventEEPROM(e);
@@ -809,7 +821,7 @@ void CBUSbase::process(byte num_messages) {
 
           // recreate the hash table
           module_config->clearEvHashTable();
-          // Serial << F("> cleared all events") << endl;
+          // DEBUG_SERIAL << F("> cleared all events") << endl;
 
           sendWRACK();
         }
@@ -830,7 +842,7 @@ void CBUSbase::process(byte num_messages) {
             }
           }
 
-          // Serial << F("> responding to to NNEVN with EVNLF, free event table slots = ") << free_slots << endl;
+          // DEBUG_SERIAL << F("> responding to to NNEVN with EVNLF, free event table slots = ") << free_slots << endl;
           // memset(&_msg, 0, sizeof(_msg));
           _msg.len = 4;
           _msg.data[0] = OPC_EVNLF;
@@ -844,10 +856,10 @@ void CBUSbase::process(byte num_messages) {
 
       case OPC_QNN:
         // this is probably a config recreate -- respond with PNN if we have a node number
-        // Serial << F("> QNN received, my node number = ") << module_config->nodeNum << endl;
+        // DEBUG_SERIAL << F("> QNN received, my node number = ") << module_config->nodeNum << endl;
 
         if (module_config->nodeNum > 0) {
-          // Serial << ("> responding with PNN message") << endl;
+          // DEBUG_SERIAL << ("> responding with PNN message") << endl;
           _msg.len = 6;
           _msg.data[0] = OPC_PNN;
           _msg.data[1] = highByte(module_config->nodeNum);
@@ -863,7 +875,7 @@ void CBUSbase::process(byte num_messages) {
       case OPC_RQMN:
         // request for node module name, excluding "CAN" prefix
         // sent during module transition, so no node number check
-        // Serial << F("> RQMN received") << endl;
+        // DEBUG_SERIAL << F("> RQMN received") << endl;
 
         // only respond if in transition to FLiM
 
@@ -882,18 +894,18 @@ void CBUSbase::process(byte num_messages) {
         evindex = _msg.data[5];
         evval = _msg.data[6];
 
-        // Serial << endl << F("> EVLRN for source nn = ") << nn << F(", en = ") << en << F(", evindex = ") << evindex << F(", evval = ") << evval << endl;
+        // DEBUG_SERIAL << endl << F("> EVLRN for source nn = ") << nn << F(", en = ") << en << F(", evindex = ") << evindex << F(", evval = ") << evval << endl;
 
         // we must be in learn mode
         if (bLearn == true) {
 
           // search for this NN, EN as we may just be adding an EV to an existing learned event
-          // Serial << F("> searching for existing event to update") << endl;
+          // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
           index = module_config->findExistingEvent(nn, en);
 
           // not found - it's a new event
           if (index >= module_config->EE_MAX_EVENTS) {
-            // Serial << F("> existing event not found - creating a new one if space available") << endl;
+            // DEBUG_SERIAL << F("> existing event not found - creating a new one if space available") << endl;
             index = module_config->findEventSpace();
           }
 
@@ -902,7 +914,7 @@ void CBUSbase::process(byte num_messages) {
           if (index < module_config->EE_MAX_EVENTS) {
 
             // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-            // Serial << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+            // DEBUG_SERIAL << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
             // don't repeat this for subsequent EVs
             if (evindex < 2) {
@@ -912,26 +924,31 @@ void CBUSbase::process(byte num_messages) {
             module_config->writeEventEV(index, evindex, evval);
 
             // recreate event hash table entry
-            // Serial << F("> updating hash table entry for idx = ") << index << endl;
+            // DEBUG_SERIAL << F("> updating hash table entry for idx = ") << index << endl;
             module_config->updateEvHashEntry(index);
 
             // respond with WRACK
             sendWRACK();
 
           } else {
-            // Serial << F("> no free event storage, index = ") << index << endl;
+            // DEBUG_SERIAL << F("> no free event storage, index = ") << index << endl;
             // respond with CMDERR
             sendCMDERR(10);
           }
 
         } else { // bLearn == true
-          // Serial << F("> error -- not in learn mode") << endl;
+          // DEBUG_SERIAL << F("> error -- not in learn mode") << endl;
         }
 
         break;
 
       case OPC_AREQ:
         // AREQ message - request for node state, only producer nodes
+
+        if ((_msg.data[1] == highByte(module_config->nodeNum)) && (_msg.data[2] == lowByte(module_config->nodeNum))) {
+          (void)(*eventhandler)(0, &_msg);
+        }
+
         break;
 
       case OPC_BOOT:
@@ -956,11 +973,11 @@ void CBUSbase::process(byte num_messages) {
 
       default:
         // unknown or unhandled OPC
-        // Serial << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
+        // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
         break;
       }
     } else {
-      // Serial << F("> oops ... zero - length frame ?? ") << endl;
+      // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
     }
   }  // while messages available
 
@@ -973,12 +990,12 @@ void CBUSbase::process(byte num_messages) {
 
   if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
 
-    // Serial << F("> timeout expired, FLiM = ") << FLiM << F(", mode change = ") << bModeChanging << endl;
+    // DEBUG_SERIAL << F("> timeout expired, FLiM = ") << FLiM << F(", mode change = ") << bModeChanging << endl;
     indicateMode(module_config->FLiM);
     bModeChanging = false;
   }
 
-  // Serial << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
+  // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
 
   //
   /// end of CBUS message processing
@@ -1000,8 +1017,8 @@ void CBUSbase::checkCANenum(void) {
 
     // enumeration timer has expired -- stop enumeration and process the responses
 
-    // Serial << F("> enum cycle complete at ") << millis() << F(", start = ") << CANenumTime << F(", duration = ") << (millis() - CANenumTime) << endl;
-    // Serial << F("> processing received responses") << endl;
+    // DEBUG_SERIAL << F("> enum cycle complete at ") << millis() << F(", start = ") << CANenumTime << F(", duration = ") << (millis() - CANenumTime) << endl;
+    // DEBUG_SERIAL << F("> processing received responses") << endl;
 
     // iterate through the 128 bit field
     for (byte i = 0; i < 16; i++) {
@@ -1022,14 +1039,18 @@ void CBUSbase::checkCANenum(void) {
         // if the bit is not set
         if (bitRead(enum_responses[i], b) == 0) {
           selected_id = ((i * 16) + b);
-          // Serial << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
-          i = 16; // ugh ... but probably better than a goto :)
+          // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
+          // i = 16; // ugh ... but probably better than a goto :)
+          // but using a goto saves 4 bytes of program size ;)
+          goto check_done;
           break;
         }
       }
     }
 
-    // Serial << F("> enumeration responses = ") << enums << F(", lowest available CAN id = ") << selected_id << endl;
+check_done:
+
+    // DEBUG_SERIAL << F("> enumeration responses = ") << enums << F(", lowest available CAN id = ") << selected_id << endl;
 
     // bCANenumComplete = true;
     bCANenum = false;
