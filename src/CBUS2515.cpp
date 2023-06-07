@@ -55,17 +55,10 @@ CBUS2515::CBUS2515() {
   initMembers();
 }
 
-CBUS2515::CBUS2515(CBUSConfig *the_config) : CBUSbase(the_config) {
-  initMembers();
-}
-
 void CBUS2515::initMembers() {
 
   _num_rx_buffers = NUM_RX_BUFFS;
   _num_tx_buffers = NUM_TX_BUFFS;
-  eventhandler = NULL;
-  eventhandlerex = NULL;
-  framehandler = NULL;
   _csPin = MCP2515_CS;
   _intPin = MCP2515_INT;
   _osc_freq = OSCFREQ;
@@ -160,6 +153,7 @@ CANFrame CBUS2515::getNextMessage(void) {
 
   canp->receive(message);
 
+  CANFrame _msg;
   _msg.id = message.id;
   _msg.len = message.len;
   _msg.rtr = message.rtr;
@@ -194,9 +188,7 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
   ret = canp->tryToSend(message);
   _numMsgsSent += ret;
 
-  if (UI) {
-    _ledGrn.pulse();
-  }
+  cbus->indicateActivity();
 
   return ret;
 }
@@ -268,4 +260,27 @@ void CBUS2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
 
 void CBUS2515::setOscFreq(unsigned long freq) {
   _osc_freq = freq;
+}
+
+//
+/// actual implementation of the makeHeader method
+/// so it can be called directly or as a CBUS class method
+/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CBUS priority) + (7 bits of CBUS CAN ID)
+/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
+//
+
+inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
+
+  msg->id = (priority << 7) + (id & 0x7f);
+  return;
+}
+
+//
+/// utility method to populate a CBUS message header
+//
+
+void CBUS2515::makeHeader(CANFrame *msg, byte priority) {
+
+  makeHeader_impl(msg, cbus->getModuleCANID(), priority);
+  return;
 }
