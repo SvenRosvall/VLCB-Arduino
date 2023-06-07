@@ -41,17 +41,18 @@
 // CBUS library
 #include <CBUS.h>
 
-// forward function declarations
-void makeHeader_impl(CANFrame *msg, byte id, byte priority = 0x0b);
-
 //
 /// construct a CBUS object with an external CBUSConfig object named "config" that is defined
 /// in user code
 //
 
-CBUSbase::CBUSbase() {
+CBUS::CBUS() {
   extern CBUSConfig config;
   module_config = &config;
+
+  eventhandler = NULL;
+  eventhandlerex = NULL;
+  framehandler = NULL;
 }
 
 //
@@ -59,21 +60,25 @@ CBUSbase::CBUSbase() {
 /// note that this CBUSConfig object must have a lifetime longer than the CBUS object.
 //
 
-CBUSbase::CBUSbase(CBUSConfig *the_config) {
+CBUS::CBUS(CBUSConfig *the_config) {
   module_config = the_config;
+
+  eventhandler = NULL;
+  eventhandlerex = NULL;
+  framehandler = NULL;
 }
 
 //
 /// register the user handler for learned events
 //
 
-void CBUSbase::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
+void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
   eventhandler = fptr;
 }
 
 // overloaded form which receives the opcode on/off state and the first event variable
 
-void CBUSbase::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
+void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
   eventhandlerex = fptr;
 }
 
@@ -82,7 +87,7 @@ void CBUSbase::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
 
-void CBUSbase::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
+void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
   framehandler = fptr;
   _opcodes = opcodes;
   _num_opcodes = num_opcodes;
@@ -92,7 +97,7 @@ void CBUSbase::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte
 /// assign the module parameter set
 //
 
-void CBUSbase::setParams(unsigned char *mparams) {
+void CBUS::setParams(unsigned char *mparams) {
   _mparams = mparams;
 }
 
@@ -100,7 +105,7 @@ void CBUSbase::setParams(unsigned char *mparams) {
 /// assign the module name
 //
 
-void CBUSbase::setName(unsigned char *mname) {
+void CBUS::setName(unsigned char *mname) {
   _mname = mname;
 }
 
@@ -108,7 +113,7 @@ void CBUSbase::setName(unsigned char *mname) {
 /// set module to SLiM mode
 //
 
-void CBUSbase::setSLiM(void) {
+void CBUS::setSLiM(void) {
 
   bModeChanging = false;
   module_config->setNodeNum(0);
@@ -122,7 +127,7 @@ void CBUSbase::setSLiM(void) {
 /// extract CANID from CAN frame header
 //
 
-inline byte CBUSbase::getCANID(unsigned long header) {
+inline byte CBUS::getCANID(unsigned long header) {
 
   return header & 0x7f;
 }
@@ -131,7 +136,7 @@ inline byte CBUSbase::getCANID(unsigned long header) {
 /// send a WRACK (write acknowledge) message
 //
 
-bool CBUSbase::sendWRACK(void) {
+bool CBUS::sendWRACK(void) {
 
   // send a write acknowledgement response
 
@@ -147,7 +152,7 @@ bool CBUSbase::sendWRACK(void) {
 /// send a CMDERR (command error) message
 //
 
-bool CBUSbase::sendCMDERR(byte cerrno) {
+bool CBUS::sendCMDERR(byte cerrno) {
 
   // send a command error response
 
@@ -164,7 +169,7 @@ bool CBUSbase::sendCMDERR(byte cerrno) {
 /// is this an Extended CAN frame ?
 //
 
-bool CBUSbase::isExt(CANFrame *amsg) {
+bool CBUS::isExt(CANFrame *amsg) {
 
   return (amsg->ext);
 }
@@ -173,7 +178,7 @@ bool CBUSbase::isExt(CANFrame *amsg) {
 /// is this a Remote frame ?
 //
 
-bool CBUSbase::isRTR(CANFrame *amsg) {
+bool CBUS::isRTR(CANFrame *amsg) {
 
   return (amsg->rtr);
 }
@@ -182,7 +187,7 @@ bool CBUSbase::isRTR(CANFrame *amsg) {
 /// if in FLiM mode, initiate a CAN ID enumeration cycle
 //
 
-void CBUSbase::CANenumeration(void) {
+void CBUS::CANenumeration(void) {
 
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
@@ -205,7 +210,7 @@ void CBUSbase::CANenumeration(void) {
 /// initiate the transition from SLiM to FLiM mode
 //
 
-void CBUSbase::initFLiM(void) {
+void CBUS::initFLiM(void) {
 
   // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
 
@@ -229,7 +234,7 @@ void CBUSbase::initFLiM(void) {
 /// revert from FLiM to SLiM mode
 //
 
-void CBUSbase::revertSLiM(void) {
+void CBUS::revertSLiM(void) {
 
   // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
 
@@ -248,7 +253,7 @@ void CBUSbase::revertSLiM(void) {
 /// change or re-confirm node number
 //
 
-void CBUSbase::renegotiate(void) {
+void CBUS::renegotiate(void) {
 
   initFLiM();
 }
@@ -257,7 +262,7 @@ void CBUSbase::renegotiate(void) {
 /// assign the two CBUS LED objects
 //
 
-void CBUSbase::setLEDs(CBUSLED green, CBUSLED yellow) {
+void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
 
   UI = true;
   _ledGrn = green;
@@ -270,7 +275,7 @@ void CBUSbase::setLEDs(CBUSLED green, CBUSLED yellow) {
 /// assign the CBUS pushbutton switch object
 //
 
-void CBUSbase::setSwitch(CBUSSwitch sw) {
+void CBUS::setSwitch(CBUSSwitch sw) {
 
   UI = true;
   _sw = sw;
@@ -280,7 +285,7 @@ void CBUSbase::setSwitch(CBUSSwitch sw) {
 /// set the CBUS LEDs to indicate the current mode
 //
 
-void CBUSbase::indicateMode(byte mode) {
+void CBUS::indicateMode(byte mode) {
 
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
 
@@ -308,9 +313,16 @@ void CBUSbase::indicateMode(byte mode) {
   }
 }
 
+void CBUS::indicateActivity()
+{
+  if (UI) {
+    _ledGrn.pulse();
+  }
+}
+
 /// main CBUS message processing procedure
 
-void CBUSbase::process(byte num_messages) {
+void CBUS::process(byte num_messages) {
 
   byte remoteCANID = 0, nvindex = 0, evindex = 0, evval = 0;
   unsigned int nn = 0, en = 0, j = 0, opc;
@@ -391,7 +403,7 @@ void CBUSbase::process(byte num_messages) {
     // retrieve the next one
 
     // memset(&_msg, 0, sizeof(CANFrame));
-    _msg = getNextMessage();
+    _msg = transport->getNextMessage();
 
     // extract OPC, NN, EN
     opc = _msg.data[0];
@@ -427,9 +439,7 @@ void CBUSbase::process(byte num_messages) {
     /// pulse the green LED
     //
 
-    if (UI) {
-      _ledGrn.pulse();
-    }
+    indicateActivity();
 
     // is this a CANID enumeration request from another node (RTR set) ?
     if (_msg.rtr) {
@@ -1004,7 +1014,7 @@ void CBUSbase::process(byte num_messages) {
   return;
 }
 
-void CBUSbase::checkCANenum(void) {
+void CBUS::checkCANenum(void) {
 
   //
   /// check the 100ms CAN enumeration cycle timer
@@ -1072,7 +1082,7 @@ check_done:
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
 
-void CBUSbase::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
+void CBUS::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
 
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);
@@ -1094,29 +1104,6 @@ void CBUSbase::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_o
 /// set the long message handler object to receive long message frames
 //
 
-void CBUSbase::setLongMessageHandler(CBUSLongMessage *handler) {
+void CBUS::setLongMessageHandler(CBUSLongMessage *handler) {
   longMessageHandler = handler;
-}
-
-//
-/// utility method to populate a CBUS message header
-//
-
-void CBUSbase::makeHeader(CANFrame *msg, byte priority) {
-
-  makeHeader_impl(msg, module_config->CANID, priority);
-  return;
-}
-
-//
-/// actual implementation of the makeHeader method
-/// so it can be called directly or as a CBUS class method
-/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CBUS priority) + (7 bits of CBUS CAN ID)
-/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
-//
-
-void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
-
-  msg->id = (priority << 7) + (id & 0x7f);
-  return;
 }

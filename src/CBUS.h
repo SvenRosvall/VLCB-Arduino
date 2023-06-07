@@ -47,9 +47,9 @@
 #include <CBUSswitch.h>
 #include <CBUSconfig.h>
 #include <cbusdefs.h>
+#include <CBUSTransport.h>
 
 #define SW_TR_HOLD 6000U                   // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
-#define DEFAULT_PRIORITY 0xB               // default CBUS messages priority. 1011 = 2|3 = normal/low
 #define LONG_MESSAGE_DEFAULT_DELAY 20      // delay in milliseconds between sending successive long message fragments
 #define LONG_MESSAGE_RECEIVE_TIMEOUT 5000  // timeout waiting for next long message packet
 #define NUM_EX_CONTEXTS 4                  // number of send and receive contexts for extended implementation = number of concurrent messages
@@ -100,24 +100,23 @@ public:
 
 class CBUSLongMessage;      // forward reference
 
-class CBUSbase {
+class CBUS {
 
 public:
-  CBUSbase();
-  CBUSbase(CBUSConfig *the_config);
+  CBUS();
+  CBUS(CBUSConfig *the_config);
+  void setTransport(CBUSTransport * transport) { this->transport = transport; }
 
-  // these methods are pure virtual and must be implemented by the derived class
-  // as a consequence, it is not possible to create an instance of this class
+  // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
-#ifdef ARDUINO_ARCH_RP2040
-  virtual bool begin(bool poll = false, SPIClassRP2040 spi = SPI) = 0;
-#else
-  virtual bool begin(bool poll = false, SPIClass spi = SPI) = 0;
-#endif
-  virtual bool available(void) = 0;
-  virtual CANFrame getNextMessage(void) = 0;
-  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) = 0;
-  virtual void reset(void) = 0;
+  bool available(void)
+  {
+    return transport->available();
+  }
+  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
+  {
+    return transport->sendMessage(msg, rtr, ext, priority);
+  }
 
   // implementations of these methods are provided in the base class
 
@@ -125,6 +124,7 @@ public:
   bool sendCMDERR(byte cerrno);
   void CANenumeration(void);
   byte getCANID(unsigned long header);
+  byte getModuleCANID() { return module_config->CANID; }
   bool isExt(CANFrame *msg);
   bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
@@ -138,15 +138,13 @@ public:
   void setName(unsigned char *mname);
   void checkCANenum(void);
   void indicateMode(byte mode);
+  void indicateActivity();
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
-  void makeHeader(CANFrame *msg, byte priority = DEFAULT_PRIORITY);
   void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
 
   void setLongMessageHandler(CBUSLongMessage *handler);
-
-  unsigned int _numMsgsSent, _numMsgsRcvd;
 
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
@@ -166,6 +164,8 @@ protected:                                          // protected members become 
   bool enumeration_required;
   bool UI = false;
 
+  CBUSTransport * transport;
+
   CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
 };
 
@@ -179,7 +179,7 @@ class CBUSLongMessage {
 
 public:
 
-  CBUSLongMessage(CBUSbase *cbus_object_ptr);
+  CBUSLongMessage(CBUS *cbus_object_ptr);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process(void);
@@ -200,7 +200,7 @@ protected:
   unsigned long _last_fragment_sent = 0UL, _last_fragment_received = 0UL;
 
   void (*_messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);        // user callback function to receive long message fragments
-  CBUSbase *_cbus_object_ptr;
+  CBUS *_cbus_object_ptr;
 };
 
 
@@ -232,7 +232,7 @@ class CBUSLongMessageEx : public CBUSLongMessage {
 
 public:
 
-  CBUSLongMessageEx(CBUSbase *cbus_object_ptr)
+  CBUSLongMessageEx(CBUS *cbus_object_ptr)
     : CBUSLongMessage(cbus_object_ptr) {}         // derived class constructor calls the base class constructor
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);

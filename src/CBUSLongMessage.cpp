@@ -52,7 +52,7 @@ uint32_t crc32(const char *s, size_t n);
 /// receives a pointer to a CBUS object which provides the CAN message handling capability
 //
 
-CBUSLongMessage::CBUSLongMessage(CBUSbase *cbus_object_ptr) {
+CBUSLongMessage::CBUSLongMessage(CBUS *cbus_object_ptr) {
 
 	_cbus_object_ptr = cbus_object_ptr;
 	_cbus_object_ptr->setLongMessageHandler(this);
