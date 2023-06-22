@@ -63,8 +63,8 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 99;          // CBUS module type
 
 const byte LED_GRN = 4;             // CBUS green SLiM LED pin
-const byte LED_YLW = 5;             // CBUS yellow FLiM LED pin
-const byte SWITCH0 = 6;             // CBUS push button switch pin
+const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
+const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
 CBUSConfig modconfig;               // configuration object

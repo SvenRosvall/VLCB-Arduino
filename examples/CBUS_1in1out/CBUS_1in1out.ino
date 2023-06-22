@@ -63,8 +63,8 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 99;          // CBUS module type
 
 const byte LED_GRN = 4;             // CBUS green SLiM LED pin
-const byte LED_YLW = 5;             // CBUS yellow FLiM LED pin
-const byte SWITCH0 = 6;             // CBUS push button switch pin
+const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
+const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
 CBUSConfig modconfig;               // configuration object
@@ -169,11 +169,11 @@ void setup() {
 
   setupCBUS();
 
-  // configure the module switch, attached to pin 7, active low
-  moduleSwitch.setPin(7, LOW);
+  // configure the module switch, attached to pin 5, active low
+  moduleSwitch.setPin(5, LOW);
 
-  // configure the module LED, attached to pin 8 via a 1K resistor
-  moduleLED.setPin(8);
+  // configure the module LED, attached to pin 6 via a 1K resistor
+  moduleLED.setPin(6);
 
   // end of setup
   Serial << F("> ready") << endl << endl;
