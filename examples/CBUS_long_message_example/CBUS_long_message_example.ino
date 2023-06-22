@@ -49,7 +49,8 @@
 #include <Streaming.h>
 
 // CBUS library header files
-#include <CBUS2515.h>               // CAN controller and CBUS class
+#include <CBUS.h>                   // CBUS class
+#include <CBUS2515.h>               // CAN controller
 #include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
 #include <CBUSconfig.h>             // module configuration
@@ -63,15 +64,16 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 97;          // CBUS module type
 
 const byte LED_GRN = 4;             // CBUS green SLiM LED pin
-const byte LED_YLW = 5;             // CBUS yellow FLiM LED pin
-const byte SWITCH0 = 6;             // CBUS push button switch pin
+const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
+const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
 CBUSConfig modconfig;               // configuration object
-CBUS2515 CBUS(&modconfig);          // CBUS object
+CBUS cbus(&modconfig);              // CBUS object
+CBUS2515 cbus2515;                  // CAN transport object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
-CBUSLongMessage lmsg(&CBUS);        // CBUS RFC0005 long message object
+CBUSLongMessage lmsg(&cbus);        // CBUS RFC0005 long message object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
@@ -118,18 +120,18 @@ void setupCBUS() {
   params.setFlags(PF_FLiM | PF_COMBI);
 
   // assign to CBUS
-  CBUS.setParams(params.getParams());
-  CBUS.setName(mname);
+  cbus.setParams(params.getParams());
+  cbus.setName(mname);
 
   // set CBUS LED pins and assign to CBUS
   ledGrn.setPin(LED_GRN);
   ledYlw.setPin(LED_YLW);
-  CBUS.setLEDs(ledGrn, ledYlw);
+  cbus.setLEDs(ledGrn, ledYlw);
 
   // initialise CBUS switch and assign to CBUS
   pb_switch.setPin(SWITCH0, LOW);
   pb_switch.run();
-  CBUS.setSwitch(pb_switch);
+  cbus.setSwitch(pb_switch);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
   if (pb_switch.isPressed() && !modconfig.FLiM) {
@@ -138,22 +140,22 @@ void setupCBUS() {
   }
 
   // register our CBUS event handler, to receive event messages of learned events
-  CBUS.setEventHandler(eventhandler);
+  cbus.setEventHandler(eventhandler);
 
   // register our CAN frame handler, to receive *every* CAN frame
-  CBUS.setFrameHandler(framehandler);
+  cbus.setFrameHandler(framehandler);
 
   // subscribe to long message streams and register our handler function
   lmsg.subscribe(streams, sizeof(streams) / sizeof(byte), lmsg_in, 32, longmessagehandler);
 
   // set CBUS LEDs to indicate the current mode
-  CBUS.indicateMode(modconfig.FLiM);
+  cbus.indicateMode(modconfig.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(4, 2);         // more buffers = more memory used, fewer = less
-  CBUS.setOscFreq(16000000UL);      // select the crystal frequency of the CAN module
-  CBUS.setPins(10, 2);              // select pins for CAN bus CE and interrupt connections
-  CBUS.begin();
+  cbus2515.setNumBuffers(4, 2);         // more buffers = more memory used, fewer = less
+  cbus2515.setOscFreq(16000000UL);      // select the crystal frequency of the CAN module
+  cbus2515.setPins(10, 2);              // select pins for CAN bus CE and interrupt connections
+  cbus2515.begin();
 }
 
 //
@@ -181,7 +183,7 @@ void loop() {
   /// do CBUS message, switch and LED processing
   //
 
-  CBUS.process();
+  cbus.process();
 
   //
   /// do RFC0005 CBUS long message processing
@@ -201,11 +203,11 @@ void loop() {
   /// check CAN message buffers
   //
 
-  if (CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
+  if (cbus2515.canp->receiveBufferPeakCount() > cbus2515.canp->receiveBufferSize()) {
     Serial << F("> receive buffer overflow") << endl;
   }
 
-  if (CBUS.canp->transmitBufferPeakCount(0) > CBUS.canp->transmitBufferSize(0)) {
+  if (cbus2515.canp->transmitBufferPeakCount(0) > cbus2515.canp->transmitBufferSize(0)) {
     Serial << F("> transmit buffer overflow") << endl;
   }
 
@@ -215,7 +217,7 @@ void loop() {
 
   byte err;
 
-  if ((err = CBUS.canp->errorFlagRegister()) != 0) {
+  if ((err = cbus2515.canp->errorFlagRegister()) != 0) {
     Serial << F("> error flag register = ") << err << endl;
   }
 
@@ -386,7 +388,7 @@ void processSerialInput(void) {
     // CAN bus status
     case 'c':
 
-      CBUS.printStatus();
+      cbus2515.printStatus();
       break;
 
     case 'h':
@@ -396,7 +398,7 @@ void processSerialInput(void) {
 
     case 'y':
       // reset CAN bus and CBUS message processing
-      CBUS.reset();
+      cbus2515.reset();
       break;
 
     case '*':
@@ -416,8 +418,8 @@ void processSerialInput(void) {
       break;
 
     case 'd':
-      Serial << F("> tx buffer = ") << CBUS.canp->transmitBufferSize(0) << F(", ") <<  CBUS.canp->transmitBufferCount(0) << F(", ") << CBUS.canp->transmitBufferPeakCount(0) << endl;
-      Serial << F("> rx buffer = ") << CBUS.canp->receiveBufferSize() << F(", ") << CBUS.canp->receiveBufferCount() << F(", ") << CBUS.canp->receiveBufferPeakCount() << endl;
+      Serial << F("> tx buffer = ") << cbus2515.canp->transmitBufferSize(0) << F(", ") <<  cbus2515.canp->transmitBufferCount(0) << F(", ") << cbus2515.canp->transmitBufferPeakCount(0) << endl;
+      Serial << F("> rx buffer = ") << cbus2515.canp->receiveBufferSize() << F(", ") << cbus2515.canp->receiveBufferCount() << F(", ") << cbus2515.canp->receiveBufferPeakCount() << endl;
       break;
 
     case '\r':

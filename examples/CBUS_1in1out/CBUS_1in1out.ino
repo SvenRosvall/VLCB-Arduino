@@ -49,7 +49,8 @@
 #include <Streaming.h>
 
 // CBUS library header files
-#include <CBUS2515.h>               // CAN controller and CBUS class
+#include <CBUS.h>                   // CBUS class
+#include <CBUS2515.h>               // CAN controller
 #include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
 #include <CBUSconfig.h>             // module configuration
@@ -68,7 +69,8 @@ const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
 CBUSConfig modconfig;               // configuration object
-CBUS2515 CBUS(&modconfig);          // CBUS object
+CBUS cbus(&modconfig);              // CBUS object
+CBUS2515 cbus2515;                  // CAN transport object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 
@@ -116,18 +118,18 @@ void setupCBUS() {
   params.setFlags(PF_FLiM | PF_COMBI);
 
   // assign to CBUS
-  CBUS.setParams(params.getParams());
-  CBUS.setName(mname);
+  cbus.setParams(params.getParams());
+  cbus.setName(mname);
 
   // set CBUS LED pins and assign to CBUS
   ledGrn.setPin(LED_GRN);
   ledYlw.setPin(LED_YLW);
-  CBUS.setLEDs(ledGrn, ledYlw);
+  cbus.setLEDs(ledGrn, ledYlw);
 
   // initialise CBUS switch and assign to CBUS
   pb_switch.setPin(SWITCH0, LOW);
   pb_switch.run();
-  CBUS.setSwitch(pb_switch);
+  cbus.setSwitch(pb_switch);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
   if (pb_switch.isPressed() && !modconfig.FLiM) {
@@ -142,18 +144,17 @@ void setupCBUS() {
   }
 
   // register our CBUS event handler, to receive event messages of learned events
-  CBUS.setEventHandler(eventhandler);
+  cbus.setEventHandler(eventhandler);
 
   // set CBUS LEDs to indicate mode
-  CBUS.indicateMode(modconfig.FLiM);
+  cbus.indicateMode(modconfig.FLiM);
 
   // configure and start CAN bus and CBUS message processing
-  CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  
-  if (!CBUS.begin())
-  {
+  cbus2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
+  cbus2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
+  cbus2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
+  cbus.setTransport(&cbus2515);
+  if (!cbus2515.begin()) {
     Serial << F("> error starting CBUS") << endl;
   }
 }
@@ -189,7 +190,7 @@ void loop() {
   /// do CBUS message, switch and LED processing
   //
 
-  CBUS.process();
+  cbus.process();
 
   //
   /// process console commands
@@ -214,11 +215,11 @@ void loop() {
   /// check CAN message buffers
   //
 
-  if (CBUS.canp->receiveBufferPeakCount() > CBUS.canp->receiveBufferSize()) {
+  if (cbus2515.canp->receiveBufferPeakCount() > cbus2515.canp->receiveBufferSize()) {
     Serial << F("> receive buffer overflow") << endl;
   }
 
-  if (CBUS.canp->transmitBufferPeakCount(0) > CBUS.canp->transmitBufferSize(0)) {
+  if (cbus2515.canp->transmitBufferPeakCount(0) > cbus2515.canp->transmitBufferSize(0)) {
     Serial << F("> transmit buffer overflow") << endl;
   }
 
@@ -226,7 +227,7 @@ void loop() {
   /// check CAN bus state
   //
 
-  byte s = CBUS.canp->errorFlagRegister();
+  byte s = cbus2515.canp->errorFlagRegister();
   if (s != 0) {
     Serial << F("> error flag register is non-zero") << endl;
   }
@@ -255,7 +256,7 @@ void processModuleSwitchChange() {
     msg.data[3] = 0;
     msg.data[4] = 1;            // event number (EN) = 1
 
-    if (CBUS.sendMessage(&msg)) {
+    if (cbus.sendMessage(&msg)) {
       Serial << F("> sent CBUS message") << endl;
     } else {
       Serial << F("> error sending CBUS message") << endl;
@@ -405,7 +406,7 @@ void processSerialInput(void) {
     // CAN bus status
     case 'c':
 
-      CBUS.printStatus();
+      cbus2515.printStatus();
       break;
 
     case 'h':
@@ -415,7 +416,7 @@ void processSerialInput(void) {
 
     case 'y':
       // reset CAN bus and CBUS message processing
-      CBUS.reset();
+      cbus2515.reset();
       break;
 
     case '*':
