@@ -91,30 +91,19 @@ public:
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex);
   byte numEvents(void);
-  byte makeHash(byte tarr[]);
-  void getEvArray(byte idx);
-  void makeEvHashTable(void);
   void updateEvHashEntry(byte idx);
   void clearEvHashTable(void);
-  bool check_hash_collisions(void);
   byte getEventEVval(byte idx, byte evnum);
   void writeEventEV(byte idx, byte evnum, byte evval);
 
   byte readNV(byte idx);
   void writeNV(byte idx, byte val);
-  void loadNVs(void);
 
   void readEvent(byte idx, byte tarr[]);
   void writeEvent(byte index, byte data[]);
   void cleareventEEPROM(byte index);
   void resetModule(CBUSLED green, CBUSLED yellow, CBUSSwitch sw);
   void resetModule(void);
-
-  byte readEEPROM(unsigned int eeaddress);
-  void writeEEPROM(unsigned int eeaddress, byte data);
-  byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]);
-  void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes);
-  void resetEEPROM(void);
 
   void setCANID(byte canid);
   void setFLiM(bool f);
@@ -123,14 +112,6 @@ public:
   void setResetFlag(void);
   void clearResetFlag(void);
   bool isResetFlagSet(void);
-
-  byte getChipEEPROMVal(unsigned int eeaddress);
-  void setChipEEPROMVal(unsigned int eeaddress, byte val);
-
-  bool setEEPROMtype(byte type);
-  void setExtEEPROMAddress(byte address, TwoWire *bus = &Wire);
-  unsigned int freeSRAM(void);
-  void reboot(void);
 
   unsigned int EE_EVENTS_START;
   byte EE_MAX_EVENTS;
@@ -142,6 +123,34 @@ public:
   byte CANID;
   bool FLiM;
   unsigned int nodeNum;
+
+  // These functions shouldn't be here. But keep them for now.
+  unsigned int freeSRAM(void);
+  void reboot(void);
+  bool setEEPROMtype(byte type);
+
+  // Stuff below are not confirmed to be needed to be publically available.
+private:
+  byte makeHash(byte tarr[]);
+  void getEvArray(byte idx);
+  void makeEvHashTable(void);
+  bool check_hash_collisions(void);
+
+  void loadNVs(void);
+
+  // Functions that depend on eeprom_type:
+  byte readEEPROM(unsigned int eeaddress);
+  void writeEEPROM(unsigned int eeaddress, byte data);
+  byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]);
+  void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes);
+  void resetEEPROM(void);
+
+  // Functions that depend on controlling macros
+  byte getChipEEPROMVal(unsigned int eeaddress);
+  void setChipEEPROMVal(unsigned int eeaddress, byte val);
+
+  void setExtEEPROMAddress(byte address, TwoWire *bus = &Wire);
+
   byte eeprom_type;
   byte external_address;
   TwoWire *I2Cbus;
