@@ -38,42 +38,21 @@
 #pragma once
 
 #include <Arduino.h>                // for definition of byte datatype
-#include <Wire.h>
 
 #include <CBUSLED.h>
 #include <CBUSswitch.h>
+#include "Storage.h"
 
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
 
-static const byte EEPROM_I2C_ADDR = 0x50;
-
+// TODO: Remove. Keep for now for backwards compatibility.
 enum {
   EEPROM_INTERNAL = 0,
   EEPROM_EXTERNAL = 1,
   EEPROM_USES_FLASH
 };
-
-// #ifdef __AVR_XMEGA__
-#if defined(DXCORE)
-#include <Flash.h>
-
-#define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
-#define FLASH_PAGE_SIZE 512
-#define NUM_FLASH_PAGES 4
-
-typedef struct _flash_page {
-  bool dirty;
-  uint8_t data[FLASH_PAGE_SIZE];
-} flash_page_t;
-
-void flash_cache_page(const byte page);
-bool flash_writeback_page(const byte page);
-bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16_t number);
-byte flash_read_byte(const uint16_t address);
-void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest);
-#endif
 
 //
 /// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
@@ -83,6 +62,8 @@ class CBUSConfig {
 
 public:
   CBUSConfig();
+  // TODO: Storage should be a constructor parameter. But leaving as setter to avoid changing other repositories.
+  void setStorage(Storage * theStorage) { this->storage = theStorage; }
   void begin(void);
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
@@ -129,6 +110,9 @@ public:
   void reboot(void);
   bool setEEPROMtype(byte type);
 
+private:
+  Storage * storage;
+
   // Stuff below are not confirmed to be needed to be publically available.
 private:
   byte makeHash(byte tarr[]);
@@ -138,22 +122,6 @@ private:
 
   void loadNVs(void);
 
-  // Functions that depend on eeprom_type:
-  byte readEEPROM(unsigned int eeaddress);
-  void writeEEPROM(unsigned int eeaddress, byte data);
-  byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]);
-  void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes);
-  void resetEEPROM(void);
-
-  // Functions that depend on controlling macros
-  byte getChipEEPROMVal(unsigned int eeaddress);
-  void setChipEEPROMVal(unsigned int eeaddress, byte val);
-
-  void setExtEEPROMAddress(byte address, TwoWire *bus = &Wire);
-
-  byte eeprom_type;
-  byte external_address;
-  TwoWire *I2Cbus;
   byte *evhashtbl;
   bool hash_collision;
 };
