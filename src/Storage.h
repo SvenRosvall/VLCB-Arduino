@@ -14,3 +14,5 @@ public:
   virtual void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes) = 0;
   virtual void resetEEPROM(void) = 0;
 };
+
+extern Storage * createDefaultStorageForPlatform();

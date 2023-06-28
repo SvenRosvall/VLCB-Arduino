@@ -62,8 +62,7 @@ class CBUSConfig {
 
 public:
   CBUSConfig();
-  // TODO: Storage should be a constructor parameter. But leaving as setter to avoid changing other repositories.
-  void setStorage(Storage * theStorage) { this->storage = theStorage; }
+  CBUSConfig(Storage * theStorage);
   void begin(void);
 
   byte findExistingEvent(unsigned int nn, unsigned int en);

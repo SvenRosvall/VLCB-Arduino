@@ -56,7 +56,14 @@ extern "C" char* sbrk(int incr);
 /// ctor
 //
 
-CBUSConfig::CBUSConfig() {
+CBUSConfig::CBUSConfig()
+{
+  this->storage = createDefaultStorageForPlatform();
+}
+
+CBUSConfig::CBUSConfig(Storage * theStorage)
+{
+  this->storage = theStorage;
 }
 
 //
@@ -546,6 +553,8 @@ unsigned int CBUSConfig::freeSRAM(void) {
   char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
 #endif
+
+  // For other platforms you will get a warning about missing return.
 }
 
 //
