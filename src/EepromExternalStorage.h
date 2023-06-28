@@ -7,6 +7,7 @@
 
 class EepromExternalStorage : public Storage
 {
+public:
   EepromExternalStorage();
   void setExtEEPROMAddress(byte address, TwoWire *bus);
   void begin();

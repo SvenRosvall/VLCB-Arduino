@@ -4,6 +4,7 @@
 
 class EepromInternalStorage : public Storage
 {
+public:
   void begin();
 
   virtual byte readEEPROM(unsigned int eeaddress) override;

@@ -25,10 +25,10 @@ bool flash_writeback_page(const byte page);
 bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16_t number);
 byte flash_read_byte(const uint16_t address);
 void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest);
-//#endif
 
 class FlashStorage : public Storage
 {
+public:
   void begin();
 
   virtual byte readEEPROM(unsigned int eeaddress) override;
