@@ -11,7 +11,7 @@ Controlling macros:
 ------------------
 __SAM3X8E__ - EEPROM emulation - DueFlashStorage.h
 ARDUINO_ARCH_RP2040 - Pico stuff
-DXCORE - Use flash
+DXCORE - Use flash - requires a separate board manager to be installed.
 ESP32, ESP8266
 
 EEPROM Types:
