@@ -1,0 +1,42 @@
+From Duncan:
+The list of platforms and their options and limitations:
+1. traditional Uno R3 and Nano have 1KB of EEPROM using the original EEPROM library
+2. Pico and ESPxx have an EEPROM emulation library but require an explicit EEPROM.begin(size) call
+3. external I2C EEPROM works on any platform (needs the I2C address to be set if other than the default)
+4. Arduino Due EEPROM emulation
+5. other boards with limited EEPROM plus optional flash EEPROM emulation libraries (e.g. Uno R4, AVR-Dx)
+6. filesystem-oriented approaches, using various file structures (binary, text, json, etc).
+
+Controlling macros:
+------------------
+__SAM3X8E__ - EEPROM emulation - DueFlashStorage.h
+ARDUINO_ARCH_RP2040 - Pico stuff
+DXCORE - Use flash - requires a separate board manager to be installed.
+ESP32, ESP8266
+
+EEPROM Types:
+------------
+EEPROM_INTERNAL
+EEPROM_EXTERNAL
+EEPROM_USES_FLASH
+
+setEEPROMtype() is only called from examples in CBUS2515. These set to EEPROM_INTERNAL.
+
+Functions that depend on eeprom_type:
+readEEPROM
+readBytesEEPROM
+writeEEPROM
+writeBytesEEPROM
+resetEEPROM
+resetModule(void)
+
+Functions that depend on controlling macros
+setChipEEPROMVal
+getChipEEPROMVal
+
+Functions only available for DXCORE
+flash_cache_page
+flash_writeback_page
+flash_write_bytes
+flash_read_byte
+flash_read_bytes
