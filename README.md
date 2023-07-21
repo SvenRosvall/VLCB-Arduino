@@ -1,6 +1,6 @@
 <img align="right" src="arduino_cbus_logo.png"  width="150" height="75">
 
-# VLCVB-Arduino
+# VLCB-Arduino
 Arduino library for VLCB running over CAN bus
 
 The code is based on a CBUS library created by Duncan Greenwood.
