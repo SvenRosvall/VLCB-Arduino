@@ -257,7 +257,6 @@ void printConfig(void) {
 
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
-  return;
 }
 
 //
@@ -320,8 +319,10 @@ void processSerialInput(void) {
           Serial << dstr;
 
           // for each data byte of this event
+          byte evarray[4];
+          modconfig.readEvent(j, evarray);
           for (byte e = 0; e < (modconfig.EE_NUM_EVS + 4); e++) {
-            sprintf(dstr, " 0x%02hx | ", modconfig.readEEPROM(modconfig.EE_EVENTS_START + (j * modconfig.EE_BYTES_PER_EVENT) + e));
+            sprintf(dstr, " 0x%02hx | ", evarray[e]);
             Serial << dstr;
           }
 
