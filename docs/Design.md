@@ -21,6 +21,7 @@ Some details:
   that is required. It makes use of a storage object that has different implementations for different
   storage types. Not all Arduino modules have EEPROM or enough EEPROM. Instead, external EEPROM or
   Flash memory can be used.
+  See furter details in [Persistent Storage](PersistentStorage.md) documentation.
 * There is no queuing in this diagram. Message queuing is expected to happen in the transport layer.
   Some transport hardware has message queues builtin, for others the transport implementation
   will include queues.
