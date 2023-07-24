@@ -51,7 +51,9 @@ ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
 /// constructor
 //
 
-CBUS2515::CBUS2515() {
+CBUS2515::CBUS2515(CBUS * cbus)
+  : cbus(cbus)
+{
   initMembers();
 }
 

@@ -70,7 +70,7 @@ const byte SWITCH0 = 8;             // CBUS push button switch pin
 // CBUS objects
 CBUSConfig modconfig;               // configuration object
 CBUS cbus(&modconfig);              // CBUS object
-CBUS2515 cbus2515;                  // CAN transport object
+CBUS2515 cbus2515(&cbus);                  // CAN transport object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 CBUSLongMessage lmsg(&cbus);        // CBUS RFC0005 long message object
@@ -92,7 +92,6 @@ char lmsg_out[32], lmsg_in[32];     // message buffers
 //
 /// setup CBUS - runs once at power on from setup()
 //
-
 void setupCBUS() {
 
   // set config layout parameters

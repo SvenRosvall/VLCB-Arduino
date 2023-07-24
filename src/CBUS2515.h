@@ -62,7 +62,7 @@ class CBUS2515 : public CBUSTransport {
 
 public:
 
-  CBUS2515();
+  CBUS2515(CBUS *);
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
 #ifdef ARDUINO_ARCH_RP2040

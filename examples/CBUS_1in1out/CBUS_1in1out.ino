@@ -70,7 +70,7 @@ const byte SWITCH0 = 8;             // CBUS push button switch pin
 // CBUS objects
 CBUSConfig modconfig;               // configuration object
 CBUS cbus(&modconfig);              // CBUS object
-CBUS2515 cbus2515;                  // CAN transport object
+CBUS2515 cbus2515(&cbus);                  // CAN transport object
 CBUSLED ledGrn, ledYlw;             // two LED objects
 CBUSSwitch pb_switch;               // switch object
 
