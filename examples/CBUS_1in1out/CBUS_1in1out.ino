@@ -56,6 +56,7 @@
 #include <CBUSconfig.h>             // module configuration
 #include <CBUSParams.h>             // CBUS parameters
 #include <cbusdefs.h>               // MERG CBUS constants
+#include <LEDUserInterface.h>
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -71,8 +72,7 @@ const byte SWITCH0 = 8;             // CBUS push button switch pin
 CBUSConfig modconfig;               // configuration object
 CBUS cbus(&modconfig);              // CBUS object
 CBUS2515 cbus2515(&cbus);                  // CAN transport object
-CBUSLED ledGrn, ledYlw;             // two LED objects
-CBUSSwitch pb_switch;               // switch object
+LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects
 CBUSSwitch moduleSwitch;            // an example switch as input
@@ -122,19 +122,12 @@ void setupCBUS() {
   cbus.setName(mname);
 
   // set CBUS LED pins and assign to CBUS
-  ledGrn.setPin(LED_GRN);
-  ledYlw.setPin(LED_YLW);
-  cbus.setLEDs(ledGrn, ledYlw);
-
-  // initialise CBUS switch and assign to CBUS
-  pb_switch.setPin(SWITCH0, LOW);
-  pb_switch.run();
-  cbus.setSwitch(pb_switch);
+  cbus.setUI(&userInterface);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
-  if (pb_switch.isPressed() && !modconfig.FLiM) {
+  if (userInterface.isButtonPressed() && !modconfig.FLiM) {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
-    modconfig.resetModule(ledGrn, ledYlw, pb_switch);
+    modconfig.resetModule(&userInterface);
   }
 
   // opportunity to set default NVs after module reset
@@ -373,8 +366,12 @@ void processSerialInput(void) {
           // for each data byte of this event
           byte evarray[4];
           modconfig.readEvent(j, evarray);
-          for (byte e = 0; e < (modconfig.EE_NUM_EVS + 4); e++) {
+          for (byte e = 0; e < 4; e++) {
             sprintf(dstr, " 0x%02hx | ", evarray[e]);
+            Serial << dstr;
+          }
+          for (byte ev = 1; ev <= modconfig.EE_NUM_EVS; ev++) {
+            sprintf(dstr, " 0x%02hx | ", modconfig.getEventEVval(j, ev));
             Serial << dstr;
           }
 

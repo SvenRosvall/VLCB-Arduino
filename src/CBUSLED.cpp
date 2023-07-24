@@ -41,12 +41,15 @@
 /// class for individual LED with non-blocking control
 //
 
-CBUSLED::CBUSLED() {
+CBUSLED::CBUSLED(byte pin)
+  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
+{
+    pinMode(_pin, OUTPUT);
+}
 
-  _state = LOW;
-  _blink = false;
-  _pulse = false;
-  _lastTime = 0UL;
+CBUSLED::CBUSLED()
+  : _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
+{
 }
 
 //  set the pin for this LED
@@ -99,7 +102,6 @@ void CBUSLED::blink() {
 void CBUSLED::pulse() {
 
   _pulse = true;
-  _state = HIGH;
   _pulseStart = millis();
   run();
 }
@@ -122,11 +124,10 @@ void CBUSLED::run() {
   if (_pulse) {
     if (millis() - _pulseStart >= PULSE_ON_TIME) {
       _pulse = false;
-      _state = LOW;
     }
   }
 
-  _write(_pin, _state);
+  _write(_pin, _pulse || _state);
 }
 
 // write to the physical pin

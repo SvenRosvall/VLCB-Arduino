@@ -59,6 +59,7 @@ class CBUSLED {
 
 public:
   CBUSLED();
+  CBUSLED(byte pin);
   void virtual setPin(byte pin);
   bool getState();
   void on();

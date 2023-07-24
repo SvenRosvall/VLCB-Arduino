@@ -258,27 +258,9 @@ void CBUS::renegotiate(void) {
   initFLiM();
 }
 
-//
-/// assign the two CBUS LED objects
-//
-
-void CBUS::setLEDs(CBUSLED green, CBUSLED yellow) {
-
-  UI = true;
-  _ledGrn = green;
-  _ledYlw = yellow;
-
-  return;
-}
-
-//
-/// assign the CBUS pushbutton switch object
-//
-
-void CBUS::setSwitch(CBUSSwitch sw) {
-
-  UI = true;
-  _sw = sw;
+void CBUS::setUI(UserInterface *ui)
+{
+  _ui = ui;
 }
 
 //
@@ -288,35 +270,15 @@ void CBUS::setSwitch(CBUSSwitch sw) {
 void CBUS::indicateMode(byte mode) {
 
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
-
-  if (UI) {
-    switch (mode) {
-
-    case MODE_FLIM:
-      _ledYlw.on();
-      _ledGrn.off();
-      break;
-
-    case MODE_SLIM:
-      _ledYlw.off();
-      _ledGrn.on();
-      break;
-
-    case MODE_CHANGING:
-      _ledYlw.blink();
-      _ledGrn.off();
-      break;
-
-    default:
-      break;
-    }
+  if (_ui) {
+    _ui->indicateMode(mode);
   }
 }
 
 void CBUS::indicateActivity()
 {
-  if (UI) {
-    _ledGrn.pulse();
+  if (_ui) {
+    _ui->indicateActivity();
   }
 }
 
@@ -335,20 +297,17 @@ void CBUS::process(byte num_messages) {
 
   // process switch operations if the module is configured with one
 
-  if (UI) {
+  if (_ui) {
 
-    // allow LEDs to update
-    _ledGrn.run();
-    _ledYlw.run();
-
-    // allow the CBUS switch some processing time
-    _sw.run();
+    // allow LEDs and switch to update
+    _ui->run();
 
     //
     /// use LEDs to indicate that the user can release the switch
     //
 
-    if (_sw.isPressed() && _sw.getCurrentStateDuration() > SW_TR_HOLD) {
+    if (_ui->resetRequested()) {
+      //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
       indicateMode(MODE_CHANGING);
     }
 
@@ -356,37 +315,35 @@ void CBUS::process(byte num_messages) {
     /// handle switch state changes
     //
 
-    if (_sw.stateChanged()) {
-
-      // has switch been released ?
-      if (!_sw.isPressed()) {
-
-        // how long was it pressed for ?
-        unsigned long press_time = _sw.getLastStateDuration();
-
-        // long hold > 6 secs
-        if (press_time > SW_TR_HOLD) {
-          // initiate mode change
-          if (!module_config->FLiM) {
-            initFLiM();
-          } else {
-            revertSLiM();
-          }
+    UserInterface::RequestedAction requestedAction = _ui->checkRequestedAction();
+    switch (requestedAction)
+    {
+      case UserInterface::CHANGE_MODE:
+        // initiate mode change
+        //Serial << "CBUS::process() - changing mode, current isFlim=" << module_config->FLiM << endl;
+        if (!module_config->FLiM) {
+          initFLiM();
+        } else {
+          revertSLiM();
         }
+        break;
 
-        // short 1-2 secs
-        if (press_time >= 1000 && press_time < 2000) {
-          renegotiate();
-        }
+      case UserInterface::RENEGOTIATE:
+        //Serial << "CBUS::process() - renegotiate" << endl;
+        renegotiate();
+        break;
 
-        // very short < 0.5 sec
-        if (press_time < 500 && module_config->FLiM) {
+      case UserInterface::ENUMERATION:
+        //Serial << "CBUS::process() - enumerate" << endl;
+        if (module_config->FLiM)
+        {
           CANenumeration();
         }
+        break;
 
-      } else {
-        // do any switch release processing here
-      }
+      case UserInterface::NONE:
+        //Serial << "CBUS::process() - no action" << endl;
+        break;
     }
   }
 
@@ -549,7 +506,6 @@ void CBUS::process(byte num_messages) {
           _msg.data[7] = _mparams[7];     // major code ver
           // final param[8] = node flags is not sent here as the max message payload is 8 bytes (0-7)
           sendMessage(&_msg);
-
         }
 
         break;

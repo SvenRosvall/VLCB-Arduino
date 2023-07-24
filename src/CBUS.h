@@ -43,11 +43,10 @@
 
 #include <SPI.h>
 
-#include <CBUSLED.h>
-#include <CBUSswitch.h>
 #include <CBUSconfig.h>
 #include <cbusdefs.h>
 #include <CBUSTransport.h>
+#include "UserInterface.h"
 
 #define SW_TR_HOLD 6000U                   // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
 #define LONG_MESSAGE_DEFAULT_DELAY 20      // delay in milliseconds between sending successive long message fragments
@@ -132,8 +131,7 @@ public:
   void revertSLiM(void);
   void setSLiM(void);
   void renegotiate(void);
-  void setLEDs(CBUSLED ledGrn, CBUSLED ledYlw);
-  void setSwitch(CBUSSwitch sw);
+  void setUI(UserInterface *ui);
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
   void checkCANenum(void);
@@ -148,8 +146,7 @@ public:
 
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
-  CBUSLED _ledGrn, _ledYlw;
-  CBUSSwitch _sw;
+  UserInterface *_ui;
   CBUSConfig *module_config;
   unsigned char *_mparams;
   unsigned char *_mname;
@@ -162,7 +159,6 @@ protected:                                          // protected members become 
   bool bModeChanging, bCANenum, bLearn;
   unsigned long timeOutTimer, CANenumTime;
   bool enumeration_required;
-  bool UI = false;
 
   CBUSTransport * transport;
 

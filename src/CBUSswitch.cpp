@@ -42,7 +42,22 @@
 /// a class to encapsulate a physical pushbutton switch, with non-blocking processing
 //
 
-void CBUSSwitch::setPin(byte pin, byte pressedState = LOW) {
+CBUSSwitch::CBUSSwitch(byte pin, byte pressedState)
+  : _pin(pin), _pressedState(pressedState)
+{
+  if (_pressedState == LOW)
+    pinMode(_pin, INPUT_PULLUP);
+
+  reset();
+  _currentState = readPin(_pin);
+}
+
+CBUSSwitch::CBUSSwitch()
+{
+  // Do nothing, expect setup in setPin()
+}
+
+void CBUSSwitch::setPin(byte pin, byte pressedState) {
 
   _pin = pin;
   _pressedState = pressedState;

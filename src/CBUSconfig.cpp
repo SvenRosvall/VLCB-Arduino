@@ -561,7 +561,7 @@ unsigned int CBUSConfig::freeSRAM(void) {
 /// manually reset the module to factory defaults
 //
 
-void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch) {
+void CBUSConfig::resetModule(UserInterface * ui) {
 
   /// standard implementation of resetModule()
 
@@ -574,9 +574,7 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
 
   // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
 
-  pbSwitch.reset();
-  ledGrn.blink();
-  ledYlw.blink();
+  ui->indicateResetting();
 
   // wait for a further (5 sec) button press -- as a 'safety' mechanism
   while (!bDone) {
@@ -587,26 +585,18 @@ void CBUSConfig::resetModule(CBUSLED ledGrn, CBUSLED ledYlw, CBUSSwitch pbSwitch
       return;
     }
 
-    pbSwitch.run();
-    ledGrn.run();
-    ledYlw.run();
+    ui->run();
 
     // wait until switch held for a further 5 secs
-    if (pbSwitch.isPressed() && pbSwitch.getCurrentStateDuration() > 5000) {
+    if (ui->resetRequested()) {
       bDone = true;
     }
   }
 
   // do the reset
   // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
-
-  ledGrn.off();
-  ledYlw.off();
-  ledGrn.run();
-  ledYlw.run();
-
+  ui->indicateResetDone();
   resetModule();
-
 }
 
 void CBUSConfig::resetModule(void) {

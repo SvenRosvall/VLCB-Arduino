@@ -39,8 +39,7 @@
 
 #include <Arduino.h>                // for definition of byte datatype
 
-#include <CBUSLED.h>
-#include <CBUSswitch.h>
+#include <UserInterface.h>
 #include "Storage.h"
 
 // in-memory hash table
@@ -82,7 +81,7 @@ public:
   void readEvent(byte idx, byte tarr[]);
   void writeEvent(byte index, byte data[]);
   void cleareventEEPROM(byte index);
-  void resetModule(CBUSLED green, CBUSLED yellow, CBUSSwitch sw);
+  void resetModule(UserInterface * ui);
   void resetModule(void);
 
   void setCANID(byte canid);
