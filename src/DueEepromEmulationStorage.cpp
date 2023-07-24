@@ -27,7 +27,7 @@ byte DueEepromEmulationStorage::readEEPROM(unsigned int eeaddress) {
 
 byte DueEepromEmulationStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) {
 
-  byte count = 0;
+  byte count;
 
     for (count = 0; count < nbytes; count++) {
       dest[count] = getChipEEPROMVal(eeaddress + count);

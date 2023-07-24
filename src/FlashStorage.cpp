@@ -73,8 +73,6 @@ void FlashStorage::writeEEPROM(unsigned int eeaddress, byte data) {
 #if defined(DXCORE)
     flash_write_bytes(eeaddress, &data, 1);
 #endif
-
-  return;
 }
 
 //
@@ -88,8 +86,6 @@ void FlashStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte num
 #if defined(DXCORE)
     flash_write_bytes(eeaddress, src, numbytes);
 #endif
-
-  return;
 }
 
 //

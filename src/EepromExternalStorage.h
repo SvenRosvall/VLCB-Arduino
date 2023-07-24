@@ -10,7 +10,7 @@ class EepromExternalStorage : public Storage
 public:
   EepromExternalStorage();
   void setExtEEPROMAddress(byte address, TwoWire *bus);
-  void begin();
+  virtual void begin() override;
 
   virtual byte readEEPROM(unsigned int eeaddress) override;
   virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) override;

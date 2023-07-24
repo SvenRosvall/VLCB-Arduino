@@ -29,7 +29,7 @@ void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *de
 class FlashStorage : public Storage
 {
 public:
-  void begin();
+  virtual void begin() override;
 
   virtual byte readEEPROM(unsigned int eeaddress) override;
   virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) override;

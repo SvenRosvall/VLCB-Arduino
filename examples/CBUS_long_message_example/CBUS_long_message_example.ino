@@ -228,7 +228,6 @@ void eventhandler(byte index, CANFrame *msg) {
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
   Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
-  return;
 }
 
 //
@@ -248,7 +247,6 @@ void framehandler(CANFrame *msg) {
   }
 
   Serial << " ]" << endl;
-  return;
 }
 
 //
@@ -264,8 +262,6 @@ void longmessagehandler(void *fragment, const unsigned int fragment_len, const b
   if (status == CBUS_LONG_MESSAGE_COMPLETE) {
     Serial << F("> received long message, stream = ") << stream_id << F(", len = ") << fragment_len << F(", msg = |") << (char *) fragment << F("|") << endl;
   }
-
-  return;
 }
 
 //
@@ -280,7 +276,6 @@ void printConfig(void) {
 
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
-  return;
 }
 
 //

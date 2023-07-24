@@ -93,7 +93,6 @@ void CBUSConfig::setFLiM(bool f) {
 
   FLiM = f;
   storage->writeEEPROM(0, f);
-  return;
 }
 
 //
@@ -104,7 +103,6 @@ void CBUSConfig::setCANID(byte canid) {
 
   CANID = canid;
   storage->writeEEPROM(1, canid);
-  return;
 }
 
 //
@@ -116,7 +114,6 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
   nodeNum = nn;
   storage->writeEEPROM(2, highByte(nodeNum));
   storage->writeEEPROM(3, lowByte(nodeNum));
-  return;
 }
 
 //
@@ -222,16 +219,13 @@ byte CBUSConfig::findEventSpace(void) {
 
 byte CBUSConfig::makeHash(byte tarr[4]) {
 
-  byte hash = 0;
-  unsigned int nn, en;
-
   // make a hash from a 4-byte NN + EN event
 
-  nn = (tarr[0] << 8) + tarr[1];
-  en = (tarr[2] << 8) + tarr[3];
+  unsigned int nn = (tarr[0] << 8) + tarr[1];
+  unsigned int en = (tarr[2] << 8) + tarr[3];
 
   // need to hash the NN and EN to a uniform distribution across HASH_LENGTH
-  hash = nn ^ (nn >> 8);
+  byte hash = nn ^ (nn >> 8);
   hash = 7 * hash + (en ^ (en >> 8));
 
   // ensure it is within bounds and non-zero
@@ -254,7 +248,6 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
   }
 
   // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
-  return;
 }
 
 //
@@ -301,8 +294,6 @@ void CBUSConfig::makeEvHashTable(void) {
   }
 
   hash_collision = check_hash_collisions();
-
-  return;
 }
 
 //
@@ -327,7 +318,6 @@ void CBUSConfig::updateEvHashEntry(byte idx) {
   hash_collision = check_hash_collisions();
 
   // DEBUG_SERIAL << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
-  return;
 }
 
 //
@@ -344,7 +334,6 @@ void CBUSConfig::clearEvHashTable(void) {
   }
 
   hash_collision = false;
-  return;
 }
 
 //
@@ -371,8 +360,6 @@ void CBUSConfig::printEvHashTable(bool raw) {
 
     DEBUG_SERIAL << endl;
   */
-
-  return;
 }
 
 //
@@ -423,7 +410,6 @@ byte CBUSConfig::readNV(byte idx) {
 void CBUSConfig::writeNV(byte idx, byte val) {
 
   storage->writeEEPROM(EE_NVS_START + (idx - 1), val);
-  return;
 }
 
 //
@@ -441,8 +427,6 @@ void CBUSConfig::writeEvent(byte index, byte data[]) {
 
   // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
   storage->writeBytesEEPROM(eeaddress, data, 4);
-
-  return;
 }
 
 //
@@ -455,8 +439,6 @@ void CBUSConfig::cleareventEEPROM(byte index) {
 
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
   writeEvent(index, unused_entry);
-
-  return;
 }
 
 //
@@ -640,7 +622,6 @@ void CBUSConfig::loadNVs(void) {
   FLiM =     storage->readEEPROM(0);
   CANID =    storage->readEEPROM(1);
   nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
-  return;
 }
 
 //

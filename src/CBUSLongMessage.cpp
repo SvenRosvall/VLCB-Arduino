@@ -71,7 +71,6 @@ void CBUSLongMessage::subscribe(byte *stream_ids, const byte num_stream_ids, voi
 	_messagehandler = messagehandler;
 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
-	return;
 }
 
 //
@@ -277,8 +276,6 @@ void CBUSLongMessage::processReceivedMessageFragment(const CANFrame *frame) {
 		_receive_buffer_index = 0;
 		_is_receiving = false;
 	}
-
-	return;
 }
 
 //
@@ -313,7 +310,6 @@ bool CBUSLongMessage::sendMessageFragment(CANFrame * frame, const byte priority)
 void CBUSLongMessage::setDelay(byte delay_in_millis) {
 
 	_msg_delay = delay_in_millis;
-	return;
 }
 
 //
@@ -326,7 +322,6 @@ void CBUSLongMessage::setDelay(byte delay_in_millis) {
 void CBUSLongMessage::setTimeout(unsigned int timeout_in_millis) {
 
 	_receive_timeout = timeout_in_millis;
-	return;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,7 +521,6 @@ void CBUSLongMessageEx::subscribe(byte *stream_ids, const byte num_stream_ids, v
 	_messagehandler = messagehandler;
 
 	// DEBUG_SERIAL << F("> Lex: subscribe: num_stream_ids = ") << num_stream_ids << endl;
-	return;
 }
 
 //
@@ -665,8 +659,6 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 		// increment the expected next sequence number for this stream context
 		++_receive_context[i]->expected_next_receive_sequence_num;
 	}
-
-	return;
 }
 
 //
@@ -676,7 +668,6 @@ void CBUSLongMessageEx::processReceivedMessageFragment(const CANFrame *frame) {
 void CBUSLongMessageEx::use_crc(bool use_crc) {
 
 	_use_crc = use_crc;
-	return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

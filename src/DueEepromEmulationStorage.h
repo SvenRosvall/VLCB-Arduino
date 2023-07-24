@@ -9,7 +9,7 @@ public:
 // If not SAM38E then this file shall be compilable but this class shall not be instantiatable.
   DueEepromEmulationStorage() = delete;
 #endif
-  void begin();
+  virtual void begin() override;
 
   virtual byte readEEPROM(unsigned int eeaddress) override;
   virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) override;

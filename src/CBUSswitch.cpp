@@ -124,8 +124,6 @@ void CBUSSwitch::run(void) {
     // no -- state has not changed
     _stateChanged = false;
   }
-
-  return;
 }
 
 bool CBUSSwitch::stateChanged(void) {
@@ -174,5 +172,4 @@ void CBUSSwitch::resetCurrentDuration(void) {
 
   // reset the state duration counter
   _lastStateChangeTime = millis();
-  return;
 }

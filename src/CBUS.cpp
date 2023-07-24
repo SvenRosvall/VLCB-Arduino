@@ -203,7 +203,6 @@ void CBUS::CANenumeration(void) {
   sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
 
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
-  return;
 }
 
 //
@@ -227,7 +226,6 @@ void CBUS::initFLiM(void) {
   sendMessage(&_msg);
 
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
-  return;
 }
 
 //
@@ -246,7 +244,6 @@ void CBUS::revertSLiM(void) {
 
   sendMessage(&_msg);
   setSLiM();
-  return;
 }
 
 //
@@ -286,8 +283,7 @@ void CBUS::indicateActivity()
 
 void CBUS::process(byte num_messages) {
 
-  byte remoteCANID = 0, nvindex = 0, evindex = 0, evval = 0;
-  unsigned int nn = 0, en = 0, j = 0, opc;
+  unsigned int j = 0;
 
   // start bus enumeration if required
   if (enumeration_required) {
@@ -363,15 +359,15 @@ void CBUS::process(byte num_messages) {
     _msg = transport->getNextMessage();
 
     // extract OPC, NN, EN
-    opc = _msg.data[0];
-    nn = (_msg.data[1] << 8) + _msg.data[2];
-    en = (_msg.data[3] << 8) + _msg.data[4];
+    unsigned int opc = _msg.data[0];
+    unsigned int nn = (_msg.data[1] << 8) + _msg.data[2];
+    unsigned int en = (_msg.data[3] << 8) + _msg.data[4];
 
     //
     /// extract the CANID of the sending module
     //
 
-    remoteCANID = getCANID(_msg.id);
+    byte remoteCANID = getCANID(_msg.id);
 
     //
     /// if registered, call the user handler with this new frame
@@ -490,7 +486,7 @@ void CBUS::process(byte num_messages) {
         // DEBUG_SERIAL << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
 
         // only respond if we are in transition to FLiM mode
-        if (bModeChanging == true) {
+        if (bModeChanging) {
 
           // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
@@ -609,6 +605,7 @@ void CBUS::process(byte num_messages) {
         // received NVRD -- read NV by index
         if (nn == module_config->nodeNum) {
 
+          byte nvindex = _msg.data[3];
           if (nvindex > module_config->EE_NUM_NVS) {
             sendCMDERR(10);
           } else {
@@ -617,7 +614,7 @@ void CBUS::process(byte num_messages) {
             _msg.data[0] = OPC_NVANS;
             // _msg.data[1] = highByte(module_config->nodeNum);
             // _msg.data[2] = lowByte(module_config->nodeNum);
-            _msg.data[4] = module_config->readNV(_msg.data[3]);
+            _msg.data[4] = module_config->readNV(nvindex);
             sendMessage(&_msg);
           }
         }
@@ -671,6 +668,7 @@ void CBUS::process(byte num_messages) {
 
           if (index < module_config->EE_MAX_EVENTS) {
 
+            // TODO: Review this. j is always 0.
             // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
             module_config->cleareventEEPROM(j);
 
@@ -857,13 +855,13 @@ void CBUS::process(byte num_messages) {
 
       case OPC_EVLRN:
         // received EVLRN -- learn an event
-        evindex = _msg.data[5];
-        evval = _msg.data[6];
+        byte evindex = _msg.data[5];
+        byte evval = _msg.data[6];
 
         // DEBUG_SERIAL << endl << F("> EVLRN for source nn = ") << nn << F(", en = ") << en << F(", evindex = ") << evindex << F(", evval = ") << evval << endl;
 
         // we must be in learn mode
-        if (bLearn == true) {
+        if (bLearn) {
 
           // search for this NN, EN as we may just be adding an EV to an existing learned event
           // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
@@ -966,8 +964,6 @@ void CBUS::process(byte num_messages) {
   //
   /// end of CBUS message processing
   //
-
-  return;
 }
 
 void CBUS::checkCANenum(void) {
@@ -1009,7 +1005,6 @@ void CBUS::checkCANenum(void) {
           // i = 16; // ugh ... but probably better than a goto :)
           // but using a goto saves 4 bytes of program size ;)
           goto check_done;
-          break;
         }
       }
     }

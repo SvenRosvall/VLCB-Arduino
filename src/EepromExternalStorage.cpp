@@ -21,12 +21,11 @@ void EepromExternalStorage::begin()
     I2Cbus->beginTransmission(external_address);
     byte result = I2Cbus->endTransmission();
 
-    if (result == 0) {
+    //if (result == 0) {
       // DEBUG_SERIAL << F("> external EEPROM selected") << endl;
-    } else {
+    //} else {
       // DEBUG_SERIAL << F("> external EEPROM not found") << endl;
-      //ret = false;
-    }
+    //}
 }
 
 
@@ -37,14 +36,13 @@ void EepromExternalStorage::begin()
 byte EepromExternalStorage::readEEPROM(unsigned int eeaddress) {
 
   byte rdata = 0;
-  int r = 0;
 
   // DEBUG_SERIAL << F("> readEEPROM, addr = ") << eeaddress << endl;
 
   I2Cbus->beginTransmission(external_address);
   I2Cbus->write((int)(eeaddress >> 8));    // MSB
   I2Cbus->write((int)(eeaddress & 0xFF));  // LSB
-  r = I2Cbus->endTransmission();
+  int r = I2Cbus->endTransmission();
 
   if (r < 0) {
     // DEBUG_SERIAL << F("> readEEPROM: I2C write error = ") << r << endl;
@@ -67,13 +65,10 @@ byte EepromExternalStorage::readEEPROM(unsigned int eeaddress) {
 
 byte EepromExternalStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) {
 
-  int r = 0;
-  byte count = 0;
-
     I2Cbus->beginTransmission(external_address);
     I2Cbus->write((int)(eeaddress >> 8));    // MSB
     I2Cbus->write((int)(eeaddress & 0xFF));  // LSB
-    r = I2Cbus->endTransmission();
+    int r = I2Cbus->endTransmission();
 
     if (r < 0) {
       // DEBUG_SERIAL << F("> readBytesEEPROM: I2C write error = ") << r << endl;
@@ -81,6 +76,7 @@ byte EepromExternalStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes,
 
     I2Cbus->requestFrom((int)external_address, (int)nbytes);
 
+    byte count = 0;
     while (I2Cbus->available() && count < nbytes) {
       dest[count++] = I2Cbus->read();
     }
@@ -97,14 +93,12 @@ byte EepromExternalStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes,
 
 void EepromExternalStorage::writeEEPROM(unsigned int eeaddress, byte data) {
 
-  int r = 0;
-
   // DEBUG_SERIAL << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
     I2Cbus->beginTransmission(external_address);
     I2Cbus->write((int)(eeaddress >> 8)); // MSB
     I2Cbus->write((int)(eeaddress & 0xFF)); // LSB
     I2Cbus->write(data);
-    r = I2Cbus->endTransmission();
+    int r = I2Cbus->endTransmission();
     delay(5);
 
     if (r < 0) {
@@ -122,8 +116,6 @@ void EepromExternalStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[],
   // *** TODO *** handle greater than 32 bytes -> the Arduino I2C write buffer size
   // max write = EEPROM pagesize - 64 bytes
 
-  int r = 0;
-
     I2Cbus->beginTransmission(external_address);
     I2Cbus->write((int)(eeaddress >> 8));   // MSB
     I2Cbus->write((int)(eeaddress & 0xFF)); // LSB
@@ -132,7 +124,7 @@ void EepromExternalStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[],
       I2Cbus->write(src[i]);
     }
 
-    r = I2Cbus->endTransmission();
+    int r = I2Cbus->endTransmission();
     delay(5);
 
     if (r < 0) {

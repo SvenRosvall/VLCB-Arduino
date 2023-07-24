@@ -178,7 +178,6 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
   // priority defaults to 1011 low/medium
 
   CANMessage message;       // ACAN2515 frame class
-  bool ret = false;
 
   makeHeader(msg, priority);                      // default priority unless user overrides
   message.id = msg->id;
@@ -187,7 +186,7 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
   message.ext = ext;
   memcpy(message.data, msg->data, msg->len);
 
-  ret = canp->tryToSend(message);
+  bool ret = canp->tryToSend(message);
   _numMsgsSent += ret;
 
   cbus->indicateActivity();
@@ -211,7 +210,6 @@ void CBUS2515::printStatus(void) {
            // << canp->errorFlagRegister()
            // << endl;
    */
-  return;
 }
 
 //
@@ -274,7 +272,6 @@ void CBUS2515::setOscFreq(unsigned long freq) {
 inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 
   msg->id = (priority << 7) + (id & 0x7f);
-  return;
 }
 
 //
@@ -284,5 +281,4 @@ inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 void CBUS2515::makeHeader(CANFrame *msg, byte priority) {
 
   makeHeader_impl(msg, cbus->getModuleCANID(), priority);
-  return;
 }

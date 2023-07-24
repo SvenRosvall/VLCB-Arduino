@@ -213,7 +213,6 @@ void eventhandler(byte index, CANFrame *msg) {
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
   Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
-  return;
 }
 
 //
@@ -233,7 +232,6 @@ void framehandler(CANFrame *msg) {
   }
 
   Serial << " ]" << endl;
-  return;
 }
 
 //
