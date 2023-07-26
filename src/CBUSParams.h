@@ -37,6 +37,9 @@
 #include <CBUSconfig.h>
 #include <cbusdefs.h>               // MERG CBUS constants
 
+namespace VLCB
+{
+
 class CBUSParams
 {
 public:
@@ -92,3 +95,5 @@ private:
   // Memory for the params is allocated on global memory and handed over to CBUS.setParams().
   static unsigned char params[21];
 };
+
+}

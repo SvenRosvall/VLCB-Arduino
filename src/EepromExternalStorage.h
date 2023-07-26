@@ -5,6 +5,9 @@
 #include <Arduino.h>                // for definition of byte datatype
 #include <Wire.h>
 
+namespace VLCB
+{
+
 class EepromExternalStorage : public Storage
 {
 public:
@@ -22,3 +25,5 @@ private:
   byte external_address;
   TwoWire *I2Cbus;
 };
+
+}

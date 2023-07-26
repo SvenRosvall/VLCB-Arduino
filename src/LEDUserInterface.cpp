@@ -2,6 +2,9 @@
 #include "CBUS.h"
 #include <Streaming.h>
 
+namespace VLCB
+{
+
 LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
   : greenLed(greenLedPin), yellowLed(yellowLedPin), pushButton(pushButtonPin)
 {
@@ -109,4 +112,6 @@ UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
     }
   }
   return NONE;
+}
+
 }

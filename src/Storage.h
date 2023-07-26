@@ -2,6 +2,9 @@
 
 #include <Arduino.h>                // for definition of byte datatype
 
+namespace VLCB
+{
+
 // Interface for persistent storage. Used by CBUSConfig class.
 class Storage
 {
@@ -16,3 +19,5 @@ public:
 };
 
 extern Storage * createDefaultStorageForPlatform();
+
+}

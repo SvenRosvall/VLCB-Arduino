@@ -2,6 +2,9 @@
 
 #include "Storage.h"
 
+namespace VLCB
+{
+
 class EepromInternalStorage : public Storage
 {
 public:
@@ -17,3 +20,5 @@ private:
   byte getChipEEPROMVal(unsigned int eeaddress);
   void setChipEEPROMVal(unsigned int eeaddress, byte val);
 };
+
+}

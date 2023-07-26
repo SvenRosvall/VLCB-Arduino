@@ -38,6 +38,9 @@
 // #include <Streaming.h>
 #include "CBUSswitch.h"
 
+namespace VLCB
+{
+
 //
 /// a class to encapsulate a physical pushbutton switch, with non-blocking processing
 //
@@ -172,4 +175,6 @@ void CBUSSwitch::resetCurrentDuration(void) {
 
   // reset the state duration counter
   _lastStateChangeTime = millis();
+}
+
 }

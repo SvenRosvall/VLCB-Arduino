@@ -2,6 +2,9 @@
 
 #include <Wire.h>
 
+namespace VLCB
+{
+
 EepromExternalStorage::EepromExternalStorage()
 {
   I2Cbus = &Wire;
@@ -143,4 +146,6 @@ void EepromExternalStorage::resetEEPROM(void) {
     for (unsigned int addr = 10; addr < 4096; addr++) {
       writeEEPROM(addr, 0xff);
     }
+}
+
 }

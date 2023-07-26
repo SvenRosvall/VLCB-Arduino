@@ -46,6 +46,9 @@
 /// in user code
 //
 
+namespace VLCB
+{
+
 CBUS::CBUS() {
   extern CBUSConfig config;
   module_config = &config;
@@ -1059,4 +1062,6 @@ void CBUS::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_ev
 
 void CBUS::setLongMessageHandler(CBUSLongMessage *handler) {
   longMessageHandler = handler;
+}
+
 }

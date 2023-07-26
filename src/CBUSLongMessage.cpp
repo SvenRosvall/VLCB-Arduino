@@ -44,6 +44,9 @@
 #include <CBUS.h>
 #include <Streaming.h>
 
+namespace VLCB
+{
+
 uint16_t crc16(uint8_t *data_p, uint16_t length);
 uint32_t crc32(const char *s, size_t n);
 
@@ -730,3 +733,4 @@ uint16_t crc16(uint8_t *data_p, uint16_t length) {
 	return (crc);
 }
 
+}

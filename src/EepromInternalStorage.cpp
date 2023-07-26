@@ -2,6 +2,9 @@
 
 #include <EEPROM.h>
 
+namespace VLCB
+{
+
 void EepromInternalStorage::begin()
 {
     // these devices require an explicit begin with the desired emulated size
@@ -98,4 +101,6 @@ void EepromInternalStorage::resetEEPROM(void) {
     for (unsigned int addr = 10; addr < 4096; addr++) {
       writeEEPROM(addr, 0xff);
     }
+}
+
 }

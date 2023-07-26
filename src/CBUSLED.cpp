@@ -37,6 +37,9 @@
 
 #include "CBUSLED.h"
 
+namespace VLCB
+{
+
 //
 /// class for individual LED with non-blocking control
 //
@@ -136,4 +139,6 @@ void CBUSLED::_write(byte pin, bool state) {
 
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
   digitalWrite(pin, state);
+}
+
 }

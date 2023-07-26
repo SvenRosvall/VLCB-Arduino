@@ -8,6 +8,9 @@
 #include "EepromInternalStorage.h"
 #endif
 
+namespace VLCB
+{
+
 Storage * createDefaultStorageForPlatform()
 {
 #if defined(__SAM38E__)
@@ -22,4 +25,6 @@ Storage * createDefaultStorageForPlatform()
   static EepromInternalStorage storage;
   return &storage;
 #endif
+}
+
 }

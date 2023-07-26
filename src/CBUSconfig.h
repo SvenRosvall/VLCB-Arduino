@@ -42,6 +42,9 @@
 #include <UserInterface.h>
 #include "Storage.h"
 
+namespace VLCB
+{
+
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
@@ -123,3 +126,5 @@ private:
   byte *evhashtbl;
   bool hash_collision;
 };
+
+}

@@ -2,7 +2,10 @@
 
 //#include "CBUS.h"
 
-#define DEFAULT_PRIORITY 0xB               // default CBUS messages priority. 1011 = 2|3 = normal/low
+namespace VLCB
+{
+
+const int DEFAULT_PRIORITY = 0xB;     // default CBUS messages priority. 1011 = 2|3 = normal/low
 
 class CANFrame;
 
@@ -20,3 +23,5 @@ public:
   virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) = 0;
   virtual void reset(void) = 0;
 };
+
+}

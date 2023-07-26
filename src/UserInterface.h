@@ -1,5 +1,8 @@
 #pragma once
 
+namespace VLCB
+{
+
 class UserInterface
 {
 public:
@@ -19,3 +22,5 @@ public:
   virtual bool resetRequested() = 0;
   virtual RequestedAction checkRequestedAction() = 0;
 };
+
+}

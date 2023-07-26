@@ -44,6 +44,9 @@
 #include <ACAN2515.h>           // ACAN2515 library
 #include <SPI.h>
 
+namespace VLCB
+{
+
 // constants
 
 static const byte MCP2515_CS = 10;                          // SPI chip select pin
@@ -54,7 +57,7 @@ static const uint32_t CANBITRATE = 125000UL;                // 125Kb/s - fixed f
 static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency default
 
 //
-/// an implementation of the absract base CBUS class
+/// an implementation of the abstract base CBUS class
 /// to support the MCP2515/25625 CAN controllers
 //
 
@@ -105,3 +108,5 @@ private:
   byte _mosi_pin, _miso_pin, _sck_pin;
 #endif
 };
+
+}

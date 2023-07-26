@@ -43,6 +43,9 @@
 
 #include <Arduino.h>            // for definition of byte datatype
 
+namespace VLCB
+{
+
 // non-blocking switch class
 
 class CBUSSwitch {
@@ -73,3 +76,5 @@ protected:
   unsigned long _prevReleaseTime;
   unsigned long _prevStateDuration;
 };
+
+}

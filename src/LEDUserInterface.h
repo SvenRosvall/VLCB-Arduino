@@ -4,7 +4,10 @@
 #include "CBUSswitch.h"
 #include "UserInterface.h"
 
-#define SW_TR_HOLD 6000U                   // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
+namespace VLCB
+{
+
+const unsigned int SW_TR_HOLD = 6000U;  // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
 
 class LEDUserInterface : public UserInterface
 {
@@ -26,3 +29,5 @@ private:
   CBUSSwitch pushButton;
 
 };
+
+}

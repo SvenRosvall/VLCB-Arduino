@@ -67,18 +67,18 @@ const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
 const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
-CBUSConfig modconfig;               // configuration object
-CBUS cbus(&modconfig);              // CBUS object
-CBUS2515 cbus2515(&cbus);                  // CAN transport object
-LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
-CBUSLongMessage lmsg(&cbus);        // CBUS RFC0005 long message object
+VLCB::CBUSConfig modconfig;               // configuration object
+VLCB::CBUS cbus(&modconfig);              // CBUS object
+VLCB::CBUS2515 cbus2515(&cbus);                  // CAN transport object
+VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::CBUSLongMessage lmsg(&cbus);        // CBUS RFC0005 long message object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
 
 // forward function declarations
-void eventhandler(byte, CANFrame *);
-void framehandler(CANFrame *);
+void eventhandler(byte, VLCB::CANFrame *);
+void framehandler(VLCB::CANFrame *);
 void processSerialInput(void);
 void printConfig(void);
 void longmessagehandler(void *, const unsigned int, const byte, const byte);
@@ -101,7 +101,7 @@ void setupCBUS() {
   modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
 
   // initialise and load configuration
-  modconfig.setEEPROMtype(EEPROM_INTERNAL);
+  modconfig.setEEPROMtype(VLCB::EEPROM_INTERNAL);
   modconfig.begin();
 
   Serial << F("> mode = ") << ((modconfig.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
@@ -111,7 +111,7 @@ void setupCBUS() {
   printConfig();
 
   // set module parameters
-  CBUSParams params(modconfig);
+  VLCB::CBUSParams params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);
@@ -222,7 +222,7 @@ void loop() {
 /// it receives the event table index and the CAN frame
 //
 
-void eventhandler(byte index, CANFrame *msg) {
+void eventhandler(byte index, VLCB::CANFrame *msg) {
 
   // as an example, display the opcode and the first EV of this event
 
@@ -236,7 +236,7 @@ void eventhandler(byte index, CANFrame *msg) {
 /// it receives a pointer to the received CAN frame
 //
 
-void framehandler(CANFrame *msg) {
+void framehandler(VLCB::CANFrame *msg) {
 
   // as an example, format and display the received frame
 
@@ -259,7 +259,7 @@ void longmessagehandler(void *fragment, const unsigned int fragment_len, const b
   // display the message
   // this will be the complete message if shorter than the provided buffer, or the final fragment if longer
 
-  if (status == CBUS_LONG_MESSAGE_COMPLETE) {
+  if (status == VLCB::CBUS_LONG_MESSAGE_COMPLETE) {
     Serial << F("> received long message, stream = ") << stream_id << F(", len = ") << fragment_len << F(", msg = |") << (char *) fragment << F("|") << endl;
   }
 }

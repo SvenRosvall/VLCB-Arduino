@@ -36,6 +36,9 @@
 
 #include <CBUSParams.h>
 
+namespace VLCB
+{
+
 unsigned char CBUSParams::params[21];
 
 void CBUSParams::initProcessorParams()
@@ -86,4 +89,6 @@ void CBUSParams::initProcessorParams()
   params[17] = '?';
   params[18] = '?';
 #endif
+}
+
 }

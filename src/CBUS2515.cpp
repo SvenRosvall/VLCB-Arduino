@@ -47,6 +47,9 @@
 // globals
 ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
 
+namespace VLCB
+{
+
 //
 /// constructor
 //
@@ -281,4 +284,6 @@ inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 void CBUS2515::makeHeader(CANFrame *msg, byte priority) {
 
   makeHeader_impl(msg, cbus->getModuleCANID(), priority);
+}
+
 }

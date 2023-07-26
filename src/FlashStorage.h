@@ -11,14 +11,18 @@
 //#error Can only use flash memory on DXCORE platforms.
 #endif
 
-#define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
-#define FLASH_PAGE_SIZE 512
-#define NUM_FLASH_PAGES 4
+namespace VLCB
+{
 
-typedef struct _flash_page {
+// Note: PROGMEM_SIZE can only be used in macros, not in initializer expression.
+#define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
+const int FLASH_PAGE_SIZE = 512;
+const int NUM_FLASH_PAGES = 4;
+
+struct flash_page_t {
   bool dirty;
   uint8_t data[FLASH_PAGE_SIZE];
-} flash_page_t;
+};
 
 void flash_cache_page(const byte page);
 bool flash_writeback_page(const byte page);
@@ -38,3 +42,5 @@ public:
   virtual void resetEEPROM(void) override;
 
 };
+
+}

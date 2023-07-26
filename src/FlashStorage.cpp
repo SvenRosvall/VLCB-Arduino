@@ -1,5 +1,8 @@
 #include "FlashStorage.h"
 
+namespace VLCB
+{
+
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
 flash_page_t cache_page;                // flash page cache
@@ -239,3 +242,5 @@ void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *de
 }
 
 #endif
+
+}

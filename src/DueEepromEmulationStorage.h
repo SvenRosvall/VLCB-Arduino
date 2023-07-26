@@ -2,6 +2,9 @@
 
 #include "Storage.h"
 
+namespace VLCB
+{
+
 class DueEepromEmulationStorage : public Storage
 {
 public:
@@ -25,3 +28,5 @@ private:
   DueFlashStorage dueFlashStorage;
 #endif
 };
+
+}

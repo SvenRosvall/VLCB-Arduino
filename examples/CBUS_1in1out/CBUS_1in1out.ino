@@ -69,20 +69,20 @@ const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
 const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
-CBUSConfig modconfig;               // configuration object
-CBUS cbus(&modconfig);              // CBUS object
-CBUS2515 cbus2515(&cbus);                  // CAN transport object
-LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::CBUSConfig modconfig;               // configuration object
+VLCB::CBUS cbus(&modconfig);              // CBUS object
+VLCB::CBUS2515 cbus2515(&cbus);                  // CAN transport object
+VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects
-CBUSSwitch moduleSwitch(5);            // an example switch as input
-CBUSLED moduleLED(6);                  // an example LED as output
+VLCB::CBUSSwitch moduleSwitch(5);            // an example switch as input
+VLCB::CBUSLED moduleLED(6);                  // an example LED as output
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte, CANFrame *);
+void eventhandler(byte, VLCB::CANFrame *);
 void processSerialInput(void);
 void printConfig(void);
 void processModuleSwitchChange(void);
@@ -102,7 +102,7 @@ void setupCBUS() {
   modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
 
   // initialise and load configuration
-  modconfig.setEEPROMtype(EEPROM_INTERNAL);
+  modconfig.setEEPROMtype(VLCB::EEPROM_INTERNAL);
   modconfig.begin();
 
   Serial << F("> mode = ") << ((modconfig.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
@@ -112,7 +112,7 @@ void setupCBUS() {
   printConfig();
 
   // set module parameters
-  CBUSParams params(modconfig);
+  VLCB::CBUSParams params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);
@@ -234,7 +234,7 @@ void processModuleSwitchChange() {
 
   if (moduleSwitch.stateChanged()) {
 
-    CANFrame msg;
+    VLCB::CANFrame msg;
     msg.id = modconfig.CANID;
     msg.len = 5;
     msg.data[0] = (moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF);
@@ -257,7 +257,7 @@ void processModuleSwitchChange() {
 /// it receives the event table index and the CAN frame
 //
 
-void eventhandler(byte index, CANFrame *msg) {
+void eventhandler(byte index, VLCB::CANFrame *msg) {
 
   // as an example, control an LED
 

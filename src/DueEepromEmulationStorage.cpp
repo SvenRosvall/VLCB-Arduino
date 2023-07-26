@@ -4,6 +4,9 @@
 #include <DueFlashStorage.h>
 #endif
 
+namespace VLCB
+{
+
 void DueEepromEmulationStorage::begin()
 {
 }
@@ -83,5 +86,7 @@ void DueEepromEmulationStorage::setChipEEPROMVal(unsigned int eeaddress, byte va
 //
 
 void DueEepromEmulationStorage::resetEEPROM(void) {
+
+}
 
 }

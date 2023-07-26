@@ -44,6 +44,10 @@
 
 #include "CBUSconfig.h"
 
+#ifdef __AVR__
+extern "C" int __heap_start, *__brkval;
+#endif
+
 #ifdef __SAM3X8E__
 extern "C" char* sbrk(int incr);
 #endif
@@ -51,6 +55,9 @@ extern "C" char* sbrk(int incr);
 #ifdef ARDUINO_ARCH_RP2040
 extern "C" char* sbrk(int incr);
 #endif
+
+namespace VLCB
+{
 
 //
 /// ctor
@@ -517,7 +524,6 @@ void CBUSConfig::reboot(void) {
 
 unsigned int CBUSConfig::freeSRAM(void) {
 #ifdef __AVR__
-  extern int __heap_start, *__brkval;
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 #endif
@@ -662,4 +668,6 @@ void CBUSConfig::clearResetFlag(void) {
 bool CBUSConfig::isResetFlagSet(void) {
 
   return (storage->readEEPROM(5) == 99);
+}
+
 }

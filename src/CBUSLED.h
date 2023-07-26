@@ -45,11 +45,14 @@
 #define DEBUG_SERIAL Serial
 #endif
 
-#define BLINK_RATE 500    // flash at 1Hz, 500mS on, 500mS off
-#define PULSE_ON_TIME 5
-
 #include <Arduino.h>      // for definition of byte datatype
 // #include <Streaming.h>
+
+namespace VLCB
+{
+
+const int BLINK_RATE = 500;    // flash at 1Hz, 500mS on, 500mS off
+const int PULSE_ON_TIME = 5;
 
 //
 /// class to encapsulate a non-blocking LED
@@ -77,3 +80,5 @@ protected:
   unsigned long _lastTime, _pulseStart;
   virtual void _write(byte pin, bool state);
 };
+
+}
