@@ -14,8 +14,10 @@
 namespace VLCB
 {
 
-// Note: PROGMEM_SIZE can only be used in macros, not in initializer expression.
-#define FLASH_AREA_BASE_ADDRESS (PROGMEM_SIZE - (0x800))        // top 2K bytes of flash
+#if defined(DXCORE)
+// Note: Using #if here as PROGMEM_SIZE is only available on DXCORE
+const int FLASH_AREA_BASE_ADDRESS = (PROGMEM_SIZE - (0x800));        // top 2K bytes of flash
+#endif
 const int FLASH_PAGE_SIZE = 512;
 const int NUM_FLASH_PAGES = 4;
 
