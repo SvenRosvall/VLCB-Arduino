@@ -105,7 +105,7 @@ class CBUS {
 
 public:
   CBUS();
-  CBUS(CBUSConfig *the_config);
+  explicit CBUS(CBUSConfig *the_config);
   void setTransport(CBUSTransport * transport) { this->transport = transport; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
@@ -177,7 +177,7 @@ class CBUSLongMessage {
 
 public:
 
-  CBUSLongMessage(CBUS *cbus_object_ptr);
+  explicit CBUSLongMessage(CBUS *cbus_object_ptr);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process(void);
@@ -230,7 +230,7 @@ class CBUSLongMessageEx : public CBUSLongMessage {
 
 public:
 
-  CBUSLongMessageEx(CBUS *cbus_object_ptr)
+  explicit CBUSLongMessageEx(CBUS *cbus_object_ptr)
     : CBUSLongMessage(cbus_object_ptr) {}         // derived class constructor calls the base class constructor
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);

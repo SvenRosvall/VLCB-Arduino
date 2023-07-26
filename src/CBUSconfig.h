@@ -64,7 +64,7 @@ class CBUSConfig {
 
 public:
   CBUSConfig();
-  CBUSConfig(Storage * theStorage);
+  explicit CBUSConfig(Storage * theStorage);
   void begin(void);
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
