@@ -1,6 +1,5 @@
 #include "LEDUserInterface.h"
 #include "CBUS.h"
-// TODO: Remove after debugging
 #include <Streaming.h>
 
 LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)

@@ -48,7 +48,7 @@
 class CBUSSwitch {
 
 public:
-  CBUSSwitch(byte pin, byte pressedState = LOW);
+  explicit CBUSSwitch(byte pin, byte pressedState = LOW);
   CBUSSwitch(); // TODO: Remove
   void setPin(byte pin, byte pressedState = LOW); // TODO: Remove
   void run(void);

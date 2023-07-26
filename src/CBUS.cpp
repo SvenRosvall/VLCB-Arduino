@@ -854,6 +854,7 @@ void CBUS::process(byte num_messages) {
         break;
 
       case OPC_EVLRN:
+      {
         // received EVLRN -- learn an event
         byte evindex = _msg.data[5];
         byte evval = _msg.data[6];
@@ -905,6 +906,7 @@ void CBUS::process(byte num_messages) {
         }
 
         break;
+      }
 
       case OPC_AREQ:
         // AREQ message - request for node state, only producer nodes

@@ -48,7 +48,6 @@
 #include <CBUSTransport.h>
 #include "UserInterface.h"
 
-#define SW_TR_HOLD 6000U                   // CBUS push button hold time for SLiM/FLiM transition in millis = 6 seconds
 #define LONG_MESSAGE_DEFAULT_DELAY 20      // delay in milliseconds between sending successive long message fragments
 #define LONG_MESSAGE_RECEIVE_TIMEOUT 5000  // timeout waiting for next long message packet
 #define NUM_EX_CONTEXTS 4                  // number of send and receive contexts for extended implementation = number of concurrent messages
@@ -204,21 +203,21 @@ protected:
 
 // send and receive contexts
 
-typedef struct _receive_context_t {
+struct receive_context_t {
   bool in_use;
   byte receive_stream_id, sender_canid;
   byte *buffer;
   unsigned int receive_buffer_index, incoming_bytes_received, incoming_message_length, expected_next_receive_sequence_num, incoming_message_crc;
   unsigned long last_fragment_received;
-} receive_context_t;
+};
 
-typedef struct _send_context_t {
+struct send_context_t {
   bool in_use;
   byte send_stream_id, send_priority, msg_delay;
   byte *buffer;
   unsigned int send_buffer_len, send_buffer_index, send_sequence_num;
   unsigned long last_fragment_sent;
-} send_context_t;
+};
 
 //
 /// a derived class to extend the base long message class to handle multiple concurrent messages, sending and receiving

@@ -75,8 +75,8 @@ CBUS2515 cbus2515(&cbus);                  // CAN transport object
 LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects
-CBUSSwitch moduleSwitch;            // an example switch as input
-CBUSLED moduleLED;                  // an example LED as output
+CBUSSwitch moduleSwitch(5);            // an example switch as input
+CBUSLED moduleLED(6);                  // an example LED as output
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
@@ -162,12 +162,6 @@ void setup() {
   Serial << endl << endl << F("> ** CBUS 1 in 1 out v1 ** ") << __FILE__ << endl;
 
   setupCBUS();
-
-  // configure the module switch, attached to pin 5, active low
-  moduleSwitch.setPin(5, LOW);
-
-  // configure the module LED, attached to pin 6 via a 1K resistor
-  moduleLED.setPin(6);
 
   // end of setup
   Serial << F("> ready") << endl << endl;
