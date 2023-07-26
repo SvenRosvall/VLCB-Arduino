@@ -17,7 +17,7 @@ Storage * createDefaultStorageForPlatform()
   static DueEepromEmulationStorage storage;
   return &storage;
 
-#elsif defined(DXCORE)
+#elif defined(DXCORE)
   static FlashStorage storage;
   return &storage;
 
