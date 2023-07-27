@@ -41,7 +41,7 @@
 // 3rd party libraries
 #include <Streaming.h>
 
-// CBUS MCP2515 library
+// VLCB MCP2515 library
 #include <CAN2515.h>
 
 // globals
@@ -54,8 +54,8 @@ namespace VLCB
 /// constructor
 //
 
-CAN2515::CAN2515(CBUS * cbus)
-  : cbus(cbus)
+CAN2515::CAN2515(Controller * controller)
+  : controller(controller)
 {
   initMembers();
 }
@@ -170,7 +170,7 @@ CANFrame CAN2515::getNextMessage(void) {
 }
 
 //
-/// send a CBUS message
+/// send a VLCB message
 //
 
 bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
@@ -192,7 +192,7 @@ bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
   bool ret = canp->tryToSend(message);
   _numMsgsSent += ret;
 
-  cbus->indicateActivity();
+  controller->indicateActivity();
 
   return ret;
 }
@@ -207,7 +207,7 @@ void CAN2515::printStatus(void) {
   // can be implemented in user's sketch
 
   /*
-    DEBUG_SERIAL << F("> CBUS status:");
+    DEBUG_SERIAL << F("> VLCB status:");
     DEBUG_SERIAL << F(" messages received = ") << _numMsgsRcvd << F(", sent = ") << _numMsgsSent << F(", receive errors = ") << endl;
            // canp->receiveErrorCounter() << F(", transmit errors = ") << canp->transmitErrorCounter() << F(", error flag = ")
            // << canp->errorFlagRegister()
@@ -267,8 +267,8 @@ void CAN2515::setOscFreq(unsigned long freq) {
 
 //
 /// actual implementation of the makeHeader method
-/// so it can be called directly or as a CBUS class method
-/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CBUS priority) + (7 bits of CBUS CAN ID)
+/// so it can be called directly or as a Controller class method
+/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CAN priority) + (7 bits of CAN ID)
 /// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
 //
 
@@ -278,12 +278,12 @@ inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 }
 
 //
-/// utility method to populate a CBUS message header
+/// utility method to populate a VLCB message header
 //
 
 void CAN2515::makeHeader(CANFrame *msg, byte priority) {
 
-  makeHeader_impl(msg, cbus->getModuleCANID(), priority);
+  makeHeader_impl(msg, controller->getModuleCANID(), priority);
 }
 
 }

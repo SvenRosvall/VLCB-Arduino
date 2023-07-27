@@ -1,5 +1,5 @@
 #include "LEDUserInterface.h"
-#include "CBUS.h"
+#include "Controller.h"
 #include <Streaming.h>
 
 namespace VLCB

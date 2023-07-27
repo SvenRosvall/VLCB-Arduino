@@ -38,18 +38,18 @@
 // 3rd party libraries
 #include <Streaming.h>
 
-// CBUS library
-#include <CBUS.h>
+// Controller library
+#include <Controller.h>
 
 //
-/// construct a CBUS object with an external Configuration object named "config" that is defined
+/// construct a Controller object with an external Configuration object named "config" that is defined
 /// in user code
 //
 
 namespace VLCB
 {
 
-CBUS::CBUS() {
+Controller::Controller() {
   extern Configuration config;
   module_config = &config;
 
@@ -59,11 +59,11 @@ CBUS::CBUS() {
 }
 
 //
-/// construct a CBUS object with a Configuration object that the user provides.
-/// note that this Configuration object must have a lifetime longer than the CBUS object.
+/// construct a Controller object with a Configuration object that the user provides.
+/// note that this Configuration object must have a lifetime longer than the Controller object.
 //
 
-CBUS::CBUS(Configuration *the_config) {
+Controller::Controller(Configuration *the_config) {
   module_config = the_config;
 
   eventhandler = NULL;
@@ -75,13 +75,13 @@ CBUS::CBUS(Configuration *the_config) {
 /// register the user handler for learned events
 //
 
-void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
+void Controller::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
   eventhandler = fptr;
 }
 
 // overloaded form which receives the opcode on/off state and the first event variable
 
-void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
+void Controller::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
   eventhandlerex = fptr;
 }
 
@@ -90,7 +90,7 @@ void CBUS::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, by
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
 
-void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
+void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
   framehandler = fptr;
   _opcodes = opcodes;
   _num_opcodes = num_opcodes;
@@ -100,7 +100,7 @@ void CBUS::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num
 /// assign the module parameter set
 //
 
-void CBUS::setParams(unsigned char *mparams) {
+void Controller::setParams(unsigned char *mparams) {
   _mparams = mparams;
 }
 
@@ -108,7 +108,7 @@ void CBUS::setParams(unsigned char *mparams) {
 /// assign the module name
 //
 
-void CBUS::setName(unsigned char *mname) {
+void Controller::setName(unsigned char *mname) {
   _mname = mname;
 }
 
@@ -116,7 +116,7 @@ void CBUS::setName(unsigned char *mname) {
 /// set module to SLiM mode
 //
 
-void CBUS::setSLiM(void) {
+void Controller::setSLiM(void) {
 
   bModeChanging = false;
   module_config->setNodeNum(0);
@@ -130,7 +130,7 @@ void CBUS::setSLiM(void) {
 /// extract CANID from CAN frame header
 //
 
-inline byte CBUS::getCANID(unsigned long header) {
+inline byte Controller::getCANID(unsigned long header) {
 
   return header & 0x7f;
 }
@@ -139,7 +139,7 @@ inline byte CBUS::getCANID(unsigned long header) {
 /// send a WRACK (write acknowledge) message
 //
 
-bool CBUS::sendWRACK(void) {
+bool Controller::sendWRACK(void) {
 
   // send a write acknowledgement response
 
@@ -155,7 +155,7 @@ bool CBUS::sendWRACK(void) {
 /// send a CMDERR (command error) message
 //
 
-bool CBUS::sendCMDERR(byte cerrno) {
+bool Controller::sendCMDERR(byte cerrno) {
 
   // send a command error response
 
@@ -172,7 +172,7 @@ bool CBUS::sendCMDERR(byte cerrno) {
 /// is this an Extended CAN frame ?
 //
 
-bool CBUS::isExt(CANFrame *amsg) {
+bool Controller::isExt(CANFrame *amsg) {
 
   return (amsg->ext);
 }
@@ -181,7 +181,7 @@ bool CBUS::isExt(CANFrame *amsg) {
 /// is this a Remote frame ?
 //
 
-bool CBUS::isRTR(CANFrame *amsg) {
+bool Controller::isRTR(CANFrame *amsg) {
 
   return (amsg->rtr);
 }
@@ -190,7 +190,7 @@ bool CBUS::isRTR(CANFrame *amsg) {
 /// if in FLiM mode, initiate a CAN ID enumeration cycle
 //
 
-void CBUS::CANenumeration(void) {
+void Controller::CANenumeration(void) {
 
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
@@ -212,7 +212,7 @@ void CBUS::CANenumeration(void) {
 /// initiate the transition from SLiM to FLiM mode
 //
 
-void CBUS::initFLiM(void) {
+void Controller::initFLiM(void) {
 
   // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
 
@@ -235,7 +235,7 @@ void CBUS::initFLiM(void) {
 /// revert from FLiM to SLiM mode
 //
 
-void CBUS::revertSLiM(void) {
+void Controller::revertSLiM(void) {
 
   // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
 
@@ -253,21 +253,21 @@ void CBUS::revertSLiM(void) {
 /// change or re-confirm node number
 //
 
-void CBUS::renegotiate(void) {
+void Controller::renegotiate(void) {
 
   initFLiM();
 }
 
-void CBUS::setUI(UserInterface *ui)
+void Controller::setUI(UserInterface *ui)
 {
   _ui = ui;
 }
 
 //
-/// set the CBUS LEDs to indicate the current mode
+/// set the Controller LEDs to indicate the current mode
 //
 
-void CBUS::indicateMode(byte mode) {
+void Controller::indicateMode(byte mode) {
 
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) {
@@ -275,16 +275,16 @@ void CBUS::indicateMode(byte mode) {
   }
 }
 
-void CBUS::indicateActivity()
+void Controller::indicateActivity()
 {
   if (_ui) {
     _ui->indicateActivity();
   }
 }
 
-/// main CBUS message processing procedure
+/// main Controller message processing procedure
 
-void CBUS::process(byte num_messages) {
+void Controller::process(byte num_messages) {
 
   unsigned int j = 0;
 
@@ -319,7 +319,7 @@ void CBUS::process(byte num_messages) {
     {
       case UserInterface::CHANGE_MODE:
         // initiate mode change
-        //Serial << "CBUS::process() - changing mode, current isFlim=" << module_config->FLiM << endl;
+        //Serial << "Controller::process() - changing mode, current isFlim=" << module_config->FLiM << endl;
         if (!module_config->FLiM) {
           initFLiM();
         } else {
@@ -328,12 +328,12 @@ void CBUS::process(byte num_messages) {
         break;
 
       case UserInterface::RENEGOTIATE:
-        //Serial << "CBUS::process() - renegotiate" << endl;
+        //Serial << "Controller::process() - renegotiate" << endl;
         renegotiate();
         break;
 
       case UserInterface::ENUMERATION:
-        //Serial << "CBUS::process() - enumerate" << endl;
+        //Serial << "Controller::process() - enumerate" << endl;
         if (module_config->FLiM)
         {
           CANenumeration();
@@ -341,7 +341,7 @@ void CBUS::process(byte num_messages) {
         break;
 
       case UserInterface::NONE:
-        //Serial << "CBUS::process() - no action" << endl;
+        //Serial << "Controller::process() - no action" << endl;
         break;
     }
   }
@@ -934,7 +934,7 @@ void CBUS::process(byte num_messages) {
       // break;
 
       case OPC_DTXC:
-        // CBUS long message
+        // Controller long message
         if (longMessageHandler != NULL) {
           longMessageHandler->processReceivedMessageFragment(&_msg);
         }
@@ -967,11 +967,11 @@ void CBUS::process(byte num_messages) {
   // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
 
   //
-  /// end of CBUS message processing
+  /// end of Controller message processing
   //
 }
 
-void CBUS::checkCANenum(void) {
+void Controller::checkCANenum(void) {
 
   //
   /// check the 100ms CAN enumeration cycle timer
@@ -1038,7 +1038,7 @@ check_done:
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
 
-void CBUS::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
+void Controller::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
 
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);
@@ -1060,7 +1060,7 @@ void CBUS::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_ev
 /// set the long message handler object to receive long message frames
 //
 
-void CBUS::setLongMessageHandler(CBUSLongMessage *handler) {
+void Controller::setLongMessageHandler(LongMessageController *handler) {
   longMessageHandler = handler;
 }
 

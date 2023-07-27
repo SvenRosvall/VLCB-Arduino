@@ -39,7 +39,7 @@
 
 // header files
 
-#include <CBUS.h>               // abstract base class
+#include <Controller.h>               // abstract base class
 #include <CAN2515.h>           // header for this class
 #include <ACAN2515.h>           // ACAN2515 library
 #include <SPI.h>
@@ -53,11 +53,11 @@ static const byte MCP2515_CS = 10;                          // SPI chip select p
 static const byte MCP2515_INT = 2;                          // interrupt pin
 static const byte NUM_RX_BUFFS = 4;                         // default value
 static const byte NUM_TX_BUFFS = 2;                         // default value
-static const uint32_t CANBITRATE = 125000UL;                // 125Kb/s - fixed for CBUS
+static const uint32_t CANBITRATE = 125000UL;                // 125Kb/s - fixed for VLCB
 static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency default
 
 //
-/// an implementation of the abstract base CBUS class
+/// an implementation of the Transport interface class
 /// to support the MCP2515/25625 CAN controllers
 //
 
@@ -65,7 +65,7 @@ class CAN2515 : public Transport {
 
 public:
 
-  CAN2515(CBUS *);
+  CAN2515(Controller *);
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
 #ifdef ARDUINO_ARCH_RP2040
@@ -79,7 +79,7 @@ public:
   void reset(void);
 
   // these methods are specific to this implementation
-  // they are not declared or implemented by the base CBUS class
+  // they are not declared or implemented by the Transport interface class
   void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
   void printStatus(void);
   void setOscFreq(unsigned long freq);
@@ -98,7 +98,7 @@ public:
 
 private:
   void initMembers();
-  CBUS * cbus;
+  Controller * controller;
   unsigned long _osc_freq;
   byte _csPin, _intPin;
   byte _num_rx_buffers, _num_tx_buffers;

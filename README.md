@@ -3,13 +3,13 @@
 # VLCB-Arduino
 Arduino library for VLCB running over CAN bus
 
-The code is based on a CBUS library created by Duncan Greenwood.
+The code is based on a Controller library created by Duncan Greenwood.
 
 See [Design documents](docs/Design.md) for how this library is structured.
 
 Note that this library depends on a number of other libraries which must also be downloaded and included in the sketch:
 
-* ACAN2515		- concrete implentation of the CBUS class using the MCP2515 controller
+* ACAN2515		- concrete implentation of the Controller class using the MCP2515 controller
 * Streaming		- C++ style output
 
 ## Hardware

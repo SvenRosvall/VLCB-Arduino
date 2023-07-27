@@ -55,10 +55,10 @@ const int LONG_MESSAGE_DEFAULT_DELAY = 20;      // delay in milliseconds between
 const int LONG_MESSAGE_RECEIVE_TIMEOUT = 5000;  // timeout waiting for next long message packet
 const int NUM_EX_CONTEXTS = 4;                  // number of send and receive contexts for extended implementation = number of concurrent messages
 const int EX_BUFFER_LEN = 64;                   // size of extended send and receive buffers
-const int OPC_DTXC = 0xe9;                      // temp opcode for CBUS long message
+const int OPC_DTXC = 0xe9;                      // temp opcode for Controller long message
 
 //
-/// CBUS modes
+/// Controller modes
 //
 
 enum {
@@ -68,20 +68,20 @@ enum {
 };
 
 //
-/// CBUS long message status codes
+/// Controller long message status codes
 //
 
 enum {
-  CBUS_LONG_MESSAGE_INCOMPLETE = 0,
-  CBUS_LONG_MESSAGE_COMPLETE,
-  CBUS_LONG_MESSAGE_SEQUENCE_ERROR,
-  CBUS_LONG_MESSAGE_TIMEOUT_ERROR,
-  CBUS_LONG_MESSAGE_CRC_ERROR,
-  CBUS_LONG_MESSAGE_TRUNCATED
+  LONG_MESSAGE_INCOMPLETE = 0,
+  LONG_MESSAGE_COMPLETE,
+  LONG_MESSAGE_SEQUENCE_ERROR,
+  LONG_MESSAGE_TIMEOUT_ERROR,
+  LONG_MESSAGE_CRC_ERROR,
+  LONG_MESSAGE_TRUNCATED
 };
 
 //
-/// CAN/CBUS message type
+/// CAN/Controller message type
 //
 
 class CANFrame {
@@ -95,18 +95,18 @@ public:
 };
 
 //
-/// an abstract class to encapsulate CAN bus and CBUS processing
+/// an abstract class to encapsulate CAN bus and Controller processing
 /// it must be implemented by a derived subclass
 //
 
-class CBUSLongMessage;      // forward reference
+class LongMessageController;      // forward reference
 
-class CBUS
+class Controller
 {
 
 public:
-  CBUS();
-  explicit CBUS(Configuration *the_config);
+  Controller();
+  explicit Controller(Configuration *the_config);
   void setTransport(Transport * trpt) { this->transport = trpt; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
@@ -145,7 +145,7 @@ public:
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
   void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
 
-  void setLongMessageHandler(CBUSLongMessage *handler);
+  void setLongMessageHandler(LongMessageController *handler);
 
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
@@ -165,20 +165,20 @@ protected:                                          // protected members become 
 
   Transport * transport;
 
-  CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
+  LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
 };
 
 //
-/// a basic class to send and receive CBUS long messages per MERG RFC 0005
+/// a basic class to send and receive Controller long messages per MERG RFC 0005
 /// handles a single message, sending and receiving
 /// suitable for small microcontrollers with limited memory
 //
 
-class CBUSLongMessage {
+class LongMessageController {
 
 public:
 
-  explicit CBUSLongMessage(CBUS *cbus_object_ptr);
+  explicit LongMessageController(Controller *controller);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process(void);
@@ -199,7 +199,7 @@ protected:
   unsigned long _last_fragment_sent = 0UL, _last_fragment_received = 0UL;
 
   void (*_messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status);        // user callback function to receive long message fragments
-  CBUS *_cbus_object_ptr;
+  Controller *controller;
 };
 
 
@@ -227,12 +227,12 @@ struct send_context_t {
 /// a derived class to extend the base long message class to handle multiple concurrent messages, sending and receiving
 //
 
-class CBUSLongMessageEx : public CBUSLongMessage {
+class LongMessageControllerEx : public LongMessageController {
 
 public:
 
-  explicit CBUSLongMessageEx(CBUS *cbus_object_ptr)
-    : CBUSLongMessage(cbus_object_ptr) {}         // derived class constructor calls the base class constructor
+  explicit LongMessageControllerEx(Controller *controller)
+    : LongMessageController(controller) {}         // derived class constructor calls the base class constructor
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);

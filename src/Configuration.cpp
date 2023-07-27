@@ -36,7 +36,7 @@
 */
 
 //
-/// CBUS module configuration
+/// Controller module configuration
 /// manages the storage of events and node variables in on-chip or external EEPROM
 //
 

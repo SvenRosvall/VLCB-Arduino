@@ -6,7 +6,7 @@ and extended with VLCB specific features.
 This library is still in progress.
 
 ## High Level Architecture
-The code is organized as a central control object (VLCB) that controls a transport object, 
+The code is organized as a central controller object that controls a transport object, 
 a storage object and a set of service objects.
 The library supports a set of different transports such as CAN, Wifi and BLE.
 The library supports a set of storage for node variables and event variables in EEPROM or Flash memory.
@@ -71,7 +71,7 @@ If a service is able to handle that message no further services will be offered 
 Thus, the order of configured services is important.
 
 There are currently no implemented services. 
-All the functionality of handling CBUS messages is implemented in the main VLCB object.
+All the functionality of handling VLCB messages is implemented in the main Controller object.
 This will be broken out to services.
 
 ### Details
@@ -80,7 +80,7 @@ This will be broken out to services.
   will include queues.
 
 ## Workflow
-The main workflow is that the VLCB control object runs every so often from the sketch loop() function.
+The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function.
 Each iteration checks the transport object if there are any incoming messages. 
 Such incoming messages are offered to each of the service objects in turn.
 The service object responds with a code to say if the message has been taken care of and no other
@@ -89,7 +89,7 @@ services need to look at this.
 The EventConsumerService may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
-The user sketch may produce events when are passed on the VLCB control object which in turn passes 
+The user sketch may produce events when are passed on the VLCB Controller object which in turn passes 
 this event as a message to the transport object.
 
 ## User Sketch
@@ -132,7 +132,7 @@ Events that the VLCB module consumes cannot be consumed/processed immediately as
 create an infinite loop in case that processing generates new events.
 Instead, some queuing needs to be implemented. 
 
-One suggestion is to add a queue within the VLCB control object.
+One suggestion is to add a queue within the VLCB Controller object.
 When producing a new message it is passed to the transport object and put on the VLCB queue. 
 When VLCB checks for next message, it first checks this queue and if it is empty it checks 
 the transport object. 

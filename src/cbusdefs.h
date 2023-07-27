@@ -86,7 +86,7 @@ extern "C" {
 // 		                       Updated CABDAT opcode to match RFC0004
 // 		Pete Brownlow,06/09/20,Ver 8t Added module type for CANRCOM. Fixed: Opcode for CABDAT, names for CANRC522 and CANMAG
 // 		
-// CBUS Manufacturer definitions
+// Controller Manufacturer definitions
 // Where the manufacturer already has an NMRA code, this is used
 // 
 #define MANU_MERG	165	// http://www.merg.co.uk
@@ -139,7 +139,7 @@ extern "C" {
 #define MTYP_CANACC4CDU	37	// CANACC4 firmware ported to CANCDU
 #define MTYP_CANWiBase	38	// CAN to MiWi base station
 #define MTYP_WiCAB	39	// Wireless cab using MiWi protocol
-#define MTYP_CANWiFi	40	// CAN to WiFi connection with Withrottle to CBUS protocol conversion
+#define MTYP_CANWiFi	40	// CAN to WiFi connection with Withrottle to Controller protocol conversion
 #define MTYP_CANFTT	41	// Turntable controller configured using FLiM
 #define MTYP_CANHNDST	42	// Handset (alternative to CANCAB)
 #define MTYP_CANTCHNDST	43	// Touchscreen handset
@@ -157,7 +157,7 @@ extern "C" {
 #define MTYP_CANCSB	55	// CANCMD with on board 3A booster
 #define MTYP_CANMAG	56	// Magnet on Track detector
 #define MTYP_CANACE16CMIO	57	// 16 input equivaent to CANACE8C
-#define MTYP_CANPiNODE	58	// CBUS module based on Raspberry Pi
+#define MTYP_CANPiNODE	58	// Controller module based on Raspberry Pi
 #define MTYP_CANDISP	59	// 25K80 version of CANLED64 (IHart and MB)
 #define MTYP_CANCOMPUTE	60	// Compute Event processing engine
 #define MTYP_CANRC522	61	// Read/Write from/to RC522 RFID tags
@@ -191,7 +191,7 @@ extern "C" {
 #define MTYP_DUALCAB	2	// Dual cab based on cancab
 // 
 // 
-// CBUS opcodes list
+// Controller opcodes list
 // 
 // Packets with no data bytes
 // 

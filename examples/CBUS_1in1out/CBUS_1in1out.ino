@@ -48,13 +48,13 @@
 // 3rd party libraries
 #include <Streaming.h>
 
-// CBUS library header files
-#include <CBUS.h>                   // CBUS class
+// VLCB library header files
+#include <Controller.h>                   // Controller class
 #include <CAN2515.h>               // CAN controller
 #include <Switch.h>             // pushbutton switch
-#include <LED.h>                // CBUS LEDs
+#include <LED.h>                // VLCB LEDs
 #include <Configuration.h>             // module configuration
-#include <Parameters.h>             // CBUS parameters
+#include <Parameters.h>             // VLCB parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
 
@@ -62,16 +62,16 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
-const byte MODULE_ID = 99;          // CBUS module type
+const byte MODULE_ID = 99;          // VLCB module type
 
-const byte LED_GRN = 4;             // CBUS green SLiM LED pin
-const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
-const byte SWITCH0 = 8;             // CBUS push button switch pin
+const byte LED_GRN = 4;             // VLCB green SLiM LED pin
+const byte LED_YLW = 7;             // VLCB yellow FLiM LED pin
+const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// CBUS objects
+// Controller objects
 VLCB::Configuration modconfig;               // configuration object
-VLCB::CBUS cbus(&modconfig);              // CBUS object
-VLCB::CAN2515 cbus2515(&cbus);                  // CAN transport object
+VLCB::Controller controller(&modconfig);              // Controller object
+VLCB::CAN2515 can2515(&controller);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects
@@ -88,10 +88,9 @@ void printConfig(void);
 void processModuleSwitchChange(void);
 
 //
-/// setup CBUS - runs once at power on from setup()
+/// setup VLCB - runs once at power on from setup()
 //
-
-void setupCBUS() {
+void setupVLCB() {
 
   // set config layout parameters
   modconfig.EE_NVS_START = 10;
@@ -117,12 +116,12 @@ void setupCBUS() {
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);
 
-  // assign to CBUS
-  cbus.setParams(params.getParams());
-  cbus.setName(mname);
+  // assign to Controller
+  controller.setParams(params.getParams());
+  controller.setName(mname);
 
-  // set CBUS LED pins and assign to CBUS
-  cbus.setUI(&userInterface);
+  // set VLCB UI and assign to Controller
+  controller.setUI(&userInterface);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
   if (userInterface.isButtonPressed() && !modconfig.FLiM) {
@@ -136,19 +135,19 @@ void setupCBUS() {
     modconfig.clearResetFlag();
   }
 
-  // register our CBUS event handler, to receive event messages of learned events
-  cbus.setEventHandler(eventhandler);
+  // register our VLCB event handler, to receive event messages of learned events
+  controller.setEventHandler(eventhandler);
 
-  // set CBUS LEDs to indicate mode
-  cbus.indicateMode(modconfig.FLiM);
+  // set Controller LEDs to indicate mode
+  controller.indicateMode(modconfig.FLiM);
 
-  // configure and start CAN bus and CBUS message processing
-  cbus2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  cbus2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  cbus2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  cbus.setTransport(&cbus2515);
-  if (!cbus2515.begin()) {
-    Serial << F("> error starting CBUS") << endl;
+  // configure and start CAN bus and VLCB message processing
+  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
+  can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
+  can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
+  controller.setTransport(&can2515);
+  if (!can2515.begin()) {
+    Serial << F("> error starting VLCB") << endl;
   }
 }
 
@@ -159,9 +158,9 @@ void setupCBUS() {
 void setup() {
 
   Serial.begin (115200);
-  Serial << endl << endl << F("> ** CBUS 1 in 1 out v1 ** ") << __FILE__ << endl;
+  Serial << endl << endl << F("> ** VLCB 1 in 1 out v1 ** ") << __FILE__ << endl;
 
-  setupCBUS();
+  setupVLCB();
 
   // end of setup
   Serial << F("> ready") << endl << endl;
@@ -174,10 +173,10 @@ void setup() {
 void loop() {
 
   //
-  /// do CBUS message, switch and LED processing
+  /// do VLCB message, switch and LED processing
   //
 
-  cbus.process();
+  controller.process();
 
   //
   /// process console commands
@@ -202,11 +201,11 @@ void loop() {
   /// check CAN message buffers
   //
 
-  if (cbus2515.canp->receiveBufferPeakCount() > cbus2515.canp->receiveBufferSize()) {
+  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize()) {
     Serial << F("> receive buffer overflow") << endl;
   }
 
-  if (cbus2515.canp->transmitBufferPeakCount(0) > cbus2515.canp->transmitBufferSize(0)) {
+  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0)) {
     Serial << F("> transmit buffer overflow") << endl;
   }
 
@@ -214,7 +213,7 @@ void loop() {
   /// check CAN bus state
   //
 
-  byte s = cbus2515.canp->errorFlagRegister();
+  byte s = can2515.canp->errorFlagRegister();
   if (s != 0) {
     Serial << F("> error flag register is non-zero") << endl;
   }
@@ -225,10 +224,10 @@ void loop() {
 //
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
-/// then send a long CBUS event with opcode ACON for on and ACOF for off
+/// then send a long VLCB event with opcode ACON for on and ACOF for off
 /// event number (EN) is 1
 
-/// you can just watch for this event in FCU or JMRI, or teach it to another CBUS consumer module
+/// you can just watch for this event in FCU or JMRI, or teach it to another VLCB consumer module
 //
 void processModuleSwitchChange() {
 
@@ -243,17 +242,17 @@ void processModuleSwitchChange() {
     msg.data[3] = 0;
     msg.data[4] = 1;            // event number (EN) = 1
 
-    if (cbus.sendMessage(&msg)) {
-      Serial << F("> sent CBUS message") << endl;
+    if (controller.sendMessage(&msg)) {
+      Serial << F("> sent VLCB message") << endl;
     } else {
-      Serial << F("> error sending CBUS message") << endl;
+      Serial << F("> error sending VLCB message") << endl;
     }
   }
 }
 
 //
 /// user-defined event processing function
-/// called from the CBUS library when a learned event is received
+/// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
 
@@ -319,7 +318,7 @@ void processSerialInput(void) {
       printConfig();
 
       // node identity
-      Serial << F("> CBUS node configuration") << endl;
+      Serial << F("> VLCB node configuration") << endl;
       Serial << F("> mode = ") << (modconfig.FLiM ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
       Serial << endl;
       break;
@@ -399,7 +398,7 @@ void processSerialInput(void) {
     // CAN bus status
     case 'c':
 
-      cbus2515.printStatus();
+      can2515.printStatus();
       break;
 
     case 'h':
@@ -408,8 +407,8 @@ void processSerialInput(void) {
       break;
 
     case 'y':
-      // reset CAN bus and CBUS message processing
-      cbus2515.reset();
+      // reset CAN bus and VLCB message processing
+      can2515.reset();
       break;
 
     case '*':

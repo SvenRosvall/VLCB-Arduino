@@ -57,7 +57,7 @@ enum {
 };
 
 //
-/// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
+/// a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc
 //
 
 class Configuration {

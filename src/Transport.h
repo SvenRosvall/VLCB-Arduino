@@ -1,15 +1,15 @@
 #pragma once
 
-//#include "CBUS.h"
+//#include "Controller.h"
 
 namespace VLCB
 {
 
-const int DEFAULT_PRIORITY = 0xB;     // default CBUS messages priority. 1011 = 2|3 = normal/low
+const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
 class CANFrame;
 
-// Interface for sending and receiving CBUS messages.
+// Interface for sending and receiving Controller messages.
 class Transport
 {
 public:

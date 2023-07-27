@@ -35,7 +35,7 @@
 */
 
 #include <Configuration.h>
-#include <cbusdefs.h>               // MERG CBUS constants
+#include <cbusdefs.h>               // MERG Controller constants
 
 namespace VLCB
 {
@@ -50,7 +50,7 @@ public:
     params[4] = config.EE_MAX_EVENTS;   //  4 num events
     params[5] = config.EE_NUM_EVS;      //  5 num evs per event
     params[6] = config.EE_NUM_NVS;      //  6 num NVs
-    params[10] = PB_CAN;                // CAN implementation of CBUS
+    params[10] = PB_CAN;                // CAN implementation of Controller
     params[11] = 0x00;
     params[12] = 0x00;
     params[13] = 0x00;
@@ -92,7 +92,7 @@ private:
   // Initializes processor specific parameters based on pre-defined macros in Arduino IDE.
   static void initProcessorParams();
 
-  // Memory for the params is allocated on global memory and handed over to CBUS.setParams().
+  // Memory for the params is allocated on global memory and handed over to Controller.setParams().
   static unsigned char params[21];
 };
 
