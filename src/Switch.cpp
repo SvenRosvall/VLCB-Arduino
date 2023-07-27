@@ -36,7 +36,7 @@
 */
 
 // #include <Streaming.h>
-#include "CBUSswitch.h"
+#include "Switch.h"
 
 namespace VLCB
 {
@@ -45,7 +45,7 @@ namespace VLCB
 /// a class to encapsulate a physical pushbutton switch, with non-blocking processing
 //
 
-CBUSSwitch::CBUSSwitch(byte pin, byte pressedState)
+Switch::Switch(byte pin, byte pressedState)
   : _pin(pin), _pressedState(pressedState)
 {
   if (_pressedState == LOW)
@@ -55,12 +55,12 @@ CBUSSwitch::CBUSSwitch(byte pin, byte pressedState)
   _currentState = readPin(_pin);
 }
 
-CBUSSwitch::CBUSSwitch()
+Switch::Switch()
 {
   // Do nothing, expect setup in setPin()
 }
 
-void CBUSSwitch::setPin(byte pin, byte pressedState) {
+void Switch::setPin(byte pin, byte pressedState) {
 
   _pin = pin;
   _pressedState = pressedState;
@@ -72,7 +72,7 @@ void CBUSSwitch::setPin(byte pin, byte pressedState) {
   _currentState = readPin(_pin);
 }
 
-void CBUSSwitch::reset(void) {
+void Switch::reset(void) {
 
   _lastState = !_pressedState;
   _stateChanged = false;
@@ -82,12 +82,12 @@ void CBUSSwitch::reset(void) {
   _prevStateDuration = 0UL;
 }
 
-byte CBUSSwitch::readPin(byte pin) {
+byte Switch::readPin(byte pin) {
 
   return digitalRead(pin);
 }
 
-void CBUSSwitch::run(void) {
+void Switch::run(void) {
 
   // check for state change
 
@@ -129,49 +129,49 @@ void CBUSSwitch::run(void) {
   }
 }
 
-bool CBUSSwitch::stateChanged(void) {
+bool Switch::stateChanged(void) {
 
   // has switch state changed ?
   // DEBUG_SERIAL << F("  -- switch state changed = ") << _stateChanged << endl;
   return _stateChanged;
 }
 
-bool CBUSSwitch::getState(void) {
+bool Switch::getState(void) {
 
   // return the current switch state read
   // DEBUG_SERIAL << F("  -- switch state = ") << _currentState << endl;
   return _currentState;
 }
 
-bool CBUSSwitch::isPressed(void) {
+bool Switch::isPressed(void) {
 
   // is the switch pressed ?
   // DEBUG_SERIAL << F("  -- switch pressed ? = ") << (_currentState == _pressedState) << endl;
   return (_currentState == _pressedState);
 }
 
-unsigned long CBUSSwitch::getCurrentStateDuration(void) {
+unsigned long Switch::getCurrentStateDuration(void) {
 
   // how long has the switch been in its current state ?
   // DEBUG_SERIAL << F("  -- current state duration = ") << (millis() - _lastStateChangeTime) << endl;
   return (millis() - _lastStateChangeTime);
 }
 
-unsigned long CBUSSwitch::getLastStateDuration(void) {
+unsigned long Switch::getLastStateDuration(void) {
 
   // how long was the last state active for ?
   // DEBUG_SERIAL << F("  -- last state duration = ") << _lastStateDuration << endl;
   return _lastStateDuration;
 }
 
-unsigned long CBUSSwitch::getLastStateChangeTime(void) {
+unsigned long Switch::getLastStateChangeTime(void) {
 
   // when was the last state change ?
   // DEBUG_SERIAL << F("  -- last state change at ") << _lastStateChangeTime << endl;
   return _lastStateChangeTime;
 }
 
-void CBUSSwitch::resetCurrentDuration(void) {
+void Switch::resetCurrentDuration(void) {
 
   // reset the state duration counter
   _lastStateChangeTime = millis();

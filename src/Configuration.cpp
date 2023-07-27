@@ -589,7 +589,7 @@ void Configuration::resetModule(UserInterface * ui) {
 
 void Configuration::resetModule(void) {
 
-  /// implementation of resetModule() without CBUSswitch or CBUSLEDs
+  /// implementation of resetModule() without VLCB Switch or LEDs
   // uint32_t t = millis();
   // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
 

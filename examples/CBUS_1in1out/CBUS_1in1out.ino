@@ -51,8 +51,8 @@
 // CBUS library header files
 #include <CBUS.h>                   // CBUS class
 #include <CAN2515.h>               // CAN controller
-#include <CBUSswitch.h>             // pushbutton switch
-#include <CBUSLED.h>                // CBUS LEDs
+#include <Switch.h>             // pushbutton switch
+#include <LED.h>                // CBUS LEDs
 #include <Configuration.h>             // module configuration
 #include <CBUSParams.h>             // CBUS parameters
 #include <cbusdefs.h>               // MERG CBUS constants
@@ -75,8 +75,8 @@ VLCB::CAN2515 cbus2515(&cbus);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects
-VLCB::CBUSSwitch moduleSwitch(5);            // an example switch as input
-VLCB::CBUSLED moduleLED(6);                  // an example LED as output
+VLCB::Switch moduleSwitch(5);            // an example switch as input
+VLCB::LED moduleLED(6);                  // an example LED as output
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };

@@ -35,110 +35,50 @@
 
 */
 
-#include "CBUSLED.h"
+//
+//
+//
+
+#pragma once
+
+#ifndef DEBUG_SERIAL
+#define DEBUG_SERIAL Serial
+#endif
+
+#include <Arduino.h>      // for definition of byte datatype
+// #include <Streaming.h>
 
 namespace VLCB
 {
 
+const int BLINK_RATE = 500;    // flash at 1Hz, 500mS on, 500mS off
+const int PULSE_ON_TIME = 5;
+
 //
-/// class for individual LED with non-blocking control
+/// class to encapsulate a non-blocking LED
 //
 
-CBUSLED::CBUSLED(byte pin)
-  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
-{
-    pinMode(_pin, OUTPUT);
-}
+class LED {
 
-CBUSLED::CBUSLED()
-  : _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
-{
-}
+public:
+  LED();
+  explicit LED(byte pin);
+  void virtual setPin(byte pin);
+  bool getState();
+  void on();
+  void off();
+  void toggle();
+  void blink();
+  virtual void run();
+  void pulse();
 
-//  set the pin for this LED
-
-void CBUSLED::setPin(byte pin) {
-
-  _pin = pin;
-  pinMode(_pin, OUTPUT);
-}
-
-// return the current state, on or off
-
-bool CBUSLED::getState() {
-
-  return _state;
-}
-
-// turn LED state on
-
-void CBUSLED::on(void) {
-
-  _state = HIGH;
-  _blink = false;
-}
-
-// turn LED state off
-
-void CBUSLED::off(void) {
-
-  _state = LOW;
-  _blink = false;
-}
-
-// toggle LED state from on to off or vv
-
-void CBUSLED::toggle(void) {
-
-  _state = !_state;
-}
-
-// blink LED
-
-void CBUSLED::blink() {
-
-  _blink = true;
-}
-
-// pulse the LED
-
-void CBUSLED::pulse() {
-
-  _pulse = true;
-  _pulseStart = millis();
-  run();
-}
-
-// actually operate the LED dependent upon its current state
-// must be called frequently from loop() if the LED is set to blink or pulse
-
-void CBUSLED::run() {
-
-  if (_blink) {
-
-    // blinking
-    if ((millis() - _lastTime) >= BLINK_RATE) {
-      toggle();
-      _lastTime = millis();
-    }
-  }
-
-  // single pulse
-  if (_pulse) {
-    if (millis() - _pulseStart >= PULSE_ON_TIME) {
-      _pulse = false;
-    }
-  }
-
-  _write(_pin, _pulse || _state);
-}
-
-// write to the physical pin
-
-void CBUSLED::_write(byte pin, bool state) {
-
-  // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(pin, state);
-}
+protected:
+  byte _pin;
+  bool _state;
+  bool _blink;
+  bool _pulse;
+  unsigned long _lastTime, _pulseStart;
+  virtual void _write(byte pin, bool state);
+};
 
 }

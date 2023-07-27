@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CBUSLED.h"
-#include "CBUSswitch.h"
+#include "LED.h"
+#include "Switch.h"
 #include "UserInterface.h"
 
 namespace VLCB
@@ -24,9 +24,9 @@ public:
   virtual RequestedAction checkRequestedAction()override;
 
 private:
-  CBUSLED greenLed;
-  CBUSLED yellowLed;
-  CBUSSwitch pushButton;
+  LED greenLed;
+  LED yellowLed;
+  Switch pushButton;
 
 };
 

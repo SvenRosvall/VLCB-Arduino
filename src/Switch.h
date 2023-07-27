@@ -48,11 +48,11 @@ namespace VLCB
 
 // non-blocking switch class
 
-class CBUSSwitch {
+class Switch {
 
 public:
-  explicit CBUSSwitch(byte pin, byte pressedState = LOW);
-  CBUSSwitch(); // TODO: Remove
+  explicit Switch(byte pin, byte pressedState = LOW);
+  Switch(); // TODO: Remove
   void setPin(byte pin, byte pressedState = LOW); // TODO: Remove
   void run(void);
   void reset(void);
