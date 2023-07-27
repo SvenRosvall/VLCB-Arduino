@@ -50,7 +50,7 @@
 
 // CBUS library header files
 #include <CBUS.h>                   // CBUS class
-#include <CBUS2515.h>               // CAN controller
+#include <CAN2515.h>               // CAN controller
 #include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
 #include <CBUSconfig.h>             // module configuration
@@ -71,7 +71,7 @@ const byte SWITCH0 = 8;             // CBUS push button switch pin
 // CBUS objects
 VLCB::CBUSConfig modconfig;               // configuration object
 VLCB::CBUS cbus(&modconfig);              // CBUS object
-VLCB::CBUS2515 cbus2515(&cbus);                  // CAN transport object
+VLCB::CAN2515 cbus2515(&cbus);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
 // module objects

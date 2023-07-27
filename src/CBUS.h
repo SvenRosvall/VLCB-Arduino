@@ -45,7 +45,7 @@
 
 #include <CBUSconfig.h>
 #include <cbusdefs.h>
-#include <CBUSTransport.h>
+#include <Transport.h>
 #include "UserInterface.h"
 
 namespace VLCB
@@ -101,12 +101,13 @@ public:
 
 class CBUSLongMessage;      // forward reference
 
-class CBUS {
+class CBUS
+{
 
 public:
   CBUS();
   explicit CBUS(CBUSConfig *the_config);
-  void setTransport(CBUSTransport * transport) { this->transport = transport; }
+  void setTransport(Transport * trpt) { this->transport = trpt; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
@@ -162,7 +163,7 @@ protected:                                          // protected members become 
   unsigned long timeOutTimer, CANenumTime;
   bool enumeration_required;
 
-  CBUSTransport * transport;
+  Transport * transport;
 
   CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
 };

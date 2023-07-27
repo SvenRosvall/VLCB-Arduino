@@ -10,7 +10,7 @@ const int DEFAULT_PRIORITY = 0xB;     // default CBUS messages priority. 1011 = 
 class CANFrame;
 
 // Interface for sending and receiving CBUS messages.
-class CBUSTransport
+class Transport
 {
 public:
 #ifdef ARDUINO_ARCH_RP2040

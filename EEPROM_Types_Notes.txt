@@ -20,7 +20,7 @@ EEPROM_INTERNAL
 EEPROM_EXTERNAL
 EEPROM_USES_FLASH
 
-setEEPROMtype() is only called from examples in CBUS2515. These set to EEPROM_INTERNAL.
+setEEPROMtype() is only called from examples in CAN2515. These set to EEPROM_INTERNAL.
 
 Functions that depend on eeprom_type:
 readEEPROM

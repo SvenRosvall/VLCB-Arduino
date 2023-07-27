@@ -50,7 +50,7 @@ media such as CAN bus.
 
 Current implementing transport classes:
 
-CBUS2515
+CAN2515
 : Transport over CAN bus using the MCP2515 chip.
 
 More transports implementations exist but have not yet been imported here.
@@ -101,7 +101,7 @@ The setup code may look like:
 ```
 // Global definitions
 VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
-VLCB::Can2515Transport canTransport(interruptPin, csPin); 
+VLCB::CAN2515 canTransport(interruptPin, csPin); 
 VLCB::EepromInternalStorage eepromStorage
 VLCB::MnsService mnsService;
 VLCB::EventConsumerService eventConsumerService(myActionCallback);

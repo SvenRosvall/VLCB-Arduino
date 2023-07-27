@@ -42,7 +42,7 @@
 #include <Streaming.h>
 
 // CBUS MCP2515 library
-#include <CBUS2515.h>
+#include <CAN2515.h>
 
 // globals
 ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
@@ -54,13 +54,13 @@ namespace VLCB
 /// constructor
 //
 
-CBUS2515::CBUS2515(CBUS * cbus)
+CAN2515::CAN2515(CBUS * cbus)
   : cbus(cbus)
 {
   initMembers();
 }
 
-void CBUS2515::initMembers() {
+void CAN2515::initMembers() {
 
   _num_rx_buffers = NUM_RX_BUFFS;
   _num_tx_buffers = NUM_TX_BUFFS;
@@ -75,9 +75,9 @@ void CBUS2515::initMembers() {
 //
 
 #ifdef ARDUINO_ARCH_RP2040
-bool CBUS2515::begin(bool poll, SPIClassRP2040 spi)
+bool CAN2515::begin(bool poll, SPIClassRP2040 spi)
 #else
-bool CBUS2515::begin(bool poll, SPIClass spi)
+bool CAN2515::begin(bool poll, SPIClass spi)
 #endif
 {
   uint16_t ret;
@@ -138,7 +138,7 @@ bool CBUS2515::begin(bool poll, SPIClass spi)
 /// check for unprocessed messages in the buffer
 //
 
-bool CBUS2515::available(void) {
+bool CAN2515::available(void) {
 
   if (_poll) {            // not using interrupts, so poll the interrupt register
     canp->poll();
@@ -152,7 +152,7 @@ bool CBUS2515::available(void) {
 /// must call available first to ensure there is something to get
 //
 
-CANFrame CBUS2515::getNextMessage(void) {
+CANFrame CAN2515::getNextMessage(void) {
 
   CANMessage message;       // ACAN2515 frame class
 
@@ -173,7 +173,7 @@ CANFrame CBUS2515::getNextMessage(void) {
 /// send a CBUS message
 //
 
-bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
+bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 
   // caller must populate the message data
   // this method will create the correct frame header (CAN ID and priority bits)
@@ -201,7 +201,7 @@ bool CBUS2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 /// display the CAN bus status instrumentation
 //
 
-void CBUS2515::printStatus(void) {
+void CAN2515::printStatus(void) {
 
   // removed so that no libraries produce serial output
   // can be implemented in user's sketch
@@ -219,7 +219,7 @@ void CBUS2515::printStatus(void) {
 /// reset the MCP2515 transceiver
 //
 
-void CBUS2515::reset(void) {
+void CAN2515::reset(void) {
   canp->end();
   delete canp;
   begin();
@@ -230,9 +230,9 @@ void CBUS2515::reset(void) {
 //
 
 #ifdef ARDUINO_ARCH_RP2040
-void CBUS2515::setPins(byte cs_pin, byte int_pin, byte mosi_pin, byte miso_pin, byte sck_pin)
+void CAN2515::setPins(byte cs_pin, byte int_pin, byte mosi_pin, byte miso_pin, byte sck_pin)
 #else
-void CBUS2515::setPins(byte cs_pin, byte int_pin)
+void CAN2515::setPins(byte cs_pin, byte int_pin)
 #endif
 {
 
@@ -251,7 +251,7 @@ void CBUS2515::setPins(byte cs_pin, byte int_pin)
 /// this can be tuned according to bus load and available memory
 //
 
-void CBUS2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
+void CAN2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
   _num_rx_buffers = num_rx_buffers;
   _num_tx_buffers = num_tx_buffers;
 }
@@ -261,7 +261,7 @@ void CBUS2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
 /// default is 16MHz but some modules have an 8MHz crystal
 //
 
-void CBUS2515::setOscFreq(unsigned long freq) {
+void CAN2515::setOscFreq(unsigned long freq) {
   _osc_freq = freq;
 }
 
@@ -281,7 +281,7 @@ inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
 /// utility method to populate a CBUS message header
 //
 
-void CBUS2515::makeHeader(CANFrame *msg, byte priority) {
+void CAN2515::makeHeader(CANFrame *msg, byte priority) {
 
   makeHeader_impl(msg, cbus->getModuleCANID(), priority);
 }

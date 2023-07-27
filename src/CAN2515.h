@@ -40,7 +40,7 @@
 // header files
 
 #include <CBUS.h>               // abstract base class
-#include <CBUS2515.h>           // header for this class
+#include <CAN2515.h>           // header for this class
 #include <ACAN2515.h>           // ACAN2515 library
 #include <SPI.h>
 
@@ -61,11 +61,11 @@ static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency
 /// to support the MCP2515/25625 CAN controllers
 //
 
-class CBUS2515 : public CBUSTransport {
+class CAN2515 : public Transport {
 
 public:
 
-  CBUS2515(CBUS *);
+  CAN2515(CBUS *);
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
 #ifdef ARDUINO_ARCH_RP2040
