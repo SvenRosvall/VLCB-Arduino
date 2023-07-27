@@ -34,7 +34,7 @@
 
 */
 
-#include <CBUSconfig.h>
+#include <Configuration.h>
 #include <cbusdefs.h>               // MERG CBUS constants
 
 namespace VLCB
@@ -43,7 +43,7 @@ namespace VLCB
 class CBUSParams
 {
 public:
-  explicit CBUSParams(CBUSConfig const & config)
+  explicit CBUSParams(Configuration const & config)
   {
     params[0] = 20;                     //  0 num params = 20
     params[1] = MANU_MERG;              //  1 manf = MERG, 165

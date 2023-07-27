@@ -18,7 +18,7 @@ void EepromExternalStorage::setExtEEPROMAddress(byte address, TwoWire *bus)
 
 void EepromExternalStorage::begin()
 {
-    // from CBUSConfig::setEEPROMtype()
+    // from Configuration::setEEPROMtype()
 
     I2Cbus->begin();
     I2Cbus->beginTransmission(external_address);

@@ -43,7 +43,7 @@
 
 #include <SPI.h>
 
-#include <CBUSconfig.h>
+#include <Configuration.h>
 #include <cbusdefs.h>
 #include <Transport.h>
 #include "UserInterface.h"
@@ -106,7 +106,7 @@ class CBUS
 
 public:
   CBUS();
-  explicit CBUS(CBUSConfig *the_config);
+  explicit CBUS(Configuration *the_config);
   void setTransport(Transport * trpt) { this->transport = trpt; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
@@ -150,7 +150,7 @@ public:
 protected:                                          // protected members become private in derived classes
   CANFrame _msg;
   UserInterface *_ui;
-  CBUSConfig *module_config;
+  Configuration *module_config;
   unsigned char *_mparams;
   unsigned char *_mname;
   void (*eventhandler)(byte index, CANFrame *msg);

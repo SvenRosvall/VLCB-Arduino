@@ -17,14 +17,14 @@ A class diagram is shown below with a selection of concrete implementations of t
 and services.
 ![Class Diagram](VLCB-Arduino-Classes.png)
 
-### Config
-The Config object stores node variables (NV) and event variables(EV) and any other configuration
+### Configuration
+The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
 that is required. It makes use of a storage object that has different implementations for different
 storage types. Not all Arduino modules have EEPROM or enough EEPROM. Instead, external EEPROM or
 Flash memory can be used.
 See furter details in [Persistent Storage](PersistentStorage.md) documentation.
 
-The configuration support is divided into a Config object that manages NVs and EVs.
+The configuration support is divided into a Configuration object that manages NVs and EVs.
 It provides functions that deal with these NVs and EVs. 
 It makes use of a Storage interface where implementing classes store the data at a given
 address.
@@ -102,7 +102,7 @@ The setup code may look like:
 // Global definitions
 VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
 VLCB::CAN2515 canTransport(interruptPin, csPin); 
-VLCB::EepromInternalStorage eepromStorage
+VLCB::EepromInternalStorage eepromStorage;
 VLCB::MnsService mnsService;
 VLCB::EventConsumerService eventConsumerService(myActionCallback);
 VLCB::Controller moduleController(userInterface, canTransport, eepromStorage, {mnsService, eventConsumerService});

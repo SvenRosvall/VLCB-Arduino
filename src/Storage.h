@@ -5,7 +5,7 @@
 namespace VLCB
 {
 
-// Interface for persistent storage. Used by CBUSConfig class.
+// Interface for persistent storage. Used by Configuration class.
 class Storage
 {
 public:

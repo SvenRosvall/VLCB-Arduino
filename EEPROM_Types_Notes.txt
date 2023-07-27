@@ -49,7 +49,7 @@ readBytesEEPROM - reads n bytes at given address
 writeEEPROM - writes one byte at given address
 writeBytesEEPROM - writes n bytes at given address
 
-In CBUSConfig:
+In Configuration:
 readEvent - reads NN+EN for given event index, via readEEPROM() * 4
 getEventVal - reads value for given event value for given event index, via readEEPROM()
 writeEventEV - writes value for a given event value for a given event index, via readEEPROM()

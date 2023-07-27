@@ -60,11 +60,11 @@ enum {
 /// a class to encapsulate CBUS module configuration, events, NVs, EEPROM, etc
 //
 
-class CBUSConfig {
+class Configuration {
 
 public:
-  CBUSConfig();
-  explicit CBUSConfig(Storage * theStorage);
+  Configuration();
+  explicit Configuration(Storage * theStorage);
   void begin(void);
 
   byte findExistingEvent(unsigned int nn, unsigned int en);

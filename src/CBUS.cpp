@@ -42,7 +42,7 @@
 #include <CBUS.h>
 
 //
-/// construct a CBUS object with an external CBUSConfig object named "config" that is defined
+/// construct a CBUS object with an external Configuration object named "config" that is defined
 /// in user code
 //
 
@@ -50,7 +50,7 @@ namespace VLCB
 {
 
 CBUS::CBUS() {
-  extern CBUSConfig config;
+  extern Configuration config;
   module_config = &config;
 
   eventhandler = NULL;
@@ -59,11 +59,11 @@ CBUS::CBUS() {
 }
 
 //
-/// construct a CBUS object with a CBUSConfig object that the user provides.
-/// note that this CBUSConfig object must have a lifetime longer than the CBUS object.
+/// construct a CBUS object with a Configuration object that the user provides.
+/// note that this Configuration object must have a lifetime longer than the CBUS object.
 //
 
-CBUS::CBUS(CBUSConfig *the_config) {
+CBUS::CBUS(Configuration *the_config) {
   module_config = the_config;
 
   eventhandler = NULL;

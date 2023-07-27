@@ -42,7 +42,7 @@
 
 #include <Streaming.h>
 
-#include "CBUSconfig.h"
+#include "Configuration.h"
 
 #ifdef __AVR__
 extern "C" int __heap_start, *__brkval;
@@ -63,12 +63,12 @@ namespace VLCB
 /// ctor
 //
 
-CBUSConfig::CBUSConfig()
+Configuration::Configuration()
 {
   this->storage = createDefaultStorageForPlatform();
 }
 
-CBUSConfig::CBUSConfig(Storage * theStorage)
+Configuration::Configuration(Storage * theStorage)
 {
   this->storage = theStorage;
 }
@@ -77,7 +77,7 @@ CBUSConfig::CBUSConfig(Storage * theStorage)
 /// initialise and set default values
 //
 
-void CBUSConfig::begin(void) {
+void Configuration::begin(void) {
 
   EE_BYTES_PER_EVENT = EE_NUM_EVS + 4;
 
@@ -88,7 +88,7 @@ void CBUSConfig::begin(void) {
 }
 
 // TODO: Remove this. Replace with setStorage(). Keep for compatibility.
-bool CBUSConfig::setEEPROMtype(byte type) {
+bool Configuration::setEEPROMtype(byte type) {
   return true;
 }
 
@@ -96,7 +96,7 @@ bool CBUSConfig::setEEPROMtype(byte type) {
 /// store the FLiM mode
 //
 
-void CBUSConfig::setFLiM(bool f) {
+void Configuration::setFLiM(bool f) {
 
   FLiM = f;
   storage->writeEEPROM(0, f);
@@ -106,7 +106,7 @@ void CBUSConfig::setFLiM(bool f) {
 /// store the CANID
 //
 
-void CBUSConfig::setCANID(byte canid) {
+void Configuration::setCANID(byte canid) {
 
   CANID = canid;
   storage->writeEEPROM(1, canid);
@@ -116,7 +116,7 @@ void CBUSConfig::setCANID(byte canid) {
 /// store the node number
 //
 
-void CBUSConfig::setNodeNum(unsigned int nn) {
+void Configuration::setNodeNum(unsigned int nn) {
 
   nodeNum = nn;
   storage->writeEEPROM(2, highByte(nodeNum));
@@ -127,7 +127,7 @@ void CBUSConfig::setNodeNum(unsigned int nn) {
 /// lookup an event by node number and event number, using the hash table
 //
 
-byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
+byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) {
 
   byte tarray[4];
   byte tmphash, i, j, matches;
@@ -206,7 +206,7 @@ byte CBUSConfig::findExistingEvent(unsigned int nn, unsigned int en) {
 /// find the first empty EEPROM event slot - the hash table entry == 0
 //
 
-byte CBUSConfig::findEventSpace(void) {
+byte Configuration::findEventSpace(void) {
 
   byte evidx;
 
@@ -224,7 +224,7 @@ byte CBUSConfig::findEventSpace(void) {
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
 
-byte CBUSConfig::makeHash(byte tarr[4]) {
+byte Configuration::makeHash(byte tarr[4]) {
 
   // make a hash from a 4-byte NN + EN event
 
@@ -247,7 +247,7 @@ byte CBUSConfig::makeHash(byte tarr[4]) {
 /// return an existing EEPROM event as a 4-byte array -- NN + EN
 //
 
-void CBUSConfig::readEvent(byte idx, byte tarr[]) {
+void Configuration::readEvent(byte idx, byte tarr[]) {
 
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
   for (byte i = 0; i < EE_HASH_BYTES; i++) {
@@ -261,7 +261,7 @@ void CBUSConfig::readEvent(byte idx, byte tarr[]) {
 /// return an event variable (EV) value given the event table index and EV number
 //
 
-byte CBUSConfig::getEventEVval(byte idx, byte evnum) {
+byte Configuration::getEventEVval(byte idx, byte evnum) {
 
   return storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
 }
@@ -270,7 +270,7 @@ byte CBUSConfig::getEventEVval(byte idx, byte evnum) {
 /// write an event variable
 //
 
-void CBUSConfig::writeEventEV(byte idx, byte evnum, byte evval) {
+void Configuration::writeEventEV(byte idx, byte evnum, byte evval) {
 
   storage->writeEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum, evval);
 }
@@ -279,7 +279,7 @@ void CBUSConfig::writeEventEV(byte idx, byte evnum, byte evval) {
 /// re/create the event hash table
 //
 
-void CBUSConfig::makeEvHashTable(void) {
+void Configuration::makeEvHashTable(void) {
 
   byte evarray[4];
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
@@ -307,7 +307,7 @@ void CBUSConfig::makeEvHashTable(void) {
 /// update a single hash table entry -- after a learn or unlearn
 //
 
-void CBUSConfig::updateEvHashEntry(byte idx) {
+void Configuration::updateEvHashEntry(byte idx) {
 
   byte evarray[4];
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
@@ -331,7 +331,7 @@ void CBUSConfig::updateEvHashEntry(byte idx) {
 /// clear the hash table
 //
 
-void CBUSConfig::clearEvHashTable(void) {
+void Configuration::clearEvHashTable(void) {
 
   // zero in the hash table indicates that the corresponding event slot is free
   // DEBUG_SERIAL << F("> clearEvHashTable - clearing hash table") << endl;
@@ -347,7 +347,7 @@ void CBUSConfig::clearEvHashTable(void) {
 /// print the event hash table
 //
 
-void CBUSConfig::printEvHashTable(bool raw) {
+void Configuration::printEvHashTable(bool raw) {
 
   // removed so that no libraries produce serial output
   // can be implemented in user's sketch
@@ -373,7 +373,7 @@ void CBUSConfig::printEvHashTable(bool raw) {
 /// return the number of stored events
 //
 
-byte CBUSConfig::numEvents(void) {
+byte Configuration::numEvents(void) {
 
   byte numevents = 0;
 
@@ -390,7 +390,7 @@ byte CBUSConfig::numEvents(void) {
 /// return a single hash table entry by index
 //
 
-byte CBUSConfig::getEvTableEntry(byte tindex) {
+byte Configuration::getEvTableEntry(byte tindex) {
 
   if (tindex < EE_MAX_EVENTS) {
     return evhashtbl[tindex];
@@ -404,7 +404,7 @@ byte CBUSConfig::getEvTableEntry(byte tindex) {
 /// note that NVs number from 1, not 0
 //
 
-byte CBUSConfig::readNV(byte idx) {
+byte Configuration::readNV(byte idx) {
 
   return (storage->readEEPROM(EE_NVS_START + (idx - 1)));
 }
@@ -414,7 +414,7 @@ byte CBUSConfig::readNV(byte idx) {
 /// note that NVs number from 1, not 0
 //
 
-void CBUSConfig::writeNV(byte idx, byte val) {
+void Configuration::writeNV(byte idx, byte val) {
 
   storage->writeEEPROM(EE_NVS_START + (idx - 1), val);
 }
@@ -428,7 +428,7 @@ void CBUSConfig::writeNV(byte idx, byte val) {
 /// just the first four bytes -- NN and EN
 //
 
-void CBUSConfig::writeEvent(byte index, byte data[]) {
+void Configuration::writeEvent(byte index, byte data[]) {
 
   int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
@@ -440,7 +440,7 @@ void CBUSConfig::writeEvent(byte index, byte data[]) {
 /// clear an event from the table
 //
 
-void CBUSConfig::cleareventEEPROM(byte index) {
+void Configuration::cleareventEEPROM(byte index) {
 
   byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
 
@@ -462,7 +462,7 @@ void CBUSConfig::cleareventEEPROM(byte index) {
 
 void (*rebootFunc)(void) = 0;  // just causes a jump to address zero - not a full chip reset
 
-void CBUSConfig::reboot(void) {
+void Configuration::reboot(void) {
 
 #ifdef __AVR__
 
@@ -522,7 +522,7 @@ void CBUSConfig::reboot(void) {
 /// get free RAM
 //
 
-unsigned int CBUSConfig::freeSRAM(void) {
+unsigned int Configuration::freeSRAM(void) {
 #ifdef __AVR__
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
@@ -549,7 +549,7 @@ unsigned int CBUSConfig::freeSRAM(void) {
 /// manually reset the module to factory defaults
 //
 
-void CBUSConfig::resetModule(UserInterface * ui) {
+void Configuration::resetModule(UserInterface * ui) {
 
   /// standard implementation of resetModule()
 
@@ -587,7 +587,7 @@ void CBUSConfig::resetModule(UserInterface * ui) {
   resetModule();
 }
 
-void CBUSConfig::resetModule(void) {
+void Configuration::resetModule(void) {
 
   /// implementation of resetModule() without CBUSswitch or CBUSLEDs
   // uint32_t t = millis();
@@ -623,7 +623,7 @@ void CBUSConfig::resetModule(void) {
 /// load node identity from EEPROM
 //
 
-void CBUSConfig::loadNVs(void) {
+void Configuration::loadNVs(void) {
 
   FLiM =     storage->readEEPROM(0);
   CANID =    storage->readEEPROM(1);
@@ -634,7 +634,7 @@ void CBUSConfig::loadNVs(void) {
 /// check whether there is a collision for any hash in the event hash table
 //
 
-bool CBUSConfig::check_hash_collisions(void) {
+bool Configuration::check_hash_collisions(void) {
 
   for (byte i = 0; i < EE_MAX_EVENTS - 1; i++) {
     for (byte j = i + 1; j < EE_MAX_EVENTS; j++) {
@@ -655,17 +655,17 @@ bool CBUSConfig::check_hash_collisions(void) {
 /// this can be tested at module startup for e.g. setting default NVs or creating producer events
 //ƒ
 
-void CBUSConfig::setResetFlag(void) {
+void Configuration::setResetFlag(void) {
 
   storage->writeEEPROM(5, 99);
 }
 
-void CBUSConfig::clearResetFlag(void) {
+void Configuration::clearResetFlag(void) {
 
   storage->writeEEPROM(5, 0);
 }
 
-bool CBUSConfig::isResetFlagSet(void) {
+bool Configuration::isResetFlagSet(void) {
 
   return (storage->readEEPROM(5) == 99);
 }

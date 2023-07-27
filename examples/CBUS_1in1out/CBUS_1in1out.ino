@@ -53,7 +53,7 @@
 #include <CAN2515.h>               // CAN controller
 #include <CBUSswitch.h>             // pushbutton switch
 #include <CBUSLED.h>                // CBUS LEDs
-#include <CBUSconfig.h>             // module configuration
+#include <Configuration.h>             // module configuration
 #include <CBUSParams.h>             // CBUS parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
@@ -69,7 +69,7 @@ const byte LED_YLW = 7;             // CBUS yellow FLiM LED pin
 const byte SWITCH0 = 8;             // CBUS push button switch pin
 
 // CBUS objects
-VLCB::CBUSConfig modconfig;               // configuration object
+VLCB::Configuration modconfig;               // configuration object
 VLCB::CBUS cbus(&modconfig);              // CBUS object
 VLCB::CAN2515 cbus2515(&cbus);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
