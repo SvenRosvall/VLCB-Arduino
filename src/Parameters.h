@@ -40,10 +40,10 @@
 namespace VLCB
 {
 
-class CBUSParams
+class Parameters
 {
 public:
-  explicit CBUSParams(Configuration const & config)
+  explicit Parameters(Configuration const & config)
   {
     params[0] = 20;                     //  0 num params = 20
     params[1] = MANU_MERG;              //  1 manf = MERG, 165

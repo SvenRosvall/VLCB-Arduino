@@ -52,7 +52,7 @@
 #include <CBUS.h>                   // CBUS class
 #include <CAN2515.h>               // CAN controller
 #include <Configuration.h>             // module configuration
-#include <CBUSParams.h>             // CBUS parameters
+#include <Parameters.h>             // CBUS parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
 
@@ -105,7 +105,7 @@ void setupCBUS() {
   printConfig();
 
   // set module parameters
-  VLCB::CBUSParams params(modconfig);
+  VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);

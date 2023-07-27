@@ -34,14 +34,14 @@
 
 */
 
-#include <CBUSParams.h>
+#include <Parameters.h>
 
 namespace VLCB
 {
 
-unsigned char CBUSParams::params[21];
+unsigned char Parameters::params[21];
 
-void CBUSParams::initProcessorParams()
+void Parameters::initProcessorParams()
 {
   params[9] = 50;
   params[19] = CPUM_ATMEL;
