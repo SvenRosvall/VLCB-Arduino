@@ -71,7 +71,7 @@ If a service is able to handle that message no further services will be offered 
 Thus, the order of configured services is important.
 
 There are currently no implemented services. 
-All the functionality of handling VLCB messages is implemented in the main Controller object.
+All the functionality of handling VLCB messages are implemented in the main Controller object.
 This will be broken out to services.
 
 ### Details
