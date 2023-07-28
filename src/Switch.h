@@ -52,8 +52,6 @@ class Switch {
 
 public:
   explicit Switch(byte pin, byte pressedState = LOW);
-  Switch(); // TODO: Remove
-  void setPin(byte pin, byte pressedState = LOW); // TODO: Remove
   void run(void);
   void reset(void);
   bool stateChanged(void);

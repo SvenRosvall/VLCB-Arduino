@@ -55,23 +55,6 @@ Switch::Switch(byte pin, byte pressedState)
   _currentState = readPin(_pin);
 }
 
-Switch::Switch()
-{
-  // Do nothing, expect setup in setPin()
-}
-
-void Switch::setPin(byte pin, byte pressedState) {
-
-  _pin = pin;
-  _pressedState = pressedState;
-
-  if (_pressedState == LOW)
-    pinMode(_pin, INPUT_PULLUP);
-
-  reset();
-  _currentState = readPin(_pin);
-}
-
 void Switch::reset(void) {
 
   _lastState = !_pressedState;
