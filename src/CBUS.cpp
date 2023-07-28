@@ -324,8 +324,8 @@ void CBUS::indicateActivity()
 
 void CBUS::process(byte num_messages) {
 
-  byte remoteCANID = 0, nvindex = 0, evindex = 0, evval = 0;
-  unsigned int nn = 0, en = 0, j = 0, opc;
+  byte remoteCANID = 0, evindex = 0, evval = 0;
+  unsigned int nn = 0, en = 0, opc;
 
   // start bus enumeration if required
   if (enumeration_required) {
@@ -653,6 +653,7 @@ void CBUS::process(byte num_messages) {
         // received NVRD -- read NV by index
         if (nn == module_config->nodeNum) {
 
+          byte nvindex = _msg.data[3];
           if (nvindex > module_config->EE_NUM_NVS) {
             sendCMDERR(10);
           } else {
@@ -661,7 +662,7 @@ void CBUS::process(byte num_messages) {
             _msg.data[0] = OPC_NVANS;
             // _msg.data[1] = highByte(module_config->nodeNum);
             // _msg.data[2] = lowByte(module_config->nodeNum);
-            _msg.data[4] = module_config->readNV(_msg.data[3]);
+            _msg.data[4] = module_config->readNV(nvindex);
             sendMessage(&_msg);
           }
         }
@@ -716,10 +717,10 @@ void CBUS::process(byte num_messages) {
           if (index < module_config->EE_MAX_EVENTS) {
 
             // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
-            module_config->cleareventEEPROM(j);
+            module_config->cleareventEEPROM(index);
 
             // update hash table
-            module_config->updateEvHashEntry(j);
+            module_config->updateEvHashEntry(index);
 
             // respond with WRACK
             sendWRACK();
