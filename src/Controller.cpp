@@ -673,10 +673,10 @@ void Controller::process(byte num_messages) {
 
             // TODO: Review this. j is always 0.
             // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
-            module_config->cleareventEEPROM(j);
+            module_config->cleareventEEPROM(index);
 
             // update hash table
-            module_config->updateEvHashEntry(j);
+            module_config->updateEvHashEntry(index);
 
             // respond with WRACK
             sendWRACK();
