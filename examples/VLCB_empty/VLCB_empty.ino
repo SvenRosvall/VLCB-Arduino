@@ -95,7 +95,6 @@ void setupVLCB() {
   modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
 
   // initialise and load configuration
-  modconfig.setEEPROMtype(VLCB::EEPROM_INTERNAL);
   modconfig.begin();
 
   Serial << F("> mode = ") << ((modconfig.currentMode) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;

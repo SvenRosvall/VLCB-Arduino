@@ -49,13 +49,6 @@ namespace VLCB
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
 
-// TODO: Remove. Keep for now for backwards compatibility.
-enum {
-  EEPROM_INTERNAL = 0,
-  EEPROM_EXTERNAL = 1,
-  EEPROM_USES_FLASH
-};
-
 //
 /// Controller modes
 //
@@ -119,7 +112,6 @@ public:
   // These functions shouldn't be here. But keep them for now.
   unsigned int freeSRAM(void);
   void reboot(void);
-  bool setEEPROMtype(byte type);
 
 private:
   Storage * storage;

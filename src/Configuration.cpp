@@ -87,11 +87,6 @@ void Configuration::begin(void) {
   loadNVs();
 }
 
-// TODO: Remove this. Replace with setStorage(). Keep for compatibility.
-bool Configuration::setEEPROMtype(byte type) {
-  return true;
-}
-
 void Configuration::setModuleMode(ModuleMode f) {
 
   currentMode = f;
