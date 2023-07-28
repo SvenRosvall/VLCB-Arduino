@@ -92,13 +92,9 @@ bool Configuration::setEEPROMtype(byte type) {
   return true;
 }
 
-//
-/// store the FLiM mode
-//
+void Configuration::setModuleMode(ModuleMode f) {
 
-void Configuration::setFLiM(bool f) {
-
-  FLiM = f;
+  currentMode = f;
   storage->writeEEPROM(0, f);
 }
 
@@ -625,7 +621,7 @@ void Configuration::resetModule(void) {
 
 void Configuration::loadNVs(void) {
 
-  FLiM =     storage->readEEPROM(0);
+  currentMode = (ModuleMode) storage->readEEPROM(0);
   CANID =    storage->readEEPROM(1);
   nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
 }

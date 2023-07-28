@@ -120,10 +120,10 @@ void Controller::setSLiM(void) {
 
   bModeChanging = false;
   module_config->setNodeNum(0);
-  module_config->setFLiM(false);
+  module_config->setModuleMode(MODE_SLIM);
   module_config->setCANID(0);
 
-  indicateMode(module_config->FLiM);
+  indicateMode(MODE_SLIM);
 }
 
 //
@@ -388,8 +388,9 @@ void Controller::process(byte num_messages)
 
   if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
 
-    // DEBUG_SERIAL << F("> timeout expired, FLiM = ") << FLiM << F(", mode change = ") << bModeChanging << endl;
-    indicateMode(module_config->FLiM);
+    // Revert to previous mode.
+    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
+    indicateMode(module_config->currentMode);
     bModeChanging = false;
   }
 
@@ -411,8 +412,8 @@ void Controller::performRequestedUserAction()
   {
     case UserInterface::CHANGE_MODE:
       // initiate mode change
-      //Serial << "Controller::process() - changing mode, current isFlim=" << module_config->FLiM << endl;
-      if (!module_config->FLiM) {
+      //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
+      if (!module_config->currentMode) {
         initFLiM();
       } else {
         revertSLiM();
@@ -426,7 +427,7 @@ void Controller::performRequestedUserAction()
 
     case UserInterface::ENUMERATION:
       //Serial << "Controller::process() - enumerate" << endl;
-      if (module_config->FLiM)
+      if (module_config->currentMode)
       {
         CANenumeration();
       }
@@ -563,13 +564,13 @@ void Controller::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID
 
       // we are now in FLiM mode - update the configuration
       bModeChanging = false;
-      module_config->setFLiM(true);
-      indicateMode(module_config->FLiM);
+      module_config->setModuleMode(MODE_FLIM);
+      indicateMode(MODE_FLIM);
 
       // enumerate the CAN bus to allocate a free CAN ID
       CANenumeration();
 
-      // DEBUG_SERIAL << F("> FLiM mode = ") << module_config->FLiM << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
+      // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
     } else {
       // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;

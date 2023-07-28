@@ -57,6 +57,16 @@ enum {
 };
 
 //
+/// Controller modes
+//
+
+enum ModuleMode {
+  MODE_SLIM = 0,
+  MODE_FLIM = 1,
+  MODE_CHANGING = 2
+};
+
+//
 /// a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc
 //
 
@@ -88,7 +98,7 @@ public:
   void resetModule(void);
 
   void setCANID(byte canid);
-  void setFLiM(bool f);
+  void setModuleMode(ModuleMode m);
   void setNodeNum(unsigned int nn);
 
   void setResetFlag(void);
@@ -103,7 +113,7 @@ public:
   byte EE_NUM_NVS;
 
   byte CANID;
-  bool FLiM;
+  ModuleMode currentMode;
   unsigned int nodeNum;
 
   // These functions shouldn't be here. But keep them for now.

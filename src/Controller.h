@@ -58,16 +58,6 @@ const int EX_BUFFER_LEN = 64;                   // size of extended send and rec
 const int OPC_DTXC = 0xe9;                      // temp opcode for Controller long message
 
 //
-/// Controller modes
-//
-
-enum {
-  MODE_SLIM = 0,
-  MODE_FLIM = 1,
-  MODE_CHANGING = 2
-};
-
-//
 /// Controller long message status codes
 //
 

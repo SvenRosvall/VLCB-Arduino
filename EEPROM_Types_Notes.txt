@@ -57,11 +57,11 @@ readNV - reads value for given NV index
 writeNV - writes value for given NV index
 writeEvent - writes NN+EN for a given event index, via writeBytesEEPROM()
 
-setFLiM - writeEEPROM(0, flag)
+setModuleMode - writeEEPROM(0, flag)
 setCANID - writeEEPROM(1, canid)
 setNodeNum - writeEEPROM(2, high NN), writeEEPROM(3, low NN)
 resetModule - various writes.
-loadNVs - reads FLiM (i=0), CANID (i=1), NN (i=2,3)
+loadNVs - reads currentMode (i=0), CANID (i=1), NN (i=2,3)
 setResetFlag - writeEEPROM(5, 99)
 clearResetFlag - writeEEPROM(5, 0)
 isResetFlagSet - readEEPROM(5)

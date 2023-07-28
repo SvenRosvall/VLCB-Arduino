@@ -98,7 +98,7 @@ void setupVLCB() {
   modconfig.setEEPROMtype(VLCB::EEPROM_INTERNAL);
   modconfig.begin();
 
-  Serial << F("> mode = ") << ((modconfig.FLiM) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
+  Serial << F("> mode = ") << ((modconfig.currentMode) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice
@@ -118,7 +118,7 @@ void setupVLCB() {
   controller.setUI(&userInterface);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
-  if (userInterface.isButtonPressed() && !modconfig.FLiM) {
+  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM) {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
     modconfig.resetModule(&userInterface);
   }
@@ -130,7 +130,7 @@ void setupVLCB() {
   controller.setFrameHandler(framehandler);
 
   // set Controller LEDs to indicate the current mode
-  controller.indicateMode(modconfig.FLiM);
+  controller.indicateMode(modconfig.currentMode);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
@@ -270,7 +270,7 @@ void processSerialInput(void) {
 
       // node identity
       Serial << F("> VLCB node configuration") << endl;
-      Serial << F("> mode = ") << (modconfig.FLiM ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
+      Serial << F("> mode = ") << (modconfig.currentMode == VLCB::MODE_FLIM ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
       Serial << endl;
       break;
 
