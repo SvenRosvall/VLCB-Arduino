@@ -111,10 +111,6 @@ public:
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
-  bool available(void)
-  {
-    return transport->available();
-  }
   bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
   {
     return transport->sendMessage(msg, rtr, ext, priority);
@@ -147,7 +143,7 @@ public:
 
   void setLongMessageHandler(LongMessageController *handler);
 
-protected:                                          // protected members become private in derived classes
+private:                                          // protected members become private in derived classes
   CANFrame _msg;
   UserInterface *_ui;
   Configuration *module_config;
@@ -166,6 +162,11 @@ protected:                                          // protected members become 
   Transport * transport;
 
   LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
+
+  void callFrameHandler(unsigned int opc, CANFrame *msg);
+  void handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID);
+  void performRequestedUserAction();
+  byte findFreeCanId();
 };
 
 //
