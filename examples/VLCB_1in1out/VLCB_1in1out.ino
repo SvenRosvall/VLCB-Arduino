@@ -234,16 +234,10 @@ void processModuleSwitchChange() {
 
   if (moduleSwitch.stateChanged()) {
 
-    VLCB::CANFrame msg;
-    msg.id = modconfig.CANID;
-    msg.len = 5;
-    msg.data[0] = (moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF);
-    msg.data[1] = highByte(modconfig.nodeNum);
-    msg.data[2] = lowByte(modconfig.nodeNum);
-    msg.data[3] = 0;
-    msg.data[4] = 1;            // event number (EN) = 1
+    byte opc = moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF;
+    byte eventNumber = 1;
 
-    if (controller.sendMessage(&msg)) {
+    if (controller.sendMessageWithNN(opc, 0, eventNumber)) {
       Serial << F("> sent VLCB message") << endl;
     } else {
       Serial << F("> error sending VLCB message") << endl;
