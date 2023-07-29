@@ -1,13 +1,5 @@
 # TODO List
 
-## Add helper sendMessage() 
-There is some boiler code for every sendMessage(). 
-Create helpers that fill in much code. 
-Example use:
-```
-sendMessage5(OPC_NUMEV, NN, nEvents);
-```
-
 ## Multiple services
 Introduce ```initializer_list``` class so that the controller
 can be set up like this:

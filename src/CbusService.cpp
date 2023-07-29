@@ -116,14 +116,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       if (paran <= controller->_mparams[0]) {
 
         paran = msg->data[3];
-
-        msg->len = 5;
-        msg->data[0] = OPC_PARAN;
-        // msg->data[1] = highByte(controller->controller->module_config->nodeNum);
-        // msg->data[2] = lowByte(controller->controller->module_config->nodeNum);
-        msg->data[3] = paran;
-        msg->data[4] = controller->_mparams[paran];
-        controller->sendMessage(msg);
+        controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
 
       } else {
         // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
@@ -145,12 +138,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->module_config->setNodeNum(nn);
 
       // respond with NNACK
-      msg->len = 3;
-      msg->data[0] = OPC_NNACK;
-      // msg->data[1] = highByte(controller->module_config->nodeNum);
-      // msg->data[2] = lowByte(controller->module_config->nodeNum);
-
-      controller->sendMessage(msg);
+      controller->sendMessageWithNN(OPC_NNACK);
 
       // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->module_config->nodeNum << endl;
 
@@ -201,12 +189,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
         controller->sendCMDERR(10);
       } else {
         // respond with NVANS
-        msg->len = 5;
-        msg->data[0] = OPC_NVANS;
-        // msg->data[1] = highByte(controller->module_config->nodeNum);
-        // msg->data[2] = lowByte(controller->module_config->nodeNum);
-        msg->data[4] = controller->module_config->readNV(nvindex);
-        controller->sendMessage(msg);
+        controller->sendMessageWithNN(OPC_NVANS, nvindex, controller->module_config->readNV(nvindex));
       }
     }
 
@@ -298,13 +281,8 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     if (nn == controller->module_config->nodeNum) {
 
       // respond with 0x74 NUMEV
-      msg->len = 4;
-      msg->data[0] = OPC_NUMEV;
-      // msg->data[1] = highByte(controller->module_config->nodeNum);
-      // msg->data[2] = lowByte(controller->module_config->nodeNum);
-      msg->data[3] = controller->module_config->numEvents();
 
-      controller->sendMessage(msg);
+      controller->sendMessageWithNN(OPC_NUMEV, controller->module_config->numEvents());
     }
 
     break;
@@ -347,12 +325,8 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
       if (controller->module_config->getEvTableEntry(msg->data[3]) != 0) {
 
-        msg->len = 6;
-        msg->data[0] = OPC_NEVAL;
-        // msg->data[1] = highByte(controller->module_config->nodeNum);
-        // msg->data[2] = lowByte(controller->module_config->nodeNum);
-        msg->data[5] = controller->module_config->getEventEVval(msg->data[3], msg->data[4]);
-        controller->sendMessage(msg);
+        byte value = controller->module_config->getEventEVval(msg->data[3], msg->data[4]);
+        controller->sendMessageWithNN(OPC_NEVAL, msg->data[3], msg->data[4], value);
       } else {
 
         // DEBUG_SERIAL << F("> request for invalid event index") << endl;
@@ -398,13 +372,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       }
 
       // DEBUG_SERIAL << F("> responding to to NNEVN with EVNLF, free event table slots = ") << free_slots << endl;
-      // memset(msg, 0, sizeof(_msg));
-      msg->len = 4;
-      msg->data[0] = OPC_EVNLF;
-      // msg->data[1] = highByte(controller->module_config->nodeNum);
-      // msg->data[2] = lowByte(controller->module_config->nodeNum);
-      msg->data[3] = free_slots;
-      controller->sendMessage(msg);
+      controller->sendMessageWithNN(OPC_EVNLF, free_slots);
     }
 
     break;
@@ -415,14 +383,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
     if (controller->module_config->nodeNum > 0) {
       // DEBUG_SERIAL << ("> responding with PNN message") << endl;
-      msg->len = 6;
-      msg->data[0] = OPC_PNN;
-      msg->data[1] = highByte(controller->module_config->nodeNum);
-      msg->data[2] = lowByte(controller->module_config->nodeNum);
-      msg->data[3] = controller->_mparams[1];
-      msg->data[4] = controller->_mparams[3];
-      msg->data[5] = controller->_mparams[8];
-      controller->sendMessage(msg);
+      controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
     }
 
     break;

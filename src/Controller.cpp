@@ -119,12 +119,7 @@ bool Controller::sendWRACK(void) {
 
   // send a write acknowledgement response
 
-  _msg.len = 3;
-  _msg.data[0] = OPC_WRACK;
-  _msg.data[1] = highByte(module_config->nodeNum);
-  _msg.data[2] = lowByte(module_config->nodeNum);
-
-  return sendMessage(&_msg);
+  return sendMessageWithNN(OPC_WRACK);
 }
 
 //
@@ -135,13 +130,7 @@ bool Controller::sendCMDERR(byte cerrno) {
 
   // send a command error response
 
-  _msg.len = 4;
-  _msg.data[0] = OPC_CMDERR;
-  _msg.data[1] = highByte(module_config->nodeNum);
-  _msg.data[2] = lowByte(module_config->nodeNum);
-  _msg.data[3] = cerrno;
-
-  return sendMessage(&_msg);
+  return sendMessageWithNN(OPC_CMDERR, cerrno);
 }
 
 //
@@ -197,11 +186,7 @@ void Controller::initFLiM(void) {
   timeOutTimer = millis();
 
   // send RQNN message with current NN, which may be zero if a virgin/SLiM node
-  _msg.len = 3;
-  _msg.data[0] = OPC_RQNN;
-  _msg.data[1] = highByte(module_config->nodeNum);
-  _msg.data[2] = lowByte(module_config->nodeNum);
-  sendMessage(&_msg);
+  sendMessageWithNN(OPC_RQNN);
 
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
 }
@@ -236,12 +221,8 @@ void Controller::revertSLiM(void) {
   // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
 
   // send NNREL message
-  _msg.len = 3;
-  _msg.data[0] = OPC_NNREL;
-  _msg.data[1] = highByte(module_config->nodeNum);
-  _msg.data[2] = lowByte(module_config->nodeNum);
 
-  sendMessage(&_msg);
+  sendMessageWithNN(OPC_NNREL);
   setSLiM();
 }
 
@@ -479,11 +460,7 @@ void Controller::checkCANenum(void)
     module_config->setCANID(selected_id);
 
     // send NNACK
-    _msg.len = 3;
-    _msg.data[0] = OPC_NNACK;
-    _msg.data[1] = highByte(module_config->nodeNum);
-    _msg.data[2] = lowByte(module_config->nodeNum);
-    sendMessage(&_msg);
+    sendMessageWithNN(OPC_NNACK);
   }
 }
 
@@ -527,6 +504,50 @@ byte Controller::findFreeCanId()
 
 void Controller::setLongMessageHandler(LongMessageController *handler) {
   longMessageHandler = handler;
+}
+
+void setNN(CANFrame *msg, unsigned int nn)
+{
+  msg->data[1] = highByte(nn);
+  msg->data[2] = lowByte(nn);
+}
+
+bool Controller::sendMessageWithNN(int opc) {
+  CANFrame msg;
+  msg.len = 3;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  return sendMessage(&msg);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1) {
+  CANFrame msg;
+  msg.len = 4;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  return sendMessage(&msg);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2) {
+  CANFrame msg;
+  msg.len = 5;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  msg.data[4] = b2;
+  return sendMessage(&msg);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3) {
+  CANFrame msg;
+  msg.len = 6;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  msg.data[4] = b2;
+  msg.data[5] = b3;
+  return sendMessage(&msg);
 }
 
 }

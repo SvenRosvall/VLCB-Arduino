@@ -107,6 +107,11 @@ public:
     return transport->sendMessage(msg, rtr, ext, priority);
   }
 
+  bool sendMessageWithNN(int opc);
+  bool sendMessageWithNN(int opc, byte b1);
+  bool sendMessageWithNN(int opc, byte b1, byte b2);
+  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
+
   // implementations of these methods are provided in the base class
 
   bool sendWRACK(void);
