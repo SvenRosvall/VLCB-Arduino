@@ -57,6 +57,7 @@
 #include <Parameters.h>             // VLCB parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
+#include "CbusService.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -70,7 +71,8 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
 VLCB::Configuration modconfig;               // configuration object
-VLCB::Controller controller(&modconfig);              // Controller object
+VLCB::CbusService cbusService;               // service for CBUS op-codes
+VLCB::Controller controller(&modconfig, &cbusService); // Controller object
 VLCB::CAN2515 can2515(&controller);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 
@@ -135,7 +137,7 @@ void setupVLCB() {
   }
 
   // register our VLCB event handler, to receive event messages of learned events
-  controller.setEventHandler(eventhandler);
+  cbusService.setEventHandler(eventhandler);
 
   // set Controller LEDs to indicate mode
   controller.indicateMode(modconfig.currentMode);

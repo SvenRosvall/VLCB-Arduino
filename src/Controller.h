@@ -47,6 +47,7 @@
 #include <cbusdefs.h>
 #include <Transport.h>
 #include "UserInterface.h"
+#include "Service.h"
 
 namespace VLCB
 {
@@ -95,8 +96,8 @@ class Controller
 {
 
 public:
-  Controller();
-  explicit Controller(Configuration *the_config);
+  explicit Controller(Service * service);
+  Controller(Configuration *the_config, Service * service);
   void setTransport(Transport * trpt) { this->transport = trpt; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
@@ -126,10 +127,7 @@ public:
   void checkCANenum(void);
   void indicateMode(byte mode);
   void indicateActivity();
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
-  void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
 
   void setLongMessageHandler(LongMessageController *handler);
 
@@ -137,10 +135,10 @@ private:                                          // protected members become pr
   CANFrame _msg;
   UserInterface *_ui;
   Configuration *module_config;
+  Service * service;
+
   unsigned char *_mparams;
   unsigned char *_mname;
-  void (*eventhandler)(byte index, CANFrame *msg);
-  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
   void (*framehandler)(CANFrame *msg);
   byte *_opcodes;
   byte _num_opcodes;
@@ -154,9 +152,13 @@ private:                                          // protected members become pr
   LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
 
   void callFrameHandler(unsigned int opc, CANFrame *msg);
-  void handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID);
   void performRequestedUserAction();
   byte findFreeCanId();
+
+  // Quick way to access necessary stuff when migrating to services.
+  // TODO: Review the necessary fields to see what is required by services
+  // TODO: Create getter/setter for each field.
+  friend class CbusService;
 };
 
 //

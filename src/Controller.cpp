@@ -40,6 +40,7 @@
 
 // Controller library
 #include <Controller.h>
+#include "CbusService.h"
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined
@@ -49,13 +50,13 @@
 namespace VLCB
 {
 
-Controller::Controller() {
+Controller::Controller(Service * service)
+  : service(service)
+{
   extern Configuration config;
   module_config = &config;
 
-  eventhandler = NULL;
-  eventhandlerex = NULL;
-  framehandler = NULL;
+  service->setController(this);
 }
 
 //
@@ -63,27 +64,17 @@ Controller::Controller() {
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
 
-Controller::Controller(Configuration *the_config) {
-  module_config = the_config;
-
-  eventhandler = NULL;
-  eventhandlerex = NULL;
-  framehandler = NULL;
+Controller::Controller(Configuration *the_config, Service * service)
+  : module_config(the_config), service(service)
+{
+  service->setController(this);
 }
 
 //
 /// register the user handler for learned events
 //
 
-void Controller::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
-  eventhandler = fptr;
-}
-
 // overloaded form which receives the opcode on/off state and the first event variable
-
-void Controller::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) {
-  eventhandlerex = fptr;
-}
 
 //
 /// register the user handler for CAN frames
@@ -373,7 +364,7 @@ void Controller::process(byte num_messages)
     //
 
     if (_msg.len > 0) {
-      handleMessage(opc, &_msg, remoteCANID);
+      service->handleMessage(opc, &_msg, remoteCANID);
     } else {
       // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
     }
@@ -521,24 +512,6 @@ byte Controller::findFreeCanId()
 //
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
-
-void Controller::processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event) {
-
-  // try to find a matching stored event -- match on nn, en
-  byte index = module_config->findExistingEvent(nn, en);
-
-  // call any registered event handler
-
-  if (index < module_config->EE_MAX_EVENTS) {
-    if (eventhandler != NULL) {
-      (void)(*eventhandler)(index, & _msg);
-    } else if (eventhandlerex != NULL) {
-      (void)(*eventhandlerex)(index, & _msg, is_on_event, \
-                              ((module_config->EE_NUM_EVS > 0) ? module_config->getEventEVval(index, 1) : 0) \
-                             );
-    }
-  }
-}
 
 //
 /// set the long message handler object to receive long message frames
