@@ -40,7 +40,6 @@
 
 // Controller library
 #include <Controller.h>
-#include "CbusService.h"
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined
@@ -101,20 +100,6 @@ void Controller::setParams(unsigned char *mparams) {
 
 void Controller::setName(unsigned char *mname) {
   _mname = mname;
-}
-
-//
-/// set module to SLiM mode
-//
-
-void Controller::setSLiM(void) {
-
-  bModeChanging = false;
-  module_config->setNodeNum(0);
-  module_config->setModuleMode(MODE_SLIM);
-  module_config->setCANID(0);
-
-  indicateMode(MODE_SLIM);
 }
 
 //
@@ -202,7 +187,6 @@ void Controller::CANenumeration(void) {
 //
 /// initiate the transition from SLiM to FLiM mode
 //
-
 void Controller::initFLiM(void) {
 
   // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
@@ -222,10 +206,31 @@ void Controller::initFLiM(void) {
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
 }
 
+void Controller::setFLiM() {
+  bModeChanging = false;
+  module_config->setModuleMode(MODE_FLIM);
+  indicateMode(MODE_FLIM);
+
+  // enumerate the CAN bus to allocate a free CAN ID
+  CANenumeration();
+}
+
+//
+/// set module to SLiM mode
+//
+void Controller::setSLiM(void) {
+
+  bModeChanging = false;
+  module_config->setNodeNum(0);
+  module_config->setModuleMode(MODE_SLIM);
+  module_config->setCANID(0);
+
+  indicateMode(MODE_SLIM);
+}
+
 //
 /// revert from FLiM to SLiM mode
 //
-
 void Controller::revertSLiM(void) {
 
   // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
@@ -238,6 +243,20 @@ void Controller::revertSLiM(void) {
 
   sendMessage(&_msg);
   setSLiM();
+}
+
+//
+/// check 30 sec timeout for SLiM/FLiM negotiation with FCU
+//
+void Controller::checkModeChangeTimeout()
+{
+  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
+
+    // Revert to previous mode.
+    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
+    indicateMode(module_config->currentMode);
+    bModeChanging = false;
+  }
 }
 
 //
@@ -372,18 +391,7 @@ void Controller::process(byte num_messages)
 
   // check CAN bus enumeration timer
   checkCANenum();
-
-  //
-  /// check 30 sec timeout for SLiM/FLiM negotiation with FCU
-  //
-
-  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
-
-    // Revert to previous mode.
-    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
-    indicateMode(module_config->currentMode);
-    bModeChanging = false;
-  }
+  checkModeChangeTimeout();
 
   // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
 

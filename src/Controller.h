@@ -118,8 +118,10 @@ public:
   bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void initFLiM(void);
-  void revertSLiM(void);
+  void setFLiM();
   void setSLiM(void);
+  void revertSLiM(void);
+  void checkModeChangeTimeout();
   void renegotiate(void);
   void setUI(UserInterface *ui);
   void setParams(unsigned char *mparams);
@@ -136,6 +138,7 @@ private:                                          // protected members become pr
   UserInterface *_ui;
   Configuration *module_config;
   Service * service;
+  Transport * transport;
 
   unsigned char *_mparams;
   unsigned char *_mname;
@@ -146,8 +149,6 @@ private:                                          // protected members become pr
   bool bModeChanging, bCANenum, bLearn;
   unsigned long timeOutTimer, CANenumTime;
   bool enumeration_required;
-
-  Transport * transport;
 
   LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
 

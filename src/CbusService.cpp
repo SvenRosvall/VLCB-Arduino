@@ -1,7 +1,8 @@
 
-#include <Controller.h>
 #include <Streaming.h>
+
 #include "CbusService.h"
+#include <Controller.h>
 
 namespace VLCB {
 
@@ -154,12 +155,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->module_config->nodeNum << endl;
 
       // we are now in FLiM mode - update the configuration
-      controller->bModeChanging = false;
-      controller->module_config->setModuleMode(MODE_FLIM);
-      controller->indicateMode(MODE_FLIM);
-
-      // enumerate the CAN bus to allocate a free CAN ID
-      controller->CANenumeration();
+      controller->setFLiM();
 
       // DEBUG_SERIAL << F("> current mode = ") << controller->module_config->currentMode << F(", node number = ") << controller->module_config->nodeNum << F(", CANID = ") << controller->module_config->CANID << endl;
 
@@ -538,4 +534,5 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     break;
   }
 }
+
 }
