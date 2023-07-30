@@ -49,13 +49,20 @@
 namespace VLCB
 {
 
-Controller::Controller(Service * service)
-  : service(service)
+Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_list<Service *> services)
+  : _ui(ui)
+  , transport(trpt)
+  , services(services)
 {
   extern Configuration config;
   module_config = &config;
 
-  service->setController(this);
+  transport->setController(this);
+
+  for (Service * service : services)
+  {
+    service->setController(this);
+  }
 }
 
 //
@@ -63,10 +70,18 @@ Controller::Controller(Service * service)
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
 
-Controller::Controller(Configuration *the_config, Service * service)
-  : module_config(the_config), service(service)
+Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services)
+  : _ui(ui)
+  , module_config(conf)
+  , transport(trpt)
+  , services(services)
 {
-  service->setController(this);
+  transport->setController(this);
+
+  for (Service * service : services)
+  {
+    service->setController(this);
+  }
 }
 
 //
@@ -192,6 +207,7 @@ void Controller::initFLiM(void) {
 }
 
 void Controller::setFLiM() {
+  // DEBUG_SERIAL << F("> set FLiM") << endl;
   bModeChanging = false;
   module_config->setModuleMode(MODE_FLIM);
   indicateMode(MODE_FLIM);
@@ -205,6 +221,7 @@ void Controller::setFLiM() {
 //
 void Controller::setSLiM(void) {
 
+  // DEBUG_SERIAL << F("> set SLiM") << endl;
   bModeChanging = false;
   module_config->setNodeNum(0);
   module_config->setModuleMode(MODE_SLIM);
@@ -247,11 +264,6 @@ void Controller::checkModeChangeTimeout()
 void Controller::renegotiate(void) {
 
   initFLiM();
-}
-
-void Controller::setUI(UserInterface *ui)
-{
-  _ui = ui;
 }
 
 //
@@ -364,7 +376,10 @@ void Controller::process(byte num_messages)
     //
 
     if (_msg.len > 0) {
-      service->handleMessage(opc, &_msg, remoteCANID);
+      for (Service * service : services)
+      {
+        service->handleMessage(opc, &_msg, remoteCANID);
+      }
     } else {
       // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
     }

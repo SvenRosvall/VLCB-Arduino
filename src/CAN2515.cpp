@@ -54,8 +54,7 @@ namespace VLCB
 /// constructor
 //
 
-CAN2515::CAN2515(Controller * controller)
-  : controller(controller)
+CAN2515::CAN2515()
 {
   initMembers();
 }
@@ -154,6 +153,7 @@ bool CAN2515::available(void) {
 
 CANFrame CAN2515::getNextMessage(void) {
 
+  // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
   CANMessage message;       // ACAN2515 frame class
 
   canp->receive(message);
@@ -180,6 +180,7 @@ bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
   // priority defaults to 1011 low/medium
 
+  // DEBUG_SERIAL << F("CAN2515 send message") << endl;
   CANMessage message;       // ACAN2515 frame class
 
   makeHeader(msg, priority);                      // default priority unless user overrides

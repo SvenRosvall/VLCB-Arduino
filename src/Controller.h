@@ -48,6 +48,7 @@
 #include <Transport.h>
 #include "UserInterface.h"
 #include "Service.h"
+#include "initializer_list.h"
 
 namespace VLCB
 {
@@ -95,9 +96,8 @@ class Controller
 {
 
 public:
-  explicit Controller(Service * service);
-  Controller(Configuration *the_config, Service * service);
-  void setTransport(Transport * trpt) { this->transport = trpt; }
+  Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
+  Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
@@ -127,7 +127,6 @@ public:
   void revertSLiM(void);
   void checkModeChangeTimeout();
   void renegotiate(void);
-  void setUI(UserInterface *ui);
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
   void checkCANenum(void);
@@ -141,7 +140,7 @@ private:                                          // protected members become pr
   CANFrame _msg;
   UserInterface *_ui;
   Configuration *module_config;
-  Service * service;
+  std::initializer_list<Service *> services;
   Transport * transport;
 
   unsigned char *_mparams;
