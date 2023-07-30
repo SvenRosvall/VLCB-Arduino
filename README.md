@@ -1,12 +1,16 @@
 <img align="right" src="arduino_cbus_logo.png"  width="150" height="75">
 
 # VLCB-Arduino
-Arduino library for [VLCB](https://github.com/Versatile-LCB/VLCB-documents) running over CAN bus.
+This project implements an Arduino library for [VLCB](https://github.com/Versatile-LCB/VLCB-documents) running over CAN bus.
+VLCB is an extension of [CBUS](https://www.merg.org.uk/resources/cbus).
 
-The code is based on a CBUS library created by Duncan Greenwood.
+This code is based on a [CBUS library](https://github.com/MERG-DEV/CBUS) created by Duncan Greenwood and extended
+by members of [MERG](https://www.merg.org.uk/). 
+See below under Credits.
 
 See [Design documents](docs/Design.md) for how this library is structured.
 
+## Dependencies
 Note that this library depends on a number of other libraries which must also be downloaded and included in the sketch:
 
 * [ACAN2515](https://github.com/pierremolinaro/acan2515) - CAN bus transport using the MCP2515 controller
@@ -14,7 +18,7 @@ Note that this library depends on a number of other libraries which must also be
 
 ## Hardware
 
-Currently supports the MCP2515 and MCP25625 CAN controller ICs via the ACAN2515 library
+Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 library.
 
 ## Credits
 
@@ -26,4 +30,7 @@ Currently supports the MCP2515 and MCP25625 CAN controller ICs via the ACAN2515 
 
 ## License
 
-Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+The code contained in this repository and the executable distributions are licensed under the terms of the
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENCE.md).
+
+If you have questions about licensing this library please contact [license@rosvall.ie](mailto:license@rosvall.ie)
