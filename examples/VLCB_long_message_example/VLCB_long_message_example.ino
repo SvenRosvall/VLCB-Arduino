@@ -68,11 +68,11 @@ const byte LED_YLW = 7;             // VLCB yellow FLiM LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
-VLCB::Configuration modconfig;               // configuration object
-VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::Controller controller(&modconfig, &cbusService); // Controller object
-VLCB::CAN2515 can2515(&controller);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::Configuration modconfig;               // configuration object
+VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::CbusService cbusService;               // service for CBUS op-codes
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &cbusService }); // Controller object
 VLCB::LongMessageController lmsg(&controller);        // Controller RFC0005 long message object
 
 // module name, must be 7 characters, space padded.
@@ -120,9 +120,6 @@ void setupVLCB() {
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
-
-  // set VLCB UI and assign to Controller
-  controller.setUI(&userInterface);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
   if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM) {

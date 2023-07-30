@@ -68,11 +68,11 @@ const byte LED_YLW = 7;             // VLCB yellow FLiM LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
-VLCB::Configuration modconfig;               // configuration object
-VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::Controller controller(&modconfig, &cbusService); // Controller object
-VLCB::CAN2515 can2515(&controller);                  // CAN transport object
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::Configuration modconfig;               // configuration object
+VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::CbusService cbusService;               // service for CBUS op-codes
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &cbusService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
@@ -115,9 +115,6 @@ void setupVLCB() {
   controller.setParams(params.getParams());
   controller.setName(mname);
 
-  // set VLCB UI and assign to Controller
-  controller.setUI(&userInterface);
-
   // module reset - if switch is depressed at startup and module is in SLiM mode
   if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM) {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
@@ -137,7 +134,6 @@ void setupVLCB() {
   can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  controller.setTransport(&can2515);
   if (!can2515.begin()) {
     Serial << F("> error starting VLCB") << endl;
   }
