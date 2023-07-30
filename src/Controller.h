@@ -56,7 +56,6 @@ const int LONG_MESSAGE_DEFAULT_DELAY = 20;      // delay in milliseconds between
 const int LONG_MESSAGE_RECEIVE_TIMEOUT = 5000;  // timeout waiting for next long message packet
 const int NUM_EX_CONTEXTS = 4;                  // number of send and receive contexts for extended implementation = number of concurrent messages
 const int EX_BUFFER_LEN = 64;                   // size of extended send and receive buffers
-const int OPC_DTXC = 0xe9;                      // temp opcode for Controller long message
 
 //
 /// Controller long message status codes
