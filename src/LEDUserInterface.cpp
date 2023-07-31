@@ -21,6 +21,12 @@ void LEDUserInterface::run()
   pushButton.run();
   greenLed.run();
   yellowLed.run();
+
+  if (resetRequested())
+  {
+    //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
+    indicateMode(MODE_CHANGING);
+  }
 }
 
 void LEDUserInterface::indicateResetting()

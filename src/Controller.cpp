@@ -136,7 +136,7 @@ bool Controller::isRTR(CANFrame *amsg) {
 /// if in FLiM mode, initiate a CAN ID enumeration cycle
 //
 
-void Controller::CANenumeration(void) {
+void Controller::startCANenumeration(void) {
 
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
@@ -179,7 +179,7 @@ void Controller::setFLiM() {
   indicateMode(MODE_FLIM);
 
   // enumerate the CAN bus to allocate a free CAN ID
-  CANenumeration();
+  startCANenumeration();
 }
 
 //
@@ -255,29 +255,20 @@ void Controller::indicateActivity()
 
 void Controller::process(byte num_messages)
 {
-  // start bus enumeration if required
-  if (enumeration_required) {
+  // TODO: Move to CanService
+  if (enumeration_required)
+  {
     enumeration_required = false;
-    CANenumeration();
+    startCANenumeration();
   }
 
   // process switch operations if the module is configured with one
 
   if (_ui)
   {
-    // allow LEDs and switch to update
     _ui->run();
 
-    //
-    /// use LEDs to indicate that the user can release the switch
-    //
-
-    if (_ui->resetRequested()) {
-      //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
-      indicateMode(MODE_CHANGING);
-    }
-
-    performRequestedUserAction();
+    performRequestedUserAction(_ui->checkRequestedAction());
   }
 
   // get received CAN frames from buffer
@@ -288,17 +279,17 @@ void Controller::process(byte num_messages)
     // at least one CAN frame is available in the reception buffer
     // retrieve the next one
 
-    // memset(&_msg, 0, sizeof(CANFrame));
     _msg = transport->getNextMessage();
 
-    unsigned int opc = _msg.data[0];
+    // TODO: Move to CanService
     byte remoteCANID = getCANID(_msg.id);
 
-    callFrameHandler(opc, &_msg);
+    callFrameHandler(&_msg);
 
     indicateActivity();
 
     // is this a CANID enumeration request from another node (RTR set) ?
+    // TODO: Move to CanService
     if (_msg.rtr) {
       // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
       // send an empty message to show our CANID
@@ -311,7 +302,7 @@ void Controller::process(byte num_messages)
     /// set flag if we find a CANID conflict with the frame's producer
     /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
     //
-
+    // TODO: Move to CanService
     if (remoteCANID == module_config->CANID && _msg.len > 0) {
       // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
       enumeration_required = true;
@@ -324,6 +315,7 @@ void Controller::process(byte num_messages)
     }
 
     // are we enumerating CANIDs ?
+    // TODO: Move to CanService
     if (bCANenum && _msg.len == 0) {
 
       // store this response in the responses array
@@ -341,7 +333,9 @@ void Controller::process(byte num_messages)
     /// if we got this far, it's a standard CAN frame (not extended, not RTR) with a data payload length > 0
     //
 
-    if (_msg.len > 0) {
+    if (_msg.len > 0) 
+    {
+      unsigned int opc = _msg.data[0];
       for (Service * service : services)
       {
         service->handleMessage(opc, &_msg, remoteCANID);
@@ -351,8 +345,9 @@ void Controller::process(byte num_messages)
     }
   }  // while messages available
 
-  // check CAN bus enumeration timer
-  checkCANenum();
+  // TODO: Move to CanService
+  checkCANenumTimout();
+
   checkModeChangeTimeout();
 
   // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
@@ -362,13 +357,8 @@ void Controller::process(byte num_messages)
   //
 }
 
-void Controller::performRequestedUserAction()
+void Controller::performRequestedUserAction(UserInterface::RequestedAction requestedAction)
 {
-  //
-  /// handle switch state changes
-  //
-
-  UserInterface::RequestedAction requestedAction = _ui->checkRequestedAction();
   switch (requestedAction)
   {
     case UserInterface::CHANGE_MODE:
@@ -390,7 +380,7 @@ void Controller::performRequestedUserAction()
       //Serial << "Controller::process() - enumerate" << endl;
       if (module_config->currentMode)
       {
-        CANenumeration();
+        startCANenumeration();
       }
       break;
 
@@ -400,25 +390,35 @@ void Controller::performRequestedUserAction()
   }
 }
 
-void Controller::callFrameHandler(unsigned int opc, CANFrame *msg)
+// Return true if framehandler shall be called for registered opcodes, if any.
+bool Controller::filterByOpcodes(const CANFrame *msg) const
 {
-  if (framehandler != NULL) {
-
-    // check if incoming opcode is in the user list, if list length > 0
-    if (_num_opcodes > 0) {
-      for (byte i = 0; i < _num_opcodes; i++) {
-        if (opc == _opcodes[i]) {
-          (void)(*framehandler)(msg);
-          break;
-        }
+  if (_num_opcodes == 0) {
+    return true;
+  }
+  if (msg->len > 0) {
+    unsigned int opc = msg->data[0];
+    for (byte i = 0; i < _num_opcodes; i++) {
+      if (opc == _opcodes[i]) {
+        return true;
       }
-    } else {
+    }
+  }
+  return false;
+}
+
+void Controller::callFrameHandler(CANFrame *msg)
+{
+  if (framehandler != NULL)
+  {
+    if (filterByOpcodes(msg))
+    {
       (void)(*framehandler)(msg);
     }
   }
 }
 
-void Controller::checkCANenum(void)
+void Controller::checkCANenumTimout(void)
 {
   //
   /// check the 100ms CAN enumeration cycle timer

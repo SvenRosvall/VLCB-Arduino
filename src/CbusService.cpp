@@ -175,7 +175,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
     if (nn == controller->module_config->nodeNum && remoteCANID != controller->module_config->CANID && !controller->bCANenum) {
       // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-      controller->CANenumeration();
+      controller->startCANenumeration();
     }
 
     break;

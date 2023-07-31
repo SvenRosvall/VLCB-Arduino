@@ -115,7 +115,7 @@ public:
 
   bool sendWRACK(void);
   bool sendCMDERR(byte cerrno);
-  void CANenumeration(void);
+  void startCANenumeration(void);
   byte getCANID(unsigned long header);
   byte getModuleCANID() { return module_config->CANID; }
   bool isExt(CANFrame *msg);
@@ -129,7 +129,7 @@ public:
   void renegotiate(void);
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
-  void checkCANenum(void);
+  void checkCANenumTimout(void);
   void indicateMode(byte mode);
   void indicateActivity();
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
@@ -155,8 +155,9 @@ private:                                          // protected members become pr
 
   LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
 
-  void callFrameHandler(unsigned int opc, CANFrame *msg);
-  void performRequestedUserAction();
+  bool filterByOpcodes(const CANFrame *msg) const;
+  void callFrameHandler(CANFrame *msg);
+  void performRequestedUserAction(UserInterface::RequestedAction requestedAction);
   byte findFreeCanId();
 
   // Quick way to access necessary stuff when migrating to services.
