@@ -28,7 +28,7 @@ readBytesEEPROM
 writeEEPROM
 writeBytesEEPROM
 resetEEPROM
-resetModule(void)
+resetModule
 
 Functions that depend on controlling macros
 setChipEEPROMVal

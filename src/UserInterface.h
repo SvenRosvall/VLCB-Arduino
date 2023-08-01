@@ -7,7 +7,8 @@ class UserInterface
 {
 public:
 
-  enum RequestedAction {
+  enum RequestedAction
+  {
     NONE,
     CHANGE_MODE,
     RENEGOTIATE,

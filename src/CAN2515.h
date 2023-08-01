@@ -61,8 +61,8 @@ static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency
 /// to support the MCP2515/25625 CAN controllers
 //
 
-class CAN2515 : public Transport {
-
+class CAN2515 : public Transport
+{
 public:
 
   CAN2515();
@@ -74,15 +74,15 @@ public:
 #else
   bool begin(bool poll = false, SPIClass spi = SPI);
 #endif
-  bool available(void);
-  CANFrame getNextMessage(void);
+  bool available();
+  CANFrame getNextMessage();
   bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);    // note default arguments
-  void reset(void);
+  void reset();
 
   // these methods are specific to this implementation
   // they are not declared or implemented by the Transport interface class
   void setNumBuffers(byte num_rx_buffers, byte num_tx_buffers = 0);      // note default arg
-  void printStatus(void);
+  void printStatus();
   void setOscFreq(unsigned long freq);
 
 #ifdef ARDUINO_ARCH_RP2040

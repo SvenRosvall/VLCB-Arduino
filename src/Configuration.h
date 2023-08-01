@@ -63,21 +63,21 @@ enum ModuleMode {
 /// a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc
 //
 
-class Configuration {
-
+class Configuration
+{
 public:
   Configuration();
   explicit Configuration(Storage * theStorage);
-  void begin(void);
+  void begin();
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
-  byte findEventSpace(void);
+  byte findEventSpace();
 
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex);
-  byte numEvents(void);
+  byte numEvents();
   void updateEvHashEntry(byte idx);
-  void clearEvHashTable(void);
+  void clearEvHashTable();
   byte getEventEVval(byte idx, byte evnum);
   void writeEventEV(byte idx, byte evnum, byte evval);
 
@@ -88,15 +88,15 @@ public:
   void writeEvent(byte index, byte data[]);
   void cleareventEEPROM(byte index);
   void resetModule(UserInterface * ui);
-  void resetModule(void);
+  void resetModule();
 
   void setCANID(byte canid);
   void setModuleMode(ModuleMode m);
   void setNodeNum(unsigned int nn);
 
-  void setResetFlag(void);
-  void clearResetFlag(void);
-  bool isResetFlagSet(void);
+  void setResetFlag();
+  void clearResetFlag();
+  bool isResetFlagSet();
 
   unsigned int EE_EVENTS_START;
   byte EE_MAX_EVENTS;
@@ -110,8 +110,8 @@ public:
   unsigned int nodeNum;
 
   // These functions shouldn't be here. But keep them for now.
-  unsigned int freeSRAM(void);
-  void reboot(void);
+  unsigned int freeSRAM();
+  void reboot();
 
 private:
   Storage * storage;
@@ -120,10 +120,10 @@ private:
 private:
   byte makeHash(byte tarr[]);
   void getEvArray(byte idx);
-  void makeEvHashTable(void);
-  bool check_hash_collisions(void);
+  void makeEvHashTable();
+  bool check_hash_collisions();
 
-  void loadNVs(void);
+  void loadNVs();
 
   byte *evhashtbl;
   bool hash_collision;

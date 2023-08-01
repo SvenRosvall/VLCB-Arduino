@@ -35,7 +35,6 @@ Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_li
 /// construct a Controller object with a Configuration object that the user provides.
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
-
 Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services)
   : _ui(ui)
   , module_config(conf)
@@ -60,8 +59,8 @@ Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt
 /// register the user handler for CAN frames
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
-
-void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes) {
+void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes)
+{
   framehandler = fptr;
   _opcodes = opcodes;
   _num_opcodes = num_opcodes;
@@ -70,74 +69,66 @@ void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], by
 //
 /// assign the module parameter set
 //
-
-void Controller::setParams(unsigned char *mparams) {
+void Controller::setParams(unsigned char *mparams)
+{
   _mparams = mparams;
 }
 
 //
 /// assign the module name
 //
-
-void Controller::setName(unsigned char *mname) {
+void Controller::setName(unsigned char *mname)
+{
   _mname = mname;
 }
 
 //
 /// extract CANID from CAN frame header
 //
-
-inline byte Controller::getCANID(unsigned long header) {
-
+inline byte Controller::getCANID(unsigned long header)
+{
   return header & 0x7f;
 }
 
 //
 /// send a WRACK (write acknowledge) message
 //
-
-bool Controller::sendWRACK(void) {
-
+bool Controller::sendWRACK()
+{
   // send a write acknowledgement response
-
   return sendMessageWithNN(OPC_WRACK);
 }
 
 //
 /// send a CMDERR (command error) message
 //
-
-bool Controller::sendCMDERR(byte cerrno) {
-
+bool Controller::sendCMDERR(byte cerrno)
+{
   // send a command error response
-
   return sendMessageWithNN(OPC_CMDERR, cerrno);
 }
 
 //
 /// is this an Extended CAN frame ?
 //
-
-bool Controller::isExt(CANFrame *amsg) {
-
+bool Controller::isExt(CANFrame *amsg)
+{
   return (amsg->ext);
 }
 
 //
 /// is this a Remote frame ?
 //
-
-bool Controller::isRTR(CANFrame *amsg) {
-
+bool Controller::isRTR(CANFrame *amsg)
+{
   return (amsg->rtr);
 }
 
 //
 /// if in FLiM mode, initiate a CAN ID enumeration cycle
 //
-
-void Controller::startCANenumeration(void) {
-
+void Controller::startCANenumeration()
+{
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
   // DEBUG_SERIAL << F("> beginning self-enumeration cycle") << endl;
@@ -157,8 +148,8 @@ void Controller::startCANenumeration(void) {
 //
 /// initiate the transition from SLiM to FLiM mode
 //
-void Controller::initFLiM(void) {
-
+void Controller::initFLiM()
+{
   // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
 
   indicateMode(MODE_CHANGING);
@@ -172,7 +163,8 @@ void Controller::initFLiM(void) {
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
 }
 
-void Controller::setFLiM() {
+void Controller::setFLiM()
+{
   // DEBUG_SERIAL << F("> set FLiM") << endl;
   bModeChanging = false;
   module_config->setModuleMode(MODE_FLIM);
@@ -185,8 +177,8 @@ void Controller::setFLiM() {
 //
 /// set module to SLiM mode
 //
-void Controller::setSLiM(void) {
-
+void Controller::setSLiM()
+{
   // DEBUG_SERIAL << F("> set SLiM") << endl;
   bModeChanging = false;
   module_config->setNodeNum(0);
@@ -199,7 +191,8 @@ void Controller::setSLiM(void) {
 //
 /// revert from FLiM to SLiM mode
 //
-void Controller::revertSLiM(void) {
+void Controller::revertSLiM()
+{
 
   // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
 
@@ -227,8 +220,8 @@ void Controller::checkModeChangeTimeout()
 /// change or re-confirm node number
 //
 
-void Controller::renegotiate(void) {
-
+void Controller::renegotiate()
+{
   initFLiM();
 }
 
@@ -236,8 +229,8 @@ void Controller::renegotiate(void) {
 /// set the Controller LEDs to indicate the current mode
 //
 
-void Controller::indicateMode(byte mode) {
-
+void Controller::indicateMode(byte mode)
+{
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) {
     _ui->indicateMode(mode);
@@ -251,8 +244,9 @@ void Controller::indicateActivity()
   }
 }
 
+//
 /// main Controller message processing procedure
-
+//
 void Controller::process(byte num_messages)
 {
   // TODO: Move to CanService
@@ -290,7 +284,8 @@ void Controller::process(byte num_messages)
 
     // is this a CANID enumeration request from another node (RTR set) ?
     // TODO: Move to CanService
-    if (_msg.rtr) {
+    if (_msg.rtr)
+    {
       // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
       // send an empty message to show our CANID
       _msg.len = 0;
@@ -303,23 +298,27 @@ void Controller::process(byte num_messages)
     /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
     //
     // TODO: Move to CanService
-    if (remoteCANID == module_config->CANID && _msg.len > 0) {
+    if (remoteCANID == module_config->CANID && _msg.len > 0)
+    {
       // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
       enumeration_required = true;
     }
 
     // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-    if (_msg.ext) {
+    if (_msg.ext)
+    {
       // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
       continue;
     }
 
     // are we enumerating CANIDs ?
     // TODO: Move to CanService
-    if (bCANenum && _msg.len == 0) {
+    if (bCANenum && _msg.len == 0)
+    {
 
       // store this response in the responses array
-      if (remoteCANID > 0) {
+      if (remoteCANID > 0)
+      {
         // fix to correctly record the received CANID
         bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
         // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
@@ -367,9 +366,12 @@ void Controller::performRequestedUserAction(UserInterface::RequestedAction reque
     case UserInterface::CHANGE_MODE:
       // initiate mode change
       //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
-      if (!module_config->currentMode) {
+      if (!module_config->currentMode)
+      {
         initFLiM();
-      } else {
+      }
+      else
+      {
         revertSLiM();
       }
       break;
@@ -396,13 +398,17 @@ void Controller::performRequestedUserAction(UserInterface::RequestedAction reque
 // Return true if framehandler shall be called for registered opcodes, if any.
 bool Controller::filterByOpcodes(const CANFrame *msg) const
 {
-  if (_num_opcodes == 0) {
+  if (_num_opcodes == 0)
+  {
     return true;
   }
-  if (msg->len > 0) {
+  if (msg->len > 0)
+  {
     unsigned int opc = msg->data[0];
-    for (byte i = 0; i < _num_opcodes; i++) {
-      if (opc == _opcodes[i]) {
+    for (byte i = 0; i < _num_opcodes; i++)
+    {
+      if (opc == _opcodes[i])
+      {
         return true;
       }
     }
@@ -421,7 +427,7 @@ void Controller::callFrameHandler(CANFrame *msg)
   }
 }
 
-void Controller::checkCANenumTimout(void)
+void Controller::checkCANenumTimout()
 {
   //
   /// check the 100ms CAN enumeration cycle timer
@@ -451,23 +457,25 @@ void Controller::checkCANenumTimout(void)
 byte Controller::findFreeCanId()
 {
   // iterate through the 128 bit field
-  for (byte i = 0; i < 16; i++) {
-
+  for (byte i = 0; i < 16; i++)
+  {
     // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
-    if (enum_responses[i] == 0xff) {
+    if (enum_responses[i] == 0xff)
+    {
       continue;
     }
 
     // for each bit in the byte
-    for (byte b = 0; b < 8; b++) {
-
+    for (byte b = 0; b < 8; b++)
+    {
       // ignore first bit of first byte -- CAN ID zero is not used for nodes
       if (i == 0 && b == 0) {
         continue;
       }
 
       // if the bit is not set
-      if (bitRead(enum_responses[i], b) == 0) {
+      if (bitRead(enum_responses[i], b) == 0)
+      {
         byte selected_id = ((i * 16) + b);
         // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
         return selected_id;
@@ -478,17 +486,14 @@ byte Controller::findFreeCanId()
   return 1;     // default if no responses from other modules
 }
 
-//
-/// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
-//
-
 void setNN(CANFrame *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);
   msg->data[2] = lowByte(nn);
 }
 
-bool Controller::sendMessageWithNN(int opc) {
+bool Controller::sendMessageWithNN(int opc)
+{
   CANFrame msg;
   msg.len = 3;
   msg.data[0] = opc;
@@ -496,7 +501,8 @@ bool Controller::sendMessageWithNN(int opc) {
   return sendMessage(&msg);
 }
 
-bool Controller::sendMessageWithNN(int opc, byte b1) {
+bool Controller::sendMessageWithNN(int opc, byte b1)
+{
   CANFrame msg;
   msg.len = 4;
   msg.data[0] = opc;
@@ -505,7 +511,8 @@ bool Controller::sendMessageWithNN(int opc, byte b1) {
   return sendMessage(&msg);
 }
 
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2) {
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2)
+{
   CANFrame msg;
   msg.len = 5;
   msg.data[0] = opc;
@@ -515,7 +522,8 @@ bool Controller::sendMessageWithNN(int opc, byte b1, byte b2) {
   return sendMessage(&msg);
 }
 
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3) {
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
+{
   CANFrame msg;
   msg.len = 6;
   msg.data[0] = opc;

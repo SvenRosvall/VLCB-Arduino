@@ -56,54 +56,47 @@ LED::LED()
 }
 
 //  set the pin for this LED
-
-void LED::setPin(byte pin) {
-
+void LED::setPin(byte pin)
+{
   _pin = pin;
   pinMode(_pin, OUTPUT);
 }
 
 // return the current state, on or off
-
-bool LED::getState() {
-
+bool LED::getState()
+{
   return _state;
 }
 
 // turn LED state on
-
-void LED::on(void) {
-
+void LED::on()
+{
   _state = HIGH;
   _blink = false;
 }
 
 // turn LED state off
-
-void LED::off(void) {
-
+void LED::off()
+{
   _state = LOW;
   _blink = false;
 }
 
 // toggle LED state from on to off or vv
-
-void LED::toggle(void) {
-
+void LED::toggle()
+{
   _state = !_state;
 }
 
 // blink LED
-
-void LED::blink() {
-
+void LED::blink()
+{
   _blink = true;
 }
 
 // pulse the LED
-
-void LED::pulse() {
-
+void LED::pulse()
+{
   _pulse = true;
   _pulseStart = millis();
   run();
@@ -111,21 +104,23 @@ void LED::pulse() {
 
 // actually operate the LED dependent upon its current state
 // must be called frequently from loop() if the LED is set to blink or pulse
-
-void LED::run() {
-
-  if (_blink) {
-
+void LED::run()
+{
+  if (_blink)
+  {
     // blinking
-    if ((millis() - _lastTime) >= BLINK_RATE) {
+    if ((millis() - _lastTime) >= BLINK_RATE)
+    {
       toggle();
       _lastTime = millis();
     }
   }
 
   // single pulse
-  if (_pulse) {
-    if (millis() - _pulseStart >= PULSE_ON_TIME) {
+  if (_pulse)
+  {
+    if (millis() - _pulseStart >= PULSE_ON_TIME)
+    {
       _pulse = false;
     }
   }
@@ -134,9 +129,8 @@ void LED::run() {
 }
 
 // write to the physical pin
-
-void LED::_write(byte pin, bool state) {
-
+void LED::_write(byte pin, bool state)
+{
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
   digitalWrite(pin, state);
 }

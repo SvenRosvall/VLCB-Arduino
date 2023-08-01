@@ -68,13 +68,10 @@ public:
 };
 
 //
-/// an abstract class to encapsulate CAN bus and Controller processing
-/// it must be implemented by a derived subclass
+/// Main object in VLCB. Coordinates transport, ui, configuration and services.
 //
-
 class Controller
 {
-
 public:
   Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
   Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
@@ -93,23 +90,23 @@ public:
 
   // implementations of these methods are provided in the base class
 
-  bool sendWRACK(void);
+  bool sendWRACK();
   bool sendCMDERR(byte cerrno);
-  void startCANenumeration(void);
+  void startCANenumeration();
   byte getCANID(unsigned long header);
   byte getModuleCANID() { return module_config->CANID; }
   bool isExt(CANFrame *msg);
   bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
-  void initFLiM(void);
+  void initFLiM();
   void setFLiM();
-  void setSLiM(void);
-  void revertSLiM(void);
+  void setSLiM();
+  void revertSLiM();
   void checkModeChangeTimeout();
-  void renegotiate(void);
+  void renegotiate();
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
-  void checkCANenumTimout(void);
+  void checkCANenumTimout();
   void indicateMode(byte mode);
   void indicateActivity();
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);

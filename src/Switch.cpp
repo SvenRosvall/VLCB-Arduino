@@ -49,14 +49,16 @@ Switch::Switch(byte pin, byte pressedState)
   : _pin(pin), _pressedState(pressedState)
 {
   if (_pressedState == LOW)
+  {
     pinMode(_pin, INPUT_PULLUP);
+  }
 
   reset();
   _currentState = readPin(_pin);
 }
 
-void Switch::reset(void) {
-
+void Switch::reset()
+{
   _lastState = !_pressedState;
   _stateChanged = false;
   _lastStateChangeTime = 0UL;
@@ -65,21 +67,21 @@ void Switch::reset(void) {
   _prevStateDuration = 0UL;
 }
 
-byte Switch::readPin(byte pin) {
-
+byte Switch::readPin(byte pin)
+{
   return digitalRead(pin);
 }
 
-void Switch::run(void) {
-
+void Switch::run()
+{
   // check for state change
 
   // read the pin
   _currentState = readPin(_pin);
 
   // has state changed ?
-  if (_currentState != _lastState) {
-
+  if (_currentState != _lastState)
+  {
     // yes - state has changed since last call to this method
     // DEBUG_SERIAL << endl << F("  -- switch state has changed state from ") << _lastState << " to " << _currentState << endl;
     // DEBUG_SERIAL << F("  -- last state change at ") << _lastStateChangeTime << ", diff = " << millis() - _lastStateChangeTime << endl;
@@ -90,9 +92,12 @@ void Switch::run(void) {
     _lastStateChangeTime = millis();
     _stateChanged = true;
 
-    if (_currentState == _pressedState) {
+    if (_currentState == _pressedState)
+    {
       // DEBUG_SERIAL << F("  -- switch has been pressed") << endl;
-    } else {
+    }
+    else
+    {
       // DEBUG_SERIAL << F("  -- switch has been released") << endl;
 
       // double-click detection
@@ -104,58 +109,58 @@ void Switch::run(void) {
       // save release time
       _prevReleaseTime = _lastStateChangeTime;
     }
-
-  } else {
-
+  }
+  else
+  {
     // no -- state has not changed
     _stateChanged = false;
   }
 }
 
-bool Switch::stateChanged(void) {
-
+bool Switch::stateChanged()
+{
   // has switch state changed ?
   // DEBUG_SERIAL << F("  -- switch state changed = ") << _stateChanged << endl;
   return _stateChanged;
 }
 
-bool Switch::getState(void) {
-
+bool Switch::getState()
+{
   // return the current switch state read
   // DEBUG_SERIAL << F("  -- switch state = ") << _currentState << endl;
   return _currentState;
 }
 
-bool Switch::isPressed(void) {
-
+bool Switch::isPressed()
+{
   // is the switch pressed ?
   // DEBUG_SERIAL << F("  -- switch pressed ? = ") << (_currentState == _pressedState) << endl;
   return (_currentState == _pressedState);
 }
 
-unsigned long Switch::getCurrentStateDuration(void) {
-
+unsigned long Switch::getCurrentStateDuration()
+{
   // how long has the switch been in its current state ?
   // DEBUG_SERIAL << F("  -- current state duration = ") << (millis() - _lastStateChangeTime) << endl;
   return (millis() - _lastStateChangeTime);
 }
 
-unsigned long Switch::getLastStateDuration(void) {
-
+unsigned long Switch::getLastStateDuration()
+{
   // how long was the last state active for ?
   // DEBUG_SERIAL << F("  -- last state duration = ") << _lastStateDuration << endl;
   return _lastStateDuration;
 }
 
-unsigned long Switch::getLastStateChangeTime(void) {
-
+unsigned long Switch::getLastStateChangeTime()
+{
   // when was the last state change ?
   // DEBUG_SERIAL << F("  -- last state change at ") << _lastStateChangeTime << endl;
   return _lastStateChangeTime;
 }
 
-void Switch::resetCurrentDuration(void) {
-
+void Switch::resetCurrentDuration()
+{
   // reset the state duration counter
   _lastStateChangeTime = millis();
 }

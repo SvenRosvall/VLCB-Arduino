@@ -85,15 +85,15 @@ unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
 void eventhandler(byte, VLCB::CANFrame *);
-void processSerialInput(void);
-void printConfig(void);
-void processModuleSwitchChange(void);
+void processSerialInput();
+void printConfig();
+void processModuleSwitchChange();
 
 //
 /// setup VLCB - runs once at power on from setup()
 //
-void setupVLCB() {
-
+void setupVLCB()
+{
   // set config layout parameters
   modconfig.EE_NVS_START = 10;
   modconfig.EE_NUM_NVS = 10;
@@ -122,13 +122,15 @@ void setupVLCB() {
   controller.setName(mname);
 
   // module reset - if switch is depressed at startup and module is in SLiM mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM) {
+  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM)
+  {
     Serial << F("> switch was pressed at startup in SLiM mode") << endl;
     modconfig.resetModule(&userInterface);
   }
 
   // opportunity to set default NVs after module reset
-  if (modconfig.isResetFlagSet()) {
+  if (modconfig.isResetFlagSet())
+  {
     Serial << F("> module has been reset") << endl;
     modconfig.clearResetFlag();
   }
@@ -143,7 +145,8 @@ void setupVLCB() {
   can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  if (!can2515.begin()) {
+  if (!can2515.begin())
+  {
     Serial << F("> error starting VLCB") << endl;
   }
 }
@@ -151,9 +154,8 @@ void setupVLCB() {
 //
 /// setup - runs once at power on
 //
-
-void setup() {
-
+void setup()
+{
   Serial.begin (115200);
   Serial << endl << endl << F("> ** VLCB 1 in 1 out v1 ** ") << __FILE__ << endl;
 
@@ -166,52 +168,48 @@ void setup() {
 //
 /// loop - runs forever
 //
-
-void loop() {
-
+void loop()
+{
   //
   /// do VLCB message, switch and LED processing
   //
-
   controller.process();
 
   //
   /// process console commands
   //
-
   processSerialInput();
 
   //
   /// give the switch and LED code some time to run
   //
-
   moduleSwitch.run();
   moduleLED.run();
 
   //
   /// Check if smich changed and do any processing for this change.
   //
-
   processModuleSwitchChange();
 
   //
   /// check CAN message buffers
   //
-
-  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize()) {
+  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize())
+  {
     Serial << F("> receive buffer overflow") << endl;
   }
 
-  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0)) {
+  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0))
+  {
     Serial << F("> transmit buffer overflow") << endl;
   }
 
   //
   /// check CAN bus state
   //
-
   byte s = can2515.canp->errorFlagRegister();
-  if (s != 0) {
+  if (s != 0)
+  {
     Serial << F("> error flag register is non-zero") << endl;
   }
 
@@ -226,16 +224,19 @@ void loop() {
 
 /// you can just watch for this event in FCU or JMRI, or teach it to another VLCB consumer module
 //
-void processModuleSwitchChange() {
-
-  if (moduleSwitch.stateChanged()) {
-
+void processModuleSwitchChange()
+{
+  if (moduleSwitch.stateChanged())
+  {
     byte opc = moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF;
     byte eventNumber = 1;
 
-    if (controller.sendMessageWithNN(opc, 0, eventNumber)) {
+    if (controller.sendMessageWithNN(opc, 0, eventNumber))
+    {
       Serial << F("> sent VLCB message") << endl;
-    } else {
+    }
+    else
+    {
       Serial << F("> error sending VLCB message") << endl;
     }
   }
@@ -246,9 +247,8 @@ void processModuleSwitchChange() {
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-
-void eventhandler(byte index, VLCB::CANFrame *msg) {
-
+void eventhandler(byte index, VLCB::CANFrame *msg)
+{
   // as an example, control an LED
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
@@ -259,16 +259,21 @@ void eventhandler(byte index, VLCB::CANFrame *msg) {
 
   // set the LED according to the opcode of the received event, if the first EV equals 0
   // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
-
-  if (msg->data[0] == OPC_ACON) {
-    if (evval == 0) {
+  if (msg->data[0] == OPC_ACON)
+  {
+    if (evval == 0)
+    {
       Serial << F("> switching the LED on") << endl;
       moduleLED.on();
-    } else if (evval == 1) {
+    }
+    else if (evval == 1)
+    {
       Serial << F("> switching the LED to blink") << endl;
       moduleLED.blink();
     }
-  } else if (msg->data[0] == OPC_ACOF) {
+  }
+  else if (msg->data[0] == OPC_ACOF)
+  {
     Serial << F("> switching the LED off") << endl;
     moduleLED.off();
   }
@@ -277,9 +282,8 @@ void eventhandler(byte index, VLCB::CANFrame *msg) {
 //
 /// print code version config details and copyright notice
 //
-
-void printConfig(void) {
-
+void printConfig()
+{
   // code version
   Serial << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
@@ -291,20 +295,18 @@ void printConfig(void) {
 //
 /// command interpreter for serial console input
 //
-
-void processSerialInput(void) {
-
+void processSerialInput()
+{
   byte uev = 0;
   char msgstr[32], dstr[32];
 
-  if (Serial.available()) {
-
+  if (Serial.available())
+  {
     char c = Serial.read();
 
-    switch (c) {
-
+    switch (c)
+    {
     case 'n':
-
       // node config
       printConfig();
 
@@ -315,13 +317,14 @@ void processSerialInput(void) {
       break;
 
     case 'e':
-
       // EEPROM learned event data table
       Serial << F("> stored events ") << endl;
       Serial << F("  max events = ") << modconfig.EE_MAX_EVENTS << F(" EVs per event = ") << modconfig.EE_NUM_EVS << F(" bytes per event = ") << modconfig.EE_BYTES_PER_EVENT << endl;
 
-      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++) {
-        if (modconfig.getEvTableEntry(j) != 0) {
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
+      {
+        if (modconfig.getEvTableEntry(j) != 0)
+        {
           ++uev;
         }
       }
@@ -331,30 +334,33 @@ void processSerialInput(void) {
 
       Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
 
-      for (byte j = 0; j < (modconfig.EE_NUM_EVS); j++) {
+      for (byte j = 0; j < (modconfig.EE_NUM_EVS); j++)
+      {
         sprintf(dstr, "EV%03d | ", j + 1);
         Serial << dstr;
       }
 
       Serial << F("Hash |") << endl;
-
       Serial << F(" --------------------------------------------------------------") << endl;
 
       // for each event data line
-      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++) {
-
-        if (modconfig.getEvTableEntry(j) != 0) {
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
+      {
+        if (modconfig.getEvTableEntry(j) != 0)
+        {
           sprintf(dstr, "  %03d  | ", j);
           Serial << dstr;
 
           // for each data byte of this event
           byte evarray[4];
           modconfig.readEvent(j, evarray);
-          for (byte e = 0; e < 4; e++) {
+          for (byte e = 0; e < 4; e++)
+          {
             sprintf(dstr, " 0x%02hx | ", evarray[e]);
             Serial << dstr;
           }
-          for (byte ev = 1; ev <= modconfig.EE_NUM_EVS; ev++) {
+          for (byte ev = 1; ev <= modconfig.EE_NUM_EVS; ev++)
+          {
             sprintf(dstr, " 0x%02hx | ", modconfig.getEventEVval(j, ev));
             Serial << dstr;
           }
@@ -370,13 +376,13 @@ void processSerialInput(void) {
 
     // NVs
     case 'v':
-
       // note NVs number from 1, not 0
       Serial << "> Node variables" << endl;
       Serial << F("   NV   Val") << endl;
       Serial << F("  --------------------") << endl;
 
-      for (byte j = 1; j <= modconfig.EE_NUM_NVS; j++) {
+      for (byte j = 1; j <= modconfig.EE_NUM_NVS; j++)
+      {
         byte v = modconfig.readNV(j);
         sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
         Serial << msgstr << endl;
@@ -388,7 +394,6 @@ void processSerialInput(void) {
 
     // CAN bus status
     case 'c':
-
       can2515.printStatus();
       break;
 

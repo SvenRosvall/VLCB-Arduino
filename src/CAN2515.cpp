@@ -53,14 +53,13 @@ namespace VLCB
 //
 /// constructor
 //
-
 CAN2515::CAN2515()
 {
   initMembers();
 }
 
-void CAN2515::initMembers() {
-
+void CAN2515::initMembers()
+{
   _num_rx_buffers = NUM_RX_BUFFS;
   _num_tx_buffers = NUM_TX_BUFFS;
   _csPin = MCP2515_CS;
@@ -72,7 +71,6 @@ void CAN2515::initMembers() {
 /// initialise the CAN controller and buffers, and attach the ISR
 /// default poll arg is set to false, so as not to break existing code
 //
-
 #ifdef ARDUINO_ARCH_RP2040
 bool CAN2515::begin(bool poll, SPIClassRP2040 spi)
 #else
@@ -112,21 +110,27 @@ bool CAN2515::begin(bool poll, SPIClass spi)
 
   // instantiate CAN bus object
   // if in polling mode, the interrupt pin and ISR not used
-  if (_poll) {
+  if (_poll)
+  {
     can = new ACAN2515(_csPin, spi, 255);
     ret = can->begin(settings, NULL);
-  } else {
+  }
+  else
+  {
     can = new ACAN2515(_csPin, spi, _intPin);
-    ret = can->begin(settings, [] {can->isr();});
+    ret = can->begin(settings, [] { can->isr(); });
   }
 
   // save pointer to CAN object so the user can access other parts of the library API
   canp = can;
 
-  if (ret == 0) {
+  if (ret == 0)
+  {
     // DEBUG_SERIAL << F("> CAN controller initialised ok") << endl;
     retval = true;
-  } else {
+  }
+  else
+  {
     // DEBUG_SERIAL << F("> error initialising CAN controller, error code = ") << ret << endl;
   }
 
@@ -136,13 +140,12 @@ bool CAN2515::begin(bool poll, SPIClass spi)
 //
 /// check for unprocessed messages in the buffer
 //
-
-bool CAN2515::available(void) {
-
-  if (_poll) {            // not using interrupts, so poll the interrupt register
+bool CAN2515::available()
+{
+  if (_poll)
+  {            // not using interrupts, so poll the interrupt register
     canp->poll();
   }
-
   return (canp->available());
 }
 
@@ -150,9 +153,8 @@ bool CAN2515::available(void) {
 /// get next unprocessed message from the buffer
 /// must call available first to ensure there is something to get
 //
-
-CANFrame CAN2515::getNextMessage(void) {
-
+CANFrame CAN2515::getNextMessage()
+{
   // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
   CANMessage message;       // ACAN2515 frame class
 
@@ -172,9 +174,8 @@ CANFrame CAN2515::getNextMessage(void) {
 //
 /// send a VLCB message
 //
-
-bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
-
+bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
+{
   // caller must populate the message data
   // this method will create the correct frame header (CAN ID and priority bits)
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
@@ -201,9 +202,8 @@ bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority) {
 //
 /// display the CAN bus status instrumentation
 //
-
-void CAN2515::printStatus(void) {
-
+void CAN2515::printStatus()
+{
   // removed so that no libraries produce serial output
   // can be implemented in user's sketch
 
@@ -219,8 +219,8 @@ void CAN2515::printStatus(void) {
 //
 /// reset the MCP2515 transceiver
 //
-
-void CAN2515::reset(void) {
+void CAN2515::reset()
+{
   canp->end();
   delete canp;
   begin();
@@ -229,7 +229,6 @@ void CAN2515::reset(void) {
 //
 /// set the CS and interrupt pins - option to override defaults
 //
-
 #ifdef ARDUINO_ARCH_RP2040
 void CAN2515::setPins(byte cs_pin, byte int_pin, byte mosi_pin, byte miso_pin, byte sck_pin)
 #else
@@ -251,8 +250,8 @@ void CAN2515::setPins(byte cs_pin, byte int_pin)
 /// set the number of CAN frame receive buffers
 /// this can be tuned according to bus load and available memory
 //
-
-void CAN2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
+void CAN2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers)
+{
   _num_rx_buffers = num_rx_buffers;
   _num_tx_buffers = num_tx_buffers;
 }
@@ -261,8 +260,8 @@ void CAN2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers) {
 /// set the MCP2515 crystal frequency
 /// default is 16MHz but some modules have an 8MHz crystal
 //
-
-void CAN2515::setOscFreq(unsigned long freq) {
+void CAN2515::setOscFreq(unsigned long freq)
+{
   _osc_freq = freq;
 }
 
@@ -272,18 +271,16 @@ void CAN2515::setOscFreq(unsigned long freq) {
 /// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CAN priority) + (7 bits of CAN ID)
 /// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
 //
-
-inline void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
-
+inline void makeHeader_impl(CANFrame *msg, byte id, byte priority)
+{
   msg->id = (priority << 7) + (id & 0x7f);
 }
 
 //
 /// utility method to populate a VLCB message header
 //
-
-void CAN2515::makeHeader(CANFrame *msg, byte priority) {
-
+void CAN2515::makeHeader(CANFrame *msg, byte priority)
+{
   makeHeader_impl(msg, controller->getModuleCANID(), priority);
 }
 

@@ -76,9 +76,8 @@ Configuration::Configuration(Storage * theStorage)
 //
 /// initialise and set default values
 //
-
-void Configuration::begin(void) {
-
+void Configuration::begin()
+{
   EE_BYTES_PER_EVENT = EE_NUM_EVS + 4;
 
   storage->begin();
@@ -87,8 +86,8 @@ void Configuration::begin(void) {
   loadNVs();
 }
 
-void Configuration::setModuleMode(ModuleMode f) {
-
+void Configuration::setModuleMode(ModuleMode f)
+{
   currentMode = f;
   storage->writeEEPROM(0, f);
 }
@@ -96,9 +95,8 @@ void Configuration::setModuleMode(ModuleMode f) {
 //
 /// store the CANID
 //
-
-void Configuration::setCANID(byte canid) {
-
+void Configuration::setCANID(byte canid)
+{
   CANID = canid;
   storage->writeEEPROM(1, canid);
 }
@@ -106,9 +104,8 @@ void Configuration::setCANID(byte canid) {
 //
 /// store the node number
 //
-
-void Configuration::setNodeNum(unsigned int nn) {
-
+void Configuration::setNodeNum(unsigned int nn)
+{
   nodeNum = nn;
   storage->writeEEPROM(2, highByte(nodeNum));
   storage->writeEEPROM(3, lowByte(nodeNum));
@@ -117,9 +114,8 @@ void Configuration::setNodeNum(unsigned int nn) {
 //
 /// lookup an event by node number and event number, using the hash table
 //
-
-byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) {
-
+byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
+{
   byte tarray[4];
   byte tmphash, i, j, matches;
   bool confirmed = false;
@@ -135,39 +131,51 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) {
   tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (i = 0; i < EE_MAX_EVENTS; i++) {
-
-    if (evhashtbl[i] == tmphash) {
-      if (!hash_collision) {
+  for (i = 0; i < EE_MAX_EVENTS; i++)
+  {
+    if (evhashtbl[i] == tmphash)
+    {
+      if (!hash_collision)
+      {
         // NN + EN hash matches and there are no hash collisions in the hash table
-      } else {
+      }
+      else
+      {
         // there is a potential hash collision, so we have to check the slower way
         // first, check if this hash appears in the table more than once
 
         // DEBUG_SERIAL << F("> there are hash collisions") << endl;
 
-        for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++) {
-          if (evhashtbl[j] == tmphash) {
+        for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++)
+        {
+          if (evhashtbl[j] == tmphash)
+          {
             ++matches;
           }
         }
 
-        if (matches > 1) {
+        if (matches > 1)
+        {
           // one or more collisions for this hash exist, so check the very slow way
           // DEBUG_SERIAL << F("> this hash matches = ") << matches << endl;
 
-          for (i = 0; i < EE_MAX_EVENTS; i++) {
-            if (evhashtbl[i] == tmphash) {
+          for (i = 0; i < EE_MAX_EVENTS; i++)
+          {
+            if (evhashtbl[i] == tmphash)
+            {
               // check the EEPROM for a match with the incoming NN and EN
               readEvent(i, tarray);
-              if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en) {
+              if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)
+              {
                 // the stored NN and EN match this event, so no further checking is required
                 confirmed = true;
                 break;
               }
             }
           }
-        } else {
+        }
+        else
+        {
           // no collisions for this specific hash, so no further checking is required
           break;
         }
@@ -179,10 +187,11 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) {
 
   // finally, there may be a collision with an event that we haven't seen before
   // so we still need to check the candidate match to be certain, if we haven't done so already
-
-  if (i < EE_MAX_EVENTS && !confirmed) {
+  if (i < EE_MAX_EVENTS && !confirmed)
+  {
     readEvent(i, tarray);
-    if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)) {
+    if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en))
+    {
       // the stored NN and EN do not match this event
       // DEBUG_SERIAL << F("> hash result does not match stored event") << endl;
       i = EE_MAX_EVENTS;
@@ -197,12 +206,14 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) {
 /// find the first empty EEPROM event slot - the hash table entry == 0
 //
 
-byte Configuration::findEventSpace(void) {
-
+byte Configuration::findEventSpace()
+{
   byte evidx;
 
-  for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++) {
-    if (evhashtbl[evidx] == 0)  {
+  for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++)
+  {
+    if (evhashtbl[evidx] == 0)
+    {
       // DEBUG_SERIAL << F("> found unused location at index = ") << evidx << endl;
       break;
     }
@@ -214,11 +225,9 @@ byte Configuration::findEventSpace(void) {
 //
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
-
-byte Configuration::makeHash(byte tarr[4]) {
-
+byte Configuration::makeHash(byte tarr[4])
+{
   // make a hash from a 4-byte NN + EN event
-
   unsigned int nn = (tarr[0] << 8) + tarr[1];
   unsigned int en = (tarr[2] << 8) + tarr[3];
 
@@ -238,10 +247,11 @@ byte Configuration::makeHash(byte tarr[4]) {
 /// return an existing EEPROM event as a 4-byte array -- NN + EN
 //
 
-void Configuration::readEvent(byte idx, byte tarr[]) {
-
+void Configuration::readEvent(byte idx, byte tarr[])
+{
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
-  for (byte i = 0; i < EE_HASH_BYTES; i++) {
+  for (byte i = 0; i < EE_HASH_BYTES; i++)
+  {
     tarr[i] = storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
   }
 
@@ -251,27 +261,24 @@ void Configuration::readEvent(byte idx, byte tarr[]) {
 //
 /// return an event variable (EV) value given the event table index and EV number
 //
-
-byte Configuration::getEventEVval(byte idx, byte evnum) {
-
+byte Configuration::getEventEVval(byte idx, byte evnum)
+{
   return storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
 }
 
 //
 /// write an event variable
 //
-
-void Configuration::writeEventEV(byte idx, byte evnum, byte evval) {
-
+void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
+{
   storage->writeEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum, evval);
 }
 
 //
 /// re/create the event hash table
 //
-
-void Configuration::makeEvHashTable(void) {
-
+void Configuration::makeEvHashTable()
+{
   byte evarray[4];
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
@@ -279,14 +286,17 @@ void Configuration::makeEvHashTable(void) {
 
   evhashtbl = (byte *)malloc(EE_MAX_EVENTS * sizeof(byte));
 
-  for (byte idx = 0; idx < EE_MAX_EVENTS; idx++) {
-
+  for (byte idx = 0; idx < EE_MAX_EVENTS; idx++)
+  {
     readEvent(idx, evarray);
 
     // empty slots have all four bytes set to 0xff
-    if (memcmp(evarray, unused_entry, 4) == 0) {
+    if (memcmp(evarray, unused_entry, 4) == 0)
+    {
       evhashtbl[idx] = 0;
-    } else {
+    }
+    else
+    {
       evhashtbl[idx] = makeHash(evarray);
     }
   }
@@ -297,9 +307,8 @@ void Configuration::makeEvHashTable(void) {
 //
 /// update a single hash table entry -- after a learn or unlearn
 //
-
-void Configuration::updateEvHashEntry(byte idx) {
-
+void Configuration::updateEvHashEntry(byte idx)
+{
   byte evarray[4];
   const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
 
@@ -307,9 +316,12 @@ void Configuration::updateEvHashEntry(byte idx) {
   readEvent(idx, evarray);
 
   // empty slots have all four bytes set to 0xff
-  if (memcmp(evarray, unused_entry, 4) == 0) {
+  if (memcmp(evarray, unused_entry, 4) == 0)
+  {
     evhashtbl[idx] = 0;
-  } else {
+  }
+  else
+  {
     evhashtbl[idx] = makeHash(evarray);
   }
 
@@ -321,13 +333,13 @@ void Configuration::updateEvHashEntry(byte idx) {
 //
 /// clear the hash table
 //
-
-void Configuration::clearEvHashTable(void) {
-
+void Configuration::clearEvHashTable()
+{
   // zero in the hash table indicates that the corresponding event slot is free
   // DEBUG_SERIAL << F("> clearEvHashTable - clearing hash table") << endl;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++) {
+  for (byte i = 0; i < EE_MAX_EVENTS; i++)
+  {
     evhashtbl[i] = 0;
   }
 
@@ -337,9 +349,8 @@ void Configuration::clearEvHashTable(void) {
 //
 /// print the event hash table
 //
-
-void Configuration::printEvHashTable(bool raw) {
-
+void Configuration::printEvHashTable(bool raw)
+{
   // removed so that no libraries produce serial output
   // can be implemented in user's sketch
   (void)raw;
@@ -363,13 +374,14 @@ void Configuration::printEvHashTable(bool raw) {
 //
 /// return the number of stored events
 //
-
-byte Configuration::numEvents(void) {
-
+byte Configuration::numEvents()
+{
   byte numevents = 0;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-    if (evhashtbl[i] != 0) {
+  for (byte i = 0; i < EE_MAX_EVENTS; i++)
+  {
+    if (evhashtbl[i] != 0)
+    {
       ++numevents;
     }
   }
@@ -380,12 +392,14 @@ byte Configuration::numEvents(void) {
 //
 /// return a single hash table entry by index
 //
-
-byte Configuration::getEvTableEntry(byte tindex) {
-
-  if (tindex < EE_MAX_EVENTS) {
+byte Configuration::getEvTableEntry(byte tindex)
+{
+  if (tindex < EE_MAX_EVENTS)
+  {
     return evhashtbl[tindex];
-  } else {
+  }
+  else
+  {
     return 0;
   }
 }
@@ -394,9 +408,8 @@ byte Configuration::getEvTableEntry(byte tindex) {
 /// read an NV value from EEPROM
 /// note that NVs number from 1, not 0
 //
-
-byte Configuration::readNV(byte idx) {
-
+byte Configuration::readNV(byte idx)
+{
   return (storage->readEEPROM(EE_NVS_START + (idx - 1)));
 }
 
@@ -404,9 +417,8 @@ byte Configuration::readNV(byte idx) {
 /// write an NV value to EEPROM
 /// note that NVs number from 1, not 0
 //
-
-void Configuration::writeNV(byte idx, byte val) {
-
+void Configuration::writeNV(byte idx, byte val)
+{
   storage->writeEEPROM(EE_NVS_START + (idx - 1), val);
 }
 
@@ -418,9 +430,8 @@ void Configuration::writeNV(byte idx, byte val) {
 /// write (or clear) an event to EEPROM
 /// just the first four bytes -- NN and EN
 //
-
-void Configuration::writeEvent(byte index, byte data[]) {
-
+void Configuration::writeEvent(byte index, byte data[])
+{
   int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
   // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
@@ -430,9 +441,8 @@ void Configuration::writeEvent(byte index, byte data[]) {
 //
 /// clear an event from the table
 //
-
-void Configuration::cleareventEEPROM(byte index) {
-
+void Configuration::cleareventEEPROM(byte index)
+{
   byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
 
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
@@ -451,10 +461,10 @@ void Configuration::cleareventEEPROM(byte index) {
 #define AVR_RESET_METHOD 3     // don't use watchdog timer method as it's unreliable on some boards
 #endif
 
-void (*rebootFunc)(void) = 0;  // just causes a jump to address zero - not a full chip reset
+void (*rebootFunc)() = 0;  // just causes a jump to address zero - not a full chip reset
 
-void Configuration::reboot(void) {
-
+void Configuration::reboot()
+{
 #ifdef __AVR__
 
 // for newer AVR Xmega, e.g. AVR-DA
@@ -512,8 +522,8 @@ void Configuration::reboot(void) {
 //
 /// get free RAM
 //
-
-unsigned int Configuration::freeSRAM(void) {
+unsigned int Configuration::freeSRAM()
+{
 #ifdef __AVR__
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
@@ -539,9 +549,8 @@ unsigned int Configuration::freeSRAM(void) {
 //
 /// manually reset the module to factory defaults
 //
-
-void Configuration::resetModule(UserInterface * ui) {
-
+void Configuration::resetModule(UserInterface * ui)
+{
   /// standard implementation of resetModule()
 
   bool bDone;
@@ -556,10 +565,11 @@ void Configuration::resetModule(UserInterface * ui) {
   ui->indicateResetting();
 
   // wait for a further (5 sec) button press -- as a 'safety' mechanism
-  while (!bDone) {
-
+  while (!bDone)
+  {
     // 30 sec timeout
-    if ((millis() - waittime) > 30000) {
+    if ((millis() - waittime) > 30000)
+    {
       // DEBUG_SERIAL << F("> timeout expired, reset not performed") << endl;
       return;
     }
@@ -567,7 +577,8 @@ void Configuration::resetModule(UserInterface * ui) {
     ui->run();
 
     // wait until switch held for a further 5 secs
-    if (ui->resetRequested()) {
+    if (ui->resetRequested())
+    {
       bDone = true;
     }
   }
@@ -578,8 +589,8 @@ void Configuration::resetModule(UserInterface * ui) {
   resetModule();
 }
 
-void Configuration::resetModule(void) {
-
+void Configuration::resetModule()
+{
   /// implementation of resetModule() without VLCB Switch or LEDs
   // uint32_t t = millis();
   // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
@@ -599,7 +610,8 @@ void Configuration::resetModule(void) {
   setResetFlag();        // set reset indicator
 
   // zero NVs (NVs number from one, not zero)
-  for (byte i = 0; i < EE_NUM_NVS; i++) {
+  for (byte i = 0; i < EE_NUM_NVS; i++)
+  {
     writeNV(i + 1, 0);
   }
 
@@ -610,12 +622,10 @@ void Configuration::resetModule(void) {
 }
 
 //
-//
 /// load node identity from EEPROM
 //
-
-void Configuration::loadNVs(void) {
-
+void Configuration::loadNVs()
+{
   currentMode = (ModuleMode) storage->readEEPROM(0);
   CANID =    storage->readEEPROM(1);
   nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
@@ -624,12 +634,14 @@ void Configuration::loadNVs(void) {
 //
 /// check whether there is a collision for any hash in the event hash table
 //
-
-bool Configuration::check_hash_collisions(void) {
-
-  for (byte i = 0; i < EE_MAX_EVENTS - 1; i++) {
-    for (byte j = i + 1; j < EE_MAX_EVENTS; j++) {
-      if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0) {
+bool Configuration::check_hash_collisions()
+{
+  for (byte i = 0; i < EE_MAX_EVENTS - 1; i++)
+  {
+    for (byte j = i + 1; j < EE_MAX_EVENTS; j++)
+    {
+      if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0)
+      {
         // DEBUG_SERIAL << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
         // return when first collision detected
         return true;
@@ -644,20 +656,19 @@ bool Configuration::check_hash_collisions(void) {
 /// a group of methods to get and set the reset flag
 /// the resetModule method writes the value 99 to EEPROM address 5 when a module reset has been performed
 /// this can be tested at module startup for e.g. setting default NVs or creating producer events
-//ƒ
-
-void Configuration::setResetFlag(void) {
-
+//
+void Configuration::setResetFlag()
+{
   storage->writeEEPROM(5, 99);
 }
 
-void Configuration::clearResetFlag(void) {
-
+void Configuration::clearResetFlag()
+{
   storage->writeEEPROM(5, 0);
 }
 
-bool Configuration::isResetFlagSet(void) {
-
+bool Configuration::isResetFlagSet()
+{
   return (storage->readEEPROM(5) == 99);
 }
 

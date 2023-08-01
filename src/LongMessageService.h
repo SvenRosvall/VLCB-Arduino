@@ -39,9 +39,9 @@ public:
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
-  bool process(void);
+  bool process();
   virtual void processReceivedMessageFragment(const CANFrame *frame);
-  bool is_sending(void);
+  bool is_sending();
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
 
@@ -84,17 +84,16 @@ struct send_context_t {
 //
 /// a derived class to extend the base long message class to handle multiple concurrent messages, sending and receiving
 //
-
-class LongMessageServiceEx : public LongMessageService {
-
+class LongMessageServiceEx : public LongMessageService
+{
 public:
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
-  bool process(void);
+  bool process();
   void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
   virtual void processReceivedMessageFragment(const CANFrame *frame);
-  byte is_sending(void);
+  byte is_sending();
   void use_crc(bool use_crc);
 
 private:

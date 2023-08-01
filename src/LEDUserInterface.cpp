@@ -89,26 +89,30 @@ UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
   {
     //Serial << "  state changed to " << pushButton.isPressed() << endl;
     // has switch been released ?
-    if (!pushButton.isPressed()) {
+    if (!pushButton.isPressed())
+    {
 
       // how long was it pressed for ?
       unsigned long press_time = pushButton.getLastStateDuration();
       //Serial << "  button released, pressed for " << pushButton.getLastStateDuration() << endl;
 
       // long hold > 6 secs
-      if (press_time > SW_TR_HOLD) {
+      if (press_time > SW_TR_HOLD)
+      {
         //Serial << "  long press - change mode" << endl;
         return CHANGE_MODE;
       }
 
       // short 1-2 secs
-      if (press_time >= 1000 && press_time < 2000) {
+      if (press_time >= 1000 && press_time < 2000)
+      {
         //Serial << "  medium press - renegotiate" << endl;
         return RENEGOTIATE;
       }
 
       // very short < 0.5 sec
-      if (press_time < 500) {
+      if (press_time < 500)
+      {
         //Serial << "  short press - enumeration" << endl;
         return ENUMERATION;
       }

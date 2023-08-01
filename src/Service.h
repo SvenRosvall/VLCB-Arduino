@@ -8,7 +8,8 @@ namespace VLCB
 class Controller;
 class CANFrame;
 
-enum Processed {
+enum Processed
+{
   NOT_PROCESSED=0,
   PROCESSED=1
 };

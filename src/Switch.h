@@ -48,19 +48,19 @@ namespace VLCB
 
 // non-blocking switch class
 
-class Switch {
-
+class Switch
+{
 public:
   explicit Switch(byte pin, byte pressedState = LOW);
-  void run(void);
-  void reset(void);
-  bool stateChanged(void);
-  bool getState(void);
-  bool isPressed(void);
-  unsigned long getCurrentStateDuration(void);
-  unsigned long getLastStateDuration(void);
-  unsigned long getLastStateChangeTime(void);
-  void resetCurrentDuration(void);
+  void run();
+  void reset();
+  bool stateChanged();
+  bool getState();
+  bool isPressed();
+  unsigned long getCurrentStateDuration();
+  unsigned long getLastStateDuration();
+  unsigned long getLastStateChangeTime();
+  void resetCurrentDuration();
 
 protected:
   byte readPin(byte pin);

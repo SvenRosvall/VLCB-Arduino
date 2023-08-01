@@ -57,9 +57,8 @@ const int PULSE_ON_TIME = 5;
 //
 /// class to encapsulate a non-blocking LED
 //
-
-class LED {
-
+class LED
+{
 public:
   LED();
   explicit LED(byte pin);
