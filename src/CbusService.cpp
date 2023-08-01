@@ -4,9 +4,6 @@
 #include "CbusService.h"
 #include <Controller.h>
 
-// TODO: Included here during refactoring.
-#include <LongMessageService.h>
-
 namespace VLCB {
 
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
@@ -484,13 +481,6 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   // system reset ... this is not what I thought it meant !
   // controller->module_config->reboot();
   // break;
-
-  case OPC_DTXC:
-    // Controller long message
-    if (controller->longMessageHandler != NULL) {
-      controller->longMessageHandler->processReceivedMessageFragment(msg);
-    }
-    break;
 
   default:
     // unknown or unhandled OPC

@@ -479,14 +479,6 @@ byte Controller::findFreeCanId()
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
 
-//
-/// set the long message handler object to receive long message frames
-//
-
-void Controller::setLongMessageHandler(LongMessageController *handler) {
-  longMessageHandler = handler;
-}
-
 void setNN(CANFrame *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);

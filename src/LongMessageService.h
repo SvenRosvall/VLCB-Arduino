@@ -30,13 +30,15 @@ enum {
 /// suitable for small microcontrollers with limited memory
 //
 
-class LongMessageController {
+class LongMessageService : public Service
+{
 
 public:
 
-  explicit LongMessageController(Controller *controller);
+  virtual void setController(Controller *controller) override { this->controller = controller; }
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
+  void handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
   bool process(void);
   virtual void processReceivedMessageFragment(const CANFrame *frame);
   bool is_sending(void);
@@ -83,12 +85,9 @@ struct send_context_t {
 /// a derived class to extend the base long message class to handle multiple concurrent messages, sending and receiving
 //
 
-class LongMessageControllerEx : public LongMessageController {
+class LongMessageServiceEx : public LongMessageService {
 
 public:
-
-  explicit LongMessageControllerEx(Controller *controller)
-          : LongMessageController(controller) {}         // derived class constructor calls the base class constructor
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);

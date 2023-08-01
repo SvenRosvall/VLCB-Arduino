@@ -72,8 +72,6 @@ public:
 /// it must be implemented by a derived subclass
 //
 
-class LongMessageController;      // forward reference
-
 class Controller
 {
 
@@ -116,8 +114,6 @@ public:
   void indicateActivity();
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
-  void setLongMessageHandler(LongMessageController *handler);
-
 private:                                          // protected members become private in derived classes
   CANFrame _msg;
   UserInterface *_ui;
@@ -134,8 +130,6 @@ private:                                          // protected members become pr
   bool bModeChanging, bCANenum, bLearn;
   unsigned long timeOutTimer, CANenumTime;
   bool enumeration_required;
-
-  LongMessageController *longMessageHandler = NULL;       // Controller long message object to receive relevant frames
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);

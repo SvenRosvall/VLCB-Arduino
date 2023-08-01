@@ -52,21 +52,10 @@ uint16_t crc16(uint8_t *data_p, uint16_t length);
 uint32_t crc32(const char *s, size_t n);
 
 //
-/// constructor
-/// receives a pointer to a Controller object which provides the CAN message handling capability
-//
-
-LongMessageController::LongMessageController(Controller *controller) {
-
-  controller = controller;
-	controller->setLongMessageHandler(this);
-}
-
-//
 /// subscribe to a range of stream IDs
 //
 
-void LongMessageController::subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buff_len, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status)) {
+void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buff_len, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status)) {
 
 	_stream_ids = stream_ids;
 	_num_stream_ids = num_stream_ids;
@@ -77,13 +66,27 @@ void LongMessageController::subscribe(byte *stream_ids, const byte num_stream_id
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
+
+void LongMessageService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
+{
+  switch (opc) {
+
+    case OPC_DTXC:
+      processReceivedMessageFragment(msg);
+      break;
+
+    default:
+      break;
+  }
+}
+
 //
 /// initiate sending of a long message
 /// this method sends the first message - the header packet
 /// the remainder of the message is sent in chunks from the process() method
 //
 
-bool LongMessageController::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
+bool LongMessageService::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
 
 	CANFrame frame;
 
@@ -123,7 +126,7 @@ bool LongMessageController::sendLongMessage(const void *msg, const unsigned int 
 /// we use this to send the individual fragments of an outgoing message and check the message receive timeout
 //
 
-bool LongMessageController::process(void) {
+bool LongMessageService::process(void) {
 
 	bool ret = true;
 	byte i;
@@ -173,7 +176,7 @@ bool LongMessageController::process(void) {
 /// this method is called by the main Controller object each time a long Controller message is received (opcode 0xe9)
 //
 
-void LongMessageController::processReceivedMessageFragment(const CANFrame *frame) {
+void LongMessageService::processReceivedMessageFragment(const CANFrame *frame) {
 
 	/// handle a received message fragment
 
@@ -288,7 +291,7 @@ void LongMessageController::processReceivedMessageFragment(const CANFrame *frame
 /// user code must not start a new message until the previous one has been completely sent
 //
 
-bool LongMessageController::is_sending(void) {
+bool LongMessageService::is_sending(void) {
 
 	return (_send_buffer_index < _send_buffer_len);
 }
@@ -297,7 +300,7 @@ bool LongMessageController::is_sending(void) {
 /// send next message fragment
 //
 
-bool LongMessageController::sendMessageFragment(CANFrame * frame, const byte priority) {
+bool LongMessageService::sendMessageFragment(CANFrame * frame, const byte priority) {
 
 	// these are common to all messages
 	frame->len = 8;
@@ -311,7 +314,7 @@ bool LongMessageController::sendMessageFragment(CANFrame * frame, const byte pri
 /// overrides the default value
 //
 
-void LongMessageController::setDelay(byte delay_in_millis) {
+void LongMessageService::setDelay(byte delay_in_millis) {
 
 	_msg_delay = delay_in_millis;
 }
@@ -323,7 +326,7 @@ void LongMessageController::setDelay(byte delay_in_millis) {
 /// overrides the default value
 //
 
-void LongMessageController::setTimeout(unsigned int timeout_in_millis) {
+void LongMessageService::setTimeout(unsigned int timeout_in_millis) {
 
 	_receive_timeout = timeout_in_millis;
 }
@@ -338,7 +341,7 @@ void LongMessageController::setTimeout(unsigned int timeout_in_millis) {
 /// allocate memory for receive and send contexts
 //
 
-bool LongMessageControllerEx::allocateContexts(byte num_receive_contexts, unsigned int receive_buffer_len, byte num_send_contexts) {
+bool LongMessageServiceEx::allocateContexts(byte num_receive_contexts, unsigned int receive_buffer_len, byte num_send_contexts) {
 
 	byte i;
 
@@ -388,7 +391,7 @@ bool LongMessageControllerEx::allocateContexts(byte num_receive_contexts, unsign
 /// the remainder of the message is sent in fragments from the process() method
 //
 
-bool LongMessageControllerEx::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
+bool LongMessageServiceEx::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority) {
 
 	byte i;
 	uint16_t msg_crc = 0;
@@ -453,7 +456,7 @@ bool LongMessageControllerEx::sendLongMessage(const void *msg, const unsigned in
 /// we use this to send the individual fragments of any outgoing messages and check the message receive timeouts
 //
 
-bool LongMessageControllerEx::process(void) {
+bool LongMessageServiceEx::process(void) {
 
 	bool ret = true;
 	byte i;
@@ -518,7 +521,7 @@ bool LongMessageControllerEx::process(void) {
 /// subscribe to a range of stream IDs
 //
 
-void LongMessageControllerEx::subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status)) {
+void LongMessageServiceEx::subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status)) {
 
 	_stream_ids = stream_ids;
 	_num_stream_ids = num_stream_ids;
@@ -532,7 +535,7 @@ void LongMessageControllerEx::subscribe(byte *stream_ids, const byte num_stream_
 /// returns number of streams currently in progress
 //
 
-byte LongMessageControllerEx::is_sending(void) {
+byte LongMessageServiceEx::is_sending(void) {
 
 	byte i, num_streams;
 
@@ -549,7 +552,7 @@ byte LongMessageControllerEx::is_sending(void) {
 /// handle an incoming long message Controller message fragment
 //
 
-void LongMessageControllerEx::processReceivedMessageFragment(const CANFrame *frame) {
+void LongMessageServiceEx::processReceivedMessageFragment(const CANFrame *frame) {
 
 	byte i, j, status;
 	uint16_t tmpcrc = 0;
@@ -669,7 +672,7 @@ void LongMessageControllerEx::processReceivedMessageFragment(const CANFrame *fra
 /// set whether to calculate and compare a CRC of the message
 //
 
-void LongMessageControllerEx::use_crc(bool use_crc) {
+void LongMessageServiceEx::use_crc(bool use_crc) {
 
 	_use_crc = use_crc;
 }

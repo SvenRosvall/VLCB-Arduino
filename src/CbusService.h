@@ -11,7 +11,7 @@ namespace VLCB {
 class CbusService : public Service
 {
 public:
-  virtual void setController(Controller *controller) { this->controller = controller; }
+  virtual void setController(Controller *controller) override { this->controller = controller; }
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   virtual void handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
