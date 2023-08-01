@@ -4,6 +4,9 @@
 #include "CbusService.h"
 #include <Controller.h>
 
+// TODO: Included here during refactoring.
+#include <LongMessageService.h>
+
 namespace VLCB {
 
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {

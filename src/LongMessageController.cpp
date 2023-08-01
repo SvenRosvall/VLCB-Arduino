@@ -41,6 +41,7 @@
 /// Developed by Duncan Greenwood (M5767)
 //
 
+#include <LongMessageService.h>
 #include <Controller.h>
 #include <Streaming.h>
 
