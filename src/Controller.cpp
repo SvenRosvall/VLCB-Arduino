@@ -338,7 +338,10 @@ void Controller::process(byte num_messages)
       unsigned int opc = _msg.data[0];
       for (Service * service : services)
       {
-        service->handleMessage(opc, &_msg, remoteCANID);
+        if (service->handleMessage(opc, &_msg, remoteCANID) == PROCESSED)
+        {
+          break;
+        }
       }
     } else {
       // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;

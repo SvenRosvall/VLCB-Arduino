@@ -67,16 +67,16 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 }
 
 
-void LongMessageService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
+Processed LongMessageService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
 {
   switch (opc) {
 
     case OPC_DTXC:
       processReceivedMessageFragment(msg);
-      break;
+      return PROCESSED;
 
     default:
-      break;
+      return NOT_PROCESSED;
   }
 }
 

@@ -17,7 +17,7 @@ public:
   virtual void setController(Controller *controller) override;
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
-  virtual void handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
+  virtual Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
 
 private:
   Controller * controller;

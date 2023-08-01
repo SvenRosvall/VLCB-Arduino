@@ -38,7 +38,7 @@ void CbusService::processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned
   }
 }
 
-void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
+Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
@@ -63,7 +63,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       processAccessoryEvent(msg, nn, en, (opc % 2 == 0));
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_ASON:
   case OPC_ASON1:
@@ -80,7 +80,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       processAccessoryEvent(msg, 0, en, (opc % 2 == 0));
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_RQNP:
     // RQNP message - request for node paramters -- does not contain a NN or EN, so only respond if we
@@ -106,7 +106,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendMessage(msg);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_RQNPN:
     // RQNPN message -- request parameter by index number
@@ -130,7 +130,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       }
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_SNN:
     // received SNN - set node number
@@ -156,7 +156,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_CANID:
     // CAN -- set CANID
@@ -171,7 +171,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       }
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_ENUM:
     // received ENUM -- start CAN bus self-enumeration
@@ -183,7 +183,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->startCANenumeration();
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NVRD:
     // received NVRD -- read NV by index
@@ -198,7 +198,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       }
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NVSET:
     // received NVSET -- set NV by index
@@ -217,7 +217,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       }
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NNLRN:
     // received NNLRN -- place into learn mode
@@ -230,7 +230,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       bitSet(controller->_mparams[8], 5);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_EVULN:
     // received EVULN -- unlearn an event, by event number
@@ -265,7 +265,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
     } // if in learn mode
 
-    break;
+    return PROCESSED;
 
   case OPC_NNULN:
     // received NNULN -- exit from learn mode
@@ -277,7 +277,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       bitClear(controller->_mparams[8], 5);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_RQEVN:
     // received RQEVN -- request for number of stored events
@@ -290,7 +290,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendMessageWithNN(OPC_NUMEV, module_config->numEvents());
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NERD:
     // request for all stored events
@@ -320,7 +320,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       } // loop each ev
     } // for me
 
-    break;
+    return PROCESSED;
 
   case OPC_REVAL:
     // received REVAL -- request read of an event variable by event index and ev num
@@ -340,7 +340,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NNCLR:
     // NNCLR -- clear all stored events
@@ -360,7 +360,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendWRACK();
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_NNEVN:
     // request for number of free event slots
@@ -380,7 +380,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendMessageWithNN(OPC_EVNLF, free_slots);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_QNN:
     // this is probably a config recreate -- respond with PNN if we have a node number
@@ -391,7 +391,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_RQMN:
     // request for node module name, excluding "CAN" prefix
@@ -408,7 +408,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       controller->sendMessage(msg);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_EVLRN:
   {
@@ -462,7 +462,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       // DEBUG_SERIAL << F("> error -- not in learn mode") << endl;
     }
 
-    break;
+    return PROCESSED;
   }
 
   case OPC_AREQ:
@@ -472,25 +472,25 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       (void)(*eventhandler)(0, msg);
     }
 
-    break;
+    return PROCESSED;
 
   case OPC_BOOT:
     // boot mode
-    break;
+    return PROCESSED;
 
   case OPC_RSTAT:
     // command station status -- not applicable to accessory modules
-    break;
+    return PROCESSED;
 
   // case OPC_ARST:
   // system reset ... this is not what I thought it meant !
   // module_config->reboot();
-  // break;
+  // return PROCESSED;
 
   default:
     // unknown or unhandled OPC
     // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
-    break;
+    return NOT_PROCESSED;
   }
 }
 
