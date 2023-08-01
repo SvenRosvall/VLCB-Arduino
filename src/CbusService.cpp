@@ -6,6 +6,12 @@
 
 namespace VLCB {
 
+void CbusService::setController(Controller *controller)
+{
+  this->controller = controller;
+  this->module_config = controller->module_config;
+}
+
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) {
   eventhandler = fptr;
 }
@@ -17,16 +23,16 @@ void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool i
 void CbusService::processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned int en, bool is_on_event) {
 
   // try to find a matching stored event -- match on nn, en
-  byte index = controller->module_config->findExistingEvent(nn, en);
+  byte index = module_config->findExistingEvent(nn, en);
 
   // call any registered event handler
 
-  if (index < controller->module_config->EE_MAX_EVENTS) {
+  if (index < module_config->EE_MAX_EVENTS) {
     if (eventhandler != NULL) {
       (void)(*eventhandler)(index, msg);
     } else if (eventhandlerex != NULL) {
       (void)(*eventhandlerex)(index, msg, is_on_event, \
-                              ((controller->module_config->EE_NUM_EVS > 0) ? controller->module_config->getEventEVval(index, 1) : 0) \
+                              ((module_config->EE_NUM_EVS > 0) ? module_config->getEventEVval(index, 1) : 0) \
                              );
     }
   }
@@ -107,7 +113,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // index 0 = number of params available;
     // respond with PARAN
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
 
       byte paran = msg->data[3];
 
@@ -134,18 +140,17 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
 
       // save the NN
-      // controller->controller->module_config->setNodeNum((msg->data[1] << 8) + msg->data[2]);
-      controller->module_config->setNodeNum(nn);
+      module_config->setNodeNum(nn);
 
       // respond with NNACK
       controller->sendMessageWithNN(OPC_NNACK);
 
-      // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->module_config->nodeNum << endl;
+      // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
       // we are now in FLiM mode - update the configuration
       controller->setFLiM();
 
-      // DEBUG_SERIAL << F("> current mode = ") << controller->module_config->currentMode << F(", node number = ") << controller->module_config->nodeNum << F(", CANID = ") << controller->module_config->CANID << endl;
+      // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
     } else {
       // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;
@@ -157,12 +162,12 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // CAN -- set CANID
     // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
       // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
       if (msg->data[3] < 1 || msg->data[3] > 99) {
         controller->sendCMDERR(7);
       } else {
-        controller->module_config->setCANID(msg->data[3]);
+        module_config->setCANID(msg->data[3]);
       }
     }
 
@@ -171,9 +176,9 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   case OPC_ENUM:
     // received ENUM -- start CAN bus self-enumeration
     // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
-    // DEBUG_SERIAL << F("> my nn = ") << controller->module_config->nodeNum << endl;
+    // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
 
-    if (nn == controller->module_config->nodeNum && remoteCANID != controller->module_config->CANID && !controller->bCANenum) {
+    if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !controller->bCANenum) {
       // DEBUG_SERIAL << F("> initiating enumeration") << endl;
       controller->startCANenumeration();
     }
@@ -182,14 +187,14 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
   case OPC_NVRD:
     // received NVRD -- read NV by index
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
 
       byte nvindex = msg->data[3];
-      if (nvindex > controller->module_config->EE_NUM_NVS) {
+      if (nvindex > module_config->EE_NUM_NVS) {
         controller->sendCMDERR(10);
       } else {
         // respond with NVANS
-        controller->sendMessageWithNN(OPC_NVANS, nvindex, controller->module_config->readNV(nvindex));
+        controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
       }
     }
 
@@ -199,13 +204,13 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // received NVSET -- set NV by index
     // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
 
-      if (msg->data[3] > controller->module_config->EE_NUM_NVS) {
+      if (msg->data[3] > module_config->EE_NUM_NVS) {
         controller->sendCMDERR(10);
       } else {
         // update EEPROM for this NV -- NVs are indexed from 1, not zero
-        controller->module_config->writeNV(msg->data[3], msg->data[4]);
+        module_config->writeNV(msg->data[3], msg->data[4]);
         // respond with WRACK
         controller->sendWRACK();
         // DEBUG_SERIAL << F("> set NV ok") << endl;
@@ -218,7 +223,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // received NNLRN -- place into learn mode
     // DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
       controller->bLearn = true;
       // DEBUG_SERIAL << F("> set lean mode ok") << endl;
       // set bit 5 in parameter 8
@@ -238,16 +243,16 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
       // DEBUG_SERIAL << F("> searching for existing event to unlearn") << endl;
 
       // search for this NN and EN pair
-      byte index = controller->module_config->findExistingEvent(nn, en);
+      byte index = module_config->findExistingEvent(nn, en);
 
-      if (index < controller->module_config->EE_MAX_EVENTS) {
+      if (index < module_config->EE_MAX_EVENTS) {
 
         // TODO: Review this. j is always 0.
         // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
-        controller->module_config->cleareventEEPROM(index);
+        module_config->cleareventEEPROM(index);
 
         // update hash table
-        controller->module_config->updateEvHashEntry(index);
+        module_config->updateEvHashEntry(index);
 
         // respond with WRACK
         controller->sendWRACK();
@@ -265,7 +270,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   case OPC_NNULN:
     // received NNULN -- exit from learn mode
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
       controller->bLearn = false;
       // DEBUG_SERIAL << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
       // clear bit 5 in parameter 8
@@ -278,11 +283,11 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // received RQEVN -- request for number of stored events
     // DEBUG_SERIAL << F("> RQEVN -- number of stored events for nn = ") << nn << endl;
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
 
       // respond with 0x74 NUMEV
 
-      controller->sendMessageWithNN(OPC_NUMEV, controller->module_config->numEvents());
+      controller->sendMessageWithNN(OPC_NUMEV, module_config->numEvents());
     }
 
     break;
@@ -291,20 +296,20 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // request for all stored events
     // DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
       msg->len = 8;
       msg->data[0] = OPC_ENRSP;                       // response opcode
-      msg->data[1] = highByte(controller->module_config->nodeNum);        // my NN hi
-      msg->data[2] = lowByte(controller->module_config->nodeNum);         // my NN lo
+      msg->data[1] = highByte(module_config->nodeNum);        // my NN hi
+      msg->data[2] = lowByte(module_config->nodeNum);         // my NN lo
 
-      for (byte i = 0; i < controller->module_config->EE_MAX_EVENTS; i++) {
+      for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++) {
 
-        if (controller->module_config->getEvTableEntry(i) != 0) {
+        if (module_config->getEvTableEntry(i) != 0) {
           // it's a valid stored event
 
           // read the event data from EEPROM
           // construct and send a ENRSP message
-          controller->module_config->readEvent(i, &msg->data[3]);
+          module_config->readEvent(i, &msg->data[3]);
           msg->data[7] = i;                           // event table index
 
           // DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
@@ -321,11 +326,11 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
     // received REVAL -- request read of an event variable by event index and ev num
     // respond with NEVAL
 
-    if (nn == controller->module_config->nodeNum) {
+    if (nn == module_config->nodeNum) {
 
-      if (controller->module_config->getEvTableEntry(msg->data[3]) != 0) {
+      if (module_config->getEvTableEntry(msg->data[3]) != 0) {
 
-        byte value = controller->module_config->getEventEVval(msg->data[3], msg->data[4]);
+        byte value = module_config->getEventEVval(msg->data[3], msg->data[4]);
         controller->sendMessageWithNN(OPC_NEVAL, msg->data[3], msg->data[4], value);
       } else {
 
@@ -340,16 +345,16 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   case OPC_NNCLR:
     // NNCLR -- clear all stored events
 
-    if (controller->bLearn == true && nn == controller->module_config->nodeNum) {
+    if (controller->bLearn == true && nn == module_config->nodeNum) {
 
       // DEBUG_SERIAL << F("> NNCLR -- clear all events") << endl;
 
-      for (byte e = 0; e < controller->module_config->EE_MAX_EVENTS; e++) {
-        controller->module_config->cleareventEEPROM(e);
+      for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++) {
+        module_config->cleareventEEPROM(e);
       }
 
       // recreate the hash table
-      controller->module_config->clearEvHashTable();
+      module_config->clearEvHashTable();
       // DEBUG_SERIAL << F("> cleared all events") << endl;
 
       controller->sendWRACK();
@@ -360,13 +365,13 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   case OPC_NNEVN:
     // request for number of free event slots
 
-    if (controller->module_config->nodeNum == nn) {
+    if (module_config->nodeNum == nn) {
 
       byte free_slots = 0;
 
       // count free slots using the event hash table
-      for (byte i = 0; i < controller->module_config->EE_MAX_EVENTS; i++) {
-        if (controller->module_config->getEvTableEntry(i) == 0) {
+      for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++) {
+        if (module_config->getEvTableEntry(i) == 0) {
           ++free_slots;
         }
       }
@@ -379,9 +384,9 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
   case OPC_QNN:
     // this is probably a config recreate -- respond with PNN if we have a node number
-    // DEBUG_SERIAL << F("> QNN received, my node number = ") << controller->module_config->nodeNum << endl;
+    // DEBUG_SERIAL << F("> QNN received, my node number = ") << module_config->nodeNum << endl;
 
-    if (controller->module_config->nodeNum > 0) {
+    if (module_config->nodeNum > 0) {
       // DEBUG_SERIAL << ("> responding with PNN message") << endl;
       controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
     }
@@ -418,31 +423,31 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
       // search for this NN, EN as we may just be adding an EV to an existing learned event
       // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
-      byte index = controller->module_config->findExistingEvent(nn, en);
+      byte index = module_config->findExistingEvent(nn, en);
 
       // not found - it's a new event
-      if (index >= controller->module_config->EE_MAX_EVENTS) {
+      if (index >= module_config->EE_MAX_EVENTS) {
         // DEBUG_SERIAL << F("> existing event not found - creating a new one if space available") << endl;
-        index = controller->module_config->findEventSpace();
+        index = module_config->findEventSpace();
       }
 
       // if existing or new event space found, write the event data
 
-      if (index < controller->module_config->EE_MAX_EVENTS) {
+      if (index < module_config->EE_MAX_EVENTS) {
 
         // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-        // DEBUG_SERIAL << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (controller->module_config->EE_EVENTS_START + (index * controller->module_config->EE_BYTES_PER_EVENT)) << endl;
+        // DEBUG_SERIAL << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
         // don't repeat this for subsequent EVs
         if (evindex < 2) {
-          controller->module_config->writeEvent(index, &msg->data[1]);
+          module_config->writeEvent(index, &msg->data[1]);
         }
 
-        controller->module_config->writeEventEV(index, evindex, evval);
+        module_config->writeEventEV(index, evindex, evval);
 
         // recreate event hash table entry
         // DEBUG_SERIAL << F("> updating hash table entry for idx = ") << index << endl;
-        controller->module_config->updateEvHashEntry(index);
+        module_config->updateEvHashEntry(index);
 
         // respond with WRACK
         controller->sendWRACK();
@@ -463,7 +468,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
   case OPC_AREQ:
     // AREQ message - request for node state, only producer nodes
 
-    if ((msg->data[1] == highByte(controller->module_config->nodeNum)) && (msg->data[2] == lowByte(controller->module_config->nodeNum))) {
+    if ((msg->data[1] == highByte(module_config->nodeNum)) && (msg->data[2] == lowByte(module_config->nodeNum))) {
       (void)(*eventhandler)(0, msg);
     }
 
@@ -479,7 +484,7 @@ void CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANI
 
   // case OPC_ARST:
   // system reset ... this is not what I thought it meant !
-  // controller->module_config->reboot();
+  // module_config->reboot();
   // break;
 
   default:
