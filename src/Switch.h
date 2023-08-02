@@ -63,7 +63,7 @@ public:
   void resetCurrentDuration();
 
 protected:
-  byte readPin(byte pin);
+  byte readPin();
   byte _pin;
   byte _pressedState;
   byte _currentState;

@@ -5,12 +5,13 @@
 namespace VLCB
 {
 
-EepromExternalStorage::EepromExternalStorage()
+EepromExternalStorage::EepromExternalStorage(byte address)
 {
+  external_address = address;
   I2Cbus = &Wire;
 }
 
-void EepromExternalStorage::setExtEEPROMAddress(byte address, TwoWire *bus)
+EepromExternalStorage::EepromExternalStorage(byte address, TwoWire *bus)
 {
   external_address = address;
   I2Cbus = bus;

@@ -31,6 +31,6 @@ Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 l
 ## License
 
 The code contained in this repository and the executable distributions are licensed under the terms of the
-[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENCE.md).
+[Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENSE.md).
 
 If you have questions about licensing this library please contact [license@rosvall.ie](mailto:license@rosvall.ie)

@@ -14,7 +14,7 @@ class Configuration;
 class CbusService : public Service
 {
 public:
-  virtual void setController(Controller *controller) override;
+  virtual void setController(Controller *cntrl) override;
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;

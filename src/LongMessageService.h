@@ -26,16 +26,16 @@ enum {
 
 //
 /// a basic class to send and receive Controller long messages per MERG RFC 0005
+/// See https://www.merg.org.uk/merg_wiki/doku.php?id=rfc:longmessageprotocol
 /// handles a single message, sending and receiving
 /// suitable for small microcontrollers with limited memory
 //
-
 class LongMessageService : public Service
 {
 
 public:
 
-  virtual void setController(Controller *controller) override { this->controller = controller; }
+  virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;

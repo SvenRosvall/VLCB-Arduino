@@ -50,18 +50,6 @@ LED::LED(byte pin)
     pinMode(_pin, OUTPUT);
 }
 
-LED::LED()
-  : _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
-{
-}
-
-//  set the pin for this LED
-void LED::setPin(byte pin)
-{
-  _pin = pin;
-  pinMode(_pin, OUTPUT);
-}
-
 // return the current state, on or off
 bool LED::getState()
 {

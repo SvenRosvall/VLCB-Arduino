@@ -60,9 +60,7 @@ const int PULSE_ON_TIME = 5;
 class LED
 {
 public:
-  LED();
   explicit LED(byte pin);
-  void virtual setPin(byte pin);
   bool getState();
   void on();
   void off();

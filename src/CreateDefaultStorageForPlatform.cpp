@@ -2,7 +2,7 @@
 
 #if defined(__SAM38E__)
 #include "DueEepromEmulationStorage.h"
-#elsif defined(DXCORE)
+#elif defined(DXCORE)
 #include "FlashStorage.h"
 #else
 #include "EepromInternalStorage.h"

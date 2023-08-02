@@ -56,10 +56,8 @@ namespace VLCB
 //
 /// CAN/Controller message type
 //
-
-class CANFrame {
-
-public:
+struct CANFrame
+{
   uint32_t id;
   bool ext;
   bool rtr;

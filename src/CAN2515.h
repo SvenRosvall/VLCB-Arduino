@@ -74,10 +74,10 @@ public:
 #else
   bool begin(bool poll = false, SPIClass spi = SPI);
 #endif
-  bool available();
-  CANFrame getNextMessage();
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);    // note default arguments
-  void reset();
+  bool available() override;
+  CANFrame getNextMessage() override;
+  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) override;    // note default arguments
+  void reset() override;
 
   // these methods are specific to this implementation
   // they are not declared or implemented by the Transport interface class

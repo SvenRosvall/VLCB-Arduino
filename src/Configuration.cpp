@@ -432,7 +432,7 @@ void Configuration::writeNV(byte idx, byte val)
 //
 void Configuration::writeEvent(byte index, byte data[])
 {
-  int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
+  unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
   // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
   storage->writeBytesEEPROM(eeaddress, data, 4);

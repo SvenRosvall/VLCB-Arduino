@@ -54,7 +54,7 @@ Switch::Switch(byte pin, byte pressedState)
   }
 
   reset();
-  _currentState = readPin(_pin);
+  _currentState = readPin();
 }
 
 void Switch::reset()
@@ -67,9 +67,9 @@ void Switch::reset()
   _prevStateDuration = 0UL;
 }
 
-byte Switch::readPin(byte pin)
+byte Switch::readPin()
 {
-  return digitalRead(pin);
+  return digitalRead(_pin);
 }
 
 void Switch::run()
@@ -77,7 +77,7 @@ void Switch::run()
   // check for state change
 
   // read the pin
-  _currentState = readPin(_pin);
+  _currentState = readPin();
 
   // has state changed ?
   if (_currentState != _lastState)

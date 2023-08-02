@@ -6,10 +6,10 @@
 
 namespace VLCB {
 
-void CbusService::setController(Controller *controller)
+void CbusService::setController(Controller *cntrl)
 {
-  this->controller = controller;
-  this->module_config = controller->module_config;
+  this->controller = cntrl;
+  this->module_config = cntrl->module_config;
 }
 
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg))
