@@ -536,4 +536,18 @@ bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
   return sendMessage(&msg);
 }
 
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  CANFrame msg;
+  msg.len = 8;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  msg.data[4] = b2;
+  msg.data[5] = b3;
+  msg.data[6] = b4;
+  msg.data[7] = b5;
+  return sendMessage(&msg);
+}
+
 }

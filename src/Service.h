@@ -24,6 +24,8 @@ class Service
 public:
   virtual void setController(Controller *controller) {}
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) = 0;
+  virtual byte getServiceID() = 0;
+  virtual byte getServiceVersionID() = 0;
 };
 
 }

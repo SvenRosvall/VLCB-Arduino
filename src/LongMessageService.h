@@ -50,6 +50,9 @@ public:
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
 
+  virtual byte getServiceID() override { return 92; }
+  virtual byte getServiceVersionID() override { return 1; }
+
 protected:
 
   bool sendMessageFragment(CANFrame *frame, const byte priority);

@@ -24,6 +24,9 @@ public:
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
+  virtual byte getServiceID() override { return 91; }
+  virtual byte getServiceVersionID() override { return 1; }
+
 private:
   Controller * controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.

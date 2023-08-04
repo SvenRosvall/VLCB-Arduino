@@ -53,6 +53,7 @@ public:
   bool sendMessageWithNN(int opc, byte b1);
   bool sendMessageWithNN(int opc, byte b1, byte b2);
   bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
+  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
 
   // implementations of these methods are provided in the base class
 

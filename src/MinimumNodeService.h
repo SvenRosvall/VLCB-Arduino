@@ -20,6 +20,9 @@ public:
   virtual void setController(Controller *cntrl) override;
   Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
+  virtual byte getServiceID() override { return 1; }
+  virtual byte getServiceVersionID() override { return 1; }
+
 private:
 
   Controller *controller;
