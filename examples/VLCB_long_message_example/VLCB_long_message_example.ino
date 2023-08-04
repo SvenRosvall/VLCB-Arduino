@@ -55,8 +55,9 @@
 #include <Parameters.h>             // VLCB parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
-#include <CbusService.h>
+#include "MinimumNodeService.h"
 #include <LongMessageService.h>
+#include <CbusService.h>
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -72,9 +73,10 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::MinimumNodeService mnService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &lmsg, &cbusService }); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &lmsg, &cbusService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };

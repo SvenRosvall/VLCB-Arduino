@@ -102,6 +102,7 @@ private:                                          // protected members become pr
   // Quick way to access necessary stuff when migrating to services.
   // TODO: Review the necessary fields to see what is required by services
   // TODO: Create getter/setter for each field.
+  friend class MinimumNodeService;
   friend class CbusService;
 };
 

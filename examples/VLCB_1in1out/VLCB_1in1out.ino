@@ -57,6 +57,7 @@
 #include <Parameters.h>             // VLCB parameters
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
+#include "MinimumNodeService.h"
 #include "CbusService.h"
 
 // constants
@@ -73,8 +74,9 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::MinimumNodeService mnService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &cbusService }); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &cbusService }); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
