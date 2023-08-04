@@ -59,10 +59,10 @@ public:
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
   void startCANenumeration();
-  byte getCANID(unsigned long header);
+  static byte getCANID(unsigned long header);
   byte getModuleCANID() { return module_config->CANID; }
-  bool isExt(CANFrame *msg);
-  bool isRTR(CANFrame *msg);
+  static bool isExt(CANFrame *msg);
+  static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void initFLiM();
   void setFLiM();

@@ -87,7 +87,7 @@ void Controller::setName(unsigned char *mname)
 //
 /// extract CANID from CAN frame header
 //
-inline byte Controller::getCANID(unsigned long header)
+byte Controller::getCANID(unsigned long header)
 {
   return header & 0x7f;
 }
