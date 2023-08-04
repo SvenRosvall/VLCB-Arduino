@@ -14,7 +14,7 @@ See [Design documents](docs/Design.md) for how this library is structured.
 Note that this library depends on a number of other libraries which must also be downloaded and included in the sketch:
 
 * [ACAN2515](https://github.com/pierremolinaro/acan2515) - CAN bus transport using the MCP2515 controller
-* [Streaming](https://github.com/janelia-arduino/Streaming)		- C++ style output
+* [Streaming](https://github.com/janelia-arduino/Streaming) - C++ style output
 
 ## Hardware
 
