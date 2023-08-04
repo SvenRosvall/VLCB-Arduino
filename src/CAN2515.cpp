@@ -124,15 +124,15 @@ CANFrame CAN2515::getNextMessage()
 
   canp->receive(message);
 
-  CANFrame _msg;
-  _msg.id = message.id;
-  _msg.len = message.len;
-  _msg.rtr = message.rtr;
-  _msg.ext = message.ext;
-  memcpy(_msg.data, message.data, message.len);
+  CANFrame msg;
+  msg.id = message.id;
+  msg.len = message.len;
+  msg.rtr = message.rtr;
+  msg.ext = message.ext;
+  memcpy(msg.data, message.data, message.len);
 
   ++_numMsgsRcvd;
-  return _msg;
+  return msg;
 }
 
 //
