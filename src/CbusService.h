@@ -22,7 +22,7 @@ public:
   virtual void setController(Controller *cntrl) override;
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
   void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
+  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
 private:
   Controller * controller;

@@ -49,7 +49,7 @@ void CbusService::processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned
   }
 }
 
-Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID)
+Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
@@ -198,10 +198,14 @@ Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg, byte remot
     // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
     // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
 
-    if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !controller->bCANenum)
     {
-      // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-      controller->startCANenumeration();
+      byte remoteCANID = controller->getCANID(msg->id);
+
+      if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !controller->bCANenum)
+      {
+        // DEBUG_SERIAL << F("> initiating enumeration") << endl;
+        controller->startCANenumeration();
+      }
     }
 
     return PROCESSED;

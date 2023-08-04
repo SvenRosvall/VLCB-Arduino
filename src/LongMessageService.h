@@ -43,7 +43,7 @@ public:
   virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
-  Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) override;
+  Processed handleMessage(unsigned int opc, CANFrame *msg) override;
   bool process();
   virtual void processReceivedMessageFragment(const CANFrame *frame);
   bool is_sending();

@@ -23,7 +23,7 @@ class Service
 {
 public:
   virtual void setController(Controller *controller) {}
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg, byte remoteCANID) = 0;
+  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) = 0;
 };
 
 }
