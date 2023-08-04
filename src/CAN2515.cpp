@@ -12,9 +12,6 @@
 // VLCB MCP2515 library
 #include <CAN2515.h>
 
-// globals
-ACAN2515 *can;    // CAN bus controller specific object - for MCP2515/25625
-
 namespace VLCB
 {
 
@@ -80,17 +77,16 @@ bool CAN2515::begin(bool poll, SPIClass spi)
   // if in polling mode, the interrupt pin and ISR not used
   if (_poll)
   {
-    can = new ACAN2515(_csPin, spi, 255);
-    ret = can->begin(settings, NULL);
+    canp = new ACAN2515(_csPin, spi, 255);
+    ret = canp->begin(settings, NULL);
   }
   else
   {
-    can = new ACAN2515(_csPin, spi, _intPin);
-    ret = can->begin(settings, [] { can->isr(); });
+    canp = new ACAN2515(_csPin, spi, _intPin);
+    static ACAN2515 * lcanp; // Need a variable with static storage duration for use in the lambda.
+    lcanp = canp;
+    ret = canp->begin(settings, [] { lcanp->isr(); });
   }
-
-  // save pointer to CAN object so the user can access other parts of the library API
-  canp = can;
 
   if (ret == 0)
   {
