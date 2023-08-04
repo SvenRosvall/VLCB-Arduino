@@ -84,7 +84,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::CANFrame *);
+void eventhandler(byte, VLCB::CANFrame *, bool ison, byte evval);
 void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
@@ -247,19 +247,18 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::CANFrame *msg)
+void eventhandler(byte index, VLCB::CANFrame *msg, bool ison, byte evval)
 {
   // as an example, control an LED
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 
   // read the value of the first event variable (EV) associated with this learned event
-  byte evval = modconfig.getEventEVval(index, 1);
   Serial << F("> EV1 = ") << evval << endl;
 
   // set the LED according to the opcode of the received event, if the first EV equals 0
   // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
-  if (msg->data[0] == OPC_ACON)
+  if (ison)
   {
     if (evval == 0)
     {
@@ -272,7 +271,7 @@ void eventhandler(byte index, VLCB::CANFrame *msg)
       moduleLED.blink();
     }
   }
-  else if (msg->data[0] == OPC_ACOF)
+  else
   {
     Serial << F("> switching the LED off") << endl;
     moduleLED.off();
