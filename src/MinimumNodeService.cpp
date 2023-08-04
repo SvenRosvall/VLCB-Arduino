@@ -16,12 +16,13 @@ void MinimumNodeService::setController(Controller *cntrl)
   this->module_config = cntrl->module_config;
 }
 
+// TODO: This list is used while implementing MNS. Remove once done.
 // MNS shall implement these opcodes in incoming requests
-// * SNN - Here - not sending NNREL
-// * QNN - Done - check params of PNN
+// * SNN - Done
+// * QNN - Done
 // * RQNP - Done
 // * RQMN - Done
-// * RQNPN - Done - Review error codes
+// * RQNPN - Done
 // * NNRSM
 // * RDGN
 // * RQSD
@@ -31,6 +32,7 @@ void MinimumNodeService::setController(Controller *cntrl)
 // * NNRSM
 //
 // CBUS - optional
+// These shall be moved to CAN service.
 // * CANID - Here
 // * ENUM - Here
 
@@ -121,6 +123,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       return PROCESSED;
 
     case OPC_CANID:
+      // TODO: Belongs to CAN service.
+
       // CAN -- set CANID
       // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
@@ -140,6 +144,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       return PROCESSED;
 
     case OPC_ENUM:
+      // TODO: Belongs to CAN service.
+
       // received ENUM -- start CAN bus self-enumeration
       // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
       // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
