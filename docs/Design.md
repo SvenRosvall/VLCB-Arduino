@@ -70,9 +70,17 @@ VLCB offers up a message to each service in turn.
 If a service is able to handle that message no further services will be offered the message.
 Thus, the order of configured services is important.
 
-There are currently no implemented services. 
-All the functionality of handling VLCB messages are implemented in the main Controller object.
-This will be broken out to services.
+MinimumNodeService
+: Handles all the mandatory op-codes that all VLCB modules must implement. 
+These op-codes involves running modes and basic node configuration such as node number and
+module parameters.
+
+LongMessageService
+: Handles the long message extension to CBUS as defined in RFC005.
+
+CbusService
+: All the op-codes in the original CBUS library were moved into this service as a 
+dumping ground while breaking out op-codes to their correct services.
 
 ### Details
 * There is no queuing in this diagram. Message queuing is expected to happen in the transport layer.
@@ -116,14 +124,6 @@ setup()
 ```
 
 ## Design Decisions to Make
-
-### Naming Convention
-A naming convention needs to be defined. 
-It needs to distinguish global names so there are no conflicts with other libraries.
-
-Some suggestions:
-* Use "VLCB_" as a prefix for all names provided by the library. This requires a lot of typing.
-* Use a "VLCB" namespace. Code within this namespace can use the shorter names.
 
 ### Self Consumed Events
 Duncan's library does not support self consumed events. 
