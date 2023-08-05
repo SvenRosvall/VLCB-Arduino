@@ -44,10 +44,7 @@ public:
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
-  {
-    return transport->sendMessage(msg, rtr, ext, priority);
-  }
+  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY);
 
   bool sendMessageWithNN(int opc);
   bool sendMessageWithNN(int opc, byte b1);

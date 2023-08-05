@@ -51,6 +51,12 @@ Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt
   }
 }
 
+bool Controller::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
+{
+  msg->id = getModuleCANID();
+  return transport->sendMessage(msg, rtr, ext, priority);
+}
+
 //
 /// register the user handler for learned events
 //
