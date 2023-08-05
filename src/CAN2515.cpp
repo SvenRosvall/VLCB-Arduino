@@ -130,6 +130,10 @@ CANFrame CAN2515::getNextMessage()
   msg.rtr = message.rtr;
   msg.ext = message.ext;
   memcpy(msg.data, message.data, message.len);
+//  DEBUG_SERIAL << F("CAN2515 getNextMessage id=") << msg.id << " len=" << msg.len << " rtr=" << msg.rtr;
+//  if (msg.len > 0)
+//    DEBUG_SERIAL << " op=" << _HEX(msg.data[0]);
+//  DEBUG_SERIAL << endl;
 
   ++_numMsgsRcvd;
   return msg;
@@ -145,7 +149,10 @@ bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
   // priority defaults to 1011 low/medium
 
-  // DEBUG_SERIAL << F("CAN2515 send message") << endl;
+//  DEBUG_SERIAL << F("CAN2515 sendMessage id=") << msg->id << " len=" << msg->len << " rtr=" << rtr;
+//  if (msg->len > 0)
+//    DEBUG_SERIAL << " op=" << _HEX(msg->data[0]);
+//  DEBUG_SERIAL << endl;
   CANMessage message;       // ACAN2515 frame class
 
   makeHeader(msg, priority);                      // default priority unless user overrides
