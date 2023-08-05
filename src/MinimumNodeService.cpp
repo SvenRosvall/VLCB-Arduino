@@ -51,9 +51,8 @@ void MinimumNodeService::setController(Controller *cntrl)
 // * RQNP - Done
 // * RQMN - Done
 // * RQNPN - Done
-// * NNRSM
 // * RDGN
-// * RQSD
+// * RQSD - Done
 // * MODE
 // * SQU
 // * NNRST
