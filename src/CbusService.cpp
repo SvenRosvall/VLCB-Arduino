@@ -16,11 +16,15 @@ void CbusService::setController(Controller *cntrl)
   this->module_config = cntrl->module_config;
 }
 
+//
+/// register the user handler for learned events
+//
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg))
 {
   eventhandler = fptr;
 }
 
+// overloaded form which receives the opcode on/off state and the first event variable
 void CbusService::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval))
 {
   eventhandlerex = fptr;

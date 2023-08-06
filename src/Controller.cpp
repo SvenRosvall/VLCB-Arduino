@@ -53,12 +53,6 @@ Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt
 }
 
 //
-/// register the user handler for learned events
-//
-
-// overloaded form which receives the opcode on/off state and the first event variable
-
-//
 /// register the user handler for CAN frames
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
