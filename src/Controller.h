@@ -17,6 +17,7 @@
 #include "UserInterface.h"
 #include "Service.h"
 #include "initializer_list.h"
+#include "VlcbDefs.h"
 
 namespace VLCB
 {
@@ -54,11 +55,10 @@ public:
   bool sendMessageWithNN(int opc, byte b1, byte b2);
   bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
   bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
-
-  // implementations of these methods are provided in the base class
-
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
+  void sendGRSP(byte opCode, byte serviceType, GrspCodes errCode);
+
   void startCANenumeration();
   static byte getCANID(unsigned long header);
   byte getModuleCANID() { return module_config->CANID; }

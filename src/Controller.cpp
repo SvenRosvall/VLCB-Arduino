@@ -8,6 +8,7 @@
 
 // Controller library
 #include <Controller.h>
+#include "VlcbDefs.h"
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined
@@ -90,24 +91,6 @@ void Controller::setName(unsigned char *mname)
 byte Controller::getCANID(unsigned long header)
 {
   return header & 0x7f;
-}
-
-//
-/// send a WRACK (write acknowledge) message
-//
-bool Controller::sendWRACK()
-{
-  // send a write acknowledgement response
-  return sendMessageWithNN(OPC_WRACK);
-}
-
-//
-/// send a CMDERR (command error) message
-//
-bool Controller::sendCMDERR(byte cerrno)
-{
-  // send a command error response
-  return sendMessageWithNN(OPC_CMDERR, cerrno);
 }
 
 //
@@ -548,6 +531,29 @@ bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, 
   msg.data[6] = b4;
   msg.data[7] = b5;
   return sendMessage(&msg);
+}
+
+//
+/// send a WRACK (write acknowledge) message
+//
+bool Controller::sendWRACK()
+{
+  // send a write acknowledgement response
+  return sendMessageWithNN(OPC_WRACK);
+}
+
+//
+/// send a CMDERR (command error) message
+//
+bool Controller::sendCMDERR(byte cerrno)
+{
+  // send a command error response
+  return sendMessageWithNN(OPC_CMDERR, cerrno);
+}
+
+void Controller::sendGRSP(byte opCode, byte serviceType, GrspCodes errCode)
+{
+  sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
 }

@@ -42,13 +42,17 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
       if (nn == module_config->nodeNum)
       {
         // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
-        if (msg->data[3] < 1 || msg->data[3] > 99)
+        byte newCANID = msg->data[3];
+        if (newCANID < 1 || newCANID > 99)
         {
-          controller->sendCMDERR(7);
+          controller->sendCMDERR(GRSP_INVALID_PARAMETER);
+          controller->sendGRSP(CAN_OP_CANID, getServiceID(), GRSP_INVALID_PARAMETER);
         }
         else
         {
-          module_config->setCANID(msg->data[3]);
+          module_config->setCANID(newCANID);
+          controller->sendWRACK();
+          controller->sendGRSP(CAN_OP_CANID, getServiceID(), GRSP_OK);
         }
       }
 
