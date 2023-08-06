@@ -101,6 +101,7 @@ private:                                          // protected members become pr
   // TODO: Review the necessary fields to see what is required by services
   // TODO: Create getter/setter for each field.
   friend class MinimumNodeService;
+  friend class CanService;
   friend class CbusService;
 };
 

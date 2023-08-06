@@ -56,6 +56,7 @@
 #include <cbusdefs.h>               // MERG CBUS constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
+#include "CanService.h"
 #include "CbusService.h"
 
 // constants
@@ -73,8 +74,9 @@ VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
+VLCB::CanService canService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &cbusService }); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };

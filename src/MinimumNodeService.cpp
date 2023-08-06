@@ -10,7 +10,7 @@
 namespace VLCB
 {
 
-enum MnsOpcodes
+enum MnsOpCodes
 {
   MNS_OP_RQNN = OPC_RQNN,
   MNS_OP_SNN = OPC_SNN,
@@ -145,46 +145,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       else
       {
         // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;
-      }
-
-      return PROCESSED;
-
-    case OPC_CANID:
-      // TODO: Belongs to CAN service.
-
-      // CAN -- set CANID
-      // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
-
-      if (nn == module_config->nodeNum)
-      {
-        // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
-        if (msg->data[3] < 1 || msg->data[3] > 99)
-        {
-          controller->sendCMDERR(7);
-        }
-        else
-        {
-          module_config->setCANID(msg->data[3]);
-        }
-      }
-
-      return PROCESSED;
-
-    case OPC_ENUM:
-      // TODO: Belongs to CAN service.
-
-      // received ENUM -- start CAN bus self-enumeration
-      // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
-      // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
-
-      {
-        byte remoteCANID = controller->getCANID(msg->id);
-
-        if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !controller->bCANenum)
-        {
-          // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-          controller->startCANenumeration();
-        }
       }
 
       return PROCESSED;
