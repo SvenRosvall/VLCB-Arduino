@@ -60,7 +60,6 @@ public:
   void sendGRSP(byte opCode, byte serviceType, GrspCodes errCode);
 
   void startCANenumeration();
-  static byte getCANID(unsigned long header);
   byte getModuleCANID() { return module_config->CANID; }
   static bool isExt(CANFrame *msg);
   static bool isRTR(CANFrame *msg);
@@ -73,7 +72,6 @@ public:
   void renegotiate();
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
-  void checkCANenumTimout();
   void indicateMode(byte mode);
   void indicateActivity();
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
@@ -90,15 +88,12 @@ private:                                          // protected members become pr
   void (*framehandler)(CANFrame *msg);
   byte *_opcodes;
   byte _num_opcodes;
-  byte enum_responses[16];                          // 128 bits for storing CAN ID enumeration results
-  bool bModeChanging, bCANenum, bLearn;
-  unsigned long timeOutTimer, CANenumTime;
-  bool enumeration_required;
+  bool bModeChanging, bLearn;
+  unsigned long timeOutTimer;
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
   void performRequestedUserAction(UserInterface::RequestedAction requestedAction);
-  byte findFreeCanId();
 
   // Quick way to access necessary stuff when migrating to services.
   // TODO: Review the necessary fields to see what is required by services

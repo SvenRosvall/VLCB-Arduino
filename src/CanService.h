@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include "UserInterface.h"
 
 namespace VLCB
 {
@@ -18,15 +19,28 @@ class CanService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override;
-  Processed handleMessage(unsigned int opc, CANFrame *msg) override;
-
   virtual byte getServiceID() override { return 3; }
   virtual byte getServiceVersionID() override { return 1; }
+
+  virtual void process(UserInterface::RequestedAction requestedAction) override;
+  virtual Processed handleRawMessage(CANFrame *msg) override;
+  Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+
+  void startCANenumeration();
 
 private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
+
+  bool enumeration_required;
+  bool bCANenum;
+  unsigned long CANenumTime;
+  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
+
+  static byte getCANID(unsigned long header);
+  void checkCANenumTimout();
+  byte findFreeCanId();
 };
 
 }

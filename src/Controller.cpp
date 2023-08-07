@@ -9,6 +9,7 @@
 // Controller library
 #include <Controller.h>
 #include "VlcbDefs.h"
+#include "CanService.h"
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined
@@ -80,14 +81,6 @@ void Controller::setName(unsigned char *mname)
 }
 
 //
-/// extract CANID from CAN frame header
-//
-byte Controller::getCANID(unsigned long header)
-{
-  return header & 0x7f;
-}
-
-//
 /// is this an Extended CAN frame ?
 //
 bool Controller::isExt(CANFrame *amsg)
@@ -101,27 +94,6 @@ bool Controller::isExt(CANFrame *amsg)
 bool Controller::isRTR(CANFrame *amsg)
 {
   return (amsg->rtr);
-}
-
-//
-/// if in FLiM mode, initiate a CAN ID enumeration cycle
-//
-void Controller::startCANenumeration()
-{
-  // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
-
-  // DEBUG_SERIAL << F("> beginning self-enumeration cycle") << endl;
-
-  // set global variables
-  bCANenum = true;                  // we are enumerating
-  CANenumTime = millis();           // the cycle start time
-  memset(enum_responses, 0, sizeof(enum_responses));
-
-  // send zero-length RTR frame
-  _msg.len = 0;
-  sendMessage(&_msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
-
-  // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
 //
@@ -228,25 +200,23 @@ void Controller::indicateActivity()
 //
 void Controller::process(byte num_messages)
 {
-  // TODO: Move to CanService
-  if (enumeration_required)
-  {
-    enumeration_required = false;
-    startCANenumeration();
-  }
-
   // process switch operations if the module is configured with one
-
+  UserInterface::RequestedAction requestedAction = UserInterface::NONE;
   if (_ui)
   {
     _ui->run();
 
-    performRequestedUserAction(_ui->checkRequestedAction());
+    requestedAction = _ui->checkRequestedAction();
+    performRequestedUserAction(requestedAction);
+  }
+
+  for (Service * service : services)
+  {
+    service->process(requestedAction);
   }
 
   // get received CAN frames from buffer
   // process by default 3 messages per run so the user's application code doesn't appear unresponsive under load
-
   for (byte mcount = 0 ; transport->available() && mcount < num_messages ; ++mcount)
   {
     // at least one CAN frame is available in the reception buffer
@@ -254,55 +224,24 @@ void Controller::process(byte num_messages)
 
     _msg = transport->getNextMessage();
 
-    // TODO: Move to CanService
-    byte remoteCANID = getCANID(_msg.id);
-
     callFrameHandler(&_msg);
 
+    for (Service * service : services)
+    {
+      // DEBUG_SERIAL << "> Passing raw message to " << endl;
+      if (service->handleRawMessage(&_msg) == PROCESSED)
+      {
+        // DEBUG_SERIAL << "> Service handled raw message" << endl;
+        break;
+      }
+    }
+
     indicateActivity();
-
-    // is this a CANID enumeration request from another node (RTR set) ?
-    // TODO: Move to CanService
-    if (_msg.rtr)
-    {
-      // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
-      // send an empty message to show our CANID
-      _msg.len = 0;
-      sendMessage(&_msg);
-      continue;
-    }
-
-    //
-    /// set flag if we find a CANID conflict with the frame's producer
-    /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
-    //
-    // TODO: Move to CanService
-    if (remoteCANID == module_config->CANID && _msg.len > 0)
-    {
-      // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
-      enumeration_required = true;
-    }
 
     // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
     if (_msg.ext)
     {
       // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
-      continue;
-    }
-
-    // are we enumerating CANIDs ?
-    // TODO: Move to CanService
-    if (bCANenum && _msg.len == 0)
-    {
-
-      // store this response in the responses array
-      if (remoteCANID > 0)
-      {
-        // fix to correctly record the received CANID
-        bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
-        // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
-      }
-
       continue;
     }
 
@@ -325,9 +264,6 @@ void Controller::process(byte num_messages)
       // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
     }
   }  // while messages available
-
-  // TODO: Move to CanService
-  checkCANenumTimout();
 
   checkModeChangeTimeout();
 
@@ -360,16 +296,7 @@ void Controller::performRequestedUserAction(UserInterface::RequestedAction reque
       renegotiate();
       break;
 
-    case UserInterface::ENUMERATION:
-      //Serial << "Controller::process() - enumerate" << endl;
-      if (module_config->currentMode)
-      {
-        startCANenumeration();
-      }
-      break;
-
-    case UserInterface::NONE:
-      //Serial << "Controller::process() - no action" << endl;
+    default:
       break;
   }
 }
@@ -404,65 +331,6 @@ void Controller::callFrameHandler(CANFrame *msg)
       (void)(*framehandler)(msg);
     }
   }
-}
-
-void Controller::checkCANenumTimout()
-{
-  //
-  /// check the 100ms CAN enumeration cycle timer
-  //
-  if (bCANenum && (millis() - CANenumTime) >= 100)
-  {
-    // enumeration timer has expired -- stop enumeration and process the responses
-
-    // DEBUG_SERIAL << F("> enum cycle complete at ") << millis() << F(", start = ") << CANenumTime << F(", duration = ") << (millis() - CANenumTime) << endl;
-    // DEBUG_SERIAL << F("> processing received responses") << endl;
-
-    byte selected_id = findFreeCanId();
-
-    // DEBUG_SERIAL << F("> enumeration responses = ") << enums << F(", lowest available CAN id = ") << selected_id << endl;
-
-    bCANenum = false;
-    CANenumTime = 0UL;
-
-    // store the new CAN ID
-    module_config->setCANID(selected_id);
-
-    // send NNACK
-    sendMessageWithNN(OPC_NNACK);
-  }
-}
-
-byte Controller::findFreeCanId()
-{
-  // iterate through the 128 bit field
-  for (byte i = 0; i < 16; i++)
-  {
-    // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
-    if (enum_responses[i] == 0xff)
-    {
-      continue;
-    }
-
-    // for each bit in the byte
-    for (byte b = 0; b < 8; b++)
-    {
-      // ignore first bit of first byte -- CAN ID zero is not used for nodes
-      if (i == 0 && b == 0) {
-        continue;
-      }
-
-      // if the bit is not set
-      if (bitRead(enum_responses[i], b) == 0)
-      {
-        byte selected_id = ((i * 16) + b);
-        // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
-        return selected_id;
-      }
-    }
-  }
-
-  return 1;     // default if no responses from other modules
 }
 
 void setNN(CANFrame *msg, unsigned int nn)
@@ -548,6 +416,20 @@ bool Controller::sendCMDERR(byte cerrno)
 void Controller::sendGRSP(byte opCode, byte serviceType, GrspCodes errCode)
 {
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
+}
+
+void Controller::startCANenumeration()
+{
+  // Delegate this to the CanService.
+  // Find it first.
+  for (Service * svc : services)
+  {
+    if (svc->getServiceID() == 3)
+    {
+      CanService * canSvc = (CanService *) svc;
+      canSvc->startCANenumeration();
+    }
+  }
 }
 
 }
