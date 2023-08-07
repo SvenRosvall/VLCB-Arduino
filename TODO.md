@@ -44,3 +44,17 @@ This might be defined in a CAN service.
 The Minimum Node Specification describes a few more states that the LED's need to indicate. 
 Review this spec again and update the user interface. 
 Also need to update the interface class and add support for these states in the Controller class.
+
+## Introduce VlcbDevs.h
+The CBUS library uses "cbusdef.h" which defines OP-codes etc. 
+This is generated for the CBUS project.
+There should be a similar "vlcbdefs.h" that includes all the VLCB OP-codes
+
+It would be nice to re-use the cbusdefs project to avoid duplicating work.
+Add a new VLCB.csv with new stuff. 
+Then generate the vlcbdefs.h with information from both CSV files.
+
+It may be argued that we want to be in full control over VLCB stuff and thus have a VLCB.csv
+that contains all OP-codes etc. 
+If we use this strategy, then there should be a method to compare the information for VLCB
+and CBUS to detect collisions.
