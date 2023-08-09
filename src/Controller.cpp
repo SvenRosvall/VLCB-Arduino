@@ -223,6 +223,7 @@ void Controller::process(byte num_messages)
     // retrieve the next one
 
     _msg = transport->getNextMessage();
+    // DEBUG_SERIAL << "> Received a message" << endl;
 
     callFrameHandler(&_msg);
 
@@ -253,6 +254,7 @@ void Controller::process(byte num_messages)
     if (_msg.len > 0) 
     {
       unsigned int opc = _msg.data[0];
+      // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
       for (Service * service : services)
       {
         if (service->handleMessage(opc, &_msg) == PROCESSED)

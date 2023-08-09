@@ -57,6 +57,7 @@ Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
+  // DEBUG_SERIAL << ">CbusSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc)
   {
