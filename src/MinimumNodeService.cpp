@@ -63,6 +63,122 @@ void MinimumNodeService::setController(Controller *cntrl)
 // * CANID - Here
 // * ENUM - Here
 
+
+//
+/// initiate the transition from SLiM to FLiM mode
+//
+void MinimumNodeService::initFLiM()
+{
+  // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
+
+  controller->indicateMode(MODE_CHANGING);
+
+  bModeChanging = true;
+  timeOutTimer = millis();
+
+  // send RQNN message with current NN, which may be zero if a virgin/SLiM node
+  controller->sendMessageWithNN(OPC_RQNN);
+
+  // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
+}
+
+void MinimumNodeService::setFLiM()
+{
+  // DEBUG_SERIAL << F("> set FLiM") << endl;
+  bModeChanging = false;
+  module_config->setModuleMode(MODE_FLIM);
+  controller->indicateMode(MODE_FLIM);
+
+  // enumerate the CAN bus to allocate a free CAN ID
+  controller->startCANenumeration();
+}
+
+//
+/// set module to SLiM mode
+//
+void MinimumNodeService::setSLiM()
+{
+  // DEBUG_SERIAL << F("> set SLiM") << endl;
+  bModeChanging = false;
+  module_config->setNodeNum(0);
+  module_config->setModuleMode(MODE_SLIM);
+  module_config->setCANID(0);
+
+  controller->indicateMode(MODE_SLIM);
+}
+
+//
+/// revert from FLiM to SLiM mode
+//
+void MinimumNodeService::revertSLiM()
+{
+
+  // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
+
+  // send NNREL message
+
+  controller->sendMessageWithNN(OPC_NNREL);
+  setSLiM();
+}
+
+//
+/// change or re-confirm node number
+//
+
+void MinimumNodeService::renegotiate()
+{
+  initFLiM();
+}
+
+//
+/// check 30 sec timeout for SLiM/FLiM negotiation with FCU
+//
+void MinimumNodeService::checkModeChangeTimeout()
+{
+  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
+
+    // Revert to previous mode.
+    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
+    controller->indicateMode(module_config->currentMode);
+    bModeChanging = false;
+  }
+}
+
+//
+/// MinimumNode Service processing procedure
+//
+
+void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
+{
+   switch (requestedAction)
+  {
+    case UserInterface::CHANGE_MODE:
+      // initiate mode change
+      //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
+      if (!module_config->currentMode)
+      {
+        initFLiM();
+      }
+      else
+      {
+        revertSLiM();
+      }
+      break;
+
+    case UserInterface::RENEGOTIATE:
+      //Serial << "Controller::process() - renegotiate" << endl;
+      renegotiate();
+      break;
+
+    default:
+      break;
+  }
+  
+  checkModeChangeTimeout();
+  
+}
+
+
 Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
@@ -76,7 +192,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // DEBUG_SERIAL << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
 
       // only respond if we are in transition to FLiM mode
-      if (controller->bModeChanging)
+      if (bModeChanging)
       {
         // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
@@ -124,7 +240,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // received SNN - set node number
       // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
-      if (controller->bModeChanging)
+      if (bModeChanging)
       {
         // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
 
@@ -137,7 +253,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
         // we are now in FLiM mode - update the configuration
-        controller->setFLiM();
+        setFLiM();
 
         // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
@@ -169,7 +285,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // only respond if in transition to FLiM
 
       // respond with NAME
-      if (controller->bModeChanging)
+      if (bModeChanging)
       {
         msg->len = 8;
         msg->data[0] = MNS_OP_NAME;
