@@ -97,86 +97,6 @@ bool Controller::isRTR(CANFrame *amsg)
 }
 
 //
-/// initiate the transition from SLiM to FLiM mode
-//
-void Controller::initFLiM()
-{
-  // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
-
-  indicateMode(MODE_CHANGING);
-
-  bModeChanging = true;
-  timeOutTimer = millis();
-
-  // send RQNN message with current NN, which may be zero if a virgin/SLiM node
-  sendMessageWithNN(OPC_RQNN);
-
-  // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
-}
-
-void Controller::setFLiM()
-{
-  // DEBUG_SERIAL << F("> set FLiM") << endl;
-  bModeChanging = false;
-  module_config->setModuleMode(MODE_FLIM);
-  indicateMode(MODE_FLIM);
-
-  // enumerate the CAN bus to allocate a free CAN ID
-  startCANenumeration();
-}
-
-//
-/// set module to SLiM mode
-//
-void Controller::setSLiM()
-{
-  // DEBUG_SERIAL << F("> set SLiM") << endl;
-  bModeChanging = false;
-  module_config->setNodeNum(0);
-  module_config->setModuleMode(MODE_SLIM);
-  module_config->setCANID(0);
-
-  indicateMode(MODE_SLIM);
-}
-
-//
-/// revert from FLiM to SLiM mode
-//
-void Controller::revertSLiM()
-{
-
-  // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
-
-  // send NNREL message
-
-  sendMessageWithNN(OPC_NNREL);
-  setSLiM();
-}
-
-//
-/// check 30 sec timeout for SLiM/FLiM negotiation with FCU
-//
-void Controller::checkModeChangeTimeout()
-{
-  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
-
-    // Revert to previous mode.
-    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
-    indicateMode(module_config->currentMode);
-    bModeChanging = false;
-  }
-}
-
-//
-/// change or re-confirm node number
-//
-
-void Controller::renegotiate()
-{
-  initFLiM();
-}
-
-//
 /// set the Controller LEDs to indicate the current mode
 //
 
@@ -207,7 +127,6 @@ void Controller::process(byte num_messages)
     _ui->run();
 
     requestedAction = _ui->checkRequestedAction();
-    performRequestedUserAction(requestedAction);
   }
 
   for (Service * service : services)
@@ -265,40 +184,11 @@ void Controller::process(byte num_messages)
     }
   }  // while messages available
 
-  checkModeChangeTimeout();
-
   // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
 
   //
   /// end of Controller message processing
   //
-}
-
-void Controller::performRequestedUserAction(UserInterface::RequestedAction requestedAction)
-{
-  switch (requestedAction)
-  {
-    case UserInterface::CHANGE_MODE:
-      // initiate mode change
-      //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
-      if (!module_config->currentMode)
-      {
-        initFLiM();
-      }
-      else
-      {
-        revertSLiM();
-      }
-      break;
-
-    case UserInterface::RENEGOTIATE:
-      //Serial << "Controller::process() - renegotiate" << endl;
-      renegotiate();
-      break;
-
-    default:
-      break;
-  }
 }
 
 // Return true if framehandler shall be called for registered opcodes, if any.

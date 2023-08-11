@@ -64,12 +64,6 @@ public:
   static bool isExt(CANFrame *msg);
   static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
-  void initFLiM();
-  void setFLiM();
-  void setSLiM();
-  void revertSLiM();
-  void checkModeChangeTimeout();
-  void renegotiate();
   void setParams(unsigned char *mparams);
   void setName(unsigned char *mname);
   void indicateMode(byte mode);
