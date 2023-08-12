@@ -52,6 +52,15 @@ void Configuration::begin()
 
   makeEvHashTable();
   loadNVs();
+  
+  if ((currentMode == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
+  {
+   storage->writeEEPROM(0, 0);     // SLiM
+   storage->writeEEPROM(1, 0);     // CANID
+   storage->writeEEPROM(2, 0);     // NN hi
+   storage->writeEEPROM(3, 0);     // NN lo
+   loadNVs();
+  }
 }
 
 void Configuration::setModuleMode(ModuleMode f)
@@ -426,7 +435,7 @@ void Configuration::cleareventEEPROM(byte index)
 #endif
 
 #ifndef AVR_RESET_METHOD
-#define AVR_RESET_METHOD 3     // don't use watchdog timer method as it's unreliable on some boards
+#define AVR_RESET_METHOD 4     // don't use watchdog timer method as it's unreliable on some boards
 #endif
 
 void (*rebootFunc)() = 0;  // just causes a jump to address zero - not a full chip reset
