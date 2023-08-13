@@ -32,7 +32,7 @@ byte CanService::getCANID(unsigned long header)
 }
 
 //
-/// if in FLiM mode, initiate a CAN ID enumeration cycle
+/// if in Normal mode, initiate a CAN ID enumeration cycle
 //
 void CanService::startCANenumeration()
 {
@@ -124,7 +124,7 @@ void CanService::process(UserInterface::RequestedAction requestedAction)
   if (requestedAction == UserInterface::ENUMERATION)
   {
     // DEBUG_SERIAL << "> User request - enumerate" << endl;
-    if (module_config->currentMode != MODE_SLIM)
+    if (module_config->currentMode != MODE_UNINITIALISED)
     {
       startCANenumeration();
     }

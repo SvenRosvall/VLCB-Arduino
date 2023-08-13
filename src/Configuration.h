@@ -22,8 +22,8 @@ static const byte HASH_LENGTH = 128;
 //
 
 enum ModuleMode {
-  MODE_SLIM = 0,
-  MODE_FLIM = 1,
+  MODE_UNINITIALISED = 0,
+  MODE_NORMAL = 1,
   MODE_CHANGING = 2
 };
 
