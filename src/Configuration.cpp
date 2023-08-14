@@ -580,7 +580,7 @@ void Configuration::resetModule()
   // set the node identity defaults
   // we set a NN and CANID of zero in Uninitialised as we're now a consumer-only node
 
-  storage->writeEEPROM(0, 0);     // Uninitialised
+  storage->writeEEPROM(0, 0);     // Mode = Uninitialised
   storage->writeEEPROM(1, 0);     // CANID
   storage->writeEEPROM(2, 0);     // NN hi
   storage->writeEEPROM(3, 0);     // NN lo
