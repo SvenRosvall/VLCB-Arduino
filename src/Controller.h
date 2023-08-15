@@ -12,7 +12,6 @@
 #include <SPI.h>
 
 #include <Configuration.h>
-#include <cbusdefs.h>
 #include <Transport.h>
 #include "UserInterface.h"
 #include "Service.h"

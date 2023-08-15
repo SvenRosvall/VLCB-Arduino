@@ -9,6 +9,7 @@
 // Controller library
 #include <Controller.h>
 #include "CanService.h"
+#include <vlcbdefs.hpp>
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined

@@ -7,6 +7,7 @@
 
 #include "CbusService.h"
 #include <Controller.h>
+#include <vlcbdefs.hpp>
 
 namespace VLCB {
 

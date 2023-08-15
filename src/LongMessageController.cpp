@@ -10,6 +10,7 @@
 
 #include <LongMessageService.h>
 #include <Controller.h>
+#include <vlcbdefs.hpp>
 #include <Streaming.h>
 
 namespace VLCB

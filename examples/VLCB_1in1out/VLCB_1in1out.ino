@@ -55,7 +55,7 @@
 #include <LED.h>                // VLCB LEDs
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <cbusdefs.h>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // MERG CBUS constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"

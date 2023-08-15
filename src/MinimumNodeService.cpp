@@ -5,7 +5,7 @@
 
 #include "MinimumNodeService.h"
 #include "Controller.h"
-#include <cbusdefs.h>
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {

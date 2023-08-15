@@ -6,7 +6,7 @@
 #include <Streaming.h>
 #include "CanService.h"
 #include "Controller.h"
-#include <cbusdefs.h>
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {

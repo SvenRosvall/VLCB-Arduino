@@ -4,7 +4,7 @@
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
 #include <Configuration.h>
-#include <cbusdefs.h>               // MERG Controller constants
+#include <vlcbdefs.hpp>               // MERG Controller constants
 
 namespace VLCB
 {
