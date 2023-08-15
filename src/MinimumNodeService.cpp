@@ -323,7 +323,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           else
           {
             // Couldn't find the service.
-            controller->sendCMDERR(GRSP_INVALID_PARAMETER);
+            controller->sendCMDERR(CMDERR_INV_EN_IDX);
             // NOTE: error code 9 is really for parameters. But there isn't any better for CMDERR.
             controller->sendGRSP(MNS_OP_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
           }

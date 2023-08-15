@@ -8,7 +8,6 @@
 
 // Controller library
 #include <Controller.h>
-#include "VlcbDefs.h"
 #include "CanService.h"
 
 //
@@ -305,7 +304,7 @@ bool Controller::sendCMDERR(byte cerrno)
   return sendMessageWithNN(OPC_CMDERR, cerrno);
 }
 
-void Controller::sendGRSP(byte opCode, byte serviceType, GrspCodes errCode)
+void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
 {
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }

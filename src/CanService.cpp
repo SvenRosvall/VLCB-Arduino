@@ -190,8 +190,8 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
         byte newCANID = msg->data[3];
         if (newCANID < 1 || newCANID > 99)
         {
-          controller->sendCMDERR(GRSP_INVALID_PARAMETER);
-          controller->sendGRSP(CAN_OP_CANID, getServiceID(), GRSP_INVALID_PARAMETER);
+          controller->sendCMDERR(CMDERR_INV_EN_IDX);
+          controller->sendGRSP(CAN_OP_CANID, getServiceID(), CMDERR_INV_EN_IDX);
         }
         else
         {
