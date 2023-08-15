@@ -44,81 +44,61 @@ void MinimumNodeService::setController(Controller *cntrl)
   this->module_config = cntrl->module_config;
 }
 
-// TODO: This list is used while implementing MNS. Remove once done.
-// MNS shall implement these opcodes in incoming requests
-// * SNN - Done
-// * QNN - Done
-// * RQNP - Done
-// * RQMN - Done
-// * RQNPN - Done
-// * RDGN
-// * RQSD - Done
-// * MODE
-// * SQU
-// * NNRST
-// * NNRSM
 //
-// CBUS - optional
-// These shall be moved to CAN service.
-// * CANID - Here
-// * ENUM - Here
-
-
+/// initiate the transition from Uninitialised to Normal mode
 //
-/// initiate the transition from SLiM to FLiM mode
-//
-void MinimumNodeService::initFLiM()
+void MinimumNodeService::initNormal()
 {
-  // DEBUG_SERIAL << F("> initiating FLiM negotation") << endl;
+  // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
   controller->indicateMode(MODE_CHANGING);
 
   bModeChanging = true;
   timeOutTimer = millis();
 
-  // send RQNN message with current NN, which may be zero if a virgin/SLiM node
+  // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
 
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
 }
 
-void MinimumNodeService::setFLiM()
+void MinimumNodeService::setNormal()
 {
-  // DEBUG_SERIAL << F("> set FLiM") << endl;
+  // DEBUG_SERIAL << F("> set Normal") << endl;
   bModeChanging = false;
-  module_config->setModuleMode(MODE_FLIM);
-  controller->indicateMode(MODE_FLIM);
+  module_config->setModuleMode(MODE_NORMAL);
+  controller->indicateMode(MODE_NORMAL);
 
   // enumerate the CAN bus to allocate a free CAN ID
   controller->startCANenumeration();
 }
 
 //
-/// set module to SLiM mode
+/// set module to Uninitialised mode
 //
-void MinimumNodeService::setSLiM()
+void MinimumNodeService::setUninitialised()
 {
-  // DEBUG_SERIAL << F("> set SLiM") << endl;
+  // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   bModeChanging = false;
   module_config->setNodeNum(0);
-  module_config->setModuleMode(MODE_SLIM);
+  module_config->setModuleMode(MODE_UNINITIALISED);
   module_config->setCANID(0);
 
-  controller->indicateMode(MODE_SLIM);
+  controller->indicateMode(MODE_UNINITIALISED);
 }
 
 //
-/// revert from FLiM to SLiM mode
+/// revert from Normal to Uninitialised mode
 //
-void MinimumNodeService::revertSLiM()
+void MinimumNodeService::revertUninitialised()
 {
 
-  // DEBUG_SERIAL << F("> reverting to SLiM mode") << endl;
+  // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
 
   // send NNREL message
 
   controller->sendMessageWithNN(OPC_NNREL);
-  setSLiM();
+  setUninitialised();
 }
 
 //
@@ -127,11 +107,11 @@ void MinimumNodeService::revertSLiM()
 
 void MinimumNodeService::renegotiate()
 {
-  initFLiM();
+  initNormal();
 }
 
 //
-/// check 30 sec timeout for SLiM/FLiM negotiation with FCU
+/// check 30 sec timeout for Uninitialised/Normal negotiation with FCU
 //
 void MinimumNodeService::checkModeChangeTimeout()
 {
@@ -157,11 +137,11 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
       //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
       if (!module_config->currentMode)
       {
-        initFLiM();
+        initNormal();
       }
       else
       {
-        revertSLiM();
+        revertUninitialised();
       }
       break;
 
@@ -178,6 +158,19 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
   
 }
 
+// TODO: This list is used while implementing MNS. Remove once done.
+// MNS shall implement these opcodes in incoming requests
+// * SNN - Done
+// * QNN - Done
+// * RQNP - Done
+// * RQMN - Done
+// * RQNPN - Done
+// * RDGN - Request Diagnostic Data (0x87)
+// * RQSD - Done
+// * MODE - Set Operating Mode (0x76)
+// * SQU - ????
+// * NNRST - Restart Node (0x5E)
+// * NNRSM - Reset to Manufacturer Settings (0x4F)
 
 Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 {
@@ -188,10 +181,10 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
     case MNS_OP_RQNP:
       // RQNP message - request for node parameters -- does not contain a NN or EN, so only respond if we
-      // are in transition to FLiM
-      // DEBUG_SERIAL << F("> RQNP -- request for node params during FLiM transition for NN = ") << nn << endl;
+      // are in transition to Normal
+      // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
-      // only respond if we are in transition to FLiM mode
+      // only respond if we are in transition to Normal mode
       if (bModeChanging)
       {
         // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
@@ -252,8 +245,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
         // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
-        // we are now in FLiM mode - update the configuration
-        setFLiM();
+        // we are now in Normal mode - update the configuration
+        setNormal();
 
         // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
@@ -282,7 +275,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // sent during module transition, so no node number check
       // DEBUG_SERIAL << F("> RQMN received") << endl;
 
-      // only respond if in transition to FLiM
+      // only respond if in transition to Normal
 
       // respond with NAME
       if (bModeChanging)

@@ -64,14 +64,14 @@ bool LEDUserInterface::resetRequested()
 void LEDUserInterface::indicateMode(byte mode) {
   switch (mode) {
 
-    case MODE_FLIM:
-      //Serial << "UI indicateMode FLiM" << endl;
+    case MODE_NORMAL:
+      //Serial << "UI indicateMode Normal" << endl;
       yellowLed.on();
       greenLed.off();
       break;
 
-    case MODE_SLIM:
-      //Serial << "UI indicateMode SLiM" << endl;
+    case MODE_UNINITIALISED:
+      //Serial << "UI indicateMode Uninitialised" << endl;
       yellowLed.off();
       greenLed.on();
       break;

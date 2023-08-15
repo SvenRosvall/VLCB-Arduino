@@ -33,10 +33,10 @@ private:
   unsigned long timeOutTimer;
   void checkModeChangeTimeout();
   void indicateMode(byte mode);
-  void initFLiM();
-  void setFLiM();
-  void setSLiM();
-  void revertSLiM();
+  void initNormal();
+  void setNormal();
+  void setUninitialised();
+  void revertUninitialised();
   void renegotiate();
 };
 

@@ -66,9 +66,12 @@ const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 99;          // VLCB module type
+const bool CONSUMER = 1;            // module is an event consumer
+const bool PRODUCER = 1;            // module is an event producer
+const bool CON_OWN = 0;             // module can consume own produced events
 
-const byte LED_GRN = 4;             // VLCB green SLiM LED pin
-const byte LED_YLW = 7;             // VLCB yellow FLiM LED pin
+const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
+const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
@@ -109,7 +112,7 @@ void setupVLCB()
   // initialise and load configuration
   modconfig.begin();
 
-  Serial << F("> mode = ") << ((modconfig.currentMode) ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID;
+  Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice
@@ -119,16 +122,16 @@ void setupVLCB()
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
-  params.setFlags(PF_FLiM | PF_COMBI);
+  params.setFlags(CONSUMER | (PRODUCER << 1) | (1 << 2) | (CON_OWN << 4));
 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
 
-  // module reset - if switch is depressed at startup and module is in SLiM mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_SLIM)
+  // module reset - if switch is depressed at startup and module is in Uninitialised mode
+  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_UNINITIALISED)
   {
-    Serial << F("> switch was pressed at startup in SLiM mode") << endl;
+    Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
     modconfig.resetModule(&userInterface);
   }
 
@@ -315,7 +318,7 @@ void processSerialInput()
 
       // node identity
       Serial << F("> VLCB node configuration") << endl;
-      Serial << F("> mode = ") << (modconfig.currentMode == VLCB::MODE_FLIM ? "FLiM" : "SLiM") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
+      Serial << F("> mode = ") << (modconfig.currentMode == VLCB::MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
       Serial << endl;
       break;
 

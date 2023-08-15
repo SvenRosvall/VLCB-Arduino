@@ -575,12 +575,12 @@ void Configuration::resetModule()
   // clear the learned events from storage
   storage->resetEEPROM();
 
-  // DEBUG_SERIAL << F("> setting SLiM config") << endl;
+  // DEBUG_SERIAL << F("> setting Uninitialised config") << endl;
 
   // set the node identity defaults
-  // we set a NN and CANID of zero in SLiM as we're now a consumer-only node
+  // we set a NN and CANID of zero in Uninitialised as we're now a consumer-only node
 
-  storage->writeEEPROM(0, 0);     // SLiM
+  storage->writeEEPROM(0, 0);     // Mode = Uninitialised
   storage->writeEEPROM(1, 0);     // CANID
   storage->writeEEPROM(2, 0);     // NN hi
   storage->writeEEPROM(3, 0);     // NN lo
