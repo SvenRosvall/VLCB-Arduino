@@ -38,6 +38,12 @@ private:
   void setUninitialised();
   void revertUninitialised();
   void renegotiate();
+  void heartbeat();
+  
+  unsigned long lastHeartbeat = 0;
+  byte heartbeatSequence = 0;
+  bool noHeartbeat = 0;
+  unsigned int heartRate = 5000;
 };
 
 }
