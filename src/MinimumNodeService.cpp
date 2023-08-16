@@ -10,34 +10,6 @@
 namespace VLCB
 {
 
-enum MnsOpCodes
-{
-  MNS_OP_RQNN = OPC_RQNN,
-  MNS_OP_SNN = OPC_SNN,
-  MNS_OP_NNACK = OPC_NNACK,
-  MNS_OP_NNREL = OPC_NNREL,
-  MNS_OP_QNN = OPC_QNN,
-  MNS_OP_PNN = OPC_PNN,
-  MNS_OP_RQNP = OPC_RQNP,
-  MNS_OP_PARAMS = OPC_PARAMS,
-  MNS_OP_RQMN = OPC_RQMN,
-  MNS_OP_NAME = OPC_NAME,
-  MNS_OP_RQNPN = OPC_RQNPN,
-  MNS_OP_PARAN = OPC_PARAN,
-  MNS_OP_CMDERR = OPC_CMDERR,
-  MNS_OP_GRSP = 0xAF,
-  MNS_OP_RDGN = 0x87,
-  MNS_OP_DGN = 0xC7,
-  MNS_OP_HEARTB = 0xAB,
-  MNS_OP_RQSD = 0x78,
-  MNS_OP_SD = 0x8C,
-  MNS_OP_ESD = 0xE7,
-  MNS_OP_MODE = 0x76,
-  MNS_OP_SQU = 0x66,
-  MNS_OP_NNRST = OPC_NNRST,
-  MNS_OP_NNRSM = OPC_NNRSM
-};
-
 void MinimumNodeService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
@@ -179,7 +151,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
   switch (opc)
   {
 
-    case MNS_OP_RQNP:
+    case OPC_RQNP:
       // RQNP message - request for node parameters -- does not contain a NN or EN, so only respond if we
       // are in transition to Normal
       // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
@@ -191,7 +163,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
         // respond with PARAMS message
         msg->len = 8;
-        msg->data[0] = MNS_OP_PARAMS;    // opcode
+        msg->data[0] = OPC_PARAMS;    // opcode
         msg->data[1] = controller->_mparams[1];     // manf code -- MERG
         msg->data[2] = controller->_mparams[2];     // minor code ver
         msg->data[3] = controller->_mparams[3];     // module ident
@@ -205,7 +177,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       return PROCESSED;
 
-    case MNS_OP_RQNPN:
+    case OPC_RQNPN:
       // RQNPN message -- request parameter by index number
       // index 0 = number of params available;
       // respond with PARAN
@@ -219,7 +191,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         if (paran <= controller->_mparams[0])
         {
           paran = msg->data[3];
-          controller->sendMessageWithNN(MNS_OP_PARAN, paran, controller->_mparams[paran]);
+          controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
 
         } else {
           // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
@@ -229,7 +201,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       return PROCESSED;
 
-    case MNS_OP_SNN:
+    case OPC_SNN:
       // received SNN - set node number
       // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
@@ -241,7 +213,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         module_config->setNodeNum(nn);
 
         // respond with NNACK
-        controller->sendMessageWithNN(MNS_OP_NNACK);
+        controller->sendMessageWithNN(OPC_NNACK);
 
         // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
@@ -258,19 +230,19 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       return PROCESSED;
 
-    case MNS_OP_QNN:
+    case OPC_QNN:
       // this is probably a config recreate -- respond with PNN if we have a node number
       // DEBUG_SERIAL << F("> QNN received, my node number = ") << module_config->nodeNum << endl;
 
       if (module_config->nodeNum > 0)
       {
         // DEBUG_SERIAL << ("> responding with PNN message") << endl;
-        controller->sendMessageWithNN(MNS_OP_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
+        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
       }
 
       return PROCESSED;
 
-    case MNS_OP_RQMN:
+    case OPC_RQMN:
       // request for node module name, excluding "CAN" prefix
       // sent during module transition, so no node number check
       // DEBUG_SERIAL << F("> RQMN received") << endl;
@@ -281,14 +253,14 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (bModeChanging)
       {
         msg->len = 8;
-        msg->data[0] = MNS_OP_NAME;
+        msg->data[0] = OPC_NAME;
         memcpy(msg->data + 1, controller->_mname, 7);
         controller->sendMessage(msg);
       }
 
       return PROCESSED;
 
-    case MNS_OP_RQSD:
+    case OPC_RQSD:
       // Request Service Definitions.
 
       if (nn == module_config->nodeNum)
@@ -296,12 +268,12 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         byte serviceIndex = msg->data[3];
         if (serviceIndex == 0)
         {
-          controller->sendMessageWithNN(MNS_OP_SD, 0, 0, controller->services.size());
+          controller->sendMessageWithNN(OPC_SD, 0, 0, controller->services.size());
           byte svcIndex = 0;
           for (auto svc : controller->services)
           {
             // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
-            controller->sendMessageWithNN(MNS_OP_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
+            controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
           }
         }
         else
@@ -318,18 +290,18 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
           if (theService)
           {
-            controller->sendMessageWithNN(MNS_OP_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+            controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
           }
           else
           {
             // Couldn't find the service.
             controller->sendCMDERR(CMDERR_INV_EN_IDX);
             // NOTE: error code 9 is really for parameters. But there isn't any better for CMDERR.
-            controller->sendGRSP(MNS_OP_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
+            controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
           }
         }
         // DEBUG_SERIAL << ("> responding with PNN message") << endl;
-        controller->sendMessageWithNN(MNS_OP_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
+        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
       }
 
       return PROCESSED;
