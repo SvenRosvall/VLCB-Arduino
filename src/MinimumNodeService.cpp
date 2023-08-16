@@ -96,6 +96,20 @@ void MinimumNodeService::checkModeChangeTimeout()
   }
 }
 
+void MinimumNodeService::heartbeat()
+{
+  if ((module_config->currentMode == MODE_NORMAL) && !noHeartbeat)
+  {
+    if ((millis() - lastHeartbeat) > heartRate)
+    {
+    //  DEBUG_SERIAL << F("> HeartBeat = ") << heartbeatSequence << endl;
+      controller->sendMessageWithNN(OPC_HEARTB, heartbeatSequence, 0, 0);  // 0 to be replaced by diagnostic status      
+      heartbeatSequence++;
+      lastHeartbeat = millis();
+    }
+  }  
+}
+
 //
 /// MinimumNode Service processing procedure
 //
@@ -127,7 +141,7 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
   }
   
   checkModeChangeTimeout();
-  
+  heartbeat();
 }
 
 // TODO: This list is used while implementing MNS. Remove once done.
@@ -229,7 +243,17 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       }
 
       return PROCESSED;
-
+      
+    case OPC_RQNN:
+      // Another module has entered setup.
+      // If we are in setup, abort (MNS Spec 3.2.1)
+      
+      if (bModeChanging)
+      {
+        bModeChanging = false;
+        controller->indicateMode(module_config->currentMode);
+      }
+        
     case OPC_QNN:
       // this is probably a config recreate -- respond with PNN if we have a node number
       // DEBUG_SERIAL << F("> QNN received, my node number = ") << module_config->nodeNum << endl;
