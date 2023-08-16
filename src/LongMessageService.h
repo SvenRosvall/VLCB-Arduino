@@ -50,7 +50,7 @@ public:
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
 
-  virtual byte getServiceID() override { return 92; }
+  virtual byte getServiceID() override { return 17; }
   virtual byte getServiceVersionID() override { return 1; }
 
 protected:
