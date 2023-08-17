@@ -49,18 +49,15 @@ void Configuration::begin()
   EE_BYTES_PER_EVENT = EE_NUM_EVS + 4;
 
   storage->begin();
-
-  makeEvHashTable();
-  loadNVs();
   
   if ((currentMode == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
-   storage->writeEEPROM(0, 0);     // SLiM
-   storage->writeEEPROM(1, 0);     // CANID
-   storage->writeEEPROM(2, 0);     // NN hi
-   storage->writeEEPROM(3, 0);     // NN lo
-   loadNVs();
+   resetModule();
+   clearResetFlag();   
   }
+  
+  makeEvHashTable();
+  loadNVs();
 }
 
 void Configuration::setModuleMode(ModuleMode f)
