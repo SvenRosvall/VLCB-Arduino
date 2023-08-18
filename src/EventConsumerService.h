@@ -7,8 +7,7 @@
 
 #include "Service.h"
 
-namespace VLCB
-{
+namespace VLCB {
 
 class Configuration;
 
@@ -16,19 +15,29 @@ class Configuration;
 // This is a service that implements all the CBUS op-codes.
 // When creating new services, pick code from here.
 // In the end there should not be any code left in this service.
-class CbusService : public Service
-{
+class EventConsumerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
+  void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
+  void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override { return 91; }
-  virtual byte getServiceVersionID() override { return 1; }
+  virtual byte getServiceID() override 
+  {
+    return 6;
+  }
+  virtual byte getServiceVersionID() override 
+  {
+    return 1;
+  }
 
 private:
-  Controller * controller;
-  Configuration * module_config;  // Shortcut to reduce indirection code.
- 
- };
+  Controller *controller;
+  Configuration *module_config;  // Shortcut to reduce indirection code.
+  void (*eventhandler)(byte index, CANFrame *msg);
+  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
 
-} // VLCB
+  void processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned int en, bool is_on_event);
+};
+
+}  // VLCB
