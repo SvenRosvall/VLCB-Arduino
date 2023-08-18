@@ -155,8 +155,8 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 // * RQSD - Done
 // * MODE - Set Operating Mode (0x76)
 // * SQU - ????
-// * NNRST - Restart Node (0x5E)
-// * NNRSM - Reset to Manufacturer Settings (0x4F)
+// * NNRST - Done
+// * NNRSM - Done
 
 Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 {
@@ -328,6 +328,33 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
       }
 
+      return PROCESSED;
+      
+    case OPC_RDGN:
+      // Request Diagnostic Data
+      
+      return PROCESSED;
+      
+    case OPC_MODE:
+      // Set Operating Mode
+      
+      return PROCESSED;
+      
+    case OPC_NNRSM:
+      //reset to manufacturer's defaults 
+      if (nn == module_config->nodeNum)
+      {        
+        controller->sendMessageWithNN(OPC_NNREL);  // release node number first
+        module_config->resetModule();        
+      }
+      return PROCESSED;
+      
+    case OPC_NNRST:
+      //software reset
+      if (nn == module_config->nodeNum)
+      {
+        module_config->reboot();
+      }
       return PROCESSED;
 
     default:
