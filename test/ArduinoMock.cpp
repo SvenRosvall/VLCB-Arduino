@@ -1,5 +1,6 @@
 #include <map>
 #include <Arduino.h>
+#include <Streaming.h>
 #include "Arduino.hpp"
 #include "ArduinoMock.hpp"
 
@@ -68,18 +69,29 @@ unsigned long millis()
 {
         return nextMillis;
 }
+void delay(unsigned int delayMillis)
+{
+  nextMillis += delayMillis;
+}
 
 int map(int value, int fromLower, int fromUpper, int toLower, int toUpper)
 {
         return (value - fromLower) * (toUpper - toLower) / (fromUpper - fromLower) + toLower;
 }
 
-//struct Print Serial;
+byte highByte(unsigned int i)
+{
+  return i >> 8;
+}
+byte lowByte(unsigned int i)
+{
+  return i & 0xFF;
+}
 
-void Serial::begin(int baudRate)
+void Serial_T::begin(int baudRate)
 {
 }
-void Serial::println(const char *)
+void Serial_T::println(const char *)
 {
 }
 
@@ -92,9 +104,5 @@ uint8_t ADCL;
 uint8_t ADCH;
 
 void sei()
-{
-}
-
-void bitWrite(int, int, int)
 {
 }

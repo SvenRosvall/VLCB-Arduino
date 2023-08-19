@@ -292,7 +292,10 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         byte serviceIndex = msg->data[3];
         if (serviceIndex == 0)
         {
+          // Request for summary of services. First a service count
           controller->sendMessageWithNN(OPC_SD, 0, 0, controller->services.size());
+          
+          // and then details of each service.
           byte svcIndex = 0;
           for (auto svc : controller->services)
           {
@@ -302,6 +305,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         }
         else
         {
+          // Request for details of a single service.
           byte svcIndex = 0;
           Service * theService = NULL;
           for (auto svc : controller->services)

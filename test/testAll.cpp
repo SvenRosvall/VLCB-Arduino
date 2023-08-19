@@ -7,9 +7,11 @@
 #include <string>
 #include <iostream>
 #include "testArduino.hpp"
+#include "testMinimumNodeService.h"
 
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
+        {"MinimumNodeService", testMinimumNodeService},
 };
 
 int main(int argc, const char * const * argv)
@@ -46,4 +48,5 @@ int main(int argc, const char * const * argv)
       }
     }
   }
+  return 0;
 }

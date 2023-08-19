@@ -35,7 +35,7 @@ class Configuration
 {
 public:
   Configuration();
-  explicit Configuration(Storage * theStorage);
+  Configuration(Storage * theStorage);
   void begin();
 
   byte findExistingEvent(unsigned int nn, unsigned int en);

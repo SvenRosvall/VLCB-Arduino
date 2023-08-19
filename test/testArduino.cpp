@@ -1,15 +1,20 @@
-#include "Arduino.hpp"
+#include <Arduino.h>
 #include "TestTools.hpp"
 
-void testMap()
+namespace
 {
-        test();
 
-        assertEquals(100, map(10, 10, 20, 100, 200));
-        assertEquals(200, map(20, 10, 20, 100, 200));
+void testBits()
+{
+  test();
+
+  assertEquals(1, bitRead(0x33, 4));
+  assertEquals(0, bitRead(0x33, 3));
+}
+
 }
 
 void testArduino()
 {
-        testMap();
+  testBits();
 }
