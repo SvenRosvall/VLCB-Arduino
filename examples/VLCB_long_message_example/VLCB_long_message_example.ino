@@ -59,7 +59,6 @@
 #include <LongMessageService.h>
 #include "CanService.h"
 #include <CbusService.h>
-#include "EventConsumerService.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -82,8 +81,7 @@ VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
-VLCB::EventConsumerService ecService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &lmsg, &cbusService, &ecService }); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &lmsg, &cbusService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
@@ -139,7 +137,7 @@ void setupVLCB()
   }
 
   // register our VLCB event handler, to receive event messages of learned events
-  ecService.setEventHandler(eventhandler);
+  cbusService.setEventHandler(eventhandler);
 
   // register our CAN frame handler, to receive *every* CAN frame
   controller.setFrameHandler(framehandler);

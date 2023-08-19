@@ -60,7 +60,6 @@
 #include "MinimumNodeService.h"
 #include "CanService.h"
 #include "CbusService.h"
-#include "EventConsumerService.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -82,8 +81,7 @@ VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::EventConsumerService ecService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService, &ecService }); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService }); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -145,7 +143,7 @@ void setupVLCB()
   }
 
   // register our VLCB event handler, to receive event messages of learned events
-  ecService.setEventHandler(eventhandler);
+  cbusService.setEventHandler(eventhandler);
 
   // set Controller LEDs to indicate mode
   controller.indicateMode(modconfig.currentMode);

@@ -93,7 +93,6 @@ private:                                          // protected members become pr
   friend class MinimumNodeService;
   friend class CanService;
   friend class CbusService;
-  friend class EventConsumerService;
 };
 
 }
