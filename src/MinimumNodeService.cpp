@@ -324,6 +324,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
           }
         }
+        // DEBUG_SERIAL << ("> responding with PNN message") << endl;
+        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
       }
 
       return PROCESSED;

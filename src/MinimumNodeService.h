@@ -19,7 +19,7 @@ public:
 
   virtual void setController(Controller *cntrl) override;
   virtual void process(UserInterface::RequestedAction requestedAction) override; 
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
   virtual byte getServiceID() override { return 1; }
   virtual byte getServiceVersionID() override { return 1; }
