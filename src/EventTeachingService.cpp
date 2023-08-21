@@ -32,7 +32,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
     if (nn == module_config->nodeNum)
     {
-      controller->bLearn = true;
+      bLearn = true;
       // DEBUG_SERIAL << F("> set lean mode ok") << endl;
       // set bit 5 in parameter 8
       bitSet(controller->_mparams[8], 5);
@@ -46,7 +46,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
     // DEBUG_SERIAL << F("> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
     // we must be in learn mode
-    if (controller->bLearn == true)
+    if (bLearn == true)
     {
       // DEBUG_SERIAL << F("> searching for existing event to unlearn") << endl;
 
@@ -78,7 +78,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
     if (nn == module_config->nodeNum)
     {
-      controller->bLearn = false;
+      bLearn = false;
       // DEBUG_SERIAL << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
       // clear bit 5 in parameter 8
       bitClear(controller->_mparams[8], 5);
@@ -153,7 +153,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
   case OPC_NNCLR:
     // NNCLR -- clear all stored events
 
-    if (controller->bLearn == true && nn == module_config->nodeNum)
+    if (bLearn == true && nn == module_config->nodeNum)
     {
       // DEBUG_SERIAL << F("> NNCLR -- clear all events") << endl;
 
@@ -202,7 +202,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
     // DEBUG_SERIAL << endl << F("> EVLRN for source nn = ") << nn << F(", en = ") << en << F(", evindex = ") << evindex << F(", evval = ") << evval << endl;
 
     // we must be in learn mode
-    if (controller->bLearn)
+    if (bLearn)
     {
       // search for this NN, EN as we may just be adding an EV to an existing learned event
       // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
