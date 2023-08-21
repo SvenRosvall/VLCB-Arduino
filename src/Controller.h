@@ -77,9 +77,9 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   unsigned char *_mname;
-  void (*framehandler)(CANFrame *msg);
-  byte *_opcodes;
-  byte _num_opcodes;
+  void (*framehandler)(CANFrame *msg) = NULL;
+  byte *_opcodes = NULL;
+  byte _num_opcodes = 0;
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
