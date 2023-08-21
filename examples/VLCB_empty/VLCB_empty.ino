@@ -58,6 +58,8 @@
 #include "MinimumNodeService.h"
 #include "CanService.h"
 #include "CbusService.h"
+#include "EventConsumerService.h"
+#include "EventTeachingService.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -79,7 +81,9 @@ VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService }); // Controller object
+VLCB::EventConsumerService ecService;
+VLCB::EventTeachingService etService;
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService, &ecService,  &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
@@ -130,7 +134,7 @@ void setupVLCB()
   }
 
   // register our VLCB event handler, to receive event messages of learned events
-  cbusService.setEventHandler(eventhandler);
+  ecService.setEventHandler(eventhandler);
 
   // register our CAN frame handler, to receive *every* CAN frame
   controller.setFrameHandler(framehandler);

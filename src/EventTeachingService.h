@@ -12,17 +12,13 @@ namespace VLCB
 
 class Configuration;
 
-// Quick and dirty service to migrate from the CBUS library to using a set of VLCB services.
-// This is a service that implements all the CBUS op-codes.
-// When creating new services, pick code from here.
-// In the end there should not be any code left in this service.
-class CbusService : public Service
+class EventTeachingService : public Service
 {
 public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override { return 91; }
+  virtual byte getServiceID() override { return 4; }
   virtual byte getServiceVersionID() override { return 1; }
 
 private:

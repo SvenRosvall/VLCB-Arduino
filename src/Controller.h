@@ -80,8 +80,6 @@ private:                                          // protected members become pr
   void (*framehandler)(CANFrame *msg);
   byte *_opcodes;
   byte _num_opcodes;
-  bool bModeChanging, bLearn;
-  unsigned long timeOutTimer;
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
@@ -93,6 +91,8 @@ private:                                          // protected members become pr
   friend class MinimumNodeService;
   friend class CanService;
   friend class CbusService;
+  friend class EventConsumerService;
+  friend class EventTeachingService;
 };
 
 }
