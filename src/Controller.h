@@ -94,6 +94,7 @@ private:                                          // protected members become pr
   friend class CanService;
   friend class CbusService;
   friend class EventConsumerService;
+  friend class EventTeachingService;
 };
 
 }

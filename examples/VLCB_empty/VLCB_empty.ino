@@ -59,6 +59,7 @@
 #include "CanService.h"
 #include "CbusService.h"
 #include "EventConsumerService.h"
+#include "EventTeachingService.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -81,7 +82,8 @@ VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
 VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::EventConsumerService ecService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService, &ecService }); // Controller object
+VLCB::EventTeachingService etService;
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService, &ecService,  &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
