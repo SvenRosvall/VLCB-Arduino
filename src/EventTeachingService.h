@@ -24,6 +24,8 @@ public:
 private:
   Controller * controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
+  
+  bool bLearn;
  
  };
 
