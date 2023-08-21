@@ -69,7 +69,6 @@ public:
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
-  CANFrame _msg;
   UserInterface *_ui;
   Configuration *module_config;
   std::initializer_list<Service *> services;
@@ -77,9 +76,9 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   unsigned char *_mname;
-  void (*framehandler)(CANFrame *msg);
-  byte *_opcodes;
-  byte _num_opcodes;
+  void (*framehandler)(CANFrame *msg) = NULL;
+  byte *_opcodes = NULL;
+  byte _num_opcodes = 0;
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);

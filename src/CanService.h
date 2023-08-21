@@ -24,7 +24,7 @@ public:
 
   virtual void process(UserInterface::RequestedAction requestedAction) override;
   virtual Processed handleRawMessage(CANFrame *msg) override;
-  Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
   void startCANenumeration();
 
