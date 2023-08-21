@@ -28,7 +28,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
     
   case OPC_NNLRN:
     // received NNLRN -- place into learn mode
-     DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
+    //DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
 
     if (nn == module_config->nodeNum)
     {

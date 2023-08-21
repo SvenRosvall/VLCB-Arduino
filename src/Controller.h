@@ -80,8 +80,6 @@ private:                                          // protected members become pr
   void (*framehandler)(CANFrame *msg);
   byte *_opcodes;
   byte _num_opcodes;
-  bool bModeChanging, bLearn;
-  unsigned long timeOutTimer;
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
