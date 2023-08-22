@@ -30,7 +30,7 @@ void LEDUserInterface::run()
   if (resetRequested())
   {
     //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
-    indicateMode(MODE_CHANGING);
+    indicateMode(MODE_SETUP);
   }
 }
 
@@ -76,7 +76,7 @@ void LEDUserInterface::indicateMode(byte mode) {
       greenLed.on();
       break;
 
-    case MODE_CHANGING:
+    case MODE_SETUP:
       //Serial << "UI indicateMode changing" << endl;
       yellowLed.blink();
       greenLed.off();
