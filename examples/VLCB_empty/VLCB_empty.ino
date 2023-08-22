@@ -80,10 +80,11 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
-VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, { &mnService, &canService, &cbusService, &ecService,  &etService }); // Controller object
+VLCB::CbusService cbusService;               // service for CBUS op-codes
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
+                            { &mnService, &canService, &ecService,  &etService, &cbusService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
