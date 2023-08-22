@@ -114,10 +114,54 @@ void testServiceDiscoveryLongMessageSvc()
   // Not testing service data bytes.
 }
 
+void testServiceDiscoveryIndexOutOfBand()
+{
+  test();
+
+  MockTransport mockTransport;
+  VLCB::Controller controller = createController(mockTransport);
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 7}};
+  mockTransport.setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport.sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport.sent_messages[0].data[0]);
+  assertEquals(OPC_RQSD, mockTransport.sent_messages[0].data[3]);
+  assertEquals(1, mockTransport.sent_messages[0].data[4]); // service ID of MNS
+  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport.sent_messages[0].data[5]); // result
+  // Not testing service data bytes.
+}
+
+void testServiceDiscoveryShortMessage()
+{
+  test();
+
+  MockTransport mockTransport;
+  VLCB::Controller controller = createController(mockTransport);
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQSD, 0x01, 0x04}};
+  mockTransport.setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport.sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport.sent_messages[0].data[0]);
+  assertEquals(OPC_RQSD, mockTransport.sent_messages[0].data[3]);
+  assertEquals(1, mockTransport.sent_messages[0].data[4]); // service ID of MNS
+  assertEquals(CMDERR_INV_CMD, mockTransport.sent_messages[0].data[5]); // result
+  // Not testing service data bytes.
+}
+
 }
 
 void testMinimumNodeService()
 {
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
+  testServiceDiscoveryIndexOutOfBand();
+  testServiceDiscoveryShortMessage();
 }
