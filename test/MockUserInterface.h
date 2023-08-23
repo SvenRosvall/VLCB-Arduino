@@ -19,4 +19,11 @@ public:
   virtual void indicateMode(byte mode) override;
   virtual bool resetRequested() override;
   virtual RequestedAction checkRequestedAction() override;
+  
+  void setRequestedAction(RequestedAction action);
+  byte getIndicatedMode();
+
+private:
+  RequestedAction requestedAction;
+  byte indicatedMode;
 };

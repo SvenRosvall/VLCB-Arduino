@@ -29,7 +29,7 @@ void MockUserInterface::indicateActivity()
 
 void MockUserInterface::indicateMode(byte mode)
 {
-
+  indicatedMode = mode;
 }
 
 bool MockUserInterface::resetRequested()
@@ -39,5 +39,15 @@ bool MockUserInterface::resetRequested()
 
 VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()
 {
-  return NONE;
+  return requestedAction;
+}
+
+void MockUserInterface::setRequestedAction(VLCB::UserInterface::RequestedAction action)
+{
+  requestedAction = action;
+}
+
+byte MockUserInterface::getIndicatedMode()
+{
+  return indicatedMode;
 }
