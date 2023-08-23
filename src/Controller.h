@@ -69,7 +69,6 @@ public:
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
-  CANFrame _msg;
   UserInterface *_ui;
   Configuration *module_config;
   std::initializer_list<Service *> services;

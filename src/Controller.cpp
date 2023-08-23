@@ -141,15 +141,15 @@ void Controller::process(byte num_messages)
     // at least one CAN frame is available in the reception buffer
     // retrieve the next one
 
-    _msg = transport->getNextMessage();
+    CANFrame msg = transport->getNextMessage();
     // DEBUG_SERIAL << "> Received a message" << endl;
 
-    callFrameHandler(&_msg);
+    callFrameHandler(&msg);
 
     for (Service * service : services)
     {
       // DEBUG_SERIAL << "> Passing raw message to " << endl;
-      if (service->handleRawMessage(&_msg) == PROCESSED)
+      if (service->handleRawMessage(&msg) == PROCESSED)
       {
         // DEBUG_SERIAL << "> Service handled raw message" << endl;
         break;
@@ -159,7 +159,7 @@ void Controller::process(byte num_messages)
     indicateActivity();
 
     // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-    if (_msg.ext)
+    if (msg.ext)
     {
       // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
       continue;
@@ -170,13 +170,13 @@ void Controller::process(byte num_messages)
     /// if we got this far, it's a standard CAN frame (not extended, not RTR) with a data payload length > 0
     //
 
-    if (_msg.len > 0) 
+    if (msg.len > 0) 
     {
-      unsigned int opc = _msg.data[0];
+      unsigned int opc = msg.data[0];
       // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
       for (Service * service : services)
       {
-        if (service->handleMessage(opc, &_msg) == PROCESSED)
+        if (service->handleMessage(opc, &msg) == PROCESSED)
         {
           break;
         }

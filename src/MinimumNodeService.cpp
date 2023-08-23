@@ -23,7 +23,7 @@ void MinimumNodeService::initNormal()
 {
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
-  controller->indicateMode(MODE_CHANGING);
+  controller->indicateMode(MODE_SETUP);
 
   bModeChanging = true;
   timeOutTimer = millis();
