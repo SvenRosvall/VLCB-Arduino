@@ -1,6 +1,7 @@
 #include <map>
 #include <Arduino.h>
 #include <Streaming.h>
+#include <iostream>
 #include "Arduino.hpp"
 #include "ArduinoMock.hpp"
 
@@ -94,6 +95,40 @@ void Serial_T::begin(int baudRate)
 void Serial_T::println(const char *)
 {
 }
+
+Serial_T & operator<<(Serial_T & s, int i)
+{
+  std::cout << i;
+  return s;
+}
+Serial_T & operator<<(Serial_T & s, unsigned int i)
+{
+  std::cout << i;
+  return s;
+}
+Serial_T & operator<<(Serial_T & s, long i)
+{
+  std::cout << i;
+  return s;
+}
+Serial_T & operator<<(Serial_T & s, unsigned long i)
+{
+  std::cout << i;
+  return s;
+}
+Serial_T & operator<<(Serial_T & s, const char * i)
+{
+  std::cout << i;
+  return s;
+}
+Serial_T & operator<<(Serial_T & s, const ENDL_T & e)
+{
+  std::cout << std::endl;
+  return s;
+}
+ENDL_T endl;
+Serial_T Serial;
+//template <typename T> T _HEX(T);
 
 // Hardware values used by ADC free running mode.
 uint8_t DIDR0;

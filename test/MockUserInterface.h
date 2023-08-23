@@ -8,6 +8,7 @@
 #pragma once
 
 #include "UserInterface.h"
+#include "Configuration.h"
 
 class MockUserInterface : public VLCB::UserInterface
 {
@@ -24,6 +25,6 @@ public:
   byte getIndicatedMode();
 
 private:
-  RequestedAction requestedAction;
-  byte indicatedMode;
+  RequestedAction requestedAction = NONE;
+  byte indicatedMode = VLCB::MODE_UNINITIALISED;
 };
