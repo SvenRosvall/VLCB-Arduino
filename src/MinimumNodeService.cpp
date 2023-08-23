@@ -5,6 +5,7 @@
 
 #include "MinimumNodeService.h"
 #include "Controller.h"
+#include "Streaming.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -19,7 +20,7 @@ void MinimumNodeService::setController(Controller *cntrl)
 //
 /// initiate the transition from Uninitialised to Normal mode
 //
-void MinimumNodeService::initNormal()
+void MinimumNodeService::initSetup()
 {
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
@@ -62,15 +63,14 @@ void MinimumNodeService::setUninitialised()
 //
 /// revert from Normal to Uninitialised mode
 //
-void MinimumNodeService::revertUninitialised()
+void MinimumNodeService::initSetupFromNormal()
 {
 
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
 
   // send NNREL message
-
   controller->sendMessageWithNN(OPC_NNREL);
-  setUninitialised();
+  initSetup();
 }
 
 //
@@ -79,7 +79,8 @@ void MinimumNodeService::revertUninitialised()
 
 void MinimumNodeService::renegotiate()
 {
-  initNormal();
+  // Request a new NN. Same as setting up to Normal mode.
+  initSetup();
 }
 
 //
@@ -87,12 +88,17 @@ void MinimumNodeService::renegotiate()
 //
 void MinimumNodeService::checkModeChangeTimeout()
 {
-  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
-
+  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) 
+  {
     // Revert to previous mode.
-    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
+    // DEBUG_SERIAL << F("MNS::checkModeChangeTimeout() timeout expired, currentMode = ") << module_config->currentMode << F(", mode change = ") << bModeChanging << endl;
     controller->indicateMode(module_config->currentMode);
     bModeChanging = false;
+    if (module_config->currentMode == MODE_NORMAL)
+    {
+      // Reclaim the NN we had.
+      controller->sendMessageWithNN(OPC_NNACK);
+    }
   }
 }
 
@@ -116,23 +122,25 @@ void MinimumNodeService::heartbeat()
 
 void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 {
-   switch (requestedAction)
+  switch (requestedAction)
   {
     case UserInterface::CHANGE_MODE:
       // initiate mode change
       //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
       if (!module_config->currentMode)
       {
-        initNormal();
+        //Serial << "MNS::process() - initiate for Normal mode. current mode=" << module_config->currentMode << endl;
+        initSetup();
       }
       else
       {
-        revertUninitialised();
+        //Serial << "MNS::process() - revert to uninitialized. current mode=" << module_config->currentMode << endl;
+        initSetupFromNormal();
       }
       break;
 
     case UserInterface::RENEGOTIATE:
-      //Serial << "Controller::process() - renegotiate" << endl;
+      //Serial << "MNS::process() - renegotiate" << endl;
       renegotiate();
       break;
 
