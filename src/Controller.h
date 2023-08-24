@@ -67,7 +67,7 @@ public:
   void setName(unsigned char *mname);
   void indicateMode(byte mode);
   void indicateActivity();
-  void requestedMode(byte reqMode);
+  void requestMode(byte reqMode);
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes

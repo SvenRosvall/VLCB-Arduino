@@ -24,7 +24,7 @@ public:
   virtual byte getServiceID() override { return 1; }
   virtual byte getServiceVersionID() override { return 1; }
   
-  void begin();
+  virtual void begin() override;
 
 private:
 

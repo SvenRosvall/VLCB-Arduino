@@ -351,7 +351,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
         }
       }
-
+ 
       return PROCESSED;
       
     case OPC_RDGN:
