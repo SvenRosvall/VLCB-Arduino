@@ -289,10 +289,19 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (nn == module_config->nodeNum)
       {
+        if (msg->len < 4)
+        {
+          controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }
+
         byte serviceIndex = msg->data[3];
         if (serviceIndex == 0)
         {
+          // Request for summary of services. First a service count
           controller->sendMessageWithNN(OPC_SD, 0, 0, controller->services.size());
+          
+          // and then details of each service.
           byte svcIndex = 0;
           for (auto svc : controller->services)
           {
@@ -302,6 +311,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         }
         else
         {
+          // Request for details of a single service.
           byte svcIndex = 0;
           Service * theService = NULL;
           for (auto svc : controller->services)
@@ -319,9 +329,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           else
           {
             // Couldn't find the service.
-            controller->sendCMDERR(CMDERR_INV_EN_IDX);
-            // NOTE: error code 9 is really for parameters. But there isn't any better for CMDERR.
-            controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
+            controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_PARAM_IDX);
           }
         }
       }

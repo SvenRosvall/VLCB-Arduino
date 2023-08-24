@@ -29,7 +29,7 @@ struct CANFrame
   bool ext;
   bool rtr;
   uint8_t len;
-  uint8_t data[8] = {};
+  uint8_t data[8];
 };
 
 //
