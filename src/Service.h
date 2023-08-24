@@ -24,6 +24,7 @@ class Service
 {
 public:
   virtual void setController(Controller *controller) {}
+  virtual void begin() {}
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
