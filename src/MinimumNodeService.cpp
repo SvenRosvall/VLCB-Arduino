@@ -78,11 +78,8 @@ void MinimumNodeService::setUninitialised()
 //
 void MinimumNodeService::revertUninitialised()
 {
-
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
-
   // send NNREL message
-
   controller->sendMessageWithNN(OPC_NNREL);
   setUninitialised();
 }
@@ -408,7 +405,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           } 
           if (newMode == MODE_LEARN)
           {
-            controller->requestedMode(newMode);
+            controller->requestMode(newMode);
             instantMode = newMode;
           }
           if (newMode == MODE_NHEARTB)
@@ -423,7 +420,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         case MODE_LEARN:
           if (newMode == MODE_NORMAL)
           {
-            controller->requestedMode(newMode);
+            controller->requestMode(newMode);
             if (noHeartbeat == true)
             {
               instantMode = MODE_NHEARTB;
@@ -444,7 +441,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
           if (newMode == MODE_LEARN)
           {
-            controller->requestedMode(newMode);
+            controller->requestMode(newMode);
             instantMode = newMode;
           } 
           
