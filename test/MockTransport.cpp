@@ -40,3 +40,9 @@ void MockTransport::setNextMessage(VLCB::CANFrame msg)
 {
   incoming_messages.push_back(msg);
 }
+
+void MockTransport::clearMessages()
+{
+  incoming_messages.clear();
+  sent_messages.clear();
+}

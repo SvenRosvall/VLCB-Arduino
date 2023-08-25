@@ -3,27 +3,14 @@
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
-// Test cases for MinimumNodeService.
-// MNS implements these OP-codes.
-// * RQNN - (Initiated by module from user action.)
-// * NNREL - (Initiated by module from user action.)
-// * SNN - Done
-// * QNN - Done
-// * RQNP - Done
-// * RQMN - Done
-// * RQNPN - Done
-// * RDGN - No support in MNS yet
-// * RQSD - Done - Tests done
-// * MODE - No support in MNS yet
-// * SQU - ????
-// * NNRST - Done
-// * NNRSM - Done
+// Test cases for NodeVariablesService.
 
 #include <memory>
 #include "TestTools.hpp"
 #include "Controller.h"
 #include "MockUserInterface.h"
 #include "MinimumNodeService.h"
+#include "NodeVariablesService.h"
 #include "MockTransport.h"
 #include "MockStorage.h"
 #include "vlcbdefs.hpp"
@@ -47,10 +34,10 @@ VLCB::Controller createController()
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
-  static std::unique_ptr<VLCB::LongMessageService> longMessageService;
-  longMessageService.reset(new VLCB::LongMessageService);
+  static std::unique_ptr<VLCB::NodeVariablesService> NodeVariablesService;
+  NodeVariablesService.reset(new VLCB::NodeVariablesService);
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              {minimumNodeService.get(), longMessageService.get()});
+                              {minimumNodeService.get(), NodeVariablesService.get()});
 
   configuration->EE_NVS_START = 0;
   configuration->EE_NUM_NVS = 4;
@@ -74,51 +61,24 @@ VLCB::Controller createController()
   return controller;
 }
 
-void testRequestNodeNumber()
+void testNumNVs()
 {
   test();
 
   VLCB::Controller controller = createController();
 
-  // Set module into Setup mode:
-  configuration->currentMode = VLCB::MODE_SETUP;
-  configuration->setNodeNum(0);
-  
-  // User requests to enter Normal mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::RENEGOTIATE);
-  
+  // read parameter 6 which stores number of NVs.
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 6}};
+  mockTransport->setNextMessage(msg_rqsd);
+
   controller.process();
 
+  // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-}
-
-void testRequestNodeNumberMissingSNN()
-{
-  // TODO!
-  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
-}
-
-void testReleaseNodeNumber()
-{
-  test();
-
-  VLCB::Controller controller = createController();
-
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
-  
-  controller.process();
-
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  
-  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
-
-  assertEquals(0, configuration->nodeNum);
+  assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(6, mockTransport->sent_messages[0].data[3]); // parameter index
+  assertEquals(4, mockTransport->sent_messages[0].data[4]); // parameter value
 }
 
 void testServiceDiscovery()
@@ -145,11 +105,11 @@ void testServiceDiscovery()
 
   assertEquals(OPC_SD, mockTransport->sent_messages[2].data[0]);
   assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
-  assertEquals(17, mockTransport->sent_messages[2].data[4]); // service ID
+  assertEquals(2, mockTransport->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
 }
 
-void testServiceDiscoveryLongMessageSvc()
+void testServiceDiscoveryNodeVarSvc()
 {
   test();
 
@@ -164,58 +124,68 @@ void testServiceDiscoveryLongMessageSvc()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
   assertEquals(2, mockTransport->sent_messages[0].data[3]); // index
-  assertEquals(17, mockTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID
   // Not testing service data bytes.
 }
 
-void testServiceDiscoveryIndexOutOfBand()
+void testSetAndReadNV()
 {
   test();
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 7}};
+  // Set NV 3 to 42
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 3, 42}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
-  assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
-}
-
-void testServiceDiscoveryShortMessage()
-{
-  test();
-
-  VLCB::Controller controller = createController();
-
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQSD, 0x01, 0x04}};
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  
+  mockTransport->clearMessages();
+  
+  // Read NV 3
+  msg_rqsd = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
-  assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
+  assertEquals(OPC_NVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(3, mockTransport->sent_messages[0].data[3]); // NV index
+  assertEquals(42, mockTransport->sent_messages[0].data[4]); // NV value
 }
 
-}
-
-void testMinimumNodeService()
+void testSetAndReadNVnew()
 {
-  testRequestNodeNumber();
-  testReleaseNodeNumber();
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 3 to 17
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  // TODO: Implement NVSETRD in NVS.
+//  assertEquals(OPC_NVANS, mockTransport->sent_messages[0].data[0]);
+//  assertEquals(3, mockTransport->sent_messages[0].data[3]); // NV index
+//  assertEquals(17, mockTransport->sent_messages[0].data[4]); // NV value
+}
+
+}
+
+void testNodeVariablesService()
+{
+  testNumNVs();
   testServiceDiscovery();
-  testServiceDiscoveryLongMessageSvc();
-  testServiceDiscoveryIndexOutOfBand();
-  testServiceDiscoveryShortMessage();
+  testServiceDiscoveryNodeVarSvc();
+  testSetAndReadNV();
+  testSetAndReadNVnew();
 }

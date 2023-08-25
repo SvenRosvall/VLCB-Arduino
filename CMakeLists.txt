@@ -79,11 +79,8 @@ add_executable(testAll
         test/testArduino.cpp
         test/testAll.cpp
         test/testMinimumNodeService.cpp
-        test/testMinimumNodeService.h
+        test/testNodeVariablesService.cpp
         test/MockUserInterface.cpp
-        test/MockUserInterface.h
         test/MockTransport.cpp
-        test/MockTransport.h
         test/MockStorage.cpp
-        test/MockStorage.h
 )
