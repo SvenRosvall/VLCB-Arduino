@@ -130,7 +130,7 @@ void Controller::indicateActivity()
   }
 }
 
-void Controller::requestedMode(byte reqMode)
+void Controller::requestMode(byte reqMode)
 {
   for (Service * svc : services)
   {
