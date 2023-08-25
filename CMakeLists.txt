@@ -54,6 +54,7 @@ add_library(core_library OBJECT
         src/CanService.cpp
         src/CanService.h
         src/vlcbdefs.hpp
+        src/NodeVariablesService.cpp
 )
 
 target_link_libraries(core_library PUBLIC)

@@ -26,46 +26,6 @@ Processed CbusService::handleMessage(unsigned int opc, CANFrame *msg)
   switch (opc)
   {
 
-  case OPC_NVRD:
-    // received NVRD -- read NV by index
-    if (nn == module_config->nodeNum) {
-
-      byte nvindex = msg->data[3];
-      if (nvindex > module_config->EE_NUM_NVS)
-      {
-        controller->sendCMDERR(10);
-      }
-      else
-      {
-        // respond with NVANS
-        controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
-      }
-    }
-
-    return PROCESSED;
-
-  case OPC_NVSET:
-    // received NVSET -- set NV by index
-    // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
-
-    if (nn == module_config->nodeNum)
-    {
-      if (msg->data[3] > module_config->EE_NUM_NVS)
-      {
-        controller->sendCMDERR(10);
-      }
-      else
-      {
-        // update EEPROM for this NV -- NVs are indexed from 1, not zero
-        module_config->writeNV(msg->data[3], msg->data[4]);
-        // respond with WRACK
-        controller->sendWRACK();
-        // DEBUG_SERIAL << F("> set NV ok") << endl;
-      }
-    }
-
-    return PROCESSED;
-
   case OPC_BOOT:
     // boot mode
     return PROCESSED;
