@@ -46,8 +46,6 @@ add_library(core_library OBJECT
         src/Storage.h
         src/UserInterface.h
         src/Service.h
-        src/CbusService.cpp
-        src/CbusService.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp
         src/MinimumNodeService.h

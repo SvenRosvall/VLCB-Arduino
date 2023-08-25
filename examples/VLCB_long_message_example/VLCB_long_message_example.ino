@@ -24,7 +24,6 @@
 #include <LongMessageService.h>
 #include "CanService.h"
 #include "NodeVariablesService.h"
-#include "CbusService.h"
 #include "EventConsumerService.h"
 #include "EventTeachingService.h"
 
@@ -51,9 +50,8 @@ VLCB::NodeVariablesService nvService;
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &lmsg, &ecService, &etService, &cbusService }); // Controller object
+                            { &mnService, &canService, &nvService, &lmsg, &ecService, &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };

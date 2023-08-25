@@ -25,7 +25,6 @@
 #include "MinimumNodeService.h"
 #include "CanService.h"
 #include "NodeVariablesService.h"
-#include "CbusService.h"
 #include "EventConsumerService.h"
 #include "EventTeachingService.h"
 
@@ -51,9 +50,8 @@ VLCB::CanService canService;
 VLCB::NodeVariablesService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::CbusService cbusService;               // service for CBUS op-codes
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &etService, &cbusService }); // Controller object
+                            { &mnService, &canService, &nvService, &ecService, &etService }); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input

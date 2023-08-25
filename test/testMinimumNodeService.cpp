@@ -29,7 +29,6 @@
 #include "vlcbdefs.hpp"
 #include "Parameters.h"
 #include "LongMessageService.h"
-#include "CbusService.h"
 
 namespace
 {
@@ -50,10 +49,8 @@ VLCB::Controller createController()
   minimumNodeService.reset(new VLCB::MinimumNodeService);
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
-  static std::unique_ptr<VLCB::CbusService> cbusService;
-  cbusService.reset(new VLCB::CbusService);
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              {minimumNodeService.get(), longMessageService.get(), cbusService.get()});
+                              {minimumNodeService.get(), longMessageService.get()});
 
   configuration->EE_NVS_START = 0;
   configuration->EE_NUM_NVS = 4;
@@ -136,10 +133,10 @@ void testServiceDiscovery()
   controller.process();
 
   // Verify sent messages.
-  assertEquals(4, mockTransport->sent_messages.size());
+  assertEquals(3, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(3, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
@@ -150,10 +147,6 @@ void testServiceDiscovery()
   assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
   assertEquals(17, mockTransport->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
-
-  assertEquals(OPC_SD, mockTransport->sent_messages[3].data[0]);
-  assertEquals(3, mockTransport->sent_messages[3].data[3]); // index
-  // Don't care about details of CbusService.
 }
 
 void testServiceDiscoveryLongMessageSvc()
