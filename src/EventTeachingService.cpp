@@ -68,7 +68,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (index < module_config->EE_MAX_EVENTS)
       {
-        // TODO: Review this. j is always 0.
         // DEBUG_SERIAL << F("> deleting event at index = ") << index << F(", evs ") << endl;
         module_config->cleareventEEPROM(index);
 
