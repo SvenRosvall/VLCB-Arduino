@@ -178,6 +178,75 @@ void testSetAndReadNVnew()
   assertEquals(17, mockTransport->sent_messages[0].data[4]); // NV value
 }
 
+void testSetNVIndexOutOfBand()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 7, 42}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
+  
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
+}
+
+void testReadNVIndexOutOfBand()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 7}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVRD, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
+  
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
+}
+
+void testSetNVnewIndexOutOfBand()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVSETRD, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
+  
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
+  assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
+}
+
 }
 
 void testNodeVariablesService()
@@ -187,4 +256,7 @@ void testNodeVariablesService()
   testServiceDiscoveryNodeVarSvc();
   testSetAndReadNV();
   testSetAndReadNVnew();
+  testSetNVIndexOutOfBand();
+  testReadNVIndexOutOfBand();
+  testSetNVnewIndexOutOfBand();
 }
