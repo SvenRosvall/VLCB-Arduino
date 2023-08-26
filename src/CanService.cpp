@@ -11,12 +11,6 @@
 namespace VLCB
 {
 
-enum CanOpCodes
-{
-  CAN_OP_ENUM = OPC_ENUM,
-  CAN_OP_CANID = OPC_CANID
-};
-
 void CanService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
@@ -180,7 +174,7 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
   switch (opc)
   {
 
-    case CAN_OP_CANID:
+    case OPC_CANID:
       // CAN -- set CANID
       // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
@@ -191,19 +185,19 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
         if (newCANID < 1 || newCANID > 99)
         {
           controller->sendCMDERR(CMDERR_INV_EN_IDX);
-          controller->sendGRSP(CAN_OP_CANID, getServiceID(), CMDERR_INV_EN_IDX);
+          controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
         }
         else
         {
           module_config->setCANID(newCANID);
           controller->sendWRACK();
-          controller->sendGRSP(CAN_OP_CANID, getServiceID(), GRSP_OK);
+          controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
         }
       }
 
       return PROCESSED;
 
-    case CAN_OP_ENUM:
+    case OPC_ENUM:
       // received ENUM -- start CAN bus self-enumeration
       {
         byte remoteCANID = getCANID(msg->id);
