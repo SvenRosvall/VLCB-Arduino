@@ -34,7 +34,7 @@ private:
   bool bModeSetup;
   bool renegotiating;
   unsigned long timeOutTimer;
-  byte reqMode;
+  //byte reqMode;
   byte instantMode;
   
   void checkModeChangeTimeout();

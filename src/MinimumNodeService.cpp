@@ -37,6 +37,9 @@ void MinimumNodeService::initSetup()
 
   bModeSetup = true;
   timeOutTimer = millis();
+  
+  // enumerate the CAN bus to allocate a free CAN ID
+  controller->startCANenumeration();
 
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
@@ -52,9 +55,6 @@ void MinimumNodeService::setNormal()
   instantMode = MODE_NORMAL;
   module_config->setModuleMode(MODE_NORMAL);
   controller->indicateMode(MODE_NORMAL);
-
-  // enumerate the CAN bus to allocate a free CAN ID
-  controller->startCANenumeration();
 }
 
 //
@@ -65,7 +65,7 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   bModeSetup = false;
   renegotiating = false;
-  instantMode == MODE_UNINITIALISED;
+  instantMode = MODE_UNINITIALISED;
   module_config->setNodeNum(0);
   module_config->setModuleMode(MODE_UNINITIALISED);
   module_config->setCANID(0);
@@ -104,8 +104,9 @@ void MinimumNodeService::checkModeChangeTimeout()
 
     // Revert to previous mode.
     // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeSetup << endl;
-    controller->indicateMode(module_config->currentMode);
     bModeSetup = false;
+    instantMode = module_config->currentMode;
+    controller->indicateMode(instantMode);    
   }
 }
 
@@ -367,54 +368,54 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         switch (instantMode)
         {
         case MODE_UNINITIALISED:
-          if (nn != 0)
+          if (nn != 0)   // Not for this node
           {
             return PROCESSED;
           }
           if (newMode != MODE_SETUP)
           {
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);
-            return PROCESSED;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
           } 
           else
           {
             initSetup();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
           }          
-          
+          return PROCESSED;
           break;
           
         case MODE_SETUP:
-          if (nn != 0)
+          if (nn != 0)   // Not for this node
           {
             return PROCESSED;
           } 
           else
           {
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);
-            return PROCESSED;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
           }
-          
+          return PROCESSED;
           break;
           
         case MODE_NORMAL:
-          if (newMode == MODE_SETUP)
+          switch (newMode)
           {
+          case MODE_SETUP:          
             renegotiate();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          } 
-          if (newMode == MODE_LEARN)
-          {
+            break;
+          
+          case MODE_LEARN:
             controller->requestMode(newMode);
             instantMode = newMode;
-          }
-          if (newMode == MODE_NHEARTB)
-          {
+            break;
+          
+          case MODE_NHEARTB:          
             //DEBUG_SERIAL << F("> MODE -- request no Heartbeats") << endl;
             noHeartbeat = true;
             instantMode = newMode;
+            break;
           }
-          
+          return PROCESSED;
           break;
           
         case MODE_LEARN:
@@ -430,7 +431,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             instantMode = newMode;
             }
           } 
-          
+          return PROCESSED;
           break;
           
         case MODE_NHEARTB:
@@ -444,7 +445,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             controller->requestMode(newMode);
             instantMode = newMode;
           } 
-          
+          return PROCESSED;
           break;
             
         }
