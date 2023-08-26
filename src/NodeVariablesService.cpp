@@ -64,6 +64,30 @@ Processed NodeVariablesService::handleMessage(unsigned int opc, CANFrame *msg)
 
       return PROCESSED;
 
+    case OPC_NVSETRD:
+      // received NVSETRD -- set NV by index and read
+      // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
+
+      if (nn == module_config->nodeNum)
+      {
+        byte nvindex = msg->data[3];
+        if (nvindex > module_config->EE_NUM_NVS)
+        {
+          controller->sendCMDERR(10);
+        }
+        else
+        {
+          // update EEPROM for this NV -- NVs are indexed from 1, not zero
+          module_config->writeNV(msg->data[3], msg->data[4]);
+
+          // respond with NVANS
+          controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
+          // DEBUG_SERIAL << F("> set NV ok") << endl;
+        }
+      }
+
+      return PROCESSED;
+
     default:
       return NOT_PROCESSED;
   }

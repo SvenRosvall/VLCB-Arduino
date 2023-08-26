@@ -173,10 +173,9 @@ void testSetAndReadNVnew()
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
-  // TODO: Implement NVSETRD in NVS.
-//  assertEquals(OPC_NVANS, mockTransport->sent_messages[0].data[0]);
-//  assertEquals(3, mockTransport->sent_messages[0].data[3]); // NV index
-//  assertEquals(17, mockTransport->sent_messages[0].data[4]); // NV value
+  assertEquals(OPC_NVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(3, mockTransport->sent_messages[0].data[3]); // NV index
+  assertEquals(17, mockTransport->sent_messages[0].data[4]); // NV value
 }
 
 }
