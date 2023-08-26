@@ -17,6 +17,22 @@ void EventTeachingService::setController(Controller *cntrl)
   this->module_config = cntrl->module_config;
 }
 
+void EventTeachingService::enableLearn()
+{
+  bLearn = true;
+   //DEBUG_SERIAL << F("> set learn mode ok") << endl;
+  // set bit 5 in parameter 8
+  bitSet(controller->_mparams[8], 5);
+}
+
+void EventTeachingService::inhibitLearn()
+{
+  bLearn = false;
+   //DEBUG_SERIAL << F("> learn mode off") << endl;
+  // clear bit 5 in parameter 8
+  bitClear(controller->_mparams[8], 5);
+}
+
 Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
@@ -32,10 +48,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
     if (nn == module_config->nodeNum)
     {
-      bLearn = true;
-      // DEBUG_SERIAL << F("> set lean mode ok") << endl;
-      // set bit 5 in parameter 8
-      bitSet(controller->_mparams[8], 5);
+     enableLearn();
     }
 
     return PROCESSED;
@@ -78,10 +91,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
     if (nn == module_config->nodeNum)
     {
-      bLearn = false;
-      // DEBUG_SERIAL << F("> NNULN for node = ") << nn << F(", learn mode off") << endl;
-      // clear bit 5 in parameter 8
-      bitClear(controller->_mparams[8], 5);
+      inhibitLearn();
     }
 
     return PROCESSED;

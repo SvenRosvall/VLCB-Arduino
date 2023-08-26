@@ -47,7 +47,8 @@ public:
   {
     return transport->sendMessage(msg, rtr, ext, priority);
   }
-
+  
+  void begin();
   bool sendMessageWithNN(int opc);
   bool sendMessageWithNN(int opc, byte b1);
   bool sendMessageWithNN(int opc, byte b1, byte b2);
@@ -66,6 +67,7 @@ public:
   void setName(unsigned char *mname);
   void indicateMode(byte mode);
   void indicateActivity();
+  void requestMode(byte reqMode);
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes

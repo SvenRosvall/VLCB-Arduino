@@ -3,6 +3,8 @@
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
+#include <Streaming.h>
+
 #include "MinimumNodeService.h"
 #include "Controller.h"
 #include <vlcbdefs.hpp>
@@ -16,17 +18,28 @@ void MinimumNodeService::setController(Controller *cntrl)
   this->module_config = cntrl->module_config;
 }
 
+void MinimumNodeService::begin()
+{
+  //Initialise instantMode
+  instantMode = module_config->currentMode;
+  //DEBUG_SERIAL << F("> instant MODE initialise as: ") << instantMode << endl;
+}
+
 //
 /// initiate the transition from Uninitialised to Normal mode
 //
-void MinimumNodeService::initNormal()
+void MinimumNodeService::initSetup()
 {
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
+  instantMode = MODE_SETUP;
   controller->indicateMode(MODE_SETUP);
 
-  bModeChanging = true;
+  bModeSetup = true;
   timeOutTimer = millis();
+  
+  // enumerate the CAN bus to allocate a free CAN ID
+  controller->startCANenumeration();
 
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
@@ -37,12 +50,11 @@ void MinimumNodeService::initNormal()
 void MinimumNodeService::setNormal()
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
-  bModeChanging = false;
+  bModeSetup = false;
+  renegotiating = false;
+  instantMode = MODE_NORMAL;
   module_config->setModuleMode(MODE_NORMAL);
   controller->indicateMode(MODE_NORMAL);
-
-  // enumerate the CAN bus to allocate a free CAN ID
-  controller->startCANenumeration();
 }
 
 //
@@ -51,7 +63,9 @@ void MinimumNodeService::setNormal()
 void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
-  bModeChanging = false;
+  bModeSetup = false;
+  renegotiating = false;
+  instantMode = MODE_UNINITIALISED;
   module_config->setNodeNum(0);
   module_config->setModuleMode(MODE_UNINITIALISED);
   module_config->setCANID(0);
@@ -64,11 +78,8 @@ void MinimumNodeService::setUninitialised()
 //
 void MinimumNodeService::revertUninitialised()
 {
-
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
-
   // send NNREL message
-
   controller->sendMessageWithNN(OPC_NNREL);
   setUninitialised();
 }
@@ -79,30 +90,33 @@ void MinimumNodeService::revertUninitialised()
 
 void MinimumNodeService::renegotiate()
 {
-  initNormal();
+  renegotiating = true;
+  controller->sendMessageWithNN(OPC_NNREL);
+  initSetup();
 }
 
 //
-/// check 30 sec timeout for Uninitialised/Normal negotiation with FCU
+/// check 30 sec timeout for MODE_CHANGE negotiation with FCU
 //
 void MinimumNodeService::checkModeChangeTimeout()
 {
-  if (bModeChanging && ((millis() - timeOutTimer) >= 30000)) {
+  if (bModeSetup && ((millis() - timeOutTimer) >= 30000)) {
 
     // Revert to previous mode.
-    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeChanging << endl;
-    controller->indicateMode(module_config->currentMode);
-    bModeChanging = false;
+    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeSetup << endl;
+    bModeSetup = false;
+    instantMode = module_config->currentMode;
+    controller->indicateMode(instantMode);    
   }
 }
 
 void MinimumNodeService::heartbeat()
 {
-  if ((module_config->currentMode == MODE_NORMAL) && !noHeartbeat)
+  if ((module_config->currentMode == MODE_NORMAL) && !noHeartbeat && !bModeSetup)
   {
     if ((millis() - lastHeartbeat) > heartRate)
     {
-    //  DEBUG_SERIAL << F("> HeartBeat = ") << heartbeatSequence << endl;
+      //DEBUG_SERIAL << F("> HeartBeat = ") << heartbeatSequence << endl;
       controller->sendMessageWithNN(OPC_HEARTB, heartbeatSequence, 0, 0);  // 0 to be replaced by diagnostic status      
       heartbeatSequence++;
       lastHeartbeat = millis();
@@ -116,30 +130,30 @@ void MinimumNodeService::heartbeat()
 
 void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 {
-   switch (requestedAction)
-  {
-    case UserInterface::CHANGE_MODE:
-      // initiate mode change
-      //Serial << "Controller::process() - changing mode, current mode=" << module_config->currentMode << endl;
-      if (!module_config->currentMode)
-      {
-        initNormal();
-      }
-      else
-      {
-        revertUninitialised();
-      }
-      break;
+   if (requestedAction == UserInterface::CHANGE_MODE)
+   {
+     switch (module_config->currentMode)
+     {
+     case MODE_UNINITIALISED:
+       initSetup();
+       break;
+       
+     case MODE_NORMAL:
+       renegotiate();
+       break;
+       
+     default:
+       break;
+     }
+   }
 
-    case UserInterface::RENEGOTIATE:
-      //Serial << "Controller::process() - renegotiate" << endl;
-      renegotiate();
-      break;
-
-    default:
-      break;
-  }
-  
+// Renegotiating timed out.  Revert to previous NN   
+   if (renegotiating && !bModeSetup)
+   {
+     controller->sendMessageWithNN(OPC_NNACK);
+     setNormal();
+   }
+     
   checkModeChangeTimeout();
   heartbeat();
 }
@@ -171,7 +185,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
       // only respond if we are in transition to Normal mode
-      if (bModeChanging)
+      if (bModeSetup)
       {
         // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
@@ -219,7 +233,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // received SNN - set node number
       // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
-      if (bModeChanging)
+      if (bModeSetup)
       {
         // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
 
@@ -248,9 +262,9 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // Another module has entered setup.
       // If we are in setup, abort (MNS Spec 3.2.1)
       
-      if (bModeChanging)
+      if (bModeSetup)
       {
-        bModeChanging = false;
+        bModeSetup = false;
         controller->indicateMode(module_config->currentMode);
       }
         
@@ -274,7 +288,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // only respond if in transition to Normal
 
       // respond with NAME
-      if (bModeChanging)
+      if (bModeSetup)
       {
         msg->len = 8;
         msg->data[0] = OPC_NAME;
@@ -329,11 +343,13 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           else
           {
             // Couldn't find the service.
-            controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_PARAM_IDX);
+            controller->sendCMDERR(CMDERR_INV_EN_IDX);
+            // NOTE: error code 9 is really for parameters. But there isn't any better for CMDERR.
+            controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
           }
         }
       }
-
+ 
       return PROCESSED;
       
     case OPC_RDGN:
@@ -343,6 +359,97 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       
     case OPC_MODE:
       // Set Operating Mode
+       //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
+      if (nn == module_config->nodeNum)
+      {        
+        byte newMode = msg->data[3];
+        //DEBUG_SERIAL << F("> MODE -- requested = ") << newMode << endl;
+        //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
+        switch (instantMode)
+        {
+        case MODE_UNINITIALISED:
+          if (nn != 0)   // Not for this node
+          {
+            return PROCESSED;
+          }
+          if (newMode != MODE_SETUP)
+          {
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
+          } 
+          else
+          {
+            initSetup();
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          }          
+          return PROCESSED;
+          break;
+          
+        case MODE_SETUP:
+          if (nn != 0)   // Not for this node
+          {
+            return PROCESSED;
+          } 
+          else
+          {
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
+          }
+          return PROCESSED;
+          break;
+          
+        case MODE_NORMAL:
+          switch (newMode)
+          {
+          case MODE_SETUP:          
+            renegotiate();
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+            break;
+          
+          case MODE_LEARN:
+            controller->requestMode(newMode);
+            instantMode = newMode;
+            break;
+          
+          case MODE_NHEARTB:          
+            //DEBUG_SERIAL << F("> MODE -- request no Heartbeats") << endl;
+            noHeartbeat = true;
+            instantMode = newMode;
+            break;
+          }
+          return PROCESSED;
+          break;
+          
+        case MODE_LEARN:
+          if (newMode == MODE_NORMAL)
+          {
+            controller->requestMode(newMode);
+            if (noHeartbeat == true)
+            {
+              instantMode = MODE_NHEARTB;
+            }
+            else
+            {
+            instantMode = newMode;
+            }
+          } 
+          return PROCESSED;
+          break;
+          
+        case MODE_NHEARTB:
+          if (newMode == MODE_NORMAL)
+          {
+            noHeartbeat = false;
+            instantMode = newMode;
+          }
+          if (newMode == MODE_LEARN)
+          {
+            controller->requestMode(newMode);
+            instantMode = newMode;
+          } 
+          return PROCESSED;
+          break;
+            
+        }
+      }
       
       return PROCESSED;
       

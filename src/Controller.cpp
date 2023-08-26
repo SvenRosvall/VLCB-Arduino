@@ -8,7 +8,9 @@
 
 // Controller library
 #include <Controller.h>
+#include "MinimumNodeService.h"
 #include "CanService.h"
+#include "EventTeachingService.h"
 #include <vlcbdefs.hpp>
 
 //
@@ -50,6 +52,19 @@ Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt
   for (Service * service : services)
   {
     service->setController(this);
+  }
+}
+
+//
+/// Initialise VLCB
+//
+
+void Controller::begin()
+{
+  module_config->begin();
+  for (Service * service : services)
+  {
+    service->begin();
   }
 }
 
@@ -114,6 +129,28 @@ void Controller::indicateActivity()
     _ui->indicateActivity();
   }
 }
+
+void Controller::requestMode(byte reqMode)
+{
+  for (Service * svc : services)
+  {
+    if (svc->getServiceID() == 4)
+    {
+      EventTeachingService * etSvc = (EventTeachingService *) svc;
+      
+      if (reqMode == MODE_LEARN)
+      {
+        etSvc->enableLearn();
+      }
+      if (reqMode == MODE_NORMAL)
+      {
+        etSvc->inhibitLearn();
+      }
+      return;
+    }
+  }
+  sendGRSP(OPC_MODE, 4, GRSP_INVALID_SERVICE);
+} 
 
 //
 /// main Controller message processing procedure
