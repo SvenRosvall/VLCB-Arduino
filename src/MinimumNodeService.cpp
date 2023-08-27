@@ -111,6 +111,7 @@ void MinimumNodeService::checkModeChangeTimeout()
     if (renegotiating)
     {
       // Renegotiating timed out.  Revert to previous NN   
+      renegotiating = false;
       controller->sendMessageWithNN(OPC_NNACK);
     }
   }
