@@ -106,7 +106,13 @@ void MinimumNodeService::checkModeChangeTimeout()
     // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeSetup << endl;
     bModeSetup = false;
     instantMode = module_config->currentMode;
-    controller->indicateMode(instantMode);    
+    controller->indicateMode(instantMode);
+
+    if (renegotiating)
+    {
+      // Renegotiating timed out.  Revert to previous NN   
+      controller->sendMessageWithNN(OPC_NNACK);
+    }
   }
 }
 
@@ -147,13 +153,6 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
      }
    }
 
-// Renegotiating timed out.  Revert to previous NN   
-   if (renegotiating && !bModeSetup)
-   {
-     controller->sendMessageWithNN(OPC_NNACK);
-     setNormal();
-   }
-     
   checkModeChangeTimeout();
   heartbeat();
 }
@@ -382,7 +381,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
           }          
           return PROCESSED;
-          break;
           
         case MODE_SETUP:
           if (nn != 0)   // Not for this node
@@ -394,7 +392,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
           }
           return PROCESSED;
-          break;
           
         case MODE_NORMAL:
           switch (newMode)
@@ -416,7 +413,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             break;
           }
           return PROCESSED;
-          break;
           
         case MODE_LEARN:
           if (newMode == MODE_NORMAL)
@@ -428,11 +424,10 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             }
             else
             {
-            instantMode = newMode;
+              instantMode = newMode;
             }
           } 
           return PROCESSED;
-          break;
           
         case MODE_NHEARTB:
           if (newMode == MODE_NORMAL)
@@ -446,8 +441,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             instantMode = newMode;
           } 
           return PROCESSED;
-          break;
-            
         }
       }
       
