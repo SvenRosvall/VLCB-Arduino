@@ -12,6 +12,7 @@ void doAssertEquals(const char * file, int line,
     printf("%s:%d: '%s' is %d, but expected %d\n",
            file, line,
            expression, actual, expected);
+    fflush(stdout);
   }
 }
 
