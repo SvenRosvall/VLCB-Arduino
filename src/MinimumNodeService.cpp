@@ -212,18 +212,25 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (nn == module_config->nodeNum)
       {
-        byte paran = msg->data[3];
-
-        // DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
-
-        if (paran <= controller->_mparams[0])
+        if (msg->len < 4)
         {
-          paran = msg->data[3];
-          controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
+          controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_CMD);
+        }
+        else
+        {
+          byte paran = msg->data[3];
 
-        } else {
-          // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
-          controller->sendCMDERR(9);
+          // DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
+
+          if (paran <= controller->_mparams[0])
+          {
+            paran = msg->data[3];
+            controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
+
+          } else {
+            // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
+            controller->sendCMDERR(9);
+          }
         }
       }
 
@@ -235,27 +242,29 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (bModeSetup)
       {
-        // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
+        if (msg->len < 3)
+        {
+          controller->sendGRSP(OPC_SNN, getServiceID(), CMDERR_INV_CMD);
+        }
+        else
+        {
+          // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
 
-        // save the NN
-        module_config->setNodeNum(nn);
+          // save the NN
+          module_config->setNodeNum(nn);
 
-        // respond with NNACK
-        controller->sendMessageWithNN(OPC_NNACK);
+          // respond with NNACK
+          controller->sendMessageWithNN(OPC_NNACK);
 
-        // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
+          // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
 
-        // we are now in Normal mode - update the configuration
-        setNormal();
+          // we are now in Normal mode - update the configuration
+          setNormal();
 
-        // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
-
+          // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
+        }
       }
-      else
-      {
-        // DEBUG_SERIAL << F("> received SNN but not in transition") << endl;
-      }
-
+     
       return PROCESSED;
       
     case OPC_RQNN:
@@ -362,6 +371,12 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
        //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
       if (nn == module_config->nodeNum)
       {        
+        if (msg->len < 4)
+        {          
+          controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }        
+        
         byte newMode = msg->data[3];
         //DEBUG_SERIAL << F("> MODE -- requested = ") << newMode << endl;
         //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
@@ -374,7 +389,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
           if (newMode != MODE_SETUP)
           {
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
+            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);            
           } 
           else
           {
@@ -390,7 +405,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           } 
           else
           {
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_SERVICE);            
+            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);            
           }
           return PROCESSED;
           
