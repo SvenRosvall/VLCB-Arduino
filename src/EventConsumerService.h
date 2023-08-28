@@ -11,10 +11,6 @@ namespace VLCB {
 
 class Configuration;
 
-// Quick and dirty service to migrate from the CBUS library to using a set of VLCB services.
-// This is a service that implements all the CBUS op-codes.
-// When creating new services, pick code from here.
-// In the end there should not be any code left in this service.
 class EventConsumerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;

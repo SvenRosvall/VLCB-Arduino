@@ -23,22 +23,28 @@ public:
 
   virtual byte getServiceID() override { return 1; }
   virtual byte getServiceVersionID() override { return 1; }
+  
+  virtual void begin() override;
 
 private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
   
-  bool bModeChanging;
+  bool bModeSetup;
+  bool renegotiating;
   unsigned long timeOutTimer;
+  //byte reqMode;
+  byte instantMode;
+  
   void checkModeChangeTimeout();
   void indicateMode(byte mode);
-  void initNormal();
+  void initSetup();
   void setNormal();
   void setUninitialised();
   void revertUninitialised();
   void renegotiate();
-  void heartbeat();
+  void heartbeat();  
   
   unsigned long lastHeartbeat = 0;
   byte heartbeatSequence = 0;

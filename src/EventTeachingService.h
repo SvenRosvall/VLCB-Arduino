@@ -20,6 +20,9 @@ public:
 
   virtual byte getServiceID() override { return 4; }
   virtual byte getServiceVersionID() override { return 1; }
+  
+  void enableLearn();
+  void inhibitLearn();
 
 private:
   Controller * controller;
