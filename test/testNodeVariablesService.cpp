@@ -39,7 +39,7 @@ VLCB::Controller createController()
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
                               {minimumNodeService.get(), NodeVariablesService.get()});
 
-  configuration->EE_NVS_START = 0;
+  configuration->EE_NVS_START = 10;
   configuration->EE_NUM_NVS = 4;
   configuration->EE_EVENTS_START = 20;
   configuration->EE_MAX_EVENTS = 20;
@@ -68,8 +68,8 @@ void testNumNVs()
   VLCB::Controller controller = createController();
 
   // read parameter 6 which stores number of NVs.
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 6}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 6}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -87,8 +87,8 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -115,8 +115,8 @@ void testServiceDiscoveryNodeVarSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -135,8 +135,8 @@ void testSetAndReadNV()
   VLCB::Controller controller = createController();
 
   // Set NV 3 to 42
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 3, 42}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSET, 0x01, 0x04, 3, 42}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -147,8 +147,8 @@ void testSetAndReadNV()
   mockTransport->clearMessages();
   
   // Read NV 3
-  msg_rqsd = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 3}};
-  mockTransport->setNextMessage(msg_rqsd);
+  msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 3}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -166,8 +166,8 @@ void testSetAndReadNVnew()
   VLCB::Controller controller = createController();
 
   // Set NV 3 to 17
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -185,8 +185,8 @@ void testSetNVIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 7, 42}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSET, 0x01, 0x04, 7, 42}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -208,8 +208,8 @@ void testReadNVIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 7}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 7}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -231,8 +231,8 @@ void testSetNVnewIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
-  mockTransport->setNextMessage(msg_rqsd);
+  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
+  mockTransport->setNextMessage(msg);
 
   controller.process();
 
@@ -247,6 +247,66 @@ void testSetNVnewIndexOutOfBand()
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
 }
 
+void testSetNVShortMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
+}
+
+void testReadNVShortMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg = {0x11, false, false, 3, {OPC_NVRD, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVRD, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
+}
+
+void testSetNVnewShortMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set NV 7 to 42
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
+}
+
 }
 
 void testNodeVariablesService()
@@ -259,4 +319,7 @@ void testNodeVariablesService()
   testSetNVIndexOutOfBand();
   testReadNVIndexOutOfBand();
   testSetNVnewIndexOutOfBand();
+  testSetNVShortMessage();
+  testReadNVShortMessage();
+  testSetNVnewShortMessage();
 }

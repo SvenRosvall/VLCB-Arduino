@@ -26,7 +26,13 @@ Processed NodeVariablesService::handleMessage(unsigned int opc, CANFrame *msg)
 
     case OPC_NVRD:
       // received NVRD -- read NV by index
-      if (nn == module_config->nodeNum) {
+      if (nn == module_config->nodeNum)
+      {
+        if (msg->len < 4)
+        {
+          controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }
 
         byte nvindex = msg->data[3];
         if (nvindex > module_config->EE_NUM_NVS)
@@ -49,6 +55,12 @@ Processed NodeVariablesService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (nn == module_config->nodeNum)
       {
+        if (msg->len < 5)
+        {
+          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }
+
         if (msg->data[3] > module_config->EE_NUM_NVS)
         {
           controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_NV_IDX);
@@ -72,6 +84,12 @@ Processed NodeVariablesService::handleMessage(unsigned int opc, CANFrame *msg)
 
       if (nn == module_config->nodeNum)
       {
+        if (msg->len < 5)
+        {
+          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }
+
         byte nvindex = msg->data[3];
         if (nvindex > module_config->EE_NUM_NVS)
         {
