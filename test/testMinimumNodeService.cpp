@@ -80,12 +80,12 @@ void testRequestNodeNumber()
 
   VLCB::Controller controller = createController();
 
-  // Set module into Setup mode:
-  configuration->currentMode = VLCB::MODE_SETUP;
+  // Set module into Uninitialized mode:
+  configuration->currentMode = VLCB::MODE_UNINITIALISED;
   configuration->setNodeNum(0);
   
-  // User requests to enter Normal mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::RENEGOTIATE);
+  // User requests to enter Setup mode.
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
   
   controller.process();
 
@@ -111,14 +111,19 @@ void testReleaseNodeNumber()
   
   controller.process();
 
-  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  
-  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
 
-  assertEquals(0, configuration->nodeNum);
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
+
+  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+
+  // Module will hold on to node number in case setup times out.
+  assertEquals(260, configuration->nodeNum);
 }
 
 void testServiceDiscovery()
