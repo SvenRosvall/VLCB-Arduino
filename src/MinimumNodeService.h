@@ -23,6 +23,8 @@ public:
 
   virtual byte getServiceID() override { return 1; }
   virtual byte getServiceVersionID() override { return 1; }
+  
+  virtual void begin() override;
   void setHeartBeat(bool f) { noHeartbeat = !f; }
 
 private:
@@ -30,8 +32,11 @@ private:
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
   
-  bool bModeChanging = false;
+  bool bModeSetup = false;
+  bool renegotiating;
   unsigned long timeOutTimer;
+  byte instantMode;
+  
   void checkModeChangeTimeout();
   void indicateMode(byte mode);
   void initSetup();

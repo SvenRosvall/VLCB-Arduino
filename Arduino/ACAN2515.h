@@ -42,11 +42,13 @@ struct ACAN2515
   void receive(CANMessage & message);
   bool tryToSend(const CANMessage & message);
   void end();
+  uint16_t receiveBufferCount();
   uint16_t receiveBufferPeakCount();
   uint16_t receiveBufferSize();
+  uint16_t transmitBufferCount(uint8_t index);
   uint16_t transmitBufferPeakCount(uint8_t index);
   uint16_t transmitBufferSize(uint8_t index);
+  uint8_t receiveErrorCounter (void) ;
+  uint8_t transmitErrorCounter (void) ;
   uint8_t errorFlagRegister();
-  uint16_t transmitBufferCount(uint8_t index);
-  uint16_t receiveBufferCount();
 };
