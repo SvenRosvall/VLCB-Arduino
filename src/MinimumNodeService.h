@@ -31,8 +31,8 @@ private:
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
   
-  bool bModeSetup;
-  bool renegotiating;
+  bool bModeSetup = false;
+  bool renegotiating = false;
   unsigned long timeOutTimer;
   //byte reqMode;
   byte instantMode;
