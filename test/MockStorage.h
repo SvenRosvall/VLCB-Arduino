@@ -8,14 +8,19 @@
 #pragma once
 
 #include <Storage.h>
+#include <vector>
 
 class MockStorage : public VLCB::Storage
 {
 public:
+  MockStorage();
   virtual void begin() override;
   virtual byte readEEPROM(unsigned int eeaddress) override;
   virtual void writeEEPROM(unsigned int eeaddress, byte data) override;
   virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte *dest) override;
   virtual void writeBytesEEPROM(unsigned int eeaddress, byte *src, byte numbytes) override;
   virtual void resetEEPROM() override;
+  
+private:
+  std::vector<byte> eeprom;
 };
