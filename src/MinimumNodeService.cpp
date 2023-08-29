@@ -97,7 +97,7 @@ void MinimumNodeService::checkModeChangeTimeout()
     instantMode = module_config->currentMode;
     controller->indicateMode(instantMode);
 
-    if (renegotiating && module_config->currentMode == MODE_NORMAL)
+    if (renegotiating)
     {
       // Renegotiating timed out.  Revert to previous NN   
       renegotiating = false;
