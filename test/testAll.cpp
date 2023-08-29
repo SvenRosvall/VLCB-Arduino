@@ -8,12 +8,12 @@
 #include <iostream>
 #include "testArduino.hpp"
 #include "testMinimumNodeService.h"
-#include "testNodeVariablesService.h"
+#include "testNodeVariableService.h"
 
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
         {"MinimumNodeService", testMinimumNodeService},
-        {"NodeVariablesService", testNodeVariablesService},
+        {"NodeVariableService", testNodeVariableService},
 };
 
 int main(int argc, const char * const * argv)

@@ -4,20 +4,20 @@
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
 #include <Streaming.h>
-#include "NodeVariablesService.h"
+#include "NodeVariableService.h"
 #include "Controller.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB
 {
 
-void NodeVariablesService::setController(Controller *cntrl)
+void NodeVariableService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
   this->module_config = cntrl->module_config;
 }
 
-Processed NodeVariablesService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 

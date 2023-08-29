@@ -90,7 +90,7 @@ private:                                          // protected members become pr
   // TODO: Create getter/setter for each field.
   friend class MinimumNodeService;
   friend class CanService;
-  friend class NodeVariablesService;
+  friend class NodeVariableService;
   friend class EventConsumerService;
   friend class EventTeachingService;
 };

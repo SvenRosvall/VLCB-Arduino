@@ -23,7 +23,7 @@
 #include "MinimumNodeService.h"
 #include <LongMessageService.h>
 #include "CanService.h"
-#include "NodeVariablesService.h"
+#include "NodeVariableService.h"
 #include "EventConsumerService.h"
 #include "EventTeachingService.h"
 
@@ -46,7 +46,7 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
-VLCB::NodeVariablesService nvService;
+VLCB::NodeVariableService nvService;
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;

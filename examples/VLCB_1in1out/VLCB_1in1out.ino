@@ -24,7 +24,7 @@
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"
-#include "NodeVariablesService.h"
+#include "NodeVariableService.h"
 #include "EventConsumerService.h"
 #include "EventTeachingService.h"
 
@@ -47,7 +47,7 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService;
-VLCB::NodeVariablesService nvService;
+VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 

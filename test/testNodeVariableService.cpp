@@ -3,19 +3,18 @@
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
-// Test cases for NodeVariablesService.
+// Test cases for NodeVariableService.
 
 #include <memory>
 #include "TestTools.hpp"
 #include "Controller.h"
 #include "MockUserInterface.h"
 #include "MinimumNodeService.h"
-#include "NodeVariablesService.h"
+#include "NodeVariableService.h"
 #include "MockTransport.h"
 #include "MockStorage.h"
 #include "vlcbdefs.hpp"
 #include "Parameters.h"
-#include "LongMessageService.h"
 
 namespace
 {
@@ -34,10 +33,10 @@ VLCB::Controller createController()
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
-  static std::unique_ptr<VLCB::NodeVariablesService> NodeVariablesService;
-  NodeVariablesService.reset(new VLCB::NodeVariablesService);
+  static std::unique_ptr<VLCB::NodeVariableService> nodeVariableService;
+  nodeVariableService.reset(new VLCB::NodeVariableService);
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              {minimumNodeService.get(), NodeVariablesService.get()});
+                              {minimumNodeService.get(), nodeVariableService.get()});
 
   configuration->EE_NVS_START = 10;
   configuration->EE_NUM_NVS = 4;
@@ -194,7 +193,7 @@ void testSetNVIndexOutOfBand()
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
   
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
@@ -217,7 +216,7 @@ void testReadNVIndexOutOfBand()
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVRD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
   
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
@@ -240,7 +239,7 @@ void testSetNVnewIndexOutOfBand()
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVSETRD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]); // error code
   
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
@@ -263,7 +262,7 @@ void testSetNVShortMessage()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
 }
 
@@ -283,7 +282,7 @@ void testReadNVShortMessage()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVRD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
 }
 
@@ -303,13 +302,13 @@ void testSetNVnewShortMessage()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariablesService
+  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
 }
 
 }
 
-void testNodeVariablesService()
+void testNodeVariableService()
 {
   testNumNVs();
   testServiceDiscovery();

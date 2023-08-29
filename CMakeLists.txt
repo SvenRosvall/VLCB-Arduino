@@ -54,7 +54,7 @@ add_library(core_library OBJECT
         src/EventConsumerService.cpp
         src/EventTeachingService.cpp
         src/vlcbdefs.hpp
-        src/NodeVariablesService.cpp
+        src/NodeVariableService.cpp
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -81,7 +81,7 @@ add_executable(testAll
         test/testArduino.cpp
         test/testAll.cpp
         test/testMinimumNodeService.cpp
-        test/testNodeVariablesService.cpp
+        test/testNodeVariableService.cpp
         test/MockUserInterface.cpp
         test/MockTransport.cpp
         test/MockStorage.cpp

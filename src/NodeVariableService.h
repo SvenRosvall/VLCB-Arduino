@@ -12,7 +12,7 @@ namespace VLCB
 
 class Configuration;
 
-class NodeVariablesService : public Service
+class NodeVariableService : public Service
 {
 
 public:
