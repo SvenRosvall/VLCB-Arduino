@@ -38,12 +38,11 @@ private:
   byte instantMode;
   
   void checkModeChangeTimeout();
-  void indicateMode(byte mode);
   void initSetup();
   void setNormal();
   void setUninitialised();
   void initSetupFromNormal();
-  void renegotiate();
+
   void heartbeat();
   
   unsigned long lastHeartbeat = 0;

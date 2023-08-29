@@ -79,17 +79,6 @@ void MinimumNodeService::setUninitialised()
 void MinimumNodeService::initSetupFromNormal()
 {
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
-  // send NNREL message
-  controller->sendMessageWithNN(OPC_NNREL);
-  initSetup();
-}
-
-//
-/// change or re-confirm node number
-//
-
-void MinimumNodeService::renegotiate()
-{
   renegotiating = true;
   controller->sendMessageWithNN(OPC_NNREL);
   initSetup();
@@ -410,8 +399,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         case MODE_NORMAL:
           switch (newMode)
           {
-          case MODE_SETUP:          
-            renegotiate();
+          case MODE_SETUP:
+            initSetupFromNormal();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             break;
           
