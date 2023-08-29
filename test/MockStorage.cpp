@@ -8,6 +8,10 @@
 #include "MockStorage.h"
 #include "Configuration.h"
 
+MockStorage::MockStorage()
+  : eeprom(1000)
+{}
+
 void MockStorage::begin()
 {
 
@@ -15,12 +19,12 @@ void MockStorage::begin()
 
 byte MockStorage::readEEPROM(unsigned int eeaddress)
 {
-  return 0;
+  return eeprom[eeaddress];
 }
 
 void MockStorage::writeEEPROM(unsigned int eeaddress, byte data)
 {
-
+  eeprom[eeaddress] = data;
 }
 
 byte MockStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte *dest)

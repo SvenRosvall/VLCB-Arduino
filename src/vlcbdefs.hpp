@@ -268,7 +268,7 @@ enum CbusOpCodes
   OPC_QCVS = 0x84, // Read CV
   OPC_PCVS = 0x85, // Report CV
   OPC_RDGN = 0x87, // Request diagnostics
-  OPC_PNVSETRD = 0x8E, // Set NV with Read
+  OPC_NVSETRD = 0x8E, // Set NV with Read
   // 
   OPC_ACON = 0x90, // on event
   OPC_ACOF = 0x91, // off event

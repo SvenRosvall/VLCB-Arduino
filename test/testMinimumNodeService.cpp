@@ -29,7 +29,6 @@
 #include "vlcbdefs.hpp"
 #include "Parameters.h"
 #include "LongMessageService.h"
-#include "CbusService.h"
 #include "ArduinoMock.hpp"
 
 namespace
@@ -58,17 +57,14 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
 
-  static std::unique_ptr<VLCB::CbusService> cbusService;
-  cbusService.reset(new VLCB::CbusService);
-
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              {minimumNodeService.get(), longMessageService.get(), cbusService.get()});
+                              {minimumNodeService.get(), longMessageService.get()});
 
   configuration->EE_NVS_START = 0;
   configuration->EE_NUM_NVS = 4;
   configuration->EE_EVENTS_START = 20;
   configuration->EE_MAX_EVENTS = 20;
-  configuration->EE_NUM_NVS = 2;
+  configuration->EE_NUM_EVS = 2;
   configuration->begin();
   // Not storing these in mockStorage. Setting directly instead.
   configuration->currentMode = VLCB::MODE_NORMAL;
@@ -96,7 +92,7 @@ void testUninitializedRequestNodeNumber()
   configuration->currentMode = VLCB::MODE_UNINITIALISED;
   configuration->setNodeNum(0);
   
-  // User requests to enter Normal mode.
+  // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
   
   controller.process();
@@ -134,11 +130,11 @@ void testUninitializedRequestNodeNumberMissingSNN()
   assertEquals(0, mockTransport->sent_messages[0].data[2]);
 
   assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  
+
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
   mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
-  
+
   controller.process();
 
   assertEquals(0, mockTransport->sent_messages.size());
@@ -158,10 +154,10 @@ void testNormalRequestNodeNumber()
   // Set module into Normal mode:
   //configuration->currentMode = VLCB::MODE_NORMAL;
   //configuration->setNodeNum(0x104);
-  
+
   // User requests to enter Normal mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
-  
+
   controller.process();
 
   assertEquals(2, mockTransport->sent_messages.size());
@@ -199,11 +195,11 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
 
   assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  
+
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
   mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
-  
+
   controller.process();
 
   assertEquals(1, mockTransport->sent_messages.size());
@@ -214,24 +210,29 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x104, configuration->nodeNum);
 }
 
-void testRenegotiateNodeNumber()
+void testReleaseNodeNumber()
 {
   test();
 
   VLCB::Controller controller = createController();
 
-  // User requests to renegotiate the NN.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::RENEGOTIATE);
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
   controller.process();
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
 
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
+
   assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
   assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+
+  // Module will hold on to node number in case setup times out.
   assertEquals(0x104, configuration->nodeNum);
 }
 
@@ -247,10 +248,10 @@ void testServiceDiscovery()
   controller.process();
 
   // Verify sent messages.
-  assertEquals(4, mockTransport->sent_messages.size());
+  assertEquals(3, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(3, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
@@ -261,10 +262,6 @@ void testServiceDiscovery()
   assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
   assertEquals(17, mockTransport->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
-
-  assertEquals(OPC_SD, mockTransport->sent_messages[3].data[0]);
-  assertEquals(3, mockTransport->sent_messages[3].data[3]); // index
-  // Don't care about details of CbusService.
 }
 
 void testServiceDiscoveryLongMessageSvc()
@@ -334,7 +331,7 @@ void testMinimumNodeService()
   testUninitializedRequestNodeNumberMissingSNN();
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
-  testRenegotiateNodeNumber();
+  testReleaseNodeNumber();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
   testServiceDiscoveryIndexOutOfBand();

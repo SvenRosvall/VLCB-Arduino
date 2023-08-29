@@ -20,6 +20,7 @@ public:
   virtual bool sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority) override;
   virtual void reset() override;
   void setNextMessage(VLCB::CANFrame msg);
+  void clearMessages();
 
   std::deque<VLCB::CANFrame> incoming_messages;
   std::vector<VLCB::CANFrame> sent_messages;

@@ -84,14 +84,13 @@ private:                                          // protected members become pr
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
-  void performRequestedUserAction(UserInterface::RequestedAction requestedAction);
 
   // Quick way to access necessary stuff when migrating to services.
   // TODO: Review the necessary fields to see what is required by services
   // TODO: Create getter/setter for each field.
   friend class MinimumNodeService;
   friend class CanService;
-  friend class CbusService;
+  friend class NodeVariableService;
   friend class EventConsumerService;
   friend class EventTeachingService;
 };

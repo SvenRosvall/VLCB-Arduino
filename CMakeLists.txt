@@ -46,14 +46,15 @@ add_library(core_library OBJECT
         src/Storage.h
         src/UserInterface.h
         src/Service.h
-        src/CbusService.cpp
-        src/CbusService.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp
         src/MinimumNodeService.h
         src/CanService.cpp
         src/CanService.h
+        src/EventConsumerService.cpp
+        src/EventTeachingService.cpp
         src/vlcbdefs.hpp
+        src/NodeVariableService.cpp
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -80,11 +81,8 @@ add_executable(testAll
         test/testArduino.cpp
         test/testAll.cpp
         test/testMinimumNodeService.cpp
-        test/testMinimumNodeService.h
+        test/testNodeVariableService.cpp
         test/MockUserInterface.cpp
-        test/MockUserInterface.h
         test/MockTransport.cpp
-        test/MockTransport.h
         test/MockStorage.cpp
-        test/MockStorage.h
 )

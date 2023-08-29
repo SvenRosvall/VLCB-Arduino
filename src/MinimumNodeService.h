@@ -33,7 +33,7 @@ private:
   Configuration * module_config;  // Shortcut to reduce indirection code.
   
   bool bModeSetup = false;
-  bool renegotiating;
+  bool renegotiating = false;
   unsigned long timeOutTimer;
   byte instantMode;
   
