@@ -51,7 +51,7 @@ void MinimumNodeService::setNormal()
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
   bModeSetup = false;
-  renegotiating = false;
+  requestingNewNN = false;
   instantMode = MODE_NORMAL;
   module_config->setModuleMode(MODE_NORMAL);
   controller->indicateMode(MODE_NORMAL);
@@ -64,7 +64,7 @@ void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   bModeSetup = false;
-  renegotiating = false;
+  requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
   module_config->setNodeNum(0);
   module_config->setModuleMode(MODE_UNINITIALISED);
@@ -79,7 +79,7 @@ void MinimumNodeService::setUninitialised()
 void MinimumNodeService::initSetupFromNormal()
 {
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
-  renegotiating = true;
+  requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
   initSetup();
 }
@@ -97,10 +97,10 @@ void MinimumNodeService::checkModeChangeTimeout()
     instantMode = module_config->currentMode;
     controller->indicateMode(instantMode);
 
-    if (renegotiating)
+    if (requestingNewNN)
     {
       // Renegotiating timed out.  Revert to previous NN   
-      renegotiating = false;
+      requestingNewNN = false;
       controller->sendMessageWithNN(OPC_NNACK);
     }
   }
