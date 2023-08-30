@@ -51,7 +51,7 @@ void MinimumNodeService::setNormal()
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
   bModeSetup = false;
-  renegotiating = false;
+  requestingNewNN = false;
   instantMode = MODE_NORMAL;
   module_config->setModuleMode(MODE_NORMAL);
   controller->indicateMode(MODE_NORMAL);
@@ -64,7 +64,7 @@ void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   bModeSetup = false;
-  renegotiating = false;
+  requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
   module_config->setNodeNum(0);
   module_config->setModuleMode(MODE_UNINITIALISED);
@@ -76,21 +76,10 @@ void MinimumNodeService::setUninitialised()
 //
 /// revert from Normal to Uninitialised mode
 //
-void MinimumNodeService::revertUninitialised()
+void MinimumNodeService::initSetupFromNormal()
 {
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
-  // send NNREL message
-  controller->sendMessageWithNN(OPC_NNREL);
-  setUninitialised();
-}
-
-//
-/// change or re-confirm node number
-//
-
-void MinimumNodeService::renegotiate()
-{
-  renegotiating = true;
+  requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
   initSetup();
 }
@@ -100,18 +89,18 @@ void MinimumNodeService::renegotiate()
 //
 void MinimumNodeService::checkModeChangeTimeout()
 {
-  if (bModeSetup && ((millis() - timeOutTimer) >= 30000)) {
-
+  if (bModeSetup && ((millis() - timeOutTimer) >= 30000)) 
+  {
     // Revert to previous mode.
     // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeSetup << endl;
     bModeSetup = false;
     instantMode = module_config->currentMode;
     controller->indicateMode(instantMode);
 
-    if (renegotiating)
+    if (requestingNewNN)
     {
       // Renegotiating timed out.  Revert to previous NN   
-      renegotiating = false;
+      requestingNewNN = false;
       controller->sendMessageWithNN(OPC_NNACK);
     }
   }
@@ -146,7 +135,7 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
        break;
        
      case MODE_NORMAL:
-       renegotiate();
+       initSetupFromNormal();
        break;
        
      default:
@@ -264,7 +253,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
         }
       }
-     
+
       return PROCESSED;
       
     case OPC_RQNN:
@@ -356,7 +345,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
         }
       }
- 
+
       return PROCESSED;
       
     case OPC_RDGN:
@@ -410,8 +399,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         case MODE_NORMAL:
           switch (newMode)
           {
-          case MODE_SETUP:          
-            renegotiate();
+          case MODE_SETUP:
+            initSetupFromNormal();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             break;
           

@@ -164,6 +164,8 @@ void Controller::process(byte num_messages)
     _ui->run();
 
     requestedAction = _ui->checkRequestedAction();
+    // if (requestedAction != UserInterface::NONE)
+    //   DEBUG_SERIAL << "Controller::process() UI action=" << requestedAction << " mode=" << module_config->currentMode << endl;
   }
 
   for (Service * service : services)

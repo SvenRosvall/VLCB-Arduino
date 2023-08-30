@@ -29,6 +29,7 @@
 #include "vlcbdefs.hpp"
 #include "Parameters.h"
 #include "LongMessageService.h"
+#include "ArduinoMock.hpp"
 
 namespace
 {
@@ -41,14 +42,21 @@ VLCB::Controller createController()
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
   mockTransport.reset(new MockTransport);
+
   mockUserInterface.reset(new MockUserInterface);
+
   static std::unique_ptr<MockStorage> mockStorage;
   mockStorage.reset(new MockStorage);
+
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
+
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
+  minimumNodeService->setHeartBeat(false);
+
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
+
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
                               {minimumNodeService.get(), longMessageService.get()});
 
@@ -74,7 +82,7 @@ VLCB::Controller createController()
   return controller;
 }
 
-void testRequestNodeNumber()
+void testUninitializedRequestNodeNumber()
 {
   test();
 
@@ -91,14 +99,115 @@ void testRequestNodeNumber()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0, mockTransport->sent_messages[0].data[2]);
 
   assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0, configuration->nodeNum);
 }
 
-void testRequestNodeNumberMissingSNN()
+void testUninitializedRequestNodeNumberMissingSNN()
 {
-  // TODO!
   // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
+
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set module into Uninitialized mode:
+  configuration->currentMode = VLCB::MODE_UNINITIALISED;
+  configuration->setNodeNum(0);
+
+  // User requests to enter Normal mode.
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0, mockTransport->sent_messages[0].data[2]);
+
+  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+
+  mockTransport->sent_messages.clear();
+  addMillis(31 * 1000);
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  //assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
+
+  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0, configuration->nodeNum);
+}
+
+void testNormalRequestNodeNumber()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set module into Normal mode:
+  //configuration->currentMode = VLCB::MODE_NORMAL;
+  //configuration->setNodeNum(0x104);
+
+  // User requests to enter Normal mode.
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
+
+  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(0x104, configuration->nodeNum);
+}
+
+void testNormalRequestNodeNumberMissingSNN()
+{
+  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
+
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // User requests to change mode.
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
+
+  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+
+  mockTransport->sent_messages.clear();
+  addMillis(31 * 1000);
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
+
+  assertEquals(VLCB::MODE_NORMAL, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(0x104, configuration->nodeNum);
 }
 
 void testReleaseNodeNumber()
@@ -108,7 +217,7 @@ void testReleaseNodeNumber()
   VLCB::Controller controller = createController();
 
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
-  
+
   controller.process();
 
   assertEquals(2, mockTransport->sent_messages.size());
@@ -121,9 +230,10 @@ void testReleaseNodeNumber()
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
 
   assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
 
   // Module will hold on to node number in case setup times out.
-  assertEquals(260, configuration->nodeNum);
+  assertEquals(0x104, configuration->nodeNum);
 }
 
 void testServiceDiscovery()
@@ -217,7 +327,10 @@ void testServiceDiscoveryShortMessage()
 
 void testMinimumNodeService()
 {
-  testRequestNodeNumber();
+  testUninitializedRequestNodeNumber();
+  testUninitializedRequestNodeNumberMissingSNN();
+  testNormalRequestNodeNumber();
+  testNormalRequestNodeNumberMissingSNN();
   testReleaseNodeNumber();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
