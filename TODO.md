@@ -28,4 +28,9 @@ Remove this as not all storages are EEPROM based.
 The begin method should take a size parameter. 
 See calculation of this size in EepromInternalStorage.cpp. 
 This calculation should sit in Controller. 
-The various storage implementations ma choose to ignore this size value.
+The various storage implementations may choose to ignore this size value.
+
+## Provide access to persistent storage for user code
+The Storage interface provides a simple API to persistent storage regardless of
+type of storage. 
+The user code should be able to reserve a chunk of bytes in this space.
