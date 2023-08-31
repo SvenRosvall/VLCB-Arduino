@@ -43,10 +43,8 @@ VLCB::Controller createController()
   configuration->EE_EVENTS_START = 20;
   configuration->EE_MAX_EVENTS = 20;
   configuration->EE_NUM_EVS = 2;
-  configuration->begin();
-  // Not storing these in mockStorage. Setting directly instead.
-  configuration->currentMode = VLCB::MODE_NORMAL;
-  configuration->nodeNum = 0x0104;
+  configuration->setModuleMode(VLCB::MODE_NORMAL);
+  configuration->setNodeNum(0x0104);
   static std::unique_ptr<VLCB::Parameters> params;
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
@@ -57,6 +55,7 @@ VLCB::Controller createController()
   controller.setParams(params->getParams());
   unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
   controller.setName(moduleName);
+  controller.begin();
   return controller;
 }
 
