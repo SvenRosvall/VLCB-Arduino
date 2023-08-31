@@ -218,7 +218,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
 
           } else {
             // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
-            controller->sendCMDERR(9);
+            controller->sendCMDERR(CMDERR_INV_PARAM_IDX);
+            controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
           }
         }
       }
