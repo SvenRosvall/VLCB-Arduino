@@ -223,6 +223,39 @@ void testReadNVIndexOutOfBand()
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
 }
 
+void testReadNVAll()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  for (int i = 1 ; i <= configuration->EE_NUM_NVS ; ++i)
+  {
+    configuration->writeNV(i, 20 + i);
+  }
+  
+  // Set NV 7 to 42
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 0}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1 + configuration->EE_NUM_NVS, mockTransport->sent_messages.size());
+
+  // First response shall contain the number of NVs
+  assertEquals(OPC_NVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[3]); // NV index
+  assertEquals(configuration->EE_NUM_NVS, mockTransport->sent_messages[0].data[4]); // NV value
+
+  // The following are all the NVs
+  for (int i = 1 ; i <= configuration->EE_NUM_NVS ; ++i)
+  {
+    assertEquals(OPC_NVANS, mockTransport->sent_messages[i].data[0]);
+    assertEquals(i, mockTransport->sent_messages[i].data[3]); // NV index
+    assertEquals(20 + i, mockTransport->sent_messages[i].data[4]); // NV value
+  }
+}
+
 void testSetNVnewIndexOutOfBand()
 {
   test();
@@ -301,7 +334,7 @@ void testSetNVnewShortMessage()
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
-  assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
+  assertEquals(OPC_NVSETRD, mockTransport->sent_messages[0].data[3]);
   assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID of NodeVariableService
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // error code
 }
@@ -315,6 +348,7 @@ void testNodeVariableService()
   testServiceDiscoveryNodeVarSvc();
   testSetAndReadNV();
   testSetAndReadNVnew();
+  testReadNVAll();
   testSetNVIndexOutOfBand();
   testReadNVIndexOutOfBand();
   testSetNVnewIndexOutOfBand();

@@ -40,6 +40,15 @@ Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
           controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_NV_IDX);
           controller->sendCMDERR(CMDERR_INV_NV_IDX);
         }
+        else if (nvindex == 0)
+        {
+          controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->EE_NUM_NVS);
+          
+          for (int i = 1 ; i <= module_config->EE_NUM_NVS ; ++i)
+          {
+            controller->sendMessageWithNN(OPC_NVANS, i, module_config->readNV(i));
+          }
+        }
         else
         {
           // respond with NVANS
@@ -86,7 +95,7 @@ Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
       {
         if (msg->len < 5)
         {
-          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
+          controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_CMD);
           return PROCESSED;
         }
 
