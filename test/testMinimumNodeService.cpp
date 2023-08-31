@@ -380,8 +380,7 @@ void testServiceDiscoveryIndexOutOfBand()
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
+  assertEquals(GRSP_INVALID_SERVICE, mockTransport->sent_messages[0].data[5]); // result
 }
 
 void testServiceDiscoveryShortMessage()
@@ -401,7 +400,6 @@ void testServiceDiscoveryShortMessage()
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
 }
 
 }
