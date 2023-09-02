@@ -33,6 +33,8 @@
 
 namespace
 {
+const int MODULE_ID = 253;
+
 static std::unique_ptr<MockUserInterface> mockUserInterface;
 static std::unique_ptr<MockTransport> mockTransport;
 static std::unique_ptr<VLCB::Configuration> configuration;
@@ -72,7 +74,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::Parameters> params;
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
-  params->setModuleId(253);
+  params->setModuleId(MODULE_ID);
   params->setFlags(PF_FLiM | PF_BOOT);
 
   // assign to Controller
@@ -236,6 +238,85 @@ void testReleaseNodeNumber()
   assertEquals(0x104, configuration->nodeNum);
 }
 
+void testReadNodeParameterCount()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 0}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[3]); // Number of services
+  assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of services
+}
+
+void testReadNodeParameterModuleId()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 3}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(3, mockTransport->sent_messages[0].data[3]); // Number of services
+  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[4]); // Number of services
+}
+
+void testReadNodeParameterInvalidIndex()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 33}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_RQNPN, mockTransport->sent_messages[1].data[3]);
+  assertEquals(1, mockTransport->sent_messages[1].data[4]); // service ID of MNS
+  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[1].data[5]); // result
+}
+
+void testReadNodeParameterShortMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQNPN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_RQNPN, mockTransport->sent_messages[0].data[3]);
+  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+}
+
 void testServiceDiscovery()
 {
   test();
@@ -299,8 +380,7 @@ void testServiceDiscoveryIndexOutOfBand()
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
+  assertEquals(GRSP_INVALID_SERVICE, mockTransport->sent_messages[0].data[5]); // result
 }
 
 void testServiceDiscoveryShortMessage()
@@ -320,7 +400,6 @@ void testServiceDiscoveryShortMessage()
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
-  // Not testing service data bytes.
 }
 
 }
@@ -332,6 +411,10 @@ void testMinimumNodeService()
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
   testReleaseNodeNumber();
+  testReadNodeParameterCount();
+  testReadNodeParameterModuleId();
+  testReadNodeParameterInvalidIndex();
+  testReadNodeParameterShortMessage();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
   testServiceDiscoveryIndexOutOfBand();
