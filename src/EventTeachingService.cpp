@@ -239,7 +239,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
         }
         else
         {
-          sendCMDERR(CMDERR_NOT_LRN);
+          controller->sendCMDERR(CMDERR_NOT_LRN);
           controller->sendGRSP(OPC_NNCLR, getServiceID(), CMDERR_NOT_LRN);
         }
       }
@@ -392,38 +392,39 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
         {
           controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
           controller->sendCMDERR(CMDERR_INV_CMD);
-        } 
-        else 
+          return PROCESSED;
+        }          
+        
+        byte index = module_config->findExistingEvent(nn, en);
+        byte evIndex = msg->data[5];
+
+        if (index >= module_config->EE_MAX_EVENTS) 
         {
-          byte index = module_config->findExistingEvent(nn, en);
-          byte evIndex = msg->data[5];
-
-          if (index >= module_config->EE_MAX_EVENTS) 
-          {
-            // DEBUG_SERIAL << F("> event not found") << endl;
-            controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
-            controller->sendCMDERR(CMDERR_INVALID_EVENT);
-            return PROCESSED;
-          }
-
-          // event found
-          if (index < module_config->EE_MAX_EVENTS) 
-          {
-            if (evIndex == 0) 
-            {
-              //send all event variables one after the other starting with the number of variables
-              controller->sendMessageWithNN(OPC_EVANS, 0, module_config->EE_NUM_EVS);
-              for (byte i = 1; module_config->EE_NUM_EVS; i++) {
-                //TODO: throttle message rate
-                controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
-              }
-            } 
-            else 
-            {
-              controller->sendMessageWithNN(OPC_EVANS, evIndex, module_config->getEventEVval(index, evIndex));
-            }
-          }
+           DEBUG_SERIAL << F("> event not found") << endl;
+          controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
+          controller->sendCMDERR(CMDERR_INVALID_EVENT);
+          return PROCESSED;
         }
+
+        // event found
+        if (index < module_config->EE_MAX_EVENTS) 
+        {
+           DEBUG_SERIAL << F("> event found. evIndex = ") << evIndex << endl;
+          if (evIndex == 0) 
+          {
+            //send all event variables one after the other starting with the number of variables
+            controller->sendMessageWithNN(OPC_EVANS, 0, module_config->EE_NUM_EVS);
+            for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+            {
+              controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
+              delay(10);
+            }
+          } 
+          else 
+          {
+            controller->sendMessageWithNN(OPC_EVANS, evIndex, module_config->getEventEVval(index, evIndex));
+          }
+        }        
       }
       return PROCESSED;
 
