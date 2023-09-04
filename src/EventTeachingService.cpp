@@ -28,7 +28,7 @@ void EventTeachingService::enableLearn()
 void EventTeachingService::inhibitLearn() 
 {
   bLearn = false;
-  DEBUG_SERIAL << F("> learn mode off") << endl;
+  //DEBUG_SERIAL << F("> learn mode off") << endl;
   // clear bit 5 in parameter 8
   bitClear(controller->_mparams[8], 5);
 }
@@ -37,7 +37,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
-  DEBUG_SERIAL << ">VlcbSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
+  //DEBUG_SERIAL << ">VlcbSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 
   {
