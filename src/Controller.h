@@ -53,6 +53,7 @@ public:
   bool sendMessageWithNN(int opc, byte b1);
   bool sendMessageWithNN(int opc, byte b1, byte b2);
   bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
+  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4);
   bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
@@ -67,7 +68,7 @@ public:
   void setName(unsigned char *mname);
   void indicateMode(byte mode);
   void indicateActivity();
-  void requestMode(byte reqMode);
+  void setLearnMode(byte reqMode);
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
@@ -93,6 +94,7 @@ private:                                          // protected members become pr
   friend class NodeVariableService;
   friend class EventConsumerService;
   friend class EventTeachingService;
+  friend class EventProducerService;
 };
 
 }

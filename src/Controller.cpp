@@ -117,6 +117,7 @@ bool Controller::isRTR(CANFrame *amsg)
 
 void Controller::indicateMode(byte mode)
 {
+ 
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) {
     _ui->indicateMode(mode);
@@ -130,7 +131,7 @@ void Controller::indicateActivity()
   }
 }
 
-void Controller::requestMode(byte reqMode)
+void Controller::setLearnMode(byte reqMode)
 {
   for (Service * svc : services)
   {
@@ -309,6 +310,19 @@ bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
   msg.data[3] = b1;
   msg.data[4] = b2;
   msg.data[5] = b3;
+  return sendMessage(&msg);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4)
+{
+  CANFrame msg;
+  msg.len = 7;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  msg.data[4] = b2;
+  msg.data[5] = b3;
+  msg.data[6] = b4;
   return sendMessage(&msg);
 }
 
