@@ -52,7 +52,8 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
       } 
       else  //if we are learning and another node is put in learn mode, stop learn.
       {
-        if (bLearn) {
+        if (bLearn) 
+        {
           inhibitLearn();
         }
       }
