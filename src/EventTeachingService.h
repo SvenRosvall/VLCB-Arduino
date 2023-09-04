@@ -7,12 +7,12 @@
 
 #include "Service.h"
 
-namespace VLCB
+namespace VLCB 
 {
 
 class Configuration;
 
-class EventTeachingService : public Service
+class EventTeachingService : public Service 
 {
 public:
   virtual void setController(Controller *cntrl) override;
@@ -20,16 +20,15 @@ public:
 
   virtual byte getServiceID() override { return 4; }
   virtual byte getServiceVersionID() override { return 1; }
-  
+
   void enableLearn();
   void inhibitLearn();
 
 private:
-  Controller * controller;
-  Configuration * module_config;  // Shortcut to reduce indirection code.
-  
-  bool bLearn;
- 
- };
+  Controller *controller;
+  Configuration *module_config;  // Shortcut to reduce indirection code.
 
-} // VLCB
+  bool bLearn = false;
+};
+
+}  // VLCB

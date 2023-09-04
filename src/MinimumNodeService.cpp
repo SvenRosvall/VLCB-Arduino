@@ -408,6 +408,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           case MODE_LEARN:
             controller->requestMode(newMode);
             instantMode = newMode;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             break;
           
           case MODE_NHEARTB:          
@@ -419,6 +420,10 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
           
         case MODE_LEARN:
+          if (newMode == MODE_SETUP)
+          {
+            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD); 
+          }
           if (newMode == MODE_NORMAL)
           {
             controller->requestMode(newMode);
@@ -434,15 +439,23 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
           
         case MODE_NHEARTB:
+          if (newMode == MODE_SETUP)
+          {
+            noHeartbeat = false;
+            initSetupFromNormal();
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          }
           if (newMode == MODE_NORMAL)
           {
             noHeartbeat = false;
             instantMode = newMode;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
           }
           if (newMode == MODE_LEARN)
           {
             controller->requestMode(newMode);
             instantMode = newMode;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
           } 
           return PROCESSED;
         }
