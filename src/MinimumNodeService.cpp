@@ -406,7 +406,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             break;
           
           case MODE_LEARN:
-            controller->requestMode(newMode);
+            //DEBUG_SERIAL << F("> MODE -- Learn") << endl;
+            controller->setLearnMode(newMode);
             instantMode = newMode;
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             break;
@@ -426,7 +427,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
           if (newMode == MODE_NORMAL)
           {
-            controller->requestMode(newMode);
+            controller->setLearnMode(newMode);
             if (noHeartbeat == true)
             {
               instantMode = MODE_NHEARTB;
@@ -453,7 +454,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           }
           if (newMode == MODE_LEARN)
           {
-            controller->requestMode(newMode);
+            controller->setLearnMode(newMode);
             instantMode = newMode;
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
           } 
