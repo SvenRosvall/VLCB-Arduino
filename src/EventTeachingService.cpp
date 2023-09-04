@@ -364,8 +364,10 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
             // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
             //DEBUG_SERIAL << F("> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
-            // Writes the first four bytes NN & EN only.  This is only done once with the first evIndex accessed.  
-            if (evIndex < 2) 
+            // Writes the first four bytes NN & EN only if they have changed.
+            byte eventTableNNEN[4];
+            module_config->readEvent(index, eventTableNNEN);            
+            if (eventTableNNEN != &msg->data[1]) 
             {
               module_config->writeEvent(index, &msg->data[1]);
             }
