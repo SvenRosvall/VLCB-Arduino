@@ -128,7 +128,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
     case OPC_NERD:
       // 57 - request for all stored events
-      DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
+      //DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
 
       if (nn == module_config->nodeNum) 
       {
@@ -147,7 +147,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
             module_config->readEvent(i, &msg->data[3]);
             msg->data[7] = i;  // event table index
 
-            DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
+            //DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
             controller->sendMessage(msg);
             delay(10);
 
@@ -334,7 +334,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
     case OPC_EVLRNI:
       // F5 - learn an event using event index
 
-      DEBUG_SERIAL << endl
+      //DEBUG_SERIAL << endl
                    << F("> EVLRNI for source nn = ") << nn << endl;
 
       // we must be in learn mode
@@ -354,14 +354,14 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
           // invalid index
           if (index >= module_config->EE_MAX_EVENTS) 
           {
-            DEBUG_SERIAL << F("> invalid index") << endl;
+            //DEBUG_SERIAL << F("> invalid index") << endl;
             controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
           }
           // write the event data
           else 
           {
             // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-            DEBUG_SERIAL << F("> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+            //DEBUG_SERIAL << F("> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
             // Writes the first four bytes NN & EN only.  This is only done once with the first evIndex accessed.  
             if (evIndex < 2) 
@@ -372,7 +372,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
             module_config->writeEventEV(index, evIndex, evVal);
 
             // recreate event hash table entry
-            DEBUG_SERIAL << F("> updating hash table entry for idx = ") << index << endl;
+            //DEBUG_SERIAL << F("> updating hash table entry for idx = ") << index << endl;
             module_config->updateEvHashEntry(index);
 
             // respond with WRACK
@@ -400,7 +400,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
         if (index >= module_config->EE_MAX_EVENTS) 
         {
-           DEBUG_SERIAL << F("> event not found") << endl;
+           //DEBUG_SERIAL << F("> event not found") << endl;
           controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
           controller->sendCMDERR(CMDERR_INVALID_EVENT);
           return PROCESSED;
@@ -409,7 +409,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
         // event found
         if (index < module_config->EE_MAX_EVENTS) 
         {
-           DEBUG_SERIAL << F("> event found. evIndex = ") << evIndex << endl;
+           //DEBUG_SERIAL << F("> event found. evIndex = ") << evIndex << endl;
           if (evIndex == 0) 
           {
             //send all event variables one after the other starting with the number of variables
