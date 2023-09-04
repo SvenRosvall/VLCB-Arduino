@@ -12,7 +12,8 @@ namespace VLCB
 
 class Configuration;
 
-class EventTeachingService : public Service {
+class EventTeachingService : public Service 
+{
 public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
