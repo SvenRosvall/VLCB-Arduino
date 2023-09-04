@@ -335,8 +335,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
     case OPC_EVLRNI:
       // F5 - learn an event using event index
 
-      //DEBUG_SERIAL << endl
-                   << F("> EVLRNI for source nn = ") << nn << endl;
+      //DEBUG_SERIAL << endl << F("> EVLRNI for source nn = ") << nn << endl;
 
       // we must be in learn mode
       if (bLearn) 
