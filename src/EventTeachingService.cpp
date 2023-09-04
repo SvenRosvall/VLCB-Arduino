@@ -20,7 +20,7 @@ void EventTeachingService::setController(Controller *cntrl)
 void EventTeachingService::enableLearn() 
 {
   bLearn = true;
-  DEBUG_SERIAL << F("> set learn mode ok") << endl;
+  //DEBUG_SERIAL << F("> set learn mode ok") << endl;
   // set bit 5 in parameter 8
   bitSet(controller->_mparams[8], 5);
 }
@@ -33,12 +33,14 @@ void EventTeachingService::inhibitLearn()
   bitClear(controller->_mparams[8], 5);
 }
 
-Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
+Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) 
+{
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
   DEBUG_SERIAL << ">VlcbSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
-  switch (opc) {
+  switch (opc) 
+  {
 
     case OPC_NNLRN:
       // 53 - place into learn mode
@@ -161,11 +163,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
 
       if (nn == module_config->nodeNum) 
       {
-        msg->len = 8;
-        msg->data[0] = OPC_ENRSP;     // response opcode
-        msg->data[1] = highByte(nn);  // my NN hi
-        msg->data[2] = lowByte(nn);   // my NN lo
-
         byte i = msg->data[3];
         if ((i >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(i) == 0)) 
         {
@@ -178,6 +175,10 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
           // read the event data from EEPROM
           // construct and send a ENRSP message
           module_config->readEvent(i, &msg->data[3]);
+          msg->len = 8;
+          msg->data[0] = OPC_ENRSP;     // response opcode
+          msg->data[1] = highByte(nn);  // my NN hi
+          msg->data[2] = lowByte(nn);   // my NN lo
           msg->data[7] = i;  // event table index
 
           // DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
@@ -355,7 +356,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
           {
             DEBUG_SERIAL << F("> invalid index") << endl;
             controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
-            return PROCESSED;
           }
           // write the event data
           else 
@@ -363,7 +363,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) {
             // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
             DEBUG_SERIAL << F("> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
-            // don't repeat this for subsequent EVs
+            // Writes the first four bytes NN & EN only.  This is only done once with the first evIndex accessed.  
             if (evIndex < 2) 
             {
               module_config->writeEvent(index, &msg->data[1]);

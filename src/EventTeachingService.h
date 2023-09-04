@@ -7,7 +7,8 @@
 
 #include "Service.h"
 
-namespace VLCB {
+namespace VLCB 
+{
 
 class Configuration;
 
@@ -16,12 +17,8 @@ public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override {
-    return 4;
-  }
-  virtual byte getServiceVersionID() override {
-    return 1;
-  }
+  virtual byte getServiceID() override { return 4; }
+  virtual byte getServiceVersionID() override { return 1; }
 
   void enableLearn();
   void inhibitLearn();
