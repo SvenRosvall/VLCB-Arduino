@@ -350,6 +350,25 @@ void testReadNodeParameterShortMessage()
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
 }
 
+void testHeartBeat()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setHeartBeat(true);
+
+  // Not expecting a heartbeat before 5 seconds.
+  addMillis(4500);
+  controller.process();
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // But expecting a heartbeat after 5 seconds.
+  addMillis(1000);
+  controller.process();
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_HEARTB, mockTransport->sent_messages[0].data[0]);
+}
+
 void testServiceDiscovery()
 {
   test();
@@ -450,6 +469,7 @@ void testMinimumNodeService()
   testReadNodeParameterModuleId();
   testReadNodeParameterInvalidIndex();
   testReadNodeParameterShortMessage();
+  testHeartBeat();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
   testServiceDiscoveryIndexOutOfBand();
