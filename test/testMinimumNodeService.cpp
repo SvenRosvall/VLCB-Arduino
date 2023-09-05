@@ -34,6 +34,7 @@
 namespace
 {
 const int MODULE_ID = 253;
+unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
 
 static std::unique_ptr<MockUserInterface> mockUserInterface;
 static std::unique_ptr<MockTransport> mockTransport;
@@ -77,7 +78,6 @@ VLCB::Controller createController()
 
   // assign to Controller
   controller.setParams(params->getParams());
-  unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
   controller.setName(moduleName);
   controller.begin();
   return controller;
@@ -350,6 +350,43 @@ void testReadNodeParameterShortMessage()
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
 }
 
+void testModuleName()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NAME, mockTransport->sent_messages[0].data[0]);
+  assertEquals(moduleName[0], mockTransport->sent_messages[0].data[1]);
+  assertEquals(moduleName[1], mockTransport->sent_messages[0].data[2]);
+  assertEquals(moduleName[2], mockTransport->sent_messages[0].data[3]);
+  assertEquals(moduleName[3], mockTransport->sent_messages[0].data[4]);
+  assertEquals(moduleName[4], mockTransport->sent_messages[0].data[5]);
+  assertEquals(moduleName[5], mockTransport->sent_messages[0].data[6]);
+  assertEquals(moduleName[6], mockTransport->sent_messages[0].data[7]);
+}
+
+void testModuleNameNormal()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+}
+
 void testHeartBeat()
 {
   test();
@@ -469,6 +506,8 @@ void testMinimumNodeService()
   testReadNodeParameterModuleId();
   testReadNodeParameterInvalidIndex();
   testReadNodeParameterShortMessage();
+  testModuleName();
+  testModuleNameNormal();
   testHeartBeat();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
