@@ -14,7 +14,6 @@ class Configuration;
 class EventProducerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
-  virtual void process(byte num); 
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
   virtual byte getServiceID() override 
@@ -35,8 +34,7 @@ private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
   void (*eventhandler)(byte index, CANFrame *msg);
-  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
-
+ 
   byte instantMode;
   byte lastMode;
   void setProducedEvents();

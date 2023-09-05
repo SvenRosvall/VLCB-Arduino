@@ -208,7 +208,7 @@ void processModuleSwitchChange()
 {
   if (moduleSwitch.stateChanged())
   {
-    bool state = moduleSwitch.isPressed() ? true : false;
+    bool state = moduleSwitch.isPressed();
     byte eventNumber = 1;
     epService.sendEvent(state, eventNumber);
   }

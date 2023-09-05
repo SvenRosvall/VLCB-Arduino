@@ -6,6 +6,7 @@
 // TODO: Add AREQ and ASRQ opcode support.
 // Check error messages
 // Set Params flags
+// Trap for EVs <2
 
 #include <Streaming.h>
 #include "EventProducerService.h"
@@ -24,6 +25,7 @@ void EventProducerService::begin()
 {
   //Initialise instantMode
   instantMode = module_config->currentMode;
+  lastMode = instantMode;
   //DEBUG_SERIAL << F("> instant MODE initialise as: ") << instantMode << endl;
   
   if (instantMode == MODE_UNINITIALISED)
@@ -37,42 +39,24 @@ void EventProducerService::begin()
 }
 
 void EventProducerService::setProducedEvents()
-{
-  if (module_config->EE_PROD_EVENTS > 0)
+{  
+  for (byte i = 0; i < module_config->EE_PROD_EVENTS; i++)
   {
-    for (byte i = 0; i < module_config->EE_PROD_EVENTS; i++)
+    if (module_config->getEvTableEntry(i) == 0)
     {
-      if (module_config->getEvTableEntry(i) == 0)
-      {
-        // Event does not exist so create it
-        byte data[4];
-        data[0] = highByte(module_config->nodeNum);
-        data[1] = lowByte(module_config->nodeNum);
-        data[2] = 0;
-        data[3] = i;
-        
-        module_config->writeEvent(i, data);  //index = i
-        module_config->writeEventEV(i, 1, 1);
-        module_config->writeEventEV(i, 2, 0);  //set default switch type
-        module_config->updateEvHashEntry(i);
-      }
-    }    
-  }
-}
-
-void EventProducerService::process(byte num)
-{
-  // Do this if mode changes
-  instantMode = controller->newMode;
-  if (lastMode != instantMode)
-  {
-    // Do this if change from setup to normal.
-    if ((lastMode == MODE_SETUP) && (instantMode == MODE_NORMAL))
-    {
-      setProducedEvents();
+      // Event does not exist so create it
+      byte data[4];
+      data[0] = highByte(module_config->nodeNum);
+      data[1] = lowByte(module_config->nodeNum);
+      data[2] = 0;
+      data[3] = i;
+      
+      module_config->writeEvent(i, data);  //index = i
+      module_config->writeEventEV(i, 1, 1);  //set this event as a producer (ev value of 0 would be a consumer)
+      module_config->writeEventEV(i, 2, 0);  //set default produced event type
+      module_config->updateEvHashEntry(i);
     }
-    lastMode = instantMode;
-  }
+  }    
 }
 
 void EventProducerService::sendEvent(bool state, byte index)
