@@ -26,6 +26,7 @@
 #include "CanService.h"
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
+#include "EventProducerService.h"
 #include "EventTeachingService.h"
 
 // constants
@@ -50,8 +51,9 @@ VLCB::CanService canService;
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &etService }); // Controller object
+                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -76,8 +78,9 @@ void setupVLCB()
   modconfig.EE_NUM_NVS = 10;
   modconfig.EE_EVENTS_START = 20;
   modconfig.EE_MAX_EVENTS = 32;
+  modconfig.EE_PROD_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
+ 
 
   // initialise and load configuration
   modconfig.begin();
@@ -205,17 +208,9 @@ void processModuleSwitchChange()
 {
   if (moduleSwitch.stateChanged())
   {
-    byte opc = moduleSwitch.isPressed() ? OPC_ACON : OPC_ACOF;
+    bool state = moduleSwitch.isPressed();
     byte eventNumber = 1;
-
-    if (controller.sendMessageWithNN(opc, 0, eventNumber))
-    {
-      Serial << F("> sent VLCB message") << endl;
-    }
-    else
-    {
-      Serial << F("> error sending VLCB message") << endl;
-    }
+    epService.sendEvent(state, eventNumber);
   }
 }
 

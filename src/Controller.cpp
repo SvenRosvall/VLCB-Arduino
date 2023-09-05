@@ -117,11 +117,20 @@ bool Controller::isRTR(CANFrame *amsg)
 
 void Controller::indicateMode(byte mode)
 {
- 
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) {
     _ui->indicateMode(mode);
   }
+  
+  if (mode == MODE_NORMAL) // used by Event Producer Service
+  {
+    setProdEventTable = true;
+  }
+}
+
+void Controller::clearProdEventTableFlag()
+{
+  setProdEventTable = false;
 }
 
 void Controller::indicateActivity()
