@@ -22,19 +22,10 @@ void EventProducerService::setController(Controller *cntrl)
 }
 
 void EventProducerService::begin()
-{
-  //Initialise instantMode
-  instantMode = module_config->currentMode;
-  lastMode = instantMode;
-  //DEBUG_SERIAL << F("> instant MODE initialise as: ") << instantMode << endl;
-  
-  if (instantMode == MODE_UNINITIALISED)
+{  
+  if (module_config->currentMode != MODE_UNINITIALISED)
   {
-    return;
-  }
-  else
-  {
-    setProducedEvents();
+    setProducedEvents();    
   }
 }
 
@@ -57,6 +48,16 @@ void EventProducerService::setProducedEvents()
       module_config->updateEvHashEntry(i);
     }
   }    
+}
+
+void EventProducerService::process(byte num)
+{
+  // Do this if mode changes to normal
+  if (controller->setProdEventTable)
+  {
+    setProducedEvents();
+    controller->clearProdEventTableFlag();
+  }
 }
 
 void EventProducerService::sendEvent(bool state, byte index)
