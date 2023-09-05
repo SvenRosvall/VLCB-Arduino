@@ -25,6 +25,7 @@
 #include "CanService.h"
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
+#include "EventProducerService.h"
 #include "EventTeachingService.h"
 
 // constants
@@ -50,8 +51,9 @@ VLCB::NodeVariableService nvService;
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &lmsg, &ecService, &etService }); // Controller object
+                            { &mnService, &canService, &nvService, &lmsg, &ecService, &epService, &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
@@ -77,9 +79,9 @@ void setupVLCB()
   modconfig.EE_NUM_NVS = 10;
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 32;
+  modconfig.EE_PROD_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
-
+  
   // initialise and load configuration
   modconfig.begin();
 

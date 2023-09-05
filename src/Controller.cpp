@@ -117,7 +117,7 @@ bool Controller::isRTR(CANFrame *amsg)
 
 void Controller::indicateMode(byte mode)
 {
- 
+  newMode = mode;  // used by Event Producer Service
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) {
     _ui->indicateMode(mode);
