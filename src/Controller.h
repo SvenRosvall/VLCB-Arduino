@@ -82,7 +82,8 @@ private:                                          // protected members become pr
   void (*framehandler)(CANFrame *msg) = NULL;
   byte *_opcodes = NULL;
   byte _num_opcodes = 0;
-  byte newMode;
+  bool setProdEventTable = false;
+  void clearProdEventTableFlag();
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
