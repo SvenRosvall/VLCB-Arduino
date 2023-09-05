@@ -23,13 +23,9 @@ void EventProducerService::setController(Controller *cntrl)
 
 void EventProducerService::begin()
 {  
-  if (module_config->currentMode == MODE_UNINITIALISED)
+  if (module_config->currentMode != MODE_UNINITIALISED)
   {
-    return;
-  }
-  else
-  {
-    setProducedEvents();
+    setProducedEvents();    
   }
 }
 
