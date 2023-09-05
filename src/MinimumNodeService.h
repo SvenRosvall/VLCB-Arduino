@@ -25,7 +25,10 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;
+  
+  // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
+  void setSetupMode();
 
 private:
 

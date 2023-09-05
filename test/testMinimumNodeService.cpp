@@ -38,6 +38,7 @@ const int MODULE_ID = 253;
 static std::unique_ptr<MockUserInterface> mockUserInterface;
 static std::unique_ptr<MockTransport> mockTransport;
 static std::unique_ptr<VLCB::Configuration> configuration;
+static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 VLCB::Controller createController()
 {
@@ -52,7 +53,6 @@ VLCB::Controller createController()
 
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
 
-  static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
   minimumNodeService->setHeartBeat(false);
 
@@ -237,6 +237,40 @@ void testReleaseNodeNumber()
   assertEquals(0x104, configuration->nodeNum);
 }
 
+void testReadNodeParametersNormalMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+}
+
+void testReadNodeParametersSetupMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PARAMS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(MANU_MERG, mockTransport->sent_messages[0].data[1]);
+  assertEquals(1, mockTransport->sent_messages[0].data[2]); // Minor version
+  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[3]);
+  assertEquals(1, mockTransport->sent_messages[0].data[7]); // Major version
+}
+
 void testReadNodeParameterCount()
 {
   test();
@@ -252,8 +286,8 @@ void testReadNodeParameterCount()
   assertEquals(1, mockTransport->sent_messages.size());
 
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0, mockTransport->sent_messages[0].data[3]); // Number of services
-  assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of services
+  assertEquals(0, mockTransport->sent_messages[0].data[3]); // Parameter index
+  assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of parameters
 }
 
 void testReadNodeParameterModuleId()
@@ -410,6 +444,8 @@ void testMinimumNodeService()
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
   testReleaseNodeNumber();
+  testReadNodeParametersNormalMode();
+  testReadNodeParametersSetupMode();
   testReadNodeParameterCount();
   testReadNodeParameterModuleId();
   testReadNodeParameterInvalidIndex();
