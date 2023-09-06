@@ -78,7 +78,7 @@ void setupVLCB()
   modconfig.EE_NUM_NVS = 10;
   modconfig.EE_EVENTS_START = 20;
   modconfig.EE_MAX_EVENTS = 32;
-  modconfig.EE_PROD_EVENTS = 1;
+  modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
  
 

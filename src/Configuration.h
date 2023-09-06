@@ -74,6 +74,7 @@ public:
   byte EE_BYTES_PER_EVENT;
   unsigned int EE_NVS_START;
   byte EE_NUM_NVS;
+  byte EE_PRODUCED_EVENTS;
 
   byte CANID;
   ModuleMode currentMode;
