@@ -31,7 +31,7 @@ void EventProducerService::begin()
 
 void EventProducerService::setProducedEvents()
 {  
-  for (byte i = 0; i < module_config->EE_PROD_EVENTS; i++)
+  for (byte i = 0; i < module_config->EE_PRODUCED_EVENTS; i++)
   {
     if (module_config->getEvTableEntry(i) == 0)
     {
