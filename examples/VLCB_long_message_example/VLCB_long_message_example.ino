@@ -83,7 +83,7 @@ void setupVLCB()
   modconfig.EE_NUM_EVS = 1;
   
   // initialise and load configuration
-  modconfig.begin();
+  controller.begin();
 
   Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
