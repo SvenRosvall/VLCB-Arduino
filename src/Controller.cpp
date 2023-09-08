@@ -85,6 +85,25 @@ void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], by
 void Controller::setParams(unsigned char *mparams)
 {
   _mparams = mparams;
+  byte flags = 0;
+  
+  for (Service * svc : services)
+  {
+    switch (svc->getServiceID())
+    {
+      case SERVICE_ID_PRODUCER:
+        flags |= PF_PRODUCER;
+        break;
+      case SERVICE_ID_CONSUMER:
+        flags |= PF_CONSUMER;
+        break;
+    }
+  }
+  if (module_config->currentMode = MODE_NORMAL)
+  {
+    flags |= PF_FLiM; 
+  }
+  _mparams[PAR_FLAGS] = flags;
 }
 
 //
@@ -122,6 +141,15 @@ void Controller::indicateMode(byte mode)
     _ui->indicateMode(mode);
   }
   
+  if ((mode == MODE_UNINITIALISED) || (mode == MODE_SETUP))
+  {
+    _mparams[PAR_FLAGS] &= ~PF_FLiM;
+  }
+  else
+  {
+    _mparams[PAR_FLAGS] |= PF_FLiM;
+  }
+   
   if (mode == MODE_NORMAL) // used by Event Producer Service
   {
     setProdEventTable = true;
