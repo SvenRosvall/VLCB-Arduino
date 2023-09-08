@@ -84,7 +84,30 @@ void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], by
 //
 void Controller::setParams(unsigned char *mparams)
 {
+  bool producer = 0;
+  bool consumer = 0;
+  bool nPreNormal = 0;
+  bool conOwn = 0;
+  byte mode = module_config->currentMode;
+  
   _mparams = mparams;
+  
+  for (Service * svc : services)
+  {
+    if (svc->getServiceID() == 5)
+    {
+      producer = 1;
+    }
+    if (svc->getServiceID() == 6)
+    {
+      consumer = 1;
+    }
+  }
+  if ((mode != MODE_UNINITIALISED) && (mode != MODE_SETUP))
+  {
+    nPreNormal = 1; 
+  }
+  _mparams[8] = consumer | (producer << 1) | nPreNormal << 2 | (conOwn << 4);
 }
 
 //
@@ -122,6 +145,15 @@ void Controller::indicateMode(byte mode)
     _ui->indicateMode(mode);
   }
   
+  if ((mode == MODE_UNINITIALISED) || (mode == MODE_SETUP))
+  {
+    bitClear(_mparams[8], 2);
+  }
+  else
+  {
+    bitSet(_mparams[8], 2);
+  }
+   
   if (mode == MODE_NORMAL) // used by Event Producer Service
   {
     setProdEventTable = true;
