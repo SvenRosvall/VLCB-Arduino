@@ -143,7 +143,7 @@ void Controller::indicateMode(byte mode)
   
   if ((mode == MODE_UNINITIALISED) || (mode == MODE_SETUP))
   {
-    _mparams[PAR_FLAGS] &= PF_FLiM;
+    _mparams[PAR_FLAGS] &= ~PF_FLiM;
   }
   else
   {
