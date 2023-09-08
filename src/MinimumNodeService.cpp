@@ -486,4 +486,11 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
+void MinimumNodeService::setSetupMode()
+{
+  bModeSetup = true;
+  instantMode = MODE_SETUP;
+  timeOutTimer = 0;
+}
+
 }

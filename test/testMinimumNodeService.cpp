@@ -34,10 +34,12 @@
 namespace
 {
 const int MODULE_ID = 253;
+unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
 
 static std::unique_ptr<MockUserInterface> mockUserInterface;
 static std::unique_ptr<MockTransport> mockTransport;
 static std::unique_ptr<VLCB::Configuration> configuration;
+static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 VLCB::Controller createController()
 {
@@ -52,7 +54,6 @@ VLCB::Controller createController()
 
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
 
-  static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
   minimumNodeService->setHeartBeat(false);
 
@@ -77,7 +78,6 @@ VLCB::Controller createController()
 
   // assign to Controller
   controller.setParams(params->getParams());
-  unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
   controller.setName(moduleName);
   controller.begin();
   return controller;
@@ -237,6 +237,91 @@ void testReleaseNodeNumber()
   assertEquals(0x104, configuration->nodeNum);
 }
 
+void testSetNodeNumber()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_SNN, 0x02, 0x07}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x02, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[2]);
+}
+
+void testSetNodeNumberNormal()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_SNN, 0x02, 0x07}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+}
+
+void testSetNodeNumberShort()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 2, {OPC_SNN, 0x02}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_SNN, mockTransport->sent_messages[0].data[3]);
+  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+}
+
+void testReadNodeParametersNormalMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+}
+
+void testReadNodeParametersSetupMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PARAMS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(MANU_MERG, mockTransport->sent_messages[0].data[1]);
+  assertEquals(1, mockTransport->sent_messages[0].data[2]); // Minor version
+  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[3]);
+  assertEquals(1, mockTransport->sent_messages[0].data[7]); // Major version
+}
+
 void testReadNodeParameterCount()
 {
   test();
@@ -252,8 +337,8 @@ void testReadNodeParameterCount()
   assertEquals(1, mockTransport->sent_messages.size());
 
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0, mockTransport->sent_messages[0].data[3]); // Number of services
-  assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of services
+  assertEquals(0, mockTransport->sent_messages[0].data[3]); // Parameter index
+  assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of parameters
 }
 
 void testReadNodeParameterModuleId()
@@ -314,6 +399,62 @@ void testReadNodeParameterShortMessage()
   assertEquals(OPC_RQNPN, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+}
+
+void testModuleName()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NAME, mockTransport->sent_messages[0].data[0]);
+  assertEquals(moduleName[0], mockTransport->sent_messages[0].data[1]);
+  assertEquals(moduleName[1], mockTransport->sent_messages[0].data[2]);
+  assertEquals(moduleName[2], mockTransport->sent_messages[0].data[3]);
+  assertEquals(moduleName[3], mockTransport->sent_messages[0].data[4]);
+  assertEquals(moduleName[4], mockTransport->sent_messages[0].data[5]);
+  assertEquals(moduleName[5], mockTransport->sent_messages[0].data[6]);
+  assertEquals(moduleName[6], mockTransport->sent_messages[0].data[7]);
+}
+
+void testModuleNameNormal()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+}
+
+void testHeartBeat()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setHeartBeat(true);
+
+  // Not expecting a heartbeat before 5 seconds.
+  addMillis(4500);
+  controller.process();
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // But expecting a heartbeat after 5 seconds.
+  addMillis(1000);
+  controller.process();
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_HEARTB, mockTransport->sent_messages[0].data[0]);
 }
 
 void testServiceDiscovery()
@@ -410,10 +551,18 @@ void testMinimumNodeService()
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
   testReleaseNodeNumber();
+  testSetNodeNumber();
+  testSetNodeNumberNormal();
+  testSetNodeNumberShort();
+  testReadNodeParametersNormalMode();
+  testReadNodeParametersSetupMode();
   testReadNodeParameterCount();
   testReadNodeParameterModuleId();
   testReadNodeParameterInvalidIndex();
   testReadNodeParameterShortMessage();
+  testModuleName();
+  testModuleNameNormal();
+  testHeartBeat();
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
   testServiceDiscoveryIndexOutOfBand();
