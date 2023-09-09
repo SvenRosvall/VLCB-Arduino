@@ -291,8 +291,8 @@ void testSetNodeNumberShort()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_SNN, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
 void testReadNodeParametersNormalMode()
@@ -395,8 +395,8 @@ void testReadNodeParameterInvalidIndex()
 
   assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
   assertEquals(OPC_RQNPN, mockTransport->sent_messages[1].data[3]);
-  assertEquals(1, mockTransport->sent_messages[1].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[1].data[5]); // result
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_PARAM_IDX, mockTransport->sent_messages[1].data[5]);
 }
 
 void testReadNodeParameterShortMessage()
@@ -414,8 +414,8 @@ void testReadNodeParameterShortMessage()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_RQNPN, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
 void testModuleName()
@@ -527,7 +527,7 @@ void testServiceDiscoveryLongMessageSvc()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
   assertEquals(4, mockTransport->sent_messages[0].data[3]); // index
-  assertEquals(17, mockTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(SERVICE_ID_STREAMING, mockTransport->sent_messages[0].data[4]);
   // Not testing service data bytes.
 }
 
@@ -546,8 +546,8 @@ void testServiceDiscoveryIndexOutOfBand()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(GRSP_INVALID_SERVICE, mockTransport->sent_messages[0].data[5]); // result
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_SERVICE, mockTransport->sent_messages[0].data[5]);
 }
 
 void testServiceDiscoveryShortMessage()
@@ -565,8 +565,8 @@ void testServiceDiscoveryShortMessage()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_RQSD, mockTransport->sent_messages[0].data[3]);
-  assertEquals(1, mockTransport->sent_messages[0].data[4]); // service ID of MNS
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]); // result
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
 }
