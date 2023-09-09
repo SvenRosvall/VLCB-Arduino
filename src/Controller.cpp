@@ -172,7 +172,7 @@ void Controller::setLearnMode(byte reqMode)
 {
   for (Service * svc : services)
   {
-    if (svc->getServiceID() == 4)
+    if (svc->getServiceID() == SERVICE_ID_OLD_TEACH)
     {
       EventTeachingService * etSvc = (EventTeachingService *) svc;
       
@@ -406,7 +406,7 @@ void Controller::startCANenumeration()
   // Find it first.
   for (Service * svc : services)
   {
-    if (svc->getServiceID() == 3)
+    if (svc->getServiceID() == SERVICE_ID_CAN)
     {
       CanService * canSvc = (CanService *) svc;
       canSvc->startCANenumeration();

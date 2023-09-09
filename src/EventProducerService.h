@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB {
 
@@ -19,7 +20,7 @@ public:
 
   virtual byte getServiceID() override 
   {
-    return 5;
+    return SERVICE_ID_PRODUCER;
   }
   virtual byte getServiceVersionID() override 
   {

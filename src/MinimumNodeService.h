@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -21,7 +22,7 @@ public:
   virtual void process(UserInterface::RequestedAction requestedAction) override; 
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override { return 1; }
+  virtual byte getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;
