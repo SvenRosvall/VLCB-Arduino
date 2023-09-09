@@ -349,6 +349,25 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       
     case OPC_RDGN:
       // 87 - Request Diagnostic Data
+      if (nn == module_config->nodeNum)
+      {        
+        if (msg->len < 5)
+        {          
+          controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }  
+        byte svcIndex = msg->data[3];
+        for (Service * svc : services)
+        {
+          if (svc->getServiceID() == svcIndex)
+          {
+            byte diagnosticCode = msg->data[4];
+        // TODO: more stuff to go in here    
+            return PROCESSED;
+          }            
+        }
+        sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+      }
       
       return PROCESSED;
       
