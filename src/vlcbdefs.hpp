@@ -537,7 +537,8 @@ enum CbusParamFlags
   PF_CONSUMER = 1, // Module is a consumer of events
   PF_PRODUCER = 2, // Module is a producer of events
   PF_COMBI = 3, // Module is both a consumer and producer of events
-  PF_FLiM = 4, // Module is in FLiM
+  PF_FLiM = 4, // Module is in FLiM (CBUS)
+  PF_NORMAL = 4, // Module is in Normal mode (VLCB)
   PF_BOOT = 8, // Module supports the FCU bootloader protocol
   PF_COE = 16, // Module can consume its own events
   PF_LRN = 32, // Module is in learn mode
