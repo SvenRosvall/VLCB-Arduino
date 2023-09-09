@@ -53,6 +53,7 @@ add_library(core_library OBJECT
         src/CanService.h
         src/EventConsumerService.cpp
         src/EventTeachingService.cpp
+        src/EventProducerService.cpp
         src/vlcbdefs.hpp
         src/NodeVariableService.cpp
 )
