@@ -187,7 +187,7 @@ void Controller::setLearnMode(byte reqMode)
       return;
     }
   }
-  sendGRSP(OPC_MODE, 4, GRSP_INVALID_SERVICE);
+  sendGRSP(OPC_MODE, SERVICE_ID_OLD_TEACH, GRSP_INVALID_SERVICE);
 } 
 
 //
