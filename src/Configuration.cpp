@@ -233,12 +233,19 @@ void Configuration::readEvent(byte idx, byte tarr[])
   // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
 }
 
+// return the address an event variable is stored in the eeprom.
+// Note that the evnum is 1 based and needs to be converted to 0 based.
+unsigned int Configuration::getEVAddress(byte idx, byte evnum)
+{
+  return EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + EE_HASH_BYTES + evnum - 1;
+}
+
 //
 /// return an event variable (EV) value given the event table index and EV number
 //
 byte Configuration::getEventEVval(byte idx, byte evnum)
 {
-  return storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
+  return storage->readEEPROM(getEVAddress(idx, evnum));
 }
 
 //
@@ -246,7 +253,7 @@ byte Configuration::getEventEVval(byte idx, byte evnum)
 //
 void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 {
-  storage->writeEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum, evval);
+  storage->writeEEPROM(getEVAddress(idx, evnum), evval);
 }
 
 //

@@ -96,6 +96,8 @@ private:
 
   void loadNVs();
 
+  unsigned int getEVAddress(byte idx, byte evnum);
+
   byte *evhashtbl;
   bool hash_collision;
 };
