@@ -49,7 +49,6 @@ VLCB::Controller createController()
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
   params->setModuleId(253);
-  params->setFlags(PF_NORMAL);
 
   // assign to Controller
   controller.setParams(params->getParams());
@@ -98,12 +97,12 @@ void testServiceDiscovery()
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
-  assertEquals(1, mockTransport->sent_messages[1].data[4]); // service ID
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[1].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[1].data[5]); // version
 
   assertEquals(OPC_SD, mockTransport->sent_messages[2].data[0]);
   assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
-  assertEquals(2, mockTransport->sent_messages[2].data[4]); // service ID
+  assertEquals(SERVICE_ID_NV, mockTransport->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
 }
 
@@ -122,7 +121,7 @@ void testServiceDiscoveryNodeVarSvc()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
   assertEquals(2, mockTransport->sent_messages[0].data[3]); // index
-  assertEquals(2, mockTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(SERVICE_ID_NV, mockTransport->sent_messages[0].data[4]); // service ID
   // Not testing service data bytes.
 }
 
