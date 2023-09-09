@@ -30,6 +30,8 @@
 #include "Parameters.h"
 #include "LongMessageService.h"
 #include "ArduinoMock.hpp"
+#include "EventConsumerService.h"
+#include "EventProducerService.h"
 
 namespace
 {
@@ -60,8 +62,14 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
 
+  static std::unique_ptr<VLCB::EventConsumerService> ecService;
+  ecService.reset(new VLCB::EventConsumerService);
+
+  static std::unique_ptr<VLCB::EventProducerService> epService;
+  epService.reset(new VLCB::EventProducerService);
+
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              {minimumNodeService.get(), longMessageService.get()});
+     {minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get()});
 
   configuration->EE_NVS_START = 0;
   configuration->EE_NUM_NVS = 4;
@@ -74,7 +82,6 @@ VLCB::Controller createController()
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
   params->setModuleId(MODULE_ID);
-  params->setFlags(PF_NORMAL);
 
   // assign to Controller
   controller.setParams(params->getParams());
@@ -334,11 +341,21 @@ void testReadNodeParameterCount()
   controller.process();
 
   // Verify sent messages.
-  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(21, mockTransport->sent_messages.size());
 
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
   assertEquals(0, mockTransport->sent_messages[0].data[3]); // Parameter index
   assertEquals(20, mockTransport->sent_messages[0].data[4]); // Number of parameters
+
+  // Manufacturer
+  assertEquals(OPC_PARAN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(1, mockTransport->sent_messages[1].data[3]);
+  assertEquals(MANU_MERG, mockTransport->sent_messages[1].data[4]);
+  
+  // Flags
+  assertEquals(OPC_PARAN, mockTransport->sent_messages[8].data[0]);
+  assertEquals(8, mockTransport->sent_messages[8].data[3]);
+  assertEquals(PF_COMBI | PF_NORMAL, mockTransport->sent_messages[8].data[4]);
 }
 
 void testReadNodeParameterModuleId()
@@ -469,20 +486,30 @@ void testServiceDiscovery()
   controller.process();
 
   // Verify sent messages.
-  assertEquals(3, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(4, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
-  assertEquals(1, mockTransport->sent_messages[1].data[4]); // service ID
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[1].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[1].data[5]); // version
 
   assertEquals(OPC_SD, mockTransport->sent_messages[2].data[0]);
   assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
-  assertEquals(17, mockTransport->sent_messages[2].data[4]); // service ID
+  assertEquals(SERVICE_ID_CONSUMER, mockTransport->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
+
+  assertEquals(OPC_SD, mockTransport->sent_messages[3].data[0]);
+  assertEquals(3, mockTransport->sent_messages[3].data[3]); // index
+  assertEquals(SERVICE_ID_PRODUCER, mockTransport->sent_messages[3].data[4]); // service ID
+  assertEquals(1, mockTransport->sent_messages[3].data[5]); // version
+
+  assertEquals(OPC_SD, mockTransport->sent_messages[4].data[0]);
+  assertEquals(4, mockTransport->sent_messages[4].data[3]); // index
+  assertEquals(SERVICE_ID_STREAMING, mockTransport->sent_messages[4].data[4]); // service ID
+  assertEquals(1, mockTransport->sent_messages[4].data[5]); // version
 }
 
 void testServiceDiscoveryLongMessageSvc()
@@ -491,7 +518,7 @@ void testServiceDiscoveryLongMessageSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 4}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -499,7 +526,7 @@ void testServiceDiscoveryLongMessageSvc()
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[3]); // index
+  assertEquals(4, mockTransport->sent_messages[0].data[3]); // index
   assertEquals(17, mockTransport->sent_messages[0].data[4]); // service ID
   // Not testing service data bytes.
 }
