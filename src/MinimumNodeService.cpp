@@ -127,22 +127,22 @@ void MinimumNodeService::heartbeat()
 
 void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 {
-   if (requestedAction == UserInterface::CHANGE_MODE)
-   {
-     switch (module_config->currentMode)
-     {
-     case MODE_UNINITIALISED:
-       initSetup();
-       break;
+  if (requestedAction == UserInterface::CHANGE_MODE)
+  {
+    switch (module_config->currentMode)
+    {
+    case MODE_UNINITIALISED:
+      initSetup();
+      break;
        
-     case MODE_NORMAL:
-       initSetupFromNormal();
-       break;
+    case MODE_NORMAL:
+      initSetupFromNormal();
+      break;
        
-     default:
-       break;
-     }
-   }
+    default:
+      break;
+    }
+  }
 
   checkModeChangeTimeout();
   heartbeat();
@@ -484,5 +484,10 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       return NOT_PROCESSED;
   }
 }
-
+void MinimumNodeService::setSetupMode()
+{
+  bModeSetup = true;
+  instantMode = MODE_SETUP;
+  timeOutTimer = 0;
+}
 }
