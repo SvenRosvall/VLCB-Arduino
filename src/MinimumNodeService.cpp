@@ -207,7 +207,6 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             for (byte i = 0; i <= controller->_mparams[0]; i++)
             {
               controller->sendMessageWithNN(OPC_PARAN, i, controller->_mparams[i]);
-              delay(1);
             }            
           }
           else if (paran <= controller->_mparams[0])
