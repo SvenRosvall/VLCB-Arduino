@@ -101,7 +101,7 @@ void Controller::setParams(unsigned char *mparams)
   }
   if (module_config->currentMode = MODE_NORMAL)
   {
-    flags |= PF_FLiM; 
+    flags |= PF_NORMAL; 
   }
   _mparams[PAR_FLAGS] = flags;
 }
@@ -143,11 +143,11 @@ void Controller::indicateMode(byte mode)
   
   if ((mode == MODE_UNINITIALISED) || (mode == MODE_SETUP))
   {
-    _mparams[PAR_FLAGS] &= ~PF_FLiM;
+    _mparams[PAR_FLAGS] &= ~PF_NORMAL;
   }
   else
   {
-    _mparams[PAR_FLAGS] |= PF_FLiM;
+    _mparams[PAR_FLAGS] |= PF_NORMAL;
   }
    
   if (mode == MODE_NORMAL) // used by Event Producer Service

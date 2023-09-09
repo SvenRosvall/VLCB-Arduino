@@ -49,7 +49,7 @@ VLCB::Controller createController()
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
   params->setModuleId(253);
-  params->setFlags(PF_FLiM | PF_BOOT);
+  params->setFlags(PF_NORMAL);
 
   // assign to Controller
   controller.setParams(params->getParams());
