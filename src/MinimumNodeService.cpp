@@ -82,6 +82,7 @@ void MinimumNodeService::initSetupFromNormal()
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
   requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
+   module_config->setNodeNum(0x0000);
   initSetup();
 }
 
@@ -349,6 +350,25 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       
     case OPC_RDGN:
       // 87 - Request Diagnostic Data
+      if (nn == module_config->nodeNum)
+      {        
+        if (msg->len < 5)
+        {          
+          controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
+          return PROCESSED;
+        }  
+        byte svcIndex = msg->data[3];
+        for (Service * svc : services)
+        {
+          if (svc->getServiceID() == svcIndex)
+          {
+            byte diagnosticCode = msg->data[4];
+        // TODO: more stuff to go in here    
+            return PROCESSED;
+          }            
+        }
+        sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+      }
       
       return PROCESSED;
       
@@ -399,8 +419,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           switch (newMode)
           {
           case MODE_SETUP:
-            initSetupFromNormal();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+            initSetupFromNormal();
             break;
           
           case MODE_LEARN:
@@ -441,8 +461,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           if (newMode == MODE_SETUP)
           {
             noHeartbeat = false;
-            initSetupFromNormal();
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+            initSetupFromNormal();
           }
           if (newMode == MODE_NORMAL)
           {

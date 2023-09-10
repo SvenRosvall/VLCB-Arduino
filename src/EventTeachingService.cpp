@@ -95,8 +95,8 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
           {
             // DEBUG_SERIAL << F("> did not find event to unlearn") << endl;
             // respond with CMDERR
-            controller->sendCMDERR(CMDERR_INV_NV_IDX);
-            controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_NV_IDX);
+            controller->sendCMDERR(CMDERR_INVALID_EVENT);
+            controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INVALID_EVENT);
           }
         }
       }  // if in learn mode
@@ -148,8 +148,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
             //DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
             controller->sendMessage(msg);
-            delay(10);
-
           }  // valid stored ev
         }    // loop each ev
       }      // for me
@@ -285,6 +283,12 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
         {
           byte evindex = msg->data[5];
           byte evval = msg->data[6];
+          if ((evindex == 0) || (evindex > module_config->EE_NUM_EVS))
+          {
+            controller->sendCMDERR(CMDERR_INV_EV_IDX);
+            controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
+            return PROCESSED;
+          }
           // search for this NN, EN as we may just be adding an EV to an existing learned event
           // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
           byte index = module_config->findExistingEvent(nn, en);
@@ -405,6 +409,13 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
           controller->sendCMDERR(CMDERR_INVALID_EVENT);
           return PROCESSED;
         }
+        
+        if (evindex > module_config->EE_NUM_EVS)
+        { 
+          controller->sendCMDERR(CMDERR_INV_EV_IDX);
+          controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
+          return PROCESSED;
+        }          
 
         // event found
         if (index < module_config->EE_MAX_EVENTS) 
@@ -417,7 +428,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
             for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
             {
               controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
-              delay(10);
             }
           } 
           else 
