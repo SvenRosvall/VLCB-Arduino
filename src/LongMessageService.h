@@ -7,6 +7,7 @@
 
 #include "Service.h"
 #include "Transport.h"  // for DEFAULT_PRIORITY
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -50,7 +51,7 @@ public:
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
 
-  virtual byte getServiceID() override { return 17; }
+  virtual byte getServiceID() override { return SERVICE_ID_STREAMING; }
   virtual byte getServiceVersionID() override { return 1; }
 
 protected:

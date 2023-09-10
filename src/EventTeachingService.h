@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB 
 {
@@ -18,7 +19,7 @@ public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override { return 4; }
+  virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
   void enableLearn();
