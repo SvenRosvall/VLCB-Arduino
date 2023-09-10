@@ -152,8 +152,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
             //DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
             controller->sendMessage(msg);
- //           delay(10);
-
           }  // valid stored ev
         }    // loop each ev
       }      // for me
@@ -417,7 +415,8 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
         }
         
         if (evindex > module_config->EE_NUM_EVS)
-        { controller->sendCMDERR(CMDERR_INV_EV_IDX);
+        { 
+          controller->sendCMDERR(CMDERR_INV_EV_IDX);
           controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
           return PROCESSED;
         }          
@@ -433,7 +432,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
             for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
             {
               controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
-//              delay(10);
             }
           } 
           else 

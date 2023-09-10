@@ -82,7 +82,6 @@ void MinimumNodeService::initSetupFromNormal()
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
   requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
-  controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
    module_config->setNodeNum(0x0000);
   initSetup();
 }
@@ -420,6 +419,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           switch (newMode)
           {
           case MODE_SETUP:
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             initSetupFromNormal();
             break;
           
@@ -461,6 +461,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           if (newMode == MODE_SETUP)
           {
             noHeartbeat = false;
+            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             initSetupFromNormal();
           }
           if (newMode == MODE_NORMAL)
