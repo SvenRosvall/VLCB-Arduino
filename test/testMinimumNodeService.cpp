@@ -159,11 +159,7 @@ void testNormalRequestNodeNumber()
 
   VLCB::Controller controller = createController();
 
-  // Set module into Normal mode:
-  //configuration->currentMode = VLCB::MODE_NORMAL;
-  //configuration->setNodeNum(0x104);
-
-  // User requests to enter Normal mode.
+  // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
   controller.process();
@@ -212,6 +208,8 @@ void testNormalRequestNodeNumberMissingSNN()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
 
   assertEquals(VLCB::MODE_NORMAL, mockUserInterface->getIndicatedMode());
   assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
