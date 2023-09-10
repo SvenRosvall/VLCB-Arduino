@@ -410,7 +410,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
         }
         
-        if (evindex > module_config->EE_NUM_EVS)
+        if (evIndex > module_config->EE_NUM_EVS)
         { 
           controller->sendCMDERR(CMDERR_INV_EV_IDX);
           controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);

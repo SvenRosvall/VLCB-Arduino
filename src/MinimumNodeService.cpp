@@ -82,7 +82,6 @@ void MinimumNodeService::initSetupFromNormal()
   // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
   requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
-   module_config->setNodeNum(0x0000);
   initSetup();
 }
 
@@ -358,7 +357,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
         }  
         byte svcIndex = msg->data[3];
-        for (Service * svc : services)
+        for (Service * svc : controller->services)
         {
           if (svc->getServiceID() == svcIndex)
           {
@@ -367,7 +366,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
             return PROCESSED;
           }            
         }
-        sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+        controller->sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
       }
       
       return PROCESSED;
