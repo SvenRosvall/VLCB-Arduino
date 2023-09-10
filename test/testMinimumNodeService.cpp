@@ -75,6 +75,7 @@ VLCB::Controller createController()
   configuration->EE_NUM_NVS = 4;
   configuration->EE_EVENTS_START = 20;
   configuration->EE_MAX_EVENTS = 20;
+  configuration->EE_PRODUCED_EVENTS = 1;
   configuration->EE_NUM_EVS = 2;
   configuration->setModuleMode(VLCB::MODE_NORMAL);
   configuration->setNodeNum(0x0104);
@@ -216,7 +217,7 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x104, configuration->nodeNum);
 }
 
-void testReleaseNodeNumber()
+void testReleaseNodeNumberByUI()
 {
   test();
 
@@ -240,6 +241,26 @@ void testReleaseNodeNumber()
 
   // Module will hold on to node number in case setup times out.
   assertEquals(0x104, configuration->nodeNum);
+}
+
+void testRequestNodeNumberElsewhere()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQNN, 0x02, 0x07}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  // Expect module to not respond, but to change to non-setup mode.
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // TODO: Need a better way of determining the instantMode.
+  assertEquals(VLCB::MODE_NORMAL, mockUserInterface->getIndicatedMode());
 }
 
 void testSetNodeNumber()
@@ -575,7 +596,8 @@ void testMinimumNodeService()
   testUninitializedRequestNodeNumberMissingSNN();
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
-  testReleaseNodeNumber();
+  testReleaseNodeNumberByUI();
+  testRequestNodeNumberElsewhere();
   testSetNodeNumber();
   testSetNodeNumberNormal();
   testSetNodeNumberShort();

@@ -264,6 +264,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         bModeSetup = false;
         controller->indicateMode(module_config->currentMode);
       }
+      return PROCESSED;
         
     case OPC_QNN:
       // 0D - this is probably a config recreate -- respond with PNN if we have a node number
@@ -502,10 +503,12 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       return NOT_PROCESSED;
   }
 }
+
 void MinimumNodeService::setSetupMode()
 {
   bModeSetup = true;
   instantMode = MODE_SETUP;
   timeOutTimer = 0;
 }
+
 }
