@@ -173,13 +173,13 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         // respond with PARAMS message
         msg->len = 8;
         msg->data[0] = OPC_PARAMS;    // opcode
-        msg->data[1] = controller->_mparams[1];     // manf code -- MERG
-        msg->data[2] = controller->_mparams[2];     // minor code ver
-        msg->data[3] = controller->_mparams[3];     // module ident
-        msg->data[4] = controller->_mparams[4];     // number of events
-        msg->data[5] = controller->_mparams[5];     // events vars per event
-        msg->data[6] = controller->_mparams[6];     // number of NVs
-        msg->data[7] = controller->_mparams[7];     // major code ver
+        msg->data[1] = controller->_mparams[PAR_MANU];     // manf code -- MERG
+        msg->data[2] = controller->_mparams[PAR_MINVER];     // minor code ver
+        msg->data[3] = controller->_mparams[PAR_MTYP];     // module ident
+        msg->data[4] = controller->_mparams[PAR_EVTNUM];     // number of events
+        msg->data[5] = controller->_mparams[PAR_EVNUM];     // events vars per event
+        msg->data[6] = controller->_mparams[PAR_NVNUM];     // number of NVs
+        msg->data[7] = controller->_mparams[PAR_MAJVER];     // major code ver
         
         controller->sendMessage(msg);
       }
@@ -205,12 +205,12 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           
           if (paran == 0)
           {
-            for (byte i = 0; i <= controller->_mparams[0]; i++)
+            for (byte i = 0; i <= controller->_mparams[PAR_NUM]; i++)
             {
               controller->sendMessageWithNN(OPC_PARAN, i, controller->_mparams[i]);
             }            
           }
-          else if (paran <= controller->_mparams[0])
+          else if (paran <= controller->_mparams[PAR_NUM])
           {
             controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
           }

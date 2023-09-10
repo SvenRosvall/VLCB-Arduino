@@ -46,7 +46,7 @@ Configuration::Configuration(Storage * theStorage)
 //
 void Configuration::begin()
 {
-  EE_BYTES_PER_EVENT = EE_NUM_EVS + 4;
+  EE_BYTES_PER_EVENT = EE_HASH_BYTES + EE_NUM_EVS;
 
   storage->begin();
   loadNVs();
@@ -91,7 +91,7 @@ void Configuration::setNodeNum(unsigned int nn)
 //
 byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
 {
-  byte tarray[4];
+  byte tarray[EE_HASH_BYTES];
   byte tmphash, i, j, matches;
   bool confirmed = false;
 
@@ -200,7 +200,7 @@ byte Configuration::findEventSpace()
 //
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
-byte Configuration::makeHash(byte tarr[4])
+byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 {
   // make a hash from a 4-byte NN + EN event
   unsigned int nn = (tarr[0] << 8) + tarr[1];
@@ -233,12 +233,19 @@ void Configuration::readEvent(byte idx, byte tarr[])
   // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
 }
 
+// return the address an event variable is stored in the eeprom.
+// Note that the evnum is 1 based and needs to be converted to 0 based.
+unsigned int Configuration::getEVAddress(byte idx, byte evnum)
+{
+  return EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + EE_HASH_BYTES + evnum - 1;
+}
+
 //
 /// return an event variable (EV) value given the event table index and EV number
 //
 byte Configuration::getEventEVval(byte idx, byte evnum)
 {
-  return storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum);
+  return storage->readEEPROM(getEVAddress(idx, evnum));
 }
 
 //
@@ -246,7 +253,7 @@ byte Configuration::getEventEVval(byte idx, byte evnum)
 //
 void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 {
-  storage->writeEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + 3 + evnum, evval);
+  storage->writeEEPROM(getEVAddress(idx, evnum), evval);
 }
 
 //
@@ -254,8 +261,8 @@ void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 //
 void Configuration::makeEvHashTable()
 {
-  byte evarray[4];
-  const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
+  byte evarray[EE_HASH_BYTES];
+  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
@@ -266,7 +273,7 @@ void Configuration::makeEvHashTable()
     readEvent(idx, evarray);
 
     // empty slots have all four bytes set to 0xff
-    if (memcmp(evarray, unused_entry, 4) == 0)
+    if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
     {
       evhashtbl[idx] = 0;
     }
@@ -284,14 +291,14 @@ void Configuration::makeEvHashTable()
 //
 void Configuration::updateEvHashEntry(byte idx)
 {
-  byte evarray[4];
-  const byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff};
+  byte evarray[EE_HASH_BYTES];
+  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
 
   // empty slots have all four bytes set to 0xff
-  if (memcmp(evarray, unused_entry, 4) == 0)
+  if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
   {
     evhashtbl[idx] = 0;
   }
@@ -405,12 +412,12 @@ void Configuration::writeNV(byte idx, byte val)
 /// write (or clear) an event to EEPROM
 /// just the first four bytes -- NN and EN
 //
-void Configuration::writeEvent(byte index, byte data[])
+void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
 {
   unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
   // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
-  storage->writeBytesEEPROM(eeaddress, data, 4);
+  storage->writeBytesEEPROM(eeaddress, data, EE_HASH_BYTES);
 }
 
 //

@@ -21,18 +21,14 @@ void EventTeachingService::enableLearn()
 {
   bLearn = true;
   //DEBUG_SERIAL << F("> set learn mode ok") << endl;
-  // set bit 5 in parameter 8
   controller->_mparams[PAR_FLAGS] |= PF_LRN;
- // bitSet(controller->_mparams[8], 5);
 }
 
 void EventTeachingService::inhibitLearn() 
 {
   bLearn = false;
   //DEBUG_SERIAL << F("> learn mode off") << endl;
-  // clear bit 5 in parameter 8
   controller->_mparams[PAR_FLAGS] &= ~PF_LRN;
- // bitClear(controller->_mparams[8], 5);
 }
 
 Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) 

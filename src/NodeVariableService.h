@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -18,7 +19,7 @@ class NodeVariableService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override;
-  virtual byte getServiceID() override { return 2; }
+  virtual byte getServiceID() override { return SERVICE_ID_NV; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
