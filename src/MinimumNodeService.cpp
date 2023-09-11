@@ -272,7 +272,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (module_config->nodeNum > 0)
       {
         // DEBUG_SERIAL << ("> responding with PNN message") << endl;
-        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[1], controller->_mparams[3], controller->_mparams[8]);
+        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[PAR_MANU], controller->_mparams[PAR_MTYP], controller->_mparams[PAR_FLAGS]);
       }
 
       return PROCESSED;

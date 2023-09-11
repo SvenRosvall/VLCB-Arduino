@@ -293,6 +293,26 @@ void testSetNodeNumberShort()
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
+void testQueryNodeNumber()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_QNN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(MANU_VLCB, mockTransport->sent_messages[0].data[3]);
+  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[4]);
+  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_SD, mockTransport->sent_messages[0].data[5]);
+}
+
 void testReadNodeParametersNormalMode()
 {
   test();
@@ -321,7 +341,7 @@ void testReadNodeParametersSetupMode()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAMS, mockTransport->sent_messages[0].data[0]);
-  assertEquals(MANU_MERG, mockTransport->sent_messages[0].data[1]);
+  assertEquals(MANU_VLCB, mockTransport->sent_messages[0].data[1]);
   assertEquals(1, mockTransport->sent_messages[0].data[2]); // Minor version
   assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[3]);
   assertEquals(1, mockTransport->sent_messages[0].data[7]); // Major version
@@ -348,12 +368,12 @@ void testReadNodeParameterCount()
   // Manufacturer
   assertEquals(OPC_PARAN, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]);
-  assertEquals(MANU_MERG, mockTransport->sent_messages[1].data[4]);
+  assertEquals(MANU_VLCB, mockTransport->sent_messages[1].data[4]);
   
   // Flags
   assertEquals(OPC_PARAN, mockTransport->sent_messages[8].data[0]);
   assertEquals(8, mockTransport->sent_messages[8].data[3]);
-  assertEquals(PF_COMBI | PF_NORMAL, mockTransport->sent_messages[8].data[4]);
+  assertEquals(PF_COMBI | PF_NORMAL | PF_SD, mockTransport->sent_messages[8].data[4]);
 }
 
 void testReadNodeParameterModuleId()
@@ -579,6 +599,7 @@ void testMinimumNodeService()
   testSetNodeNumber();
   testSetNodeNumberNormal();
   testSetNodeNumberShort();
+  testQueryNodeNumber();
   testReadNodeParametersNormalMode();
   testReadNodeParametersSetupMode();
   testReadNodeParameterCount();

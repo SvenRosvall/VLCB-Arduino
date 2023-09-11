@@ -91,6 +91,9 @@ void Controller::setParams(unsigned char *mparams)
   {
     switch (svc->getServiceID())
     {
+      case SERVICE_ID_MNS:
+        flags |= PF_SD;
+        break;
       case SERVICE_ID_PRODUCER:
         flags |= PF_PRODUCER;
         break;
@@ -99,7 +102,7 @@ void Controller::setParams(unsigned char *mparams)
         break;
     }
   }
-  if (module_config->currentMode = MODE_NORMAL)
+  if (module_config->currentMode == MODE_NORMAL)
   {
     flags |= PF_NORMAL; 
   }
