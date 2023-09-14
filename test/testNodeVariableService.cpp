@@ -42,6 +42,7 @@ VLCB::Controller createController()
   configuration->EE_NUM_NVS = 4;
   configuration->EE_EVENTS_START = 20;
   configuration->EE_MAX_EVENTS = 20;
+  configuration->EE_PRODUCED_EVENTS = 1;
   configuration->EE_NUM_EVS = 2;
   configuration->setModuleMode(VLCB::MODE_NORMAL);
   configuration->setNodeNum(0x0104);
