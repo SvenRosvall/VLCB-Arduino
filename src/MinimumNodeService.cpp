@@ -22,6 +22,7 @@ void MinimumNodeService::begin()
 {
   //Initialise instantMode
   instantMode = module_config->currentMode;
+  noHeartbeat = !module_config->heartbeat;
   controller->indicateMode(instantMode);
   //DEBUG_SERIAL << F("> instant MODE initialise as: ") << instantMode << endl;
 }
@@ -383,104 +384,43 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
         }        
         
-        byte newMode = msg->data[3];
-        //DEBUG_SERIAL << F("> MODE -- requested = ") << newMode << endl;
+        byte requestedMode = msg->data[3];
+        //DEBUG_SERIAL << F("> MODE -- requested = ") << requestedMode << endl;
         //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
-        switch (instantMode)
+        if (instantMode == MODE_NORMAL)
         {
-        case MODE_UNINITIALISED:
-          if (nn != 0)   // Not for this node
+          switch (requestedMode)
           {
-            return PROCESSED;
-          }
-          if (newMode != MODE_SETUP)
-          {
-            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);            
-          } 
-          else
-          {
-            initSetup();
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          }          
-          return PROCESSED;
-          
-        case MODE_SETUP:
-          if (nn != 0)   // Not for this node
-          {
-            return PROCESSED;
-          } 
-          else
-          {
-            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);            
-          }
-          return PROCESSED;
-          
-        case MODE_NORMAL:
-          switch (newMode)
-          {
-          case MODE_SETUP:
+          case 0x00:
+          // Request Setup
             controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
             initSetupFromNormal();
-            break;
-          
-          case MODE_LEARN:
-            //DEBUG_SERIAL << F("> MODE -- Learn") << endl;
-            controller->setLearnMode(newMode);
-            instantMode = newMode;
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-            break;
-          
-          case MODE_NHEARTB:          
-            //DEBUG_SERIAL << F("> MODE -- request no Heartbeats") << endl;
+            return PROCESSED;
+            
+          case 0x0C:
+          // Turn on Heartbeat
+            noHeartbeat = false;
+            module_config->setHeartbeat(!noHeartbeat);
+            return PROCESSED;
+            
+          case 0x0D:
+          // Turn off Heartbeat
             noHeartbeat = true;
-            instantMode = newMode;
-            break;
+            module_config->setHeartbeat(!noHeartbeat);
+            return PROCESSED;
           }
-          return PROCESSED;
-          
-        case MODE_LEARN:
-          if (newMode == MODE_SETUP)
-          {
-            controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD); 
-          }
-          if (newMode == MODE_NORMAL)
-          {
-            controller->setLearnMode(newMode);
-            if (noHeartbeat == true)
-            {
-              instantMode = MODE_NHEARTB;
-            }
-            else
-            {
-              instantMode = newMode;
-            }
-          } 
-          return PROCESSED;
-          
-        case MODE_NHEARTB:
-          if (newMode == MODE_SETUP)
-          {
-            noHeartbeat = false;
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-            initSetupFromNormal();
-          }
-          if (newMode == MODE_NORMAL)
-          {
-            noHeartbeat = false;
-            instantMode = newMode;
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          }
-          if (newMode == MODE_LEARN)
-          {
-            controller->setLearnMode(newMode);
-            instantMode = newMode;
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          } 
+          // if in MODE_NORMAL but none of the above commands, let another service see message
+          break;  
+        }
+        else
+        {
           return PROCESSED;
         }
       }
-      
+      else
+      {
       return PROCESSED;
+      }
       
     case OPC_NNRSM:
       //4F - reset to manufacturer's defaults 

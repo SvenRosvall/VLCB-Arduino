@@ -51,7 +51,7 @@ private:
   
   unsigned long lastHeartbeat = 0;
   byte heartbeatSequence = 0;
-  bool noHeartbeat = false;
+  bool noHeartbeat;
   unsigned int heartRate = 5000;
 };
 

@@ -51,7 +51,7 @@ void Configuration::begin()
   storage->begin();
   loadNVs();
   
-  if ((currentMode == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
+  if ((storage->readEEPROM(0) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
    resetModule();
    clearResetFlag();
@@ -64,7 +64,23 @@ void Configuration::begin()
 void Configuration::setModuleMode(ModuleMode f)
 {
   currentMode = f;
+  byte oldMode = storage->readEEPROM(0);
   storage->writeEEPROM(0, f);
+}
+
+void Configuration::setHeartbeat(bool beat)
+{
+  heartbeat = beat;
+  byte mode = storage->readEEPROM(0);
+  if (beat)
+  {
+    bitSet(mode, 1);
+  }
+  else
+  {
+    bitClear(mode,1);
+  }
+  storage->writeEEPROM(0, mode);
 }
 
 //
@@ -583,7 +599,7 @@ void Configuration::resetModule()
   // DEBUG_SERIAL << F("> setting Uninitialised config") << endl;
 
   // set the node identity defaults
-  // we set a NN and CANID of zero in Uninitialised as we're now a consumer-only node
+  // we set a NN and CANID of zero and a mode Uninitialised
 
   storage->writeEEPROM(0, 0);     // Mode = Uninitialised
   storage->writeEEPROM(1, 0);     // CANID
@@ -608,7 +624,8 @@ void Configuration::resetModule()
 //
 void Configuration::loadNVs()
 {
-  currentMode = (ModuleMode) storage->readEEPROM(0);
+  currentMode = (ModuleMode) (storage->readEEPROM(0) & 0x01); // Bit 0 persists Uninitialised / Normal mode
+  heartbeat = storage->readEEPROM(0) & 0x02; // Bit 1 persists no heartbeat or heartbaet
   CANID =    storage->readEEPROM(1);
   nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
 }

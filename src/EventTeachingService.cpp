@@ -39,6 +39,24 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
 
   switch (opc) 
   {
+    case OPC_MODE:
+      // 76 - Set Operating Mode
+      //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
+      byte requestedMode = msg->data[3];
+      switch (requestedMode)
+      {
+      case 0x08:
+        // Turn on Learn Mode
+        enableLearn();
+        return PROCESSED;
+        
+      case 0x09:
+        // Turn off Learn Mode
+        inhibitLearn();
+        return PROCESSED;
+      }
+      // if none of the above commands, let another service see message
+      break;       
 
     case OPC_NNLRN:
       // 53 - place into learn mode
