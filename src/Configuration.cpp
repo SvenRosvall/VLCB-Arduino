@@ -64,7 +64,6 @@ void Configuration::begin()
 void Configuration::setModuleMode(ModuleMode f)
 {
   currentMode = f;
-  byte oldMode = storage->readEEPROM(0);
   storage->writeEEPROM(0, f);
 }
 
