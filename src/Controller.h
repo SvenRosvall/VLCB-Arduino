@@ -16,6 +16,7 @@
 #include "UserInterface.h"
 #include "Service.h"
 #include "initializer_list.h"
+#include "ArrayHolder.h"
 
 namespace VLCB
 {
@@ -74,7 +75,7 @@ public:
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
   Configuration *module_config;
-  std::initializer_list<Service *> services;
+  ArrayHolder<Service *> services;
   Transport * transport;
 
   unsigned char *_mparams;
