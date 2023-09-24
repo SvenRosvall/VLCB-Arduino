@@ -25,8 +25,6 @@ enum ModuleMode {
   MODE_UNINITIALISED = 0,
   MODE_NORMAL = 1,
   MODE_SETUP = 2,
-  MODE_LEARN = 3,
-  MODE_NHEARTB = 4
 };
 
 //
@@ -62,7 +60,9 @@ public:
 
   void setCANID(byte canid);
   void setModuleMode(ModuleMode m);
+  void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
+  void setEventAck(bool ea);
 
   void setResetFlag();
   void clearResetFlag();
@@ -76,6 +76,8 @@ public:
   byte EE_NUM_NVS;
   byte EE_PRODUCED_EVENTS;
 
+  bool heartbeat;
+  bool eventAck;
   byte CANID;
   ModuleMode currentMode;
   unsigned int nodeNum;

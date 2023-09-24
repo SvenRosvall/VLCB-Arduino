@@ -171,28 +171,6 @@ void Controller::indicateActivity()
   }
 }
 
-void Controller::setLearnMode(byte reqMode)
-{
-  for (Service * svc : services)
-  {
-    if (svc->getServiceID() == SERVICE_ID_OLD_TEACH)
-    {
-      EventTeachingService * etSvc = (EventTeachingService *) svc;
-      
-      if (reqMode == MODE_LEARN)
-      {
-        etSvc->enableLearn();
-      }
-      if (reqMode == MODE_NORMAL)
-      {
-        etSvc->inhibitLearn();
-      }
-      return;
-    }
-  }
-  sendGRSP(OPC_MODE, SERVICE_ID_OLD_TEACH, GRSP_INVALID_SERVICE);
-} 
-
 //
 /// main Controller message processing procedure
 //
