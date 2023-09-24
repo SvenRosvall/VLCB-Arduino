@@ -82,6 +82,21 @@ void Configuration::setHeartbeat(bool beat)
   storage->writeEEPROM(0, mode);
 }
 
+void Configuration::setEventAck(bool ea)
+{
+  eventAck = ea;
+  byte servicePersist = storage->readEEPROM(4);
+  if (ea)
+  {
+    bitSet(servicePersist, 0);
+  }
+  else
+  {
+    bitClear(servicePersist,0);
+  }
+  storage->writeEEPROM(4, servicePersist);
+}
+
 //
 /// store the CANID
 //
@@ -624,9 +639,10 @@ void Configuration::resetModule()
 void Configuration::loadNVs()
 {
   currentMode = (ModuleMode) (storage->readEEPROM(0) & 0x01); // Bit 0 persists Uninitialised / Normal mode
-  heartbeat = storage->readEEPROM(0) & 0x02; // Bit 1 persists no heartbeat or heartbaet
+  heartbeat = storage->readEEPROM(0) & 0x02; // Bit 1 persists no heartbeat or heartbeat
   CANID =    storage->readEEPROM(1);
   nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
+  eventAck = storage->readEEPROM(4) & 0x01; // Bit 0 persists event Acknowledgement if set
 }
 
 //

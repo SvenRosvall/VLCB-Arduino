@@ -62,6 +62,7 @@ public:
   void setModuleMode(ModuleMode m);
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
+  void setEventAck(bool ea);
 
   void setResetFlag();
   void clearResetFlag();
@@ -76,6 +77,7 @@ public:
   byte EE_PRODUCED_EVENTS;
 
   bool heartbeat;
+  bool eventAck;
   byte CANID;
   ModuleMode currentMode;
   unsigned int nodeNum;
