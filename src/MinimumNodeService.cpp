@@ -376,52 +376,52 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
     case OPC_MODE:
       // 76 - Set Operating Mode
        //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
-      if (nn == module_config->nodeNum)
-      {        
-        if (msg->len < 4)
-        {          
-          controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
-          return PROCESSED;
-        }        
-        
-        byte requestedMode = msg->data[3];
-        //DEBUG_SERIAL << F("> MODE -- requested = ") << requestedMode << endl;
-        //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
-        if (instantMode == MODE_NORMAL)
-        {
-          switch (requestedMode)
-          {
-          case 0x00:
-          // Request Setup
-            controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-            initSetupFromNormal();
-            return PROCESSED;
-            
-          case 0x0C:
-          // Turn on Heartbeat
-            noHeartbeat = false;
-            module_config->setHeartbeat(!noHeartbeat);
-            return PROCESSED;
-            
-          case 0x0D:
-          // Turn off Heartbeat
-            noHeartbeat = true;
-            module_config->setHeartbeat(!noHeartbeat);
-            return PROCESSED;
-          }
-          // if in MODE_NORMAL but none of the above commands, let another service see message
-          break;  
-        }
-        else
-        {
-          return PROCESSED;
-        }
-      }
-      else
+      if (nn != module_config->nodeNum)
       {
-      return PROCESSED;
+        return PROCESSED;
+      }
+      if (msg->len < 4)
+      {          
+        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+        return PROCESSED;
+      }        
+      
+      byte requestedMode = msg->data[3];
+      //DEBUG_SERIAL << F("> MODE -- requested = ") << requestedMode << endl;
+      //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
+      if (instantMode != MODE_NORMAL)
+      {
+        return PROCESSED;
       }
       
+      switch (requestedMode)
+      {
+      case 0xFF:
+      // Request Uninitialised
+        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+        return PROCESSED;
+        
+      case 0x00:
+      // Request Setup
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        initSetupFromNormal();
+        return PROCESSED;
+        
+      case 0x0C:
+      // Turn on Heartbeat
+        noHeartbeat = false;
+        module_config->setHeartbeat(!noHeartbeat);
+        return PROCESSED;
+        
+      case 0x0D:
+      // Turn off Heartbeat
+        noHeartbeat = true;
+        module_config->setHeartbeat(!noHeartbeat);
+        return PROCESSED;
+      }      
+      // if in MODE_NORMAL but none of the above commands, let another service see message
+      return NOT_PROCESSED;  
+            
     case OPC_NNRSM:
       //4F - reset to manufacturer's defaults 
       if (nn == module_config->nodeNum)
