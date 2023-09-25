@@ -17,13 +17,6 @@ namespace std
     public:
 
       constexpr initializer_list() noexcept : array(0), len(0) { }
-      
-      // This copy ctor is only used in test code for creating a controller.
-      initializer_list(const initializer_list & rhs)
-        : len(rhs.len)
-        , array(copyArray(rhs.array, rhs.len))
-      {
-      }
 
       // Number of elements.
       constexpr size_t
@@ -42,16 +35,6 @@ namespace std
       constexpr initializer_list(const E* a, size_t l)
         : array(a), len(l) { }
         
-      static E* copyArray(const E * a, size_t len)
-      {
-        E * array = new E[len];
-        for (int i = 0 ; i < len ; ++i)
-        {
-          array[i] = a[i];
-        }
-        return array;
-      }
-
       const E* array;
       size_t len;
     };
