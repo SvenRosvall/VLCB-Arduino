@@ -17,13 +17,6 @@ namespace std
     public:
 
       constexpr initializer_list() noexcept : array(0), len(0) { }
-      
-      // This copy ctor is only used in test code for creating a controller.
-      initializer_list(const initializer_list & rhs)
-        : len(rhs.len)
-        , array(rhs.array)
-      {
-      }
 
       // Number of elements.
       constexpr size_t
