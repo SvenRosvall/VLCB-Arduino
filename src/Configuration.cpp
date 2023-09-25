@@ -51,7 +51,7 @@ void Configuration::begin()
   storage->begin();
   loadNVs();
   
-  if ((storage->readEEPROM(0) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
+  if ((storage->readEEPROM(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
    resetModule();
    clearResetFlag();
@@ -64,37 +64,37 @@ void Configuration::begin()
 void Configuration::setModuleMode(ModuleMode f)
 {
   currentMode = f;
-  storage->writeEEPROM(0, f);
+  storage->writeEEPROM(LOCATION_MODE, f);
 }
 
 void Configuration::setHeartbeat(bool beat)
 {
   heartbeat = beat;
-  byte mode = storage->readEEPROM(4);
+  byte mode = storage->readEEPROM(LOCATION_FLAGS);
   if (beat)
   {
-    bitSet(mode, 0);
+    bitSet(mode, HEARTBEAT_BIT);
   }
   else
   {
-    bitClear(mode, 0);
+    bitClear(mode, HEARTBEAT_BIT);
   }
-  storage->writeEEPROM(0, mode);
+  storage->writeEEPROM(LOCATION_FLAGS, mode);
 }
 
 void Configuration::setEventAck(bool ea)
 {
   eventAck = ea;
-  byte servicePersist = storage->readEEPROM(4);
+  byte servicePersist = storage->readEEPROM(LOCATION_FLAGS);
   if (ea)
   {
-    bitSet(servicePersist, 1);
+    bitSet(servicePersist, EVENT_ACK_BIT);
   }
   else
   {
-    bitClear(servicePersist, 1);
+    bitClear(servicePersist, EVENT_ACK_BIT);
   }
-  storage->writeEEPROM(4, servicePersist);
+  storage->writeEEPROM(LOCATION_FLAGS, servicePersist);
 }
 
 //
@@ -103,7 +103,7 @@ void Configuration::setEventAck(bool ea)
 void Configuration::setCANID(byte canid)
 {
   CANID = canid;
-  storage->writeEEPROM(1, canid);
+  storage->writeEEPROM(LOCATION_CANID, canid);
 }
 
 //
@@ -112,8 +112,8 @@ void Configuration::setCANID(byte canid)
 void Configuration::setNodeNum(unsigned int nn)
 {
   nodeNum = nn;
-  storage->writeEEPROM(2, highByte(nodeNum));
-  storage->writeEEPROM(3, lowByte(nodeNum));
+  storage->writeEEPROM(LOCATION_NODE_NUMBER_HIGH, highByte(nodeNum));
+  storage->writeEEPROM(LOCATION_NODE_NUMBER_LOW, lowByte(nodeNum));
 }
 
 //
@@ -615,10 +615,11 @@ void Configuration::resetModule()
   // set the node identity defaults
   // we set a NN and CANID of zero and a mode Uninitialised
 
-  storage->writeEEPROM(0, 0);     // Mode = Uninitialised
-  storage->writeEEPROM(1, 0);     // CANID
-  storage->writeEEPROM(2, 0);     // NN hi
-  storage->writeEEPROM(3, 0);     // NN lo
+  storage->writeEEPROM(LOCATION_MODE, MODE_UNINITIALISED);
+  storage->writeEEPROM(LOCATION_CANID, 0);
+  storage->writeEEPROM(LOCATION_NODE_NUMBER_HIGH, 0);
+  storage->writeEEPROM(LOCATION_NODE_NUMBER_LOW, 0);
+  storage->writeEEPROM(LOCATION_FLAGS, 0);
   setResetFlag();        // set reset indicator
 
   // zero NVs (NVs number from one, not zero)
@@ -638,11 +639,11 @@ void Configuration::resetModule()
 //
 void Configuration::loadNVs()
 {
-  currentMode = (ModuleMode) (storage->readEEPROM(0) & 0x01); // Bit 0 persists Uninitialised / Normal mode
-  heartbeat = storage->readEEPROM(4) & 0x01; // Bit 1 persists no heartbeat or heartbeat
-  CANID =    storage->readEEPROM(1);
-  nodeNum =  (storage->readEEPROM(2) << 8) + storage->readEEPROM(3);
-  eventAck = storage->readEEPROM(4) & 0x02; // Bit 0 persists event Acknowledgement if set
+  currentMode = (ModuleMode) (storage->readEEPROM(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
+  CANID =    storage->readEEPROM(LOCATION_CANID);
+  nodeNum =  (storage->readEEPROM(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->readEEPROM(LOCATION_NODE_NUMBER_LOW);
+  heartbeat = storage->readEEPROM(LOCATION_FLAGS) & (1 << HEARTBEAT_BIT);
+  eventAck = storage->readEEPROM(LOCATION_FLAGS) & (1 << EVENT_ACK_BIT);
 }
 
 //
@@ -673,17 +674,17 @@ bool Configuration::check_hash_collisions()
 //
 void Configuration::setResetFlag()
 {
-  storage->writeEEPROM(5, 99);
+  storage->writeEEPROM(LOCATION_RESET_FLAG, 99);
 }
 
 void Configuration::clearResetFlag()
 {
-  storage->writeEEPROM(5, 0);
+  storage->writeEEPROM(LOCATION_RESET_FLAG, 0);
 }
 
 bool Configuration::isResetFlagSet()
 {
-  return (storage->readEEPROM(5) == 99);
+  return (storage->readEEPROM(LOCATION_RESET_FLAG) == 99);
 }
 
 }
