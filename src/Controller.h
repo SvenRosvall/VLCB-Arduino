@@ -66,7 +66,7 @@ public:
   static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void setParams(unsigned char *mparams);
-  void setName(unsigned char *mname);
+  void setName(const unsigned char *mname);
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
@@ -79,7 +79,7 @@ private:                                          // protected members become pr
   Transport * transport;
 
   unsigned char *_mparams;
-  unsigned char *_mname;
+  const unsigned char *_mname;
   void (*framehandler)(CANFrame *msg) = NULL;
   byte *_opcodes = NULL;
   byte _num_opcodes = 0;

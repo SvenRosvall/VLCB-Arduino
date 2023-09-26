@@ -21,41 +21,20 @@
 
 #include <memory>
 #include "TestTools.hpp"
-#include "Controller.h"
-#include "MockUserInterface.h"
-#include "MinimumNodeService.h"
-#include "MockTransport.h"
-#include "MockStorage.h"
-#include "vlcbdefs.hpp"
-#include "Parameters.h"
-#include "LongMessageService.h"
 #include "ArduinoMock.hpp"
+#include "Controller.h"
+#include "MinimumNodeService.h"
+#include "LongMessageService.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
+#include "VlcbCommon.h"
 
 namespace
 {
-const int MODULE_ID = 253;
-unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
-
-static std::unique_ptr<MockUserInterface> mockUserInterface;
-static std::unique_ptr<MockTransport> mockTransport;
-static std::unique_ptr<VLCB::Configuration> configuration;
-static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
+std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 VLCB::Controller createController()
 {
-  // Use pointers to objects to create the controller with.
-  // Use unique_ptr so that next invocation deletes the previous objects.
-  mockTransport.reset(new MockTransport);
-
-  mockUserInterface.reset(new MockUserInterface);
-
-  static std::unique_ptr<MockStorage> mockStorage;
-  mockStorage.reset(new MockStorage);
-
-  configuration.reset(new VLCB::Configuration(mockStorage.get()));
-
   minimumNodeService.reset(new VLCB::MinimumNodeService);
   minimumNodeService->setHeartBeat(false);
 
@@ -68,27 +47,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventProducerService> epService;
   epService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-     {minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get()});
-
-  configuration->EE_NVS_START = 0;
-  configuration->EE_NUM_NVS = 4;
-  configuration->EE_EVENTS_START = 20;
-  configuration->EE_MAX_EVENTS = 20;
-  configuration->EE_PRODUCED_EVENTS = 1;
-  configuration->EE_NUM_EVS = 2;
-  configuration->setModuleMode(VLCB::MODE_NORMAL);
-  configuration->setNodeNum(0x0104);
-  static std::unique_ptr<VLCB::Parameters> params;
-  params.reset(new VLCB::Parameters(*configuration));
-  params->setVersion(1, 1, 'a');
-  params->setModuleId(MODULE_ID);
-
-  // assign to Controller
-  controller.setParams(params->getParams());
-  controller.setName(moduleName);
-  controller.begin();
-  return controller;
+  return ::createController({minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get()});
 }
 
 void testUninitializedRequestNodeNumber()
@@ -103,7 +62,7 @@ void testUninitializedRequestNodeNumber()
   
   // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
-  
+
   controller.process();
 
   assertEquals(1, mockTransport->sent_messages.size());

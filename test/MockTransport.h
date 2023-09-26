@@ -10,6 +10,7 @@
 #include <deque>
 #include <vector>
 #include "Transport.h"
+#include "Controller.h" // for CANFrame
 
 class MockTransport : public VLCB::Transport
 {

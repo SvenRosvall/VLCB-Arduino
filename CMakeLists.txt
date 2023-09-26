@@ -86,4 +86,5 @@ add_executable(testAll
         test/MockUserInterface.cpp
         test/MockTransport.cpp
         test/MockStorage.cpp
+        test/VlcbCommon.cpp
 )
