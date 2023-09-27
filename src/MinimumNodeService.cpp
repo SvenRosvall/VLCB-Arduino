@@ -15,7 +15,7 @@ namespace VLCB
 void MinimumNodeService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 void MinimumNodeService::begin()

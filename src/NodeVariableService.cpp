@@ -14,7 +14,7 @@ namespace VLCB
 void NodeVariableService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)

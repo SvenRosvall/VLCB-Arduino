@@ -41,6 +41,8 @@ class Controller
 public:
   Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
   Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
+  
+  Configuration * getModuleConfig() { return module_config; }
 
   // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
 
@@ -66,12 +68,15 @@ public:
   static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void setParams(unsigned char *mparams);
+  void setParamFlag(unsigned char flag, bool b);
   void setName(const unsigned char *mname);
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
+  bool isSetProdEventTableFlag() { return setProdEventTable; }
+  void clearProdEventTableFlag();
   void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
-  
+
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
   Configuration *module_config;
@@ -84,7 +89,6 @@ private:                                          // protected members become pr
   byte *_opcodes = NULL;
   byte _num_opcodes = 0;
   bool setProdEventTable = false;
-  void clearProdEventTableFlag();
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
@@ -93,11 +97,6 @@ private:                                          // protected members become pr
   // TODO: Review the necessary fields to see what is required by services
   // TODO: Create getter/setter for each field.
   friend class MinimumNodeService;
-  friend class CanService;
-  friend class NodeVariableService;
-  friend class EventConsumerService;
-  friend class EventTeachingService;
-  friend class EventProducerService;
 };
 
 }
