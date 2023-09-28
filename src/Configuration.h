@@ -17,10 +17,23 @@ namespace VLCB
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
 
+enum EepromLocations {
+  LOCATION_MODE = 0,
+  LOCATION_CANID = 1,
+  LOCATION_NODE_NUMBER_HIGH = 2,
+  LOCATION_NODE_NUMBER_LOW = 3,
+  LOCATION_FLAGS = 4,
+  LOCATION_RESET_FLAG = 5
+};
+
+enum FlagBits {
+  HEARTBEAT_BIT = 0,
+  EVENT_ACK_BIT = 1,
+};
+
 //
 /// Controller modes
 //
-
 enum ModuleMode {
   MODE_UNINITIALISED = 0,
   MODE_NORMAL = 1,
