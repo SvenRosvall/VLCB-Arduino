@@ -7,7 +7,6 @@
 
 #include "MinimumNodeService.h"
 #include "Controller.h"
-#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -15,7 +14,7 @@ namespace VLCB
 void MinimumNodeService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 void MinimumNodeService::begin()
@@ -173,13 +172,13 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         // respond with PARAMS message
         msg->len = 8;
         msg->data[0] = OPC_PARAMS;    // opcode
-        msg->data[1] = controller->_mparams[PAR_MANU];     // manf code -- MERG
-        msg->data[2] = controller->_mparams[PAR_MINVER];     // minor code ver
-        msg->data[3] = controller->_mparams[PAR_MTYP];     // module ident
-        msg->data[4] = controller->_mparams[PAR_EVTNUM];     // number of events
-        msg->data[5] = controller->_mparams[PAR_EVNUM];     // events vars per event
-        msg->data[6] = controller->_mparams[PAR_NVNUM];     // number of NVs
-        msg->data[7] = controller->_mparams[PAR_MAJVER];     // major code ver
+        msg->data[1] = controller->getParam(PAR_MANU);     // manf code -- MERG
+        msg->data[2] = controller->getParam(PAR_MINVER);     // minor code ver
+        msg->data[3] = controller->getParam(PAR_MTYP);     // module ident
+        msg->data[4] = controller->getParam(PAR_EVTNUM);     // number of events
+        msg->data[5] = controller->getParam(PAR_EVNUM);     // events vars per event
+        msg->data[6] = controller->getParam(PAR_NVNUM);     // number of NVs
+        msg->data[7] = controller->getParam(PAR_MAJVER);     // major code ver
         
         controller->sendMessage(msg);
       }
@@ -205,14 +204,14 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           
           if (paran == 0)
           {
-            for (byte i = 0; i <= controller->_mparams[PAR_NUM]; i++)
+            for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
             {
-              controller->sendMessageWithNN(OPC_PARAN, i, controller->_mparams[i]);
+              controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
             }            
           }
-          else if (paran <= controller->_mparams[PAR_NUM])
+          else if (paran <= controller->getParam(PAR_NUM))
           {
-            controller->sendMessageWithNN(OPC_PARAN, paran, controller->_mparams[paran]);
+            controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
           }
           else
           {
@@ -274,7 +273,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (module_config->nodeNum > 0)
       {
         // DEBUG_SERIAL << ("> responding with PNN message") << endl;
-        controller->sendMessageWithNN(OPC_PNN, controller->_mparams[PAR_MANU], controller->_mparams[PAR_MTYP], controller->_mparams[PAR_FLAGS]);
+        controller->sendMessageWithNN(OPC_PNN, controller->getParam(PAR_MANU), controller->getParam(PAR_MTYP), controller->getParam(PAR_FLAGS));
       }
 
       return PROCESSED;
@@ -291,7 +290,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       {
         msg->len = 8;
         msg->data[0] = OPC_NAME;
-        memcpy(msg->data + 1, controller->_mname, 7);
+        memcpy(msg->data + 1, controller->getModuleName(), 7);
         controller->sendMessage(msg);
       }
 
@@ -312,11 +311,11 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
         if (serviceIndex == 0)
         {
           // Request for summary of services. First a service count
-          controller->sendMessageWithNN(OPC_SD, 0, 0, controller->services.size());
+          controller->sendMessageWithNN(OPC_SD, 0, 0, controller->getServices().size());
           
           // and then details of each service.
           byte svcIndex = 0;
-          for (auto svc : controller->services)
+          for (auto svc : controller->getServices())
           {
             // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
             controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
@@ -327,7 +326,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           // Request for details of a single service.
           byte svcIndex = 0;
           Service * theService = NULL;
-          for (auto svc : controller->services)
+          for (auto svc : controller->getServices())
           {
             if (++svcIndex == serviceIndex)
             {
@@ -359,7 +358,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
           return PROCESSED;
         }  
         byte svcIndex = msg->data[3];
-        for (Service * svc : controller->services)
+        for (Service * svc : controller->getServices())
         {
           if (svc->getServiceID() == svcIndex)
           {

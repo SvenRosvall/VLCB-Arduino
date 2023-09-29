@@ -14,21 +14,21 @@ namespace VLCB {
 void EventTeachingService::setController(Controller *cntrl) 
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 void EventTeachingService::enableLearn() 
 {
   bLearn = true;
   //DEBUG_SERIAL << F("> set learn mode ok") << endl;
-  controller->_mparams[PAR_FLAGS] |= PF_LRN;
+  controller->setParamFlag(PF_LRN, true);
 }
 
 void EventTeachingService::inhibitLearn() 
 {
   bLearn = false;
   //DEBUG_SERIAL << F("> learn mode off") << endl;
-  controller->_mparams[PAR_FLAGS] &= ~PF_LRN;
+  controller->setParamFlag(PF_LRN, false);
 }
 
 Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) 

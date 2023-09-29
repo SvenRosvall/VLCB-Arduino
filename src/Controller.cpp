@@ -144,18 +144,23 @@ void Controller::indicateMode(byte mode)
     _ui->indicateMode(mode);
   }
   
-  if ((mode == MODE_UNINITIALISED) || (mode == MODE_SETUP))
-  {
-    _mparams[PAR_FLAGS] &= ~PF_NORMAL;
-  }
-  else
-  {
-    _mparams[PAR_FLAGS] |= PF_NORMAL;
-  }
-   
+  setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
+ 
   if (mode == MODE_NORMAL) // used by Event Producer Service
   {
     setProdEventTable = true;
+  }
+}
+
+void Controller::setParamFlag(unsigned char flag, bool set)
+{ 
+  if (set)
+  {
+    _mparams[PAR_FLAGS] |= flag;
+  }
+  else
+  {
+    _mparams[PAR_FLAGS] &= ~flag;
   }
 }
 

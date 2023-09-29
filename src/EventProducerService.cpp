@@ -18,7 +18,7 @@ namespace VLCB {
 void EventProducerService::setController(Controller *cntrl) 
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 void EventProducerService::begin()
@@ -53,7 +53,7 @@ void EventProducerService::setProducedEvents()
 void EventProducerService::process(byte num)
 {
   // Do this if mode changes to normal
-  if (controller->setProdEventTable)
+  if (controller->isSetProdEventTableFlag())
   {
     setProducedEvents();
     controller->clearProdEventTableFlag();
