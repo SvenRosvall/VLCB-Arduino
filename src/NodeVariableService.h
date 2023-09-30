@@ -28,6 +28,10 @@ private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
+
+  Processed handleReadNV(const CANFrame *msg, unsigned int nn);
+  Processed handleSetNV(const CANFrame *msg, unsigned int nn);
+  Processed handleSetAndReadNV(const CANFrame *msg, unsigned int nn);
 };
 
 }

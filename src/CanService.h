@@ -42,6 +42,9 @@ private:
   static byte getCANID(unsigned long header);
   void checkCANenumTimout();
   byte findFreeCanId();
+
+  Processed handleEnumeration(const CANFrame *msg, unsigned int nn);
+  Processed handleSetCANID(const CANFrame *msg, unsigned int nn);
 };
 
 }

@@ -53,6 +53,13 @@ private:
   byte heartbeatSequence = 0;
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
+
+  Processed handleRequestNodeParameters(CANFrame *msg);
+  Processed handleRequestNodeParameter(const CANFrame *msg, unsigned int nn);
+  Processed handleSetNodeNumber(const CANFrame *msg, unsigned int nn);
+  Processed handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn);
+  Processed handleRequestDiagnostics(const CANFrame *msg, unsigned int nn);
+  Processed handleModeMessage(const CANFrame *msg, unsigned int nn);
 };
 
 }

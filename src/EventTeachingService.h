@@ -30,6 +30,20 @@ private:
   Configuration *module_config;  // Shortcut to reduce indirection code.
 
   bool bLearn = false;
+
+  Processed handleLearnMode(const CANFrame *msg);
+  Processed handleLearn(unsigned int nn);
+  Processed handleUnlearnEvent(const CANFrame *msg, unsigned int nn, unsigned int en);
+  Processed handleUnlearn(unsigned int nn);
+  Processed handleRequestEventCount(unsigned int nn);
+  Processed handleReadEvents(CANFrame *msg, unsigned int nn);
+  Processed handleReadEventIndex(CANFrame *msg, unsigned int nn);
+  Processed handleReadEventVariable(const CANFrame *msg, unsigned int nn);
+  Processed handleClearEvents(unsigned int nn);
+  Processed handleGetFreeEventSlots(unsigned int nn);
+  Processed handleLearnEvent(CANFrame *msg, unsigned int nn, unsigned int en);
+  Processed handleLearnEventIndex(CANFrame *msg);
+  Processed handleRequestEventVariable(const CANFrame *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB
