@@ -51,7 +51,7 @@ void Configuration::begin()
   storage->begin();
   loadNVs();
   
-  if ((storage->readEEPROM(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
+  if ((storage->read(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
    resetModule();
    clearResetFlag();
@@ -64,13 +64,13 @@ void Configuration::begin()
 void Configuration::setModuleMode(ModuleMode f)
 {
   currentMode = f;
-  storage->writeEEPROM(LOCATION_MODE, f);
+  storage->write(LOCATION_MODE, f);
 }
 
 void Configuration::setHeartbeat(bool beat)
 {
   heartbeat = beat;
-  byte mode = storage->readEEPROM(LOCATION_FLAGS);
+  byte mode = storage->read(LOCATION_FLAGS);
   if (beat)
   {
     bitSet(mode, HEARTBEAT_BIT);
@@ -79,13 +79,13 @@ void Configuration::setHeartbeat(bool beat)
   {
     bitClear(mode, HEARTBEAT_BIT);
   }
-  storage->writeEEPROM(LOCATION_FLAGS, mode);
+  storage->write(LOCATION_FLAGS, mode);
 }
 
 void Configuration::setEventAck(bool ea)
 {
   eventAck = ea;
-  byte servicePersist = storage->readEEPROM(LOCATION_FLAGS);
+  byte servicePersist = storage->read(LOCATION_FLAGS);
   if (ea)
   {
     bitSet(servicePersist, EVENT_ACK_BIT);
@@ -94,7 +94,7 @@ void Configuration::setEventAck(bool ea)
   {
     bitClear(servicePersist, EVENT_ACK_BIT);
   }
-  storage->writeEEPROM(LOCATION_FLAGS, servicePersist);
+  storage->write(LOCATION_FLAGS, servicePersist);
 }
 
 //
@@ -103,7 +103,7 @@ void Configuration::setEventAck(bool ea)
 void Configuration::setCANID(byte canid)
 {
   CANID = canid;
-  storage->writeEEPROM(LOCATION_CANID, canid);
+  storage->write(LOCATION_CANID, canid);
 }
 
 //
@@ -112,8 +112,8 @@ void Configuration::setCANID(byte canid)
 void Configuration::setNodeNum(unsigned int nn)
 {
   nodeNum = nn;
-  storage->writeEEPROM(LOCATION_NODE_NUMBER_HIGH, highByte(nodeNum));
-  storage->writeEEPROM(LOCATION_NODE_NUMBER_LOW, lowByte(nodeNum));
+  storage->write(LOCATION_NODE_NUMBER_HIGH, highByte(nodeNum));
+  storage->write(LOCATION_NODE_NUMBER_LOW, lowByte(nodeNum));
 }
 
 //
@@ -257,7 +257,7 @@ void Configuration::readEvent(byte idx, byte tarr[])
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
   for (byte i = 0; i < EE_HASH_BYTES; i++)
   {
-    tarr[i] = storage->readEEPROM(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
+    tarr[i] = storage->read(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
   }
 
   // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
@@ -275,7 +275,7 @@ unsigned int Configuration::getEVAddress(byte idx, byte evnum)
 //
 byte Configuration::getEventEVval(byte idx, byte evnum)
 {
-  return storage->readEEPROM(getEVAddress(idx, evnum));
+  return storage->read(getEVAddress(idx, evnum));
 }
 
 //
@@ -283,7 +283,7 @@ byte Configuration::getEventEVval(byte idx, byte evnum)
 //
 void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 {
-  storage->writeEEPROM(getEVAddress(idx, evnum), evval);
+  storage->write(getEVAddress(idx, evnum), evval);
 }
 
 //
@@ -422,7 +422,7 @@ byte Configuration::getEvTableEntry(byte tindex)
 //
 byte Configuration::readNV(byte idx)
 {
-  return (storage->readEEPROM(EE_NVS_START + (idx - 1)));
+  return (storage->read(EE_NVS_START + (idx - 1)));
 }
 
 //
@@ -431,7 +431,7 @@ byte Configuration::readNV(byte idx)
 //
 void Configuration::writeNV(byte idx, byte val)
 {
-  storage->writeEEPROM(EE_NVS_START + (idx - 1), val);
+  storage->write(EE_NVS_START + (idx - 1), val);
 }
 
 //
@@ -447,7 +447,7 @@ void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
   unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
   // DEBUG_SERIAL << F("> writeEvent, index = ") << index << F(", addr = ") << eeaddress << endl;
-  storage->writeBytesEEPROM(eeaddress, data, EE_HASH_BYTES);
+  storage->writeBytes(eeaddress, data, EE_HASH_BYTES);
 }
 
 //
@@ -608,18 +608,18 @@ void Configuration::resetModule()
   // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
 
   // clear the learned events from storage
-  storage->resetEEPROM();
+  storage->reset();
 
   // DEBUG_SERIAL << F("> setting Uninitialised config") << endl;
 
   // set the node identity defaults
   // we set a NN and CANID of zero and a mode Uninitialised
 
-  storage->writeEEPROM(LOCATION_MODE, MODE_UNINITIALISED);
-  storage->writeEEPROM(LOCATION_CANID, 0);
-  storage->writeEEPROM(LOCATION_NODE_NUMBER_HIGH, 0);
-  storage->writeEEPROM(LOCATION_NODE_NUMBER_LOW, 0);
-  storage->writeEEPROM(LOCATION_FLAGS, 0);
+  storage->write(LOCATION_MODE, MODE_UNINITIALISED);
+  storage->write(LOCATION_CANID, 0);
+  storage->write(LOCATION_NODE_NUMBER_HIGH, 0);
+  storage->write(LOCATION_NODE_NUMBER_LOW, 0);
+  storage->write(LOCATION_FLAGS, 0);
   setResetFlag();        // set reset indicator
 
   // zero NVs (NVs number from one, not zero)
@@ -639,11 +639,11 @@ void Configuration::resetModule()
 //
 void Configuration::loadNVs()
 {
-  currentMode = (ModuleMode) (storage->readEEPROM(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
-  CANID =    storage->readEEPROM(LOCATION_CANID);
-  nodeNum =  (storage->readEEPROM(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->readEEPROM(LOCATION_NODE_NUMBER_LOW);
-  heartbeat = storage->readEEPROM(LOCATION_FLAGS) & (1 << HEARTBEAT_BIT);
-  eventAck = storage->readEEPROM(LOCATION_FLAGS) & (1 << EVENT_ACK_BIT);
+  currentMode = (ModuleMode) (storage->read(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
+  CANID = storage->read(LOCATION_CANID);
+  nodeNum = (storage->read(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->read(LOCATION_NODE_NUMBER_LOW);
+  heartbeat = storage->read(LOCATION_FLAGS) & (1 << HEARTBEAT_BIT);
+  eventAck = storage->read(LOCATION_FLAGS) & (1 << EVENT_ACK_BIT);
 }
 
 //
@@ -674,17 +674,17 @@ bool Configuration::check_hash_collisions()
 //
 void Configuration::setResetFlag()
 {
-  storage->writeEEPROM(LOCATION_RESET_FLAG, 99);
+  storage->write(LOCATION_RESET_FLAG, 99);
 }
 
 void Configuration::clearResetFlag()
 {
-  storage->writeEEPROM(LOCATION_RESET_FLAG, 0);
+  storage->write(LOCATION_RESET_FLAG, 0);
 }
 
 bool Configuration::isResetFlagSet()
 {
-  return (storage->readEEPROM(LOCATION_RESET_FLAG) == 99);
+  return (storage->read(LOCATION_RESET_FLAG) == 99);
 }
 
 }
