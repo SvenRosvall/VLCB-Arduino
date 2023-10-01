@@ -22,9 +22,6 @@ Review this spec again and update the user interface.
 Also need to update the interface class and add support for these states in the Controller class.
 
 ## Updates to the Storage interface
-The read and write methods have an "EEPROM" suffix. 
-Remove this as not all storages are EEPROM based.
-
 The begin method should take a size parameter. 
 See calculation of this size in EepromInternalStorage.cpp. 
 This calculation should sit in Controller. 

@@ -27,7 +27,7 @@ void EepromInternalStorage::begin()
 //
 /// read a single byte from EEPROM
 //
-byte EepromInternalStorage::readEEPROM(unsigned int eeaddress)
+byte EepromInternalStorage::read(unsigned int eeaddress)
 {
   byte rdata = getChipEEPROMVal(eeaddress);
 
@@ -38,7 +38,7 @@ byte EepromInternalStorage::readEEPROM(unsigned int eeaddress)
 /// read a number of bytes from EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-byte EepromInternalStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[])
+byte EepromInternalStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
   byte count;
     for (count = 0; count < nbytes; count++) {
@@ -57,9 +57,9 @@ byte EepromInternalStorage::getChipEEPROMVal(unsigned int eeaddress)
 //
 /// write a byte
 //
-void EepromInternalStorage::writeEEPROM(unsigned int eeaddress, byte data)
+void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 {
-// DEBUG_SERIAL << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
+// DEBUG_SERIAL << F("> write, addr = ") << eeaddress << F(", data = ") << data << endl;
 
   setChipEEPROMVal(eeaddress, data);
 }
@@ -68,7 +68,7 @@ void EepromInternalStorage::writeEEPROM(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void EepromInternalStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes)
+void EepromInternalStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
   for (byte i = 0; i < numbytes; i++)
   {
@@ -92,7 +92,7 @@ void EepromInternalStorage::setChipEEPROMVal(unsigned int eeaddress, byte val)
 //
 /// clear all event data in external EEPROM chip
 //
-void EepromInternalStorage::resetEEPROM()
+void EepromInternalStorage::reset()
 {
   // Note: There was no code for resetting internal EEPROM. Instead this reset was done in resetModule()
 
@@ -100,7 +100,7 @@ void EepromInternalStorage::resetEEPROM()
 
   for (unsigned int addr = 10; addr < 4096; addr++)
   {
-    writeEEPROM(addr, 0xff);
+    write(addr, 0xff);
   }
 }
 

@@ -39,7 +39,7 @@ void FlashStorage::begin()
 //
 /// read a single byte from EEPROM
 //
-byte FlashStorage::readEEPROM(unsigned int eeaddress)
+byte FlashStorage::read(unsigned int eeaddress)
 {
   byte rdata = 0;
 
@@ -57,7 +57,7 @@ byte FlashStorage::readEEPROM(unsigned int eeaddress)
 /// read a number of bytes from EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-byte FlashStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[])
+byte FlashStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
   byte count = 0;
 
@@ -75,7 +75,7 @@ byte FlashStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte des
 //
 /// write a byte
 //
-void FlashStorage::writeEEPROM(unsigned int eeaddress, byte data)
+void FlashStorage::write(unsigned int eeaddress, byte data)
 {
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
@@ -87,7 +87,7 @@ void FlashStorage::writeEEPROM(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void FlashStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes)
+void FlashStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
@@ -98,7 +98,7 @@ void FlashStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte num
 //
 /// clear all event data in external EEPROM chip
 //
-void FlashStorage::resetEEPROM()
+void FlashStorage::reset()
 {
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)

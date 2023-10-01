@@ -17,27 +17,27 @@ void MockStorage::begin()
 
 }
 
-byte MockStorage::readEEPROM(unsigned int eeaddress)
+byte MockStorage::read(unsigned int eeaddress)
 {
   return eeprom[eeaddress];
 }
 
-void MockStorage::writeEEPROM(unsigned int eeaddress, byte data)
+void MockStorage::write(unsigned int eeaddress, byte data)
 {
   eeprom[eeaddress] = data;
 }
 
-byte MockStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte *dest)
+byte MockStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
   return 0;
 }
 
-void MockStorage::writeBytesEEPROM(unsigned int eeaddress, byte *src, byte numbytes)
+void MockStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
 
 }
 
-void MockStorage::resetEEPROM()
+void MockStorage::reset()
 {
 
 }

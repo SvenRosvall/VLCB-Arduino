@@ -7,13 +7,14 @@ library such as EEPROM (internal and external via I2C) and Flash.
 Module configurations are stored in the persistent storage at particular addresses.
 The address space is used are:
 
-| Address | Description           |
-|---------|-----------------------|
-| 0       | Mode (SLiM=0, FLiM=1) |
-| 1       | CAN ID                |
-| 2       | NN high byte          |
-| 3       | NN low byte           |
-| 5       | Reset flag            |
+| Address | Description                      |
+|---------|----------------------------------|
+| 0       | Mode (Uninitialized=0, Normal=1) |
+| 1       | CAN ID                           |
+| 2       | NN high byte                     |
+| 3       | NN low byte                      |
+| 4       | Mode flags                       |
+| 5       | Reset flag                       |
 
 Node Variables are stored as bytes from an address given by EE_NVS_START and 
 uses EE_NUM_NVS bytes.

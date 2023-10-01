@@ -20,7 +20,7 @@ void DueEepromEmulationStorage::begin()
 //
 /// read a single byte from EEPROM
 //
-byte DueEepromEmulationStorage::readEEPROM(unsigned int eeaddress)
+byte DueEepromEmulationStorage::read(unsigned int eeaddress)
 {
   byte rdata = getChipEEPROMVal(eeaddress);
   return rdata;
@@ -30,7 +30,7 @@ byte DueEepromEmulationStorage::readEEPROM(unsigned int eeaddress)
 /// read a number of bytes from EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-byte DueEepromEmulationStorage::readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[])
+byte DueEepromEmulationStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
   byte count;
 
@@ -52,9 +52,9 @@ byte DueEepromEmulationStorage::getChipEEPROMVal(unsigned int eeaddress)
 //
 /// write a byte
 //
-void DueEepromEmulationStorage::writeEEPROM(unsigned int eeaddress, byte data)
+void DueEepromEmulationStorage::write(unsigned int eeaddress, byte data)
 {
-  // DEBUG_SERIAL << F("> writeEEPROM, addr = ") << eeaddress << F(", data = ") << data << endl;
+  // DEBUG_SERIAL << F("> write, addr = ") << eeaddress << F(", data = ") << data << endl;
 
   setChipEEPROMVal(eeaddress, data);
 }
@@ -63,7 +63,7 @@ void DueEepromEmulationStorage::writeEEPROM(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void DueEepromEmulationStorage::writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes)
+void DueEepromEmulationStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
   for (byte i = 0; i < numbytes; i++) {
     setChipEEPROMVal(eeaddress + i, src[i]);
@@ -84,7 +84,7 @@ void DueEepromEmulationStorage::setChipEEPROMVal(unsigned int eeaddress, byte va
 //
 /// clear all event data in external EEPROM chip
 //
-void DueEepromEmulationStorage::resetEEPROM()
+void DueEepromEmulationStorage::reset()
 {
 
 }
