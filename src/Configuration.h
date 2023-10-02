@@ -17,16 +17,27 @@ namespace VLCB
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;
 
+enum EepromLocations {
+  LOCATION_MODE = 0,
+  LOCATION_CANID = 1,
+  LOCATION_NODE_NUMBER_HIGH = 2,
+  LOCATION_NODE_NUMBER_LOW = 3,
+  LOCATION_FLAGS = 4,
+  LOCATION_RESET_FLAG = 5
+};
+
+enum FlagBits {
+  HEARTBEAT_BIT = 0,
+  EVENT_ACK_BIT = 1,
+};
+
 //
 /// Controller modes
 //
-
 enum ModuleMode {
   MODE_UNINITIALISED = 0,
   MODE_NORMAL = 1,
   MODE_SETUP = 2,
-  MODE_LEARN = 3,
-  MODE_NHEARTB = 4
 };
 
 //
@@ -62,7 +73,9 @@ public:
 
   void setCANID(byte canid);
   void setModuleMode(ModuleMode m);
+  void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
+  void setEventAck(bool ea);
 
   void setResetFlag();
   void clearResetFlag();
@@ -74,7 +87,10 @@ public:
   byte EE_BYTES_PER_EVENT;
   unsigned int EE_NVS_START;
   byte EE_NUM_NVS;
+  byte EE_PRODUCED_EVENTS;
 
+  bool heartbeat;
+  bool eventAck;
   byte CANID;
   ModuleMode currentMode;
   unsigned int nodeNum;
@@ -94,6 +110,8 @@ private:
   bool check_hash_collisions();
 
   void loadNVs();
+
+  unsigned int getEVAddress(byte idx, byte evnum);
 
   byte *evhashtbl;
   bool hash_collision;

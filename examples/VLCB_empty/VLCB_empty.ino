@@ -24,6 +24,7 @@
 #include "CanService.h"
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
+#include "EventProducerService.h"
 #include "EventTeachingService.h"
 
 // constants
@@ -31,9 +32,6 @@ const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 99;          // VLCB module type
-const bool CONSUMER = 1;            // module is an event consumer
-const bool PRODUCER = 1;            // module is an event producer
-const bool CON_OWN = 0;             // module can consume own produced events
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
@@ -48,8 +46,9 @@ VLCB::CanService canService;
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &etService }); // Controller object
+                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
@@ -70,11 +69,12 @@ void setupVLCB()
   modconfig.EE_NUM_NVS = 10;
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 32;
+  modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  modconfig.EE_BYTES_PER_EVENT = (modconfig.EE_NUM_EVS + 4);
+  
 
   // initialise and load configuration
-  modconfig.begin();
+  controller.begin();
 
   Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
@@ -86,8 +86,7 @@ void setupVLCB()
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
-  params.setFlags(CONSUMER | (PRODUCER << 1) | (1 << 2) | (CON_OWN << 4));
-
+ 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);

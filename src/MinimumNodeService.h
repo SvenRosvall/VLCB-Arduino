@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -21,11 +22,14 @@ public:
   virtual void process(UserInterface::RequestedAction requestedAction) override; 
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  virtual byte getServiceID() override { return 1; }
+  virtual byte getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;
+  
+  // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
+  void setSetupMode();
 
 private:
 
@@ -49,6 +53,13 @@ private:
   byte heartbeatSequence = 0;
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
+
+  Processed handleRequestNodeParameters(CANFrame *msg);
+  Processed handleRequestNodeParameter(const CANFrame *msg, unsigned int nn);
+  Processed handleSetNodeNumber(const CANFrame *msg, unsigned int nn);
+  Processed handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn);
+  Processed handleRequestDiagnostics(const CANFrame *msg, unsigned int nn);
+  Processed handleModeMessage(const CANFrame *msg, unsigned int nn);
 };
 
 }

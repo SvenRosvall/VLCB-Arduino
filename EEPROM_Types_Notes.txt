@@ -27,7 +27,7 @@ readEEPROM
 readBytesEEPROM
 writeEEPROM
 writeBytesEEPROM
-resetEEPROM
+reset
 resetModule
 
 Functions that depend on controlling macros
@@ -44,24 +44,24 @@ flash_read_bytes
 Workflow:
 --------
 In Storage classes:
-readEEPROM - reads one byte at given address
-readBytesEEPROM - reads n bytes at given address
-writeEEPROM - writes one byte at given address
-writeBytesEEPROM - writes n bytes at given address
+read - reads one byte at given address
+readBytes - reads n bytes at given address
+write - writes one byte at given address
+writeBytes - writes n bytes at given address
 
 In Configuration:
-readEvent - reads NN+EN for given event index, via readEEPROM() * 4
-getEventVal - reads value for given event value for given event index, via readEEPROM()
-writeEventEV - writes value for a given event value for a given event index, via readEEPROM()
+readEvent - reads NN+EN for given event index, via read() * 4
+getEventVal - reads value for given event value for given event index, via read()
+writeEventEV - writes value for a given event value for a given event index, via read()
 readNV - reads value for given NV index
 writeNV - writes value for given NV index
-writeEvent - writes NN+EN for a given event index, via writeBytesEEPROM()
+writeEvent - writes NN+EN for a given event index, via writeBytes()
 
-setModuleMode - writeEEPROM(0, flag)
-setCANID - writeEEPROM(1, canid)
-setNodeNum - writeEEPROM(2, high NN), writeEEPROM(3, low NN)
+setModuleMode - write(0, flag)
+setCANID - write(1, canid)
+setNodeNum - write(2, high NN), writeEEPROM(3, low NN)
 resetModule - various writes.
 loadNVs - reads currentMode (i=0), CANID (i=1), NN (i=2,3)
-setResetFlag - writeEEPROM(5, 99)
-clearResetFlag - writeEEPROM(5, 0)
-isResetFlagSet - readEEPROM(5)
+setResetFlag - write(5, 99)
+clearResetFlag - write(5, 0)
+isResetFlagSet - read(5)

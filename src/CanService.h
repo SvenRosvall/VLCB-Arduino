@@ -7,6 +7,7 @@
 
 #include "Service.h"
 #include "UserInterface.h"
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -19,7 +20,7 @@ class CanService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override;
-  virtual byte getServiceID() override { return 3; }
+  virtual byte getServiceID() override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(UserInterface::RequestedAction requestedAction) override;
@@ -41,6 +42,9 @@ private:
   static byte getCANID(unsigned long header);
   void checkCANenumTimout();
   byte findFreeCanId();
+
+  Processed handleEnumeration(const CANFrame *msg, unsigned int nn);
+  Processed handleSetCANID(const CANFrame *msg, unsigned int nn);
 };
 
 }

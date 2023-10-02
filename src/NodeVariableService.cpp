@@ -14,7 +14,7 @@ namespace VLCB
 void NodeVariableService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
@@ -23,95 +23,118 @@ Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
 
   switch (opc)
   {
-
     case OPC_NVRD:
       // received NVRD -- read NV by index
-      if (nn == module_config->nodeNum)
-      {
-        if (msg->len < 4)
-        {
-          controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_CMD);
-          return PROCESSED;
-        }
-
-        byte nvindex = msg->data[3];
-        if (nvindex > module_config->EE_NUM_NVS)
-        {
-          controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_NV_IDX);
-          controller->sendCMDERR(CMDERR_INV_NV_IDX);
-        }
-        else
-        {
-          // respond with NVANS
-          controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
-        }
-      }
-
-      return PROCESSED;
+      return handleReadNV(msg, nn);
 
     case OPC_NVSET:
       // received NVSET -- set NV by index
-      // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
-
-      if (nn == module_config->nodeNum)
-      {
-        if (msg->len < 5)
-        {
-          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
-          return PROCESSED;
-        }
-
-        if (msg->data[3] > module_config->EE_NUM_NVS)
-        {
-          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_NV_IDX);
-          controller->sendCMDERR(CMDERR_INV_NV_IDX);
-        }
-        else
-        {
-          // update EEPROM for this NV -- NVs are indexed from 1, not zero
-          module_config->writeNV(msg->data[3], msg->data[4]);
-          // respond with WRACK
-          controller->sendWRACK();
-          // DEBUG_SERIAL << F("> set NV ok") << endl;
-        }
-      }
-
-      return PROCESSED;
+      return handleSetNV(msg, nn);
 
     case OPC_NVSETRD:
       // received NVSETRD -- set NV by index and read
-      // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
-
-      if (nn == module_config->nodeNum)
-      {
-        if (msg->len < 5)
-        {
-          controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
-          return PROCESSED;
-        }
-
-        byte nvindex = msg->data[3];
-        if (nvindex > module_config->EE_NUM_NVS)
-        {
-          controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_NV_IDX);
-          controller->sendCMDERR(CMDERR_INV_NV_IDX);
-        }
-        else
-        {
-          // update EEPROM for this NV -- NVs are indexed from 1, not zero
-          module_config->writeNV(msg->data[3], msg->data[4]);
-
-          // respond with NVANS
-          controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
-          // DEBUG_SERIAL << F("> set NV ok") << endl;
-        }
-      }
-
-      return PROCESSED;
+      return handleSetAndReadNV(msg, nn);
 
     default:
       return NOT_PROCESSED;
   }
+}
+
+Processed NodeVariableService::handleReadNV(const CANFrame *msg, unsigned int nn)
+{
+  if (nn == module_config->nodeNum)
+  {
+    if (msg->len < 4)
+    {
+      controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_CMD);
+      return PROCESSED;
+    }
+
+    byte nvindex = msg->data[3];
+    if (nvindex > module_config->EE_NUM_NVS)
+    {
+      controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_NV_IDX);
+      controller->sendCMDERR(CMDERR_INV_NV_IDX);
+    }
+    else if (nvindex == 0)
+    {
+      controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->EE_NUM_NVS);
+
+      for (int i = 1; i <= module_config->EE_NUM_NVS; ++i)
+      {
+        controller->sendMessageWithNN(OPC_NVANS, i, module_config->readNV(i));
+      }
+    }
+    else
+    {
+      // respond with NVANS
+      controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
+    }
+  }
+
+  return PROCESSED;
+}
+
+Processed NodeVariableService::handleSetNV(const CANFrame *msg, unsigned int nn)
+{
+  // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
+
+  if (nn == module_config->nodeNum)
+  {
+    if (msg->len < 5)
+    {
+      controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
+      return PROCESSED;
+    }
+
+    if (msg->data[3] > module_config->EE_NUM_NVS)
+    {
+      controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_NV_IDX);
+      controller->sendCMDERR(CMDERR_INV_NV_IDX);
+    }
+    else
+    {
+      // update EEPROM for this NV -- NVs are indexed from 1, not zero
+      module_config->writeNV(msg->data[3], msg->data[4]);
+      // respond with WRACK
+      controller->sendWRACK();
+      // DEBUG_SERIAL << F("> set NV ok") << endl;
+    }
+  }
+
+  return PROCESSED;
+}
+
+Processed NodeVariableService::handleSetAndReadNV(const CANFrame *msg, unsigned int nn)
+{
+  // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
+
+  if (nn == module_config->nodeNum)
+  {
+    if (msg->len < 5)
+    {
+      controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_CMD);
+      return PROCESSED;
+    }
+
+    byte nvindex = msg->data[3];
+    if (nvindex > module_config->EE_NUM_NVS)
+    {
+      controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_NV_IDX);
+      controller->sendCMDERR(CMDERR_INV_NV_IDX);
+    }
+    else
+    {
+      // update EEPROM for this NV -- NVs are indexed from 1, not zero
+      module_config->writeNV(msg->data[3], msg->data[4]);
+
+      // respond with NVANS
+      controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
+      // DEBUG_SERIAL << F("> set NV ok") << endl;
+    }
+  }
+
+  return PROCESSED;
 }
 
 }

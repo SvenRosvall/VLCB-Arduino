@@ -16,11 +16,11 @@ class Storage
 public:
   virtual void begin() = 0;
 
-  virtual byte readEEPROM(unsigned int eeaddress) = 0;
-  virtual void writeEEPROM(unsigned int eeaddress, byte data) = 0;
-  virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) = 0;
-  virtual void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes) = 0;
-  virtual void resetEEPROM() = 0;
+  virtual byte read(unsigned int eeaddress) = 0;
+  virtual void write(unsigned int eeaddress, byte data) = 0;
+  virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) = 0;
+  virtual void writeBytes(unsigned int eeaddress, byte src[], byte numbytes) = 0;
+  virtual void reset() = 0;
 };
 
 extern Storage * createDefaultStorageForPlatform();

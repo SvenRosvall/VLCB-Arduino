@@ -14,42 +14,42 @@ class Parameters
 public:
   explicit Parameters(Configuration const & config)
   {
-    params[0] = 20;                     //  0 num params = 20
-    params[1] = MANU_MERG;              //  1 manf = MERG, 165
-    params[4] = config.EE_MAX_EVENTS;   //  4 num events
-    params[5] = config.EE_NUM_EVS;      //  5 num evs per event
-    params[6] = config.EE_NUM_NVS;      //  6 num NVs
-    params[10] = PB_CAN;                // CAN implementation of Controller
-    params[11] = 0x00;
-    params[12] = 0x00;
-    params[13] = 0x00;
-    params[14] = 0x00;
+    params[PAR_NUM] = 20;                     //  0 num params = 20
+    params[PAR_MANU] = MANU_VLCB;              //  1 manf = MERG, 165
+    params[PAR_EVTNUM] = config.EE_MAX_EVENTS;   //  4 num events
+    params[PAR_EVNUM] = config.EE_NUM_EVS;      //  5 num evs per event
+    params[PAR_NVNUM] = config.EE_NUM_NVS;      //  6 num NVs
+    params[PAR_BUSTYPE] = PB_CAN;                // CAN implementation of Controller
+    params[PAR_LOAD] = 0x00;
+    params[PAR_LOAD+1] = 0x00;
+    params[PAR_LOAD+2] = 0x00;
+    params[PAR_LOAD+3] = 0x00;
     initProcessorParams();
   }
 
   void setVersion(char major, char minor, char beta)
   {
-    params[7] = major;                //  7 code major version
-    params[2] = minor;                //  2 code minor version
-    params[20] = beta;                // 20 code beta version
+    params[PAR_MAJVER] = major;                //  7 code major version
+    params[PAR_MINVER] = minor;                //  2 code minor version
+    params[PAR_BETA] = beta;                // 20 code beta version
   }
 
   void setModuleId(byte id)
   {
-    params[3] = id;                   //  3 module id
+    params[PAR_MTYP] = id;                   //  3 module id
   }
 
   void setFlags(byte flags)
   {
-    params[8] = flags;                //  8 flags - FLiM, consumer/producer
+    params[PAR_FLAGS] = flags;                //  8 flags - FLiM, consumer/producer
   }
 
   // Optional: use this to override processor info that is set by default.
   void setProcessor(byte manufacturer, byte id, char const * name)
   {
-    params[9] = id;                  //  9 processor id
-    params[19] = manufacturer;       // 19 processor manufacturer
-    memcpy(params + 15, name, 4);   // 15-18 processor version
+    params[PAR_CPUID] = id;                  //  9 processor id
+    params[PAR_CPUMAN] = manufacturer;       // 19 processor manufacturer
+    memcpy(params + PAR_CPUMID, name, 4);   // 15-18 processor version
   }
 
   unsigned char * getParams()

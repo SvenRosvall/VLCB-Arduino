@@ -12,29 +12,32 @@ namespace VLCB {
 
 class Configuration;
 
-class EventConsumerService : public Service {
+class EventProducerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
+  virtual void process(byte num); 
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
   virtual byte getServiceID() override 
   {
-    return SERVICE_ID_CONSUMER;
+    return SERVICE_ID_PRODUCER;
   }
   virtual byte getServiceVersionID() override 
   {
     return 1;
   }
+  void begin();
+  void sendEvent(bool state, byte index);
+  void sendEvent(bool state, byte index, byte data1);
+  void sendEvent(bool state, byte index, byte data1, byte data2);
+  void sendEvent(bool state, byte index, byte data1, byte data2, byte data3);
 
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
   void (*eventhandler)(byte index, CANFrame *msg);
-  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
-
-  void processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned int en, bool is_on_event);
+ 
+  void setProducedEvents();
 };
 
 }  // VLCB

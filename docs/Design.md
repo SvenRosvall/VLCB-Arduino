@@ -138,17 +138,3 @@ When VLCB checks for next message, it first checks this queue and if it is empty
 the transport object. 
 The queues within the transport object is not used as some implementations might not have 
 any such queues.
-
-### Defining OP-codes
-Most op-codes are defined in "cbusdefs.h".
-We need to add the new OP-codes that VLCB defines.
-
-In VLCB OP-codes are defined per service, plus a few generic ones. 
-Should these op-codes be defined within the service only? 
-This makes it easy to see what op-codes a service shall support. 
-Harder to get an overview of all op-codes and find duplicates. 
-Although duplicates should be resolved in the Opcode Specification.
-
-Continue to reuse "cbusdefs.h" for compatibility or create a new set of opcodes in "VlcbDefs.h"?
-"cbusdefs.h" uses #define and not enums. Enums are nice for type safety.
-Possibly generate "VlcbDefs.h" from the same source as "cbusdef.h" plus VLCB specifics.

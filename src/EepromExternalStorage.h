@@ -20,11 +20,11 @@ public:
   EepromExternalStorage(byte address, TwoWire *bus);
   virtual void begin() override;
 
-  virtual byte readEEPROM(unsigned int eeaddress) override;
-  virtual byte readBytesEEPROM(unsigned int eeaddress, byte nbytes, byte dest[]) override;
-  virtual void writeEEPROM(unsigned int eeaddress, byte data) override;
-  virtual void writeBytesEEPROM(unsigned int eeaddress, byte src[], byte numbytes) override;
-  virtual void resetEEPROM() override;
+  virtual byte read(unsigned int eeaddress) override;
+  virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;
+  virtual void write(unsigned int eeaddress, byte data) override;
+  virtual void writeBytes(unsigned int eeaddress, byte src[], byte numbytes) override;
+  virtual void reset() override;
 
 private:
   byte external_address;

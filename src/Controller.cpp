@@ -85,12 +85,34 @@ void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], by
 void Controller::setParams(unsigned char *mparams)
 {
   _mparams = mparams;
+  byte flags = 0;
+  
+  for (Service * svc : services)
+  {
+    switch (svc->getServiceID())
+    {
+      case SERVICE_ID_MNS:
+        flags |= PF_SD;
+        break;
+      case SERVICE_ID_PRODUCER:
+        flags |= PF_PRODUCER;
+        break;
+      case SERVICE_ID_CONSUMER:
+        flags |= PF_CONSUMER;
+        break;
+    }
+  }
+  if (module_config->currentMode == MODE_NORMAL)
+  {
+    flags |= PF_NORMAL; 
+  }
+  _mparams[PAR_FLAGS] = flags;
 }
 
 //
 /// assign the module name
 //
-void Controller::setName(unsigned char *mname)
+void Controller::setName(const unsigned char *mname)
 {
   _mname = mname;
 }
@@ -121,6 +143,30 @@ void Controller::indicateMode(byte mode)
   if (_ui) {
     _ui->indicateMode(mode);
   }
+  
+  setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
+ 
+  if (mode == MODE_NORMAL) // used by Event Producer Service
+  {
+    setProdEventTable = true;
+  }
+}
+
+void Controller::setParamFlag(unsigned char flag, bool set)
+{ 
+  if (set)
+  {
+    _mparams[PAR_FLAGS] |= flag;
+  }
+  else
+  {
+    _mparams[PAR_FLAGS] &= ~flag;
+  }
+}
+
+void Controller::clearProdEventTableFlag()
+{
+  setProdEventTable = false;
 }
 
 void Controller::indicateActivity()
@@ -129,28 +175,6 @@ void Controller::indicateActivity()
     _ui->indicateActivity();
   }
 }
-
-void Controller::requestMode(byte reqMode)
-{
-  for (Service * svc : services)
-  {
-    if (svc->getServiceID() == 4)
-    {
-      EventTeachingService * etSvc = (EventTeachingService *) svc;
-      
-      if (reqMode == MODE_LEARN)
-      {
-        etSvc->enableLearn();
-      }
-      if (reqMode == MODE_NORMAL)
-      {
-        etSvc->inhibitLearn();
-      }
-      return;
-    }
-  }
-  sendGRSP(OPC_MODE, 4, GRSP_INVALID_SERVICE);
-} 
 
 //
 /// main Controller message processing procedure
@@ -312,6 +336,19 @@ bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
   return sendMessage(&msg);
 }
 
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4)
+{
+  CANFrame msg;
+  msg.len = 7;
+  msg.data[0] = opc;
+  setNN(&msg, module_config->nodeNum);
+  msg.data[3] = b1;
+  msg.data[4] = b2;
+  msg.data[5] = b3;
+  msg.data[6] = b4;
+  return sendMessage(&msg);
+}
+
 bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5)
 {
   CANFrame msg;
@@ -355,7 +392,7 @@ void Controller::startCANenumeration()
   // Find it first.
   for (Service * svc : services)
   {
-    if (svc->getServiceID() == 3)
+    if (svc->getServiceID() == SERVICE_ID_CAN)
     {
       CanService * canSvc = (CanService *) svc;
       canSvc->startCANenumeration();

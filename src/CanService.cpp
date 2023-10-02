@@ -14,7 +14,7 @@ namespace VLCB
 void CanService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
-  this->module_config = cntrl->module_config;
+  this->module_config = cntrl->getModuleConfig();
 }
 
 //
@@ -152,7 +152,6 @@ Processed CanService::handleRawMessage(CANFrame *msg)
   // are we enumerating CANIDs ?
   if (bCANenum && msg->len == 0)
   {
-
     // store this response in the responses array
     if (remoteCANID > 0)
     {
@@ -176,47 +175,54 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
 
     case OPC_CANID:
       // CAN -- set CANID
-      // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
-
-      if (nn == module_config->nodeNum)
-      {
-        // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
-        byte newCANID = msg->data[3];
-        if (newCANID < 1 || newCANID > 99)
-        {
-          controller->sendCMDERR(CMDERR_INV_EN_IDX);
-          controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
-        }
-        else
-        {
-          module_config->setCANID(newCANID);
-          controller->sendWRACK();
-          controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
-        }
-      }
-
-      return PROCESSED;
+      return handleSetCANID(msg, nn);
 
     case OPC_ENUM:
       // received ENUM -- start CAN bus self-enumeration
-      {
-        byte remoteCANID = getCANID(msg->id);
-
-        // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
-        // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
-
-        if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !bCANenum)
-        {
-          // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-          startCANenumeration();
-        }
-      }
-
-      return PROCESSED;
+      return handleEnumeration(msg, nn);
 
     default:
       return NOT_PROCESSED;
   }
+}
+
+Processed CanService::handleSetCANID(const CANFrame *msg, unsigned int nn)
+{
+  // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
+
+  if (nn == module_config->nodeNum)
+  {
+    // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
+    byte newCANID = msg->data[3];
+    if (newCANID < 1 || newCANID > 99)
+    {
+      controller->sendCMDERR(CMDERR_INV_EN_IDX);
+      controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
+    }
+    else
+    {
+      module_config->setCANID(newCANID);
+      controller->sendWRACK();
+      controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
+    }
+  }
+
+  return PROCESSED;
+}
+
+Processed CanService::handleEnumeration(const CANFrame *msg, unsigned int nn)
+{
+  byte remoteCANID = getCANID(msg->id);
+
+  // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
+  // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
+
+  if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !bCANenum)
+  {
+    // DEBUG_SERIAL << F("> initiating enumeration") << endl;
+    startCANenumeration();
+  }
+  return PROCESSED;
 }
 
 }
