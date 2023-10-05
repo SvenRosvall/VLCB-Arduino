@@ -448,7 +448,7 @@ Processed EventTeachingService::handleLearnEventIndex(CANFrame *msg)
         // Writes the first four bytes NN & EN only if they have changed.
         byte eventTableNNEN[4];
         module_config->readEvent(index, eventTableNNEN);
-        if (memcmp(eventTableNNEN, &msg->data[1], 4) == 0)
+        if (memcmp(eventTableNNEN, &msg->data[1], 4) != 0)
         {
           module_config->writeEvent(index, &msg->data[1]);
         }
