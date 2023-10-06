@@ -127,10 +127,10 @@ void setupVLCB()
 {
   // set config layout parameters
   modconfig.EE_NVS_START = 10;
-  modconfig.EE_NUM_NVS = 2;  // An arbitory number to create some NVs.  Not used in this application
+  modconfig.EE_NUM_NVS = NUM_SWITCHES;
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
-  modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
+  modconfig.EE_PRODUCED_EVENTS = 0;
   modconfig.EE_NUM_EVS = NUM_LEDS;
   
   // initialise and load configuration
@@ -238,20 +238,18 @@ void processSwitches(void) {
   for (byte i = 0; i < NUM_SWITCHES; i++) {
     moduleSwitch[i].update();
     if (moduleSwitch[i].changed()) {      
-      byte nn_en[4];
-      modconfig.readEvent(i, nn_en);
-      byte evval = modconfig.getEventEVval(i, 1);
+      byte nv = i+1;
+      byte nvval = modconfig.readNV(nv);
       bool state;
 
-      DEBUG_PRINT(F("> Button ") << i << F(" state change detected"));
-      Serial << F(" EV Value = ") << evval << endl;
+      //DEBUG_PRINT(F("> Button ") << i << F(" state change detected"));
+      //DEBUG_PRINT(F(" NV Value = ") << nvval);
 
-      switch (evval) {
+      switch (nvval) {
         case 0:
           // ON and OFF
           state = (moduleSwitch[i].fell());
-          DEBUG_PRINT(F("> Button ") << i
-                      << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
+          //DEBUG_PRINT(F("> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
           epService.sendEvent(state, i);
           break;
 
@@ -259,7 +257,7 @@ void processSwitches(void) {
           // Only ON
           if (moduleSwitch[i].fell()) {
             state = true;
-            DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
+            //DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
           }
           break;
@@ -268,7 +266,7 @@ void processSwitches(void) {
           // Only OFF
           if (moduleSwitch[i].fell()) {
             state = false;
-            DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
+            //DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
           }
           break;
@@ -278,8 +276,7 @@ void processSwitches(void) {
           if (moduleSwitch[i].fell()) {
             switchState[i] = !switchState[i];
             state = (switchState[i]);
-            DEBUG_PRINT(F("> Button ") << i
-                        << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
+            //DEBUG_PRINT(F("> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
             epService.sendEvent(state, i);
           }
           break;
