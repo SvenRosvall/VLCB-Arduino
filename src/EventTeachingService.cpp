@@ -453,6 +453,10 @@ Processed EventTeachingService::handleLearnEventIndex(CANFrame *msg)
           module_config->writeEvent(index, &msg->data[1]);
         }
 
+        if (evIndex == 0)  // Not a valid evIndex
+        {
+          evIndex = 1;
+        }
         module_config->writeEventEV(index, evIndex, evVal);
 
         // recreate event hash table entry
