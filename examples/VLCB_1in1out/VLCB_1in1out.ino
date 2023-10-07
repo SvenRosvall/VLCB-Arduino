@@ -196,7 +196,7 @@ void loop()
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
 /// then send a long VLCB event with opcode ACON for on and ACOF for off
-/// event number (EN) is 1
+/// event number (EN) is 0 as event indices start at 0.
 
 /// you can just watch for this event in FCU or JMRI, or teach it to another VLCB consumer module
 //
@@ -205,7 +205,7 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte eventNumber = 1;
+    byte eventNumber = 0;  // First switch has an event index of 0
     epService.sendEvent(state, eventNumber);
   }
 }
