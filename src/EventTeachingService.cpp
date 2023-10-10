@@ -455,7 +455,7 @@ Processed EventTeachingService::handleLearnEventIndex(CANFrame *msg)
 
         if (evIndex == 0)  // Not a valid evIndex
         {
-          evIndex = 1;
+          controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_INVALID_COMMAND_PARAMETER);
         }
         module_config->writeEventEV(index, evIndex, evVal);
 
