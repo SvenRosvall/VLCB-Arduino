@@ -91,6 +91,11 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
   case OPC_REQEV:
     // B2 - Read event variable in learn mode
     return handleRequestEventVariable(msg, nn, en);
+    
+  default:
+    // unknown or unhandled OPC
+    // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
+    return NOT_PROCESSED;
   }
 }
 
