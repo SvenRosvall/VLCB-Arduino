@@ -130,7 +130,7 @@ void setupVLCB()
   modconfig.EE_NUM_NVS = NUM_SWITCHES;
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
-  modconfig.EE_PRODUCED_EVENTS = 0;
+  modconfig.EE_PRODUCED_EVENTS = 4;
   modconfig.EE_NUM_EVS = NUM_LEDS;
   
   // initialise and load configuration
