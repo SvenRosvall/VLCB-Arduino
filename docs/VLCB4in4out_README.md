@@ -22,17 +22,21 @@ for use with an Uno but can easily be adapted for use with other Arduino types.
 
 If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
 
-Digital pin 2          Interupt CAN
-Digital pin 10 (SS)    CS    CAN
-Digital pin 11 (MOSI)  SI    CAN
-Digital pin 12 (MISO)  SO    CAN
-Digital pin 13 (SCK)   Sck   CAN
+Pin | Description
+--- | ---
+Digital pin 2 | Interupt CAN
+Digital pin 10| (SS)    CS    CAN
+Digital pin 11| (MOSI)  SI    CAN
+Digital pin 12| (MISO)  SO    CAN
+Digital pin 13| (SCK)   Sck   CAN
 
 Using the CAN Shield, the following pins are used for VLCB Initialisation:
 
-Digital pin 4          VLCB Green LED
-Digital pin 7          VLCB Yellow LED
-Digital pin 8          VLCB Switch
+Pin | Description
+--- | ---
+Digital pin 4 | VLCB Green LED
+Digital pin 7 | VLCB Yellow LED
+Digital pin 8 | VLCB Switch
 
 **It is the users responsibility that the total current that the Arduino is asked to supply 
 stays within the capacity of the on board regulator.  Failure to do this will result in 
