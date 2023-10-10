@@ -43,8 +43,6 @@ void EventProducerService::setProducedEvents()
       data[3] = i;
       
       module_config->writeEvent(i, data);  //index = i
-      module_config->writeEventEV(i, 1, 1);  //set this event as a producer (ev value of 0 would be a consumer)
-      module_config->writeEventEV(i, 2, 0);  //set default produced event type
       module_config->updateEvHashEntry(i);
     }
   }    
