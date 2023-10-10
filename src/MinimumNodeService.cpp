@@ -204,15 +204,14 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // only respond if in transition to Normal
 
       // respond with NAME
-      if (bModeSetup)
+      if (bModeSetup || (controller->getParam(PAR_FLAGS) & 0b00100000))
       {
         msg->len = 8;
         msg->data[0] = OPC_NAME;
         memcpy(msg->data + 1, controller->getModuleName(), 7);
         controller->sendMessage(msg);
-        return PROCESSED;
       }
-      return NOT_PROCESSED;
+      return PROCESSED;
 
     case OPC_RQSD:
       // 78 - Request Service Definitions.

@@ -91,26 +91,6 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
   case OPC_REQEV:
     // B2 - Read event variable in learn mode
     return handleRequestEventVariable(msg, nn, en);
-
-  case OPC_RQMN:
-    // 11 - request for node module name, excluding "CAN" prefix
-    // DEBUG_SERIAL << F("> RQMN received") << endl;
-
-    // only respond if in Learn
-    // respond with NAME
-    if (bLearn)
-    {
-      msg->len = 8;
-      msg->data[0] = OPC_NAME;
-      memcpy(msg->data + 1, controller->getModuleName(), 7);
-      controller->sendMessage(msg);
-    }
-    return PROCESSED;
-    
-  default:
-    // unknown or unhandled OPC
-    // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
-    return NOT_PROCESSED;
   }
 }
 
