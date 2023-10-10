@@ -67,13 +67,16 @@ OP_CODE | HEX | Function
 #### Consumed Events
 
 Event Variables control the action to take when a consumed event is received.
-The number of Event Variables (EV) is equal to the number of LEDs plus 1.
+The number of Event Variables (EV) is equal to the number of LEDs.
 
-The remaining Event Variables control the LEDs. 
-Event Variable 2 (EV2) controls the first LED pin in the ```LED``` array. 
-EV3 controls the second LED pin, etc.
+Event Variable 1 (EV1) controls the first LED pin in the ```LED``` array. 
+EV2 controls the second LED pin, etc.
 
-The following EV values are defined to control the LEDs:
+The LEDs are controlled by the LEDContro class.  This allows for any LED to be
+switched on, switched off or flashed at a rate determined in the call:
+LEDControl::flash(unsigned int period)
+
+The following EV values are defined to control the LEDs in this example:
 
  EV Value | Function
 --------|-----------
@@ -118,7 +121,7 @@ is enabled from the menu bar Settings / Advance / Debug Mode. There will now be 
 window at the bottom of the page called "Cbus message".
 
 The module is first put into Teach Mode using the opcode 76.  The message to send is:
-76nn08 where nn are the two bytes of the node number in hex.  Remember thes are bytes and
+76nn08 where nn are the two bytes of the node number in hex.  Remember these are bytes and
 so nn will be 4 characters long.
 
 Next, the module is taught the short event using the "learn an event using event index"
