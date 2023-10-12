@@ -201,11 +201,11 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // sent during module transition, so no node number check
       // DEBUG_SERIAL << F("> RQMN received") << endl;
 
-      // only respond if in transition to Normal
+      // only respond if in transition to Normal, i.e. Setup mode, or in learn mode.
 
-      // respond with NAME
-      if (bModeSetup || (controller->getParam(PAR_FLAGS) & 0b00100000))
+      if (bModeSetup || (controller->getParam(PAR_FLAGS) & PF_LRN))
       {
+        // respond with NAME
         msg->len = 8;
         msg->data[0] = OPC_NAME;
         memcpy(msg->data + 1, controller->getModuleName(), 7);

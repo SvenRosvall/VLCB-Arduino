@@ -416,7 +416,7 @@ void testReadNodeParameterShortMessage()
   assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
-void testModuleName()
+void testModuleNameSetup()
 {
   test();
 
@@ -437,6 +437,22 @@ void testModuleName()
   assertEquals(moduleName[4], mockTransport->sent_messages[0].data[5]);
   assertEquals(moduleName[5], mockTransport->sent_messages[0].data[6]);
   assertEquals(moduleName[6], mockTransport->sent_messages[0].data[7]);
+}
+
+void testModuleNameLearn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.setParamFlag(PF_LRN, true); // Should really use the event teaching service here.
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NAME, mockTransport->sent_messages[0].data[0]);
 }
 
 void testModuleNameNormal()
@@ -587,7 +603,8 @@ void testMinimumNodeService()
   testReadNodeParameterModuleId();
   testReadNodeParameterInvalidIndex();
   testReadNodeParameterShortMessage();
-  testModuleName();
+  testModuleNameSetup();
+  testModuleNameLearn();
   testModuleNameNormal();
   testHeartBeat();
   testServiceDiscovery();
