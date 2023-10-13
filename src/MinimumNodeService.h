@@ -30,6 +30,7 @@ public:
   // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
   void setSetupMode();
+  void setUninitialised();
 
 private:
 
@@ -44,7 +45,6 @@ private:
   void checkModeChangeTimeout();
   void initSetup();
   void setNormal();
-  void setUninitialised();
   void initSetupFromNormal();
 
   void heartbeat();

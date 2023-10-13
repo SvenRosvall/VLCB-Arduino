@@ -38,6 +38,10 @@ enum ModuleMode {
   MODE_UNINITIALISED = 0,
   MODE_NORMAL = 1,
   MODE_SETUP = 2,
+  
+  // Minor modes
+  MODE_HEARTBEAT_ON = 0x0C,
+  MODE_HEARTBEAT_OFF = 0x0D,
 };
 
 //

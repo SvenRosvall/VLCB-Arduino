@@ -423,6 +423,14 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
   if (nn != module_config->nodeNum)
   {
+    // Not for this module.
+    return PROCESSED;
+  }
+  if (instantMode == MODE_SETUP)
+  {
+    // Cannot leave Setup mode with MODE request.
+    // Can only leave Setup with SNN (-> Normal) or timeout (-> Uninitialized)
+    controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
     return PROCESSED;
   }
   if (msg->len < 4)
@@ -434,31 +442,57 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
   byte requestedMode = msg->data[3];
   //DEBUG_SERIAL << F("> MODE -- requested = ") << requestedMode << endl;
   //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
-  if (instantMode != MODE_NORMAL)
-  {
-    return PROCESSED;
-  }
 
   switch (requestedMode)
   {
     case 0xFF:
-      // Request Uninitialised
+      // Request factory reset mode
       controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
       return PROCESSED;
 
-    case 0x00:
+    case MODE_UNINITIALISED:
+      // Cannot change to uninitialized mode.      
+      controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+      return PROCESSED;
+      
+    case MODE_SETUP:
       // Request Setup
-      controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-      initSetupFromNormal();
+      if (instantMode == VLCB::MODE_NORMAL && module_config->nodeNum != 0)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        initSetupFromNormal();
+      }
+      else if (instantMode == VLCB::MODE_UNINITIALISED)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        initSetup();
+      }
+      else if (instantMode == VLCB::MODE_SETUP)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+      }
+      // Else instantMode is in an unrecognised mode.
+      return PROCESSED;
+      
+    case MODE_NORMAL:
+      // Request Normal. Only OK if we are already in Normal mode.
+      if (instantMode == VLCB::MODE_NORMAL)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+      }
+      else
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+      }
       return PROCESSED;
 
-    case 0x0C:
+    case MODE_HEARTBEAT_ON:
       // Turn on Heartbeat
       noHeartbeat = false;
       module_config->setHeartbeat(!noHeartbeat);
       return PROCESSED;
 
-    case 0x0D:
+    case MODE_HEARTBEAT_OFF:
       // Turn off Heartbeat
       noHeartbeat = true;
       module_config->setHeartbeat(!noHeartbeat);
