@@ -454,21 +454,22 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
 
     case MODE_SETUP:
       // Request Setup
-      if (instantMode == VLCB::MODE_NORMAL && module_config->nodeNum != 0)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-        initSetupFromNormal();
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetupFromNormal();
+          return PROCESSED;
+      
+        case MODE_UNINITIALISED:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetup();
+          return PROCESSED;
+
+        default:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          return PROCESSED;
       }
-      else if (instantMode == VLCB::MODE_UNINITIALISED)
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-        initSetup();
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
-      }
-      return PROCESSED;
       
     case MODE_NORMAL:
       // Request Normal. Only OK if we are already in Normal mode.
