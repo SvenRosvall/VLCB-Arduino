@@ -426,13 +426,7 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
     // Not for this module.
     return PROCESSED;
   }
-  if (instantMode == MODE_SETUP)
-  {
-    // Cannot leave Setup mode with MODE request.
-    // Can only leave Setup with SNN (-> Normal) or timeout (-> Uninitialized)
-    controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
-    return PROCESSED;
-  }
+
   if (msg->len < 4)
   {
     controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
@@ -445,16 +439,19 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
 
   switch (requestedMode)
   {
-    case 0xFF:
+    case MODE_UNINITIALISED:
       // Request factory reset mode
-      controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+      if (instantMode == VLCB::MODE_SETUP)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        setUninitialised();
+      }
+      else
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+      }
       return PROCESSED;
 
-    case MODE_UNINITIALISED:
-      // Cannot change to uninitialized mode.      
-      controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
-      return PROCESSED;
-      
     case MODE_SETUP:
       // Request Setup
       if (instantMode == VLCB::MODE_NORMAL && module_config->nodeNum != 0)
@@ -467,11 +464,10 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
         controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
         initSetup();
       }
-      else if (instantMode == VLCB::MODE_SETUP)
+      else
       {
         controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
       }
-      // Else instantMode is in an unrecognised mode.
       return PROCESSED;
       
     case MODE_NORMAL:

@@ -627,6 +627,34 @@ void testModeSetupToNormal()
   assertEquals(OPC_MODE, mockTransport->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
   assertEquals(GRSP_INVALID_MODE, mockTransport->sent_messages[0].data[5]);
+
+  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0, configuration->nodeNum);
+}
+
+void testModeSetupToUnininitialized()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setUninitialised();
+  minimumNodeService->setSetupMode();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_UNINITIALISED}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(GRSP_OK, mockTransport->sent_messages[0].data[5]);
+
+  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0, configuration->nodeNum);
 }
 
 void testModeNormalToSetup()
@@ -699,6 +727,24 @@ void testModeSetupToOtherThanNormal()
   assertEquals(GRSP_INVALID_MODE, mockTransport->sent_messages[0].data[5]);
 }
 
+void testModeNormalToNormal()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, VLCB::MODE_NORMAL}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
+  assertEquals(GRSP_OK, mockTransport->sent_messages[0].data[5]);
+}
+
 void testModeShortMessage()
 {
   test();
@@ -748,8 +794,10 @@ void testMinimumNodeService()
   testServiceDiscoveryShortMessage();
   testModeUninitializedToSetup();
   testModeSetupToNormal();
+  testModeSetupToUnininitialized();
   testModeNormalToSetup();
   testModeUninitializedToOtherThanSetup();
   testModeSetupToOtherThanNormal();
+  testModeNormalToNormal();
   testModeShortMessage();
 }
