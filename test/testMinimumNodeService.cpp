@@ -69,8 +69,8 @@ void testUninitializedRequestNodeNumber()
   assertEquals(0, mockTransport->sent_messages[0].data[1]);
   assertEquals(0, mockTransport->sent_messages[0].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
 }
 
@@ -95,7 +95,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   assertEquals(0, mockTransport->sent_messages[0].data[1]);
   assertEquals(0, mockTransport->sent_messages[0].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
 
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
@@ -106,8 +106,8 @@ void testUninitializedRequestNodeNumberMissingSNN()
   assertEquals(0, mockTransport->sent_messages.size());
   //assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
 
-  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
 }
 
@@ -130,8 +130,8 @@ void testNormalRequestNodeNumber()
   assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, configuration->currentMode);
   assertEquals(0x104, configuration->nodeNum);
 }
 
@@ -156,7 +156,7 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
 
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
@@ -169,8 +169,8 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
 
-  assertEquals(VLCB::MODE_NORMAL, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, configuration->currentMode);
   assertEquals(0x104, configuration->nodeNum);
 }
 
@@ -193,8 +193,8 @@ void testReleaseNodeNumberByUI()
   assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, configuration->currentMode);
 
   // Module will hold on to node number in case setup times out.
   assertEquals(0x104, configuration->nodeNum);
@@ -217,7 +217,7 @@ void testRequestNodeNumberElsewhere()
   assertEquals(0, mockTransport->sent_messages.size());
 
   // TODO: Need a better way of determining the instantMode.
-  assertEquals(VLCB::MODE_NORMAL, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
 }
 
 void testSetNodeNumber()
@@ -588,7 +588,7 @@ void testModeUninitializedToSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -604,8 +604,8 @@ void testModeUninitializedToSetup()
   assertEquals(0, mockTransport->sent_messages[1].data[1]);
   assertEquals(0, mockTransport->sent_messages[1].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
 }
 
@@ -617,7 +617,7 @@ void testModeSetupToNormal()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -628,8 +628,8 @@ void testModeSetupToNormal()
   assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
   assertEquals(GRSP_INVALID_MODE, mockTransport->sent_messages[0].data[5]);
 
-  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
 }
 
@@ -641,7 +641,7 @@ void testModeSetupToUnininitialized()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_UNINITIALISED}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -652,8 +652,8 @@ void testModeSetupToUnininitialized()
   assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
   assertEquals(GRSP_OK, mockTransport->sent_messages[0].data[5]);
 
-  assertEquals(VLCB::MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
 }
 
@@ -663,7 +663,7 @@ void testModeNormalToSetup()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, VLCB::MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -683,8 +683,8 @@ void testModeNormalToSetup()
   assertEquals(0x01, mockTransport->sent_messages[2].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[2].data[2]);
 
-  assertEquals(VLCB::MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(VLCB::MODE_NORMAL, configuration->currentMode);
+  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, configuration->currentMode);
   assertEquals(0x104, configuration->nodeNum);
 }
 
@@ -695,7 +695,7 @@ void testModeUninitializedToOtherThanSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -715,7 +715,7 @@ void testModeSetupToOtherThanNormal()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, VLCB::MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -733,7 +733,7 @@ void testModeNormalToNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, VLCB::MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();

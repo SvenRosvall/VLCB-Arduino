@@ -441,7 +441,7 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
   {
     case MODE_UNINITIALISED:
       // Request factory reset mode
-      if (instantMode == VLCB::MODE_SETUP)
+      if (instantMode == MODE_SETUP)
       {
         controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
         setUninitialised();
@@ -473,7 +473,7 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
       
     case MODE_NORMAL:
       // Request Normal. Only OK if we are already in Normal mode.
-      if (instantMode == VLCB::MODE_NORMAL)
+      if (instantMode == MODE_NORMAL)
       {
         controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
       }

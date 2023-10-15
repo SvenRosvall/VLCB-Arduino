@@ -9,6 +9,7 @@
 
 #include <UserInterface.h>
 #include "Storage.h"
+#include "vlcbdefs.hpp"
 
 namespace VLCB
 {
@@ -29,19 +30,6 @@ enum EepromLocations {
 enum FlagBits {
   HEARTBEAT_BIT = 0,
   EVENT_ACK_BIT = 1,
-};
-
-//
-/// Controller modes
-//
-enum ModuleMode {
-  MODE_UNINITIALISED = 0xFF,
-  MODE_SETUP = 0,
-  MODE_NORMAL = 1,
-  
-  // Minor modes
-  MODE_HEARTBEAT_ON = 0x0C,
-  MODE_HEARTBEAT_OFF = 0x0D,
 };
 
 //
@@ -76,7 +64,7 @@ public:
   void resetModule();
 
   void setCANID(byte canid);
-  void setModuleMode(ModuleMode m);
+  void setModuleMode(VlcbModeParams m);
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
   void setEventAck(bool ea);
@@ -96,7 +84,7 @@ public:
   bool heartbeat;
   bool eventAck;
   byte CANID;
-  ModuleMode currentMode;
+  VlcbModeParams currentMode;
   unsigned int nodeNum;
 
   // These functions shouldn't be here. But keep them for now.

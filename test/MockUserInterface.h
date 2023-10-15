@@ -9,6 +9,7 @@
 
 #include "UserInterface.h"
 #include "Configuration.h"
+#include "vlcbdefs.hpp"
 
 class MockUserInterface : public VLCB::UserInterface
 {
@@ -26,5 +27,5 @@ public:
 
 private:
   RequestedAction requestedAction = NONE;
-  byte indicatedMode = VLCB::MODE_UNINITIALISED;
+  byte indicatedMode = MODE_UNINITIALISED;
 };

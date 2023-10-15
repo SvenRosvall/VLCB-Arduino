@@ -105,12 +105,12 @@ Processed EventTeachingService::handleLearnMode(const CANFrame *msg)
   byte requestedMode = msg->data[3];
   switch (requestedMode)
   {
-    case 0x08:
+    case MODE_LEARN_ON:
       // Turn on Learn Mode
       enableLearn();
       return PROCESSED;
 
-    case 0x09:
+    case MODE_LEARN_OFF:
       // Turn off Learn Mode
       inhibitLearn();
       return PROCESSED;

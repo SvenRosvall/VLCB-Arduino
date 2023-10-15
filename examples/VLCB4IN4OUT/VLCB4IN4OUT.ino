@@ -152,7 +152,7 @@ void setupVLCB()
   controller.setName(mname);
 
   // module reset - if switch is depressed at startup and module is in Uninitialised mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_UNINITIALISED)
+  if (userInterface.isButtonPressed() && modconfig.currentMode == MODE_UNINITIALISED)
   {
     Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
     modconfig.resetModule(&userInterface);
@@ -376,7 +376,7 @@ void processSerialInput()
 
         // node identity
         Serial << F("> VLCB node configuration") << endl;
-        Serial << F("> mode = ") << (modconfig.currentMode == VLCB::MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
+        Serial << F("> mode = ") << (modconfig.currentMode == MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
         Serial << endl;
         break;
 
