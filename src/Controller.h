@@ -60,12 +60,12 @@ public:
   }
   
   void begin();
-  bool sendMessageWithNN(int opc);
-  bool sendMessageWithNN(int opc, byte b1);
-  bool sendMessageWithNN(int opc, byte b1, byte b2);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+  inline bool sendMessageWithNN(int opc);
+  inline bool sendMessageWithNN(int opc, byte b1);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
   void sendGRSP(byte opCode, byte serviceType, byte errCode);
@@ -97,6 +97,39 @@ private:                                          // protected members become pr
 
   bool filterByOpcodes(const CANFrame *msg) const;
   void callFrameHandler(CANFrame *msg);
+  bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
+  bool sendMessageWithNNandData(int opc, int len, ...);
 };
+
+
+bool Controller::sendMessageWithNN(int opc)
+{
+  return sendMessageWithNNandData(opc);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1)
+{
+  return sendMessageWithNNandData(opc, 1, b1);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2)
+{
+  return sendMessageWithNNandData(opc, 2, b1, b2);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
+{
+  return sendMessageWithNNandData(opc, 3, b1, b2, b3);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4)
+{
+  return sendMessageWithNNandData(opc, 4, b1, b2, b3, b4);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  return sendMessageWithNNandData(opc, 5, b1, b2, b3, b4, b5);
+}
 
 }
