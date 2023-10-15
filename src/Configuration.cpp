@@ -61,7 +61,7 @@ void Configuration::begin()
   makeEvHashTable();  
 }
 
-void Configuration::setModuleMode(ModuleMode f)
+void Configuration::setModuleMode(CbusModeParams f)
 {
   currentMode = f;
   storage->write(LOCATION_MODE, f);
@@ -639,7 +639,7 @@ void Configuration::resetModule()
 //
 void Configuration::loadNVs()
 {
-  currentMode = (ModuleMode) (storage->read(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
+  currentMode = (CbusModeParams) (storage->read(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
   CANID = storage->read(LOCATION_CANID);
   nodeNum = (storage->read(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->read(LOCATION_NODE_NUMBER_LOW);
   heartbeat = storage->read(LOCATION_FLAGS) & (1 << HEARTBEAT_BIT);

@@ -33,7 +33,7 @@ VLCB::Controller createController(const std::initializer_list<VLCB::Service *> s
   configuration->EE_MAX_EVENTS = 20;
   configuration->EE_PRODUCED_EVENTS = 1;
   configuration->EE_NUM_EVS = 2;
-  configuration->setModuleMode(VLCB::MODE_NORMAL);
+  configuration->setModuleMode(MODE_NORMAL);
   configuration->setNodeNum(0x0104);
   static std::unique_ptr<VLCB::Parameters> params;
   params.reset(new VLCB::Parameters(*configuration));

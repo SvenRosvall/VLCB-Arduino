@@ -545,6 +545,28 @@ enum CbusParamFlags
   PF_SD = 64, // Module supports Service Discovery
 };
 
+enum CbusModeParams
+{
+  // 
+  // Parameters to the MODE op-code
+  // 
+  // Exclusive modes
+  MODE_UNINITIALISED = 0xFF, // Uninitialised / factory settings
+  MODE_SETUP = 0, // Set up mode
+  MODE_NORMAL = 1, // Normal operation mode
+  // Event Teaching Service modes
+  MODE_LEARN_ON = 0x08, // Turn on learn mode
+  MODE_LEARN_OFF = 0x09, // Turn off learn mode
+  // Event Acknowledgment Service modes
+  MODE_EVENT_ACK_ON = 0x0A, // Turn on event acknowledgements
+  MODE_EVENT_ACK_OFF = 0x0B, // Turn off event acknowledgements
+  // Minimum Node Service modes
+  MODE_HEARTBEAT_ON = 0x0C, // Turn on heartbeat
+  MODE_HEARTBEAT_OFF = 0x0D, // Turn off heartbeat
+  // Boot modes
+  MODE_BOOT = 0x0E, // PIC Boot loader mode
+};
+
 enum CbusBusTypes
 {
   // 
