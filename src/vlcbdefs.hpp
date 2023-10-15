@@ -545,7 +545,7 @@ enum CbusParamFlags
   PF_SD = 64, // Module supports Service Discovery
 };
 
-enum CbusModeParams
+enum VlcbModeParams
 {
   // 
   // Parameters to the MODE op-code

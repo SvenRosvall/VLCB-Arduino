@@ -64,7 +64,7 @@ public:
   void resetModule();
 
   void setCANID(byte canid);
-  void setModuleMode(CbusModeParams m);
+  void setModuleMode(VlcbModeParams m);
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
   void setEventAck(bool ea);
@@ -84,7 +84,7 @@ public:
   bool heartbeat;
   bool eventAck;
   byte CANID;
-  CbusModeParams currentMode;
+  VlcbModeParams currentMode;
   unsigned int nodeNum;
 
   // These functions shouldn't be here. But keep them for now.
