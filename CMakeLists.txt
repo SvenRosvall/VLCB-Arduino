@@ -31,6 +31,7 @@ add_library(hardware_library OBJECT
         src/FlashStorage.h
         src/LEDUserInterface.cpp
         src/LEDUserInterface.h
+        src/SerialUserInterface.cpp
 )
 
 add_library(core_library OBJECT
