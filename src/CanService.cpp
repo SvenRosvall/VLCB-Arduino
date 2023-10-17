@@ -156,7 +156,7 @@ Processed CanService::handleRawMessage(CANFrame *msg)
     if (remoteCANID > 0)
     {
       // fix to correctly record the received CANID
-      bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
+      bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
       // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
     }
 
