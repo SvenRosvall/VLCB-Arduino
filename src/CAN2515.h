@@ -66,7 +66,6 @@ public:
   unsigned int _numMsgsSent, _numMsgsRcvd;
 
 private:
-  void initMembers();
   Controller * controller;
   unsigned long _osc_freq;
   byte _csPin, _intPin;
