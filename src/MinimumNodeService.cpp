@@ -365,28 +365,16 @@ Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *ms
         controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
       }
     }
-    else
+    else if (serviceIndex <= controller->getServices().size())
     {
       // Request for details of a single service.
-      byte svcIndex = 0;
-      Service *theService = NULL;
-      for (auto svc: controller->getServices())
-      {
-        if (++svcIndex == serviceIndex)
-        {
-          theService = svc;
-          break;
-        }
-      }
-      if (theService)
-      {
-        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
-      }
-      else
-      {
-        // Couldn't find the service.
-        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+    }
+    else
+    {
+      // Couldn't find the service.
+      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }
   }
 
@@ -402,17 +390,18 @@ Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsi
       controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
       return PROCESSED;
     }
-    byte svcIndex = msg->data[3];
-    for (Service *svc: controller->getServices())
+    byte serviceIndex = msg->data[3];
+    if (serviceIndex <= controller->getServices().size())
     {
-      if (svc->getServiceID() == svcIndex)
-      {
-        byte diagnosticCode = msg->data[4];
-        // TODO: more stuff to go in here    
-        return PROCESSED;
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      byte diagnosticCode = msg->data[4];
+      // TODO: more stuff to go in here    
+      return PROCESSED;
     }
-    controller->sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+    else
+    {
+      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_SERVICE);
+    }
   }
 
   return PROCESSED;
