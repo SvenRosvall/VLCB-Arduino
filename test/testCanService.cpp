@@ -3,7 +3,9 @@
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
-// Test cases for NodeVariableService.
+// Test cases for CanService.
+// * Service Discovery
+// * CANID enumeration
 
 #include <memory>
 #include "TestTools.hpp"
@@ -74,10 +76,38 @@ void testServiceDiscoveryCanSvc()
   // Not testing service data bytes.
 }
 
+void testRtrMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.getModuleConfig()->CANID = 3;
+
+  VLCB::CANFrame msg = {0x11, false, true, 0, {}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Verify sent messages.
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(0, mockTransport->sent_messages[0].len);
+  assertEquals(false, mockTransport->sent_messages[0].rtr);
+  assertEquals(3, mockTransport->sent_messages[0].id);
+}
+
 }
 
 void testCanService()
 {
   testServiceDiscovery();
   testServiceDiscoveryCanSvc();
+//  testCanidEnumerationOnPowerUp();
+//  testCanidEnumerationOnSetUp();
+//  testCanidEnumerationOnFirstSentMessage();
+//  testCanidEnumerationOnConflict();
+//  testCanidEnumerationOnENUM(); // Deprecated
+  testRtrMessage();
+//  testFindFreeCanidOnEmptyBus();
+//  testFindFreeCanidOnPopulatedBus();
+//  testCANID(); // Deprecated
 }

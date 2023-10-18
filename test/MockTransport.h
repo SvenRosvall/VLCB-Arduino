@@ -10,7 +10,7 @@
 #include <deque>
 #include <vector>
 #include "Transport.h"
-#include "Controller.h" // for CANFrame
+#include "Controller.h"
 
 class MockTransport : public VLCB::Transport
 {
@@ -25,4 +25,7 @@ public:
 
   std::deque<VLCB::CANFrame> incoming_messages;
   std::vector<VLCB::CANFrame> sent_messages;
+  
+private:
+  VLCB::Controller * controller;
 };
