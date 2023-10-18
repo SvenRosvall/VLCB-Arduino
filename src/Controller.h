@@ -53,9 +53,9 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
   bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
   {
+    indicateActivity();
     return transport->sendMessage(msg, rtr, ext, priority);
   }
   
