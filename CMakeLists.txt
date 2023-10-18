@@ -83,6 +83,7 @@ add_executable(testAll
         test/testAll.cpp
         test/testMinimumNodeService.cpp
         test/testNodeVariableService.cpp
+        test/testCanService.cpp
         test/MockUserInterface.cpp
         test/MockTransport.cpp
         test/MockStorage.cpp
