@@ -39,7 +39,6 @@ private:
   unsigned long CANenumTime;
   byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
 
-  static byte getCANID(unsigned long header);
   void checkCANenumTimout();
   byte findFreeCanId();
 
