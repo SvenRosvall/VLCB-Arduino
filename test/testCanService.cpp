@@ -14,13 +14,14 @@
 #include "CanService.h"
 #include "Parameters.h"
 #include "VlcbCommon.h"
+#include "ArduinoMock.hpp"
 
 namespace
 {
+std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 VLCB::Controller createController()
 {
-  static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
   static std::unique_ptr<VLCB::CanService> canService;
@@ -76,6 +77,36 @@ void testServiceDiscoveryCanSvc()
   // Not testing service data bytes.
 }
 
+void testCanidEnumerationOnUserAction()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  minimumNodeService->setSetupMode();
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
+
+  // Check that CANID is unset on creation.
+  assertEquals(0, controller.getModuleCANID());
+
+  controller.process();
+
+  // Expect message to make other modules report their CANID's
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(true, mockTransport->sent_messages[0].rtr);
+  assertEquals(0, mockTransport->sent_messages[0].len);
+
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+  addMillis(101);
+  mockTransport->sent_messages.clear();
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Expect first available CANID
+  assertEquals(1, controller.getModuleCANID());
+}
+
 void testRtrMessage()
 {
   test();
@@ -101,13 +132,13 @@ void testCanService()
 {
   testServiceDiscovery();
   testServiceDiscoveryCanSvc();
+  testCanidEnumerationOnUserAction();
 //  testCanidEnumerationOnPowerUp();
 //  testCanidEnumerationOnSetUp();
 //  testCanidEnumerationOnFirstSentMessage();
 //  testCanidEnumerationOnConflict();
 //  testCanidEnumerationOnENUM(); // Deprecated
   testRtrMessage();
-//  testFindFreeCanidOnEmptyBus();
 //  testFindFreeCanidOnPopulatedBus();
 //  testCANID(); // Deprecated
 }
