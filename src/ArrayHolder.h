@@ -29,6 +29,9 @@ public:
   // One past the last element.
   constexpr const E*
   end() const noexcept { return begin() + size(); }
+  
+  constexpr const E
+  operator[](size_t index) const noexcept { return array[index]; }
 
 private:
   static E* copyArray(const E * a, size_t len);
