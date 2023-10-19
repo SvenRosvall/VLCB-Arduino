@@ -180,6 +180,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (bModeSetup)
       {
         bModeSetup = false;
+        instantMode = module_config->currentMode;
         controller->indicateMode(module_config->currentMode);
       }
       return PROCESSED;
