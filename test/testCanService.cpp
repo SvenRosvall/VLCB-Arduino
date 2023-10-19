@@ -90,13 +90,14 @@ void testCanidEnumerationOnUserAction()
   assertEquals(0, controller.getModuleCANID());
 
   controller.process();
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(true, mockTransport->sent_messages[0].rtr);
   assertEquals(0, mockTransport->sent_messages[0].len);
 
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+  // Processing after enumeration timeout
   addMillis(101);
   mockTransport->sent_messages.clear();
   controller.process();
@@ -126,6 +127,48 @@ void testRtrMessage()
   assertEquals(3, mockTransport->sent_messages[0].id);
 }
 
+void testFindFreeCanidOnPopulatedBus()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  minimumNodeService->setSetupMode();
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
+
+  // Check that CANID is unset on creation.
+  assertEquals(0, controller.getModuleCANID());
+
+  controller.process();
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+
+  // Expect message to make other modules report their CANID's
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(true, mockTransport->sent_messages[0].rtr);
+  assertEquals(0, mockTransport->sent_messages[0].len);
+  mockTransport->sent_messages.clear();
+
+  // Simulate other nodes
+  for (byte remoteCanid = 1 ; remoteCanid <= 19 ; ++remoteCanid)
+  {
+    VLCB::CANFrame msg = {remoteCanid, false, false, 0, {}};
+    mockTransport->setNextMessage(msg);
+    controller.process();
+    mockTransport->incoming_messages.clear();
+  }
+  assertEquals(0, mockTransport->sent_messages.size());
+  
+  // Processing after enumeration timeout
+  addMillis(101);
+  mockTransport->sent_messages.clear();
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Expect first available CANID
+  assertEquals(20, controller.getModuleCANID());
+}
+
 }
 
 void testCanService()
@@ -139,6 +182,6 @@ void testCanService()
 //  testCanidEnumerationOnConflict();
 //  testCanidEnumerationOnENUM(); // Deprecated
   testRtrMessage();
-//  testFindFreeCanidOnPopulatedBus();
+  testFindFreeCanidOnPopulatedBus();
 //  testCANID(); // Deprecated
 }
