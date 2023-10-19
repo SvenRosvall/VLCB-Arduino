@@ -96,7 +96,7 @@ byte CanService::findFreeCanId()
       // if the bit is not set
       if (bitRead(enum_responses[i], b) == 0)
       {
-        byte selected_id = ((i * 16) + b);
+        byte selected_id = ((i * 8) + b);
         // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
         return selected_id;
       }
