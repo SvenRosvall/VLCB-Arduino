@@ -20,7 +20,7 @@ void CanService::setController(Controller *cntrl)
 //
 /// extract CANID from CAN frame header
 //
-byte CanService::getCANID(unsigned long header)
+inline byte getCANID(unsigned long header)
 {
   return header & 0x7f;
 }
