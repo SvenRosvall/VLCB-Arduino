@@ -462,7 +462,7 @@ void CBUSbase::process(byte num_messages) {
       // store this response in the responses array
       if (remoteCANID > 0) {
         // fix to correctly record the received CANID
-        bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
+        bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
         // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
       }
 
@@ -1024,7 +1024,7 @@ void CBUSbase::checkCANenum(void) {
     // iterate through the 128 bit field
     for (byte i = 0; i < 16; i++) {
 
-      // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
+      // ignore if this byte is all 1's -> there are no unused IDs in this group of bits
       if (enum_responses[i] == 0xff) {
         continue;
       }
@@ -1039,9 +1039,9 @@ void CBUSbase::checkCANenum(void) {
 
         // if the bit is not set
         if (bitRead(enum_responses[i], b) == 0) {
-          selected_id = ((i * 16) + b);
+          selected_id = ((i * 8) + b);
           // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
-          // i = 16; // ugh ... but probably better than a goto :)
+          // i = 8; // ugh ... but probably better than a goto :)
           // but using a goto saves 4 bytes of program size ;)
           goto check_done;
           break;

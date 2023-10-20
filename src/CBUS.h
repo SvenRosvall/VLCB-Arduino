@@ -54,7 +54,7 @@
 #define LONG_MESSAGE_RECEIVE_TIMEOUT 5000  // timeout waiting for next long message packet
 #define NUM_EX_CONTEXTS 4                  // number of send and receive contexts for extended implementation = number of concurrent messages
 #define EX_BUFFER_LEN 64                   // size of extended send and receive buffers
-#define OPC_DTXC 0xe9                      // temp opcode for CBUS long message
+// #define OPC_DTXC 0xe9                      // temp opcode for CBUS long message
 
 //
 /// CBUS modes
