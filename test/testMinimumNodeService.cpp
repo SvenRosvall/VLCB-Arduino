@@ -265,6 +265,7 @@ void testSetNodeNumberShort()
   controller.process();
 
   assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(6, mockTransport->sent_messages[0].len);
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
   assertEquals(OPC_SNN, mockTransport->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]);
