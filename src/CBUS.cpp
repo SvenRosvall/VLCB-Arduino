@@ -510,6 +510,9 @@ void CBUSbase::process(byte num_messages) {
       case OPC_ASOF2:
       case OPC_ASOF3:
 
+      case OPC_ARSON:
+      case OPC_ARSOF:
+
         // lookup this accessory event in the event table and call the user's registered callback function
         if (eventhandler || eventhandlerex) {
           processAccessoryEvent(0, en, (opc % 2 == 0));
