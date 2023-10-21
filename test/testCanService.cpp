@@ -108,6 +108,34 @@ void testCanidEnumerationOnUserAction()
   assertEquals(1, controller.getModuleCANID());
 }
 
+void testCanidEnumerationOnENUM()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_ENUM, 0x01, 0x04, 2}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect message to make other modules report their CANID's
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(true, mockTransport->sent_messages[0].rtr);
+  assertEquals(0, mockTransport->sent_messages[0].len);
+
+  // Processing after enumeration timeout
+  addMillis(101);
+  mockTransport->sent_messages.clear();
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
+
+  // Expect first available CANID
+  assertEquals(1, controller.getModuleCANID());
+}
+
 void testRtrMessage()
 {
   test();
@@ -169,6 +197,28 @@ void testFindFreeCanidOnPopulatedBus()
   assertEquals(20, controller.getModuleCANID());
 }
 
+void testCANID()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::CANFrame msg = {0x11, false, false, 3, {OPC_CANID, 0x01, 0x04, 33}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_CANID, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_CAN, mockTransport->sent_messages[1].data[4]);
+  assertEquals(GRSP_OK, mockTransport->sent_messages[1].data[5]);
+
+  // Expect first available CANID
+  assertEquals(33, controller.getModuleCANID());
+}
+
 }
 
 void testCanService()
@@ -180,8 +230,8 @@ void testCanService()
 //  testCanidEnumerationOnSetUp();
 //  testCanidEnumerationOnFirstSentMessage();
 //  testCanidEnumerationOnConflict();
-//  testCanidEnumerationOnENUM(); // Deprecated
+  testCanidEnumerationOnENUM(); // Deprecated
   testRtrMessage();
   testFindFreeCanidOnPopulatedBus();
-//  testCANID(); // Deprecated
+  testCANID(); // Deprecated
 }
