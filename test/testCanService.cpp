@@ -136,6 +136,38 @@ void testCanidEnumerationOnENUM()
   assertEquals(1, controller.getModuleCANID());
 }
 
+void testCanidEnumerationOnConflict()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.getModuleConfig()->setCANID(3);
+
+  VLCB::CANFrame msg = {3, false, false, 1, {OPC_RQNP}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+  assertEquals(0, mockTransport->sent_messages.size());
+  
+  // Collision above only sets a flag. Enumeration happens next.
+  controller.process();
+
+  // Expect message to make other modules report their CANID's
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(true, mockTransport->sent_messages[0].rtr);
+  assertEquals(0, mockTransport->sent_messages[0].len);
+
+  // Processing after enumeration timeout
+  addMillis(101);
+  mockTransport->sent_messages.clear();
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Expect first available CANID
+  assertEquals(1, controller.getModuleCANID());
+}
+
 void testRtrMessage()
 {
   test();
@@ -229,7 +261,7 @@ void testCanService()
 //  testCanidEnumerationOnPowerUp();
 //  testCanidEnumerationOnSetUp();
 //  testCanidEnumerationOnFirstSentMessage();
-//  testCanidEnumerationOnConflict();
+  testCanidEnumerationOnConflict();
   testCanidEnumerationOnENUM(); // Deprecated
   testRtrMessage();
   testFindFreeCanidOnPopulatedBus();
