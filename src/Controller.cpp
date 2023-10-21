@@ -298,7 +298,7 @@ bool Controller::sendMessageWithNNandData(int opc, int len, ...)
   va_list args;
   va_start(args, len);
   CANFrame msg;
-  msg.len = len;
+  msg.len = len + 3;
   msg.data[0] = opc;
   setNN(&msg, module_config->nodeNum);
   for (int i = 0 ; i < len ; ++i)
