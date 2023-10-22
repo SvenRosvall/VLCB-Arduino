@@ -108,6 +108,45 @@ void testCanidEnumerationOnUserAction()
   assertEquals(1, controller.getModuleCANID());
 }
 
+void testCanidEnumerationOnSetUp()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+
+  // Check that CANID is unset on creation.
+  assertEquals(0, controller.getModuleCANID());
+
+  controller.process();
+  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+
+  // Expect message to make other modules report their CANID's
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(true, mockTransport->sent_messages[0].rtr);
+  assertEquals(0, mockTransport->sent_messages[0].len);
+
+  assertEquals(OPC_RQNN, mockTransport->sent_messages[1].data[0]);
+  assertEquals(0, mockTransport->sent_messages[1].data[1]);
+  assertEquals(0, mockTransport->sent_messages[1].data[2]);
+
+  // Processing after enumeration timeout
+  addMillis(101);
+  mockTransport->sent_messages.clear();
+  controller.process();
+
+  // Expect first available CANID
+  assertEquals(1, controller.getModuleCANID());
+
+  // Expect no further messages
+  assertEquals(0, mockTransport->sent_messages.size());
+  
+  // Note: RQNN shouldn't really be sent until a CANID has been set. 
+  // But this works so going to leave as is.
+}
+
 void testCanidEnumerationOnENUM()
 {
   test();
@@ -258,9 +297,7 @@ void testCanService()
   testServiceDiscovery();
   testServiceDiscoveryCanSvc();
   testCanidEnumerationOnUserAction();
-//  testCanidEnumerationOnPowerUp();
-//  testCanidEnumerationOnSetUp();
-//  testCanidEnumerationOnFirstSentMessage();
+  testCanidEnumerationOnSetUp();
   testCanidEnumerationOnConflict();
   testCanidEnumerationOnENUM(); // Deprecated
   testRtrMessage();
