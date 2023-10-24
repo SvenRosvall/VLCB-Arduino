@@ -9,11 +9,13 @@
 #include "testArduino.hpp"
 #include "testMinimumNodeService.h"
 #include "testNodeVariableService.h"
+#include "testCanService.h"
 
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},
+        {"CanService", testCanService},
 };
 
 int main(int argc, const char * const * argv)

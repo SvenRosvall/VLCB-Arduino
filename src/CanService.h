@@ -27,15 +27,16 @@ public:
   virtual Processed handleRawMessage(CANFrame *msg) override;
   virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
 
-  void startCANenumeration();
+  void startCANenumeration(bool fromENUM = false);
 
 private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
 
-  bool enumeration_required;
-  bool bCANenum;
+  bool enumeration_required = false;
+  bool bCANenum = false;
+  bool startedFromEnumMessage = false;
   unsigned long CANenumTime;
   byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
 

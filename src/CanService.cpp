@@ -28,7 +28,7 @@ inline byte getCANID(unsigned long header)
 //
 /// if in Normal mode, initiate a CAN ID enumeration cycle
 //
-void CanService::startCANenumeration()
+void CanService::startCANenumeration(bool fromENUM)
 {
   // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
@@ -38,6 +38,7 @@ void CanService::startCANenumeration()
   bCANenum = true;                  // we are enumerating
   CANenumTime = millis();           // the cycle start time
   memset(enum_responses, 0, sizeof(enum_responses));
+  startedFromEnumMessage = fromENUM;
 
   // send zero-length RTR frame
   CANFrame msg;
@@ -64,13 +65,15 @@ void CanService::checkCANenumTimout()
     // DEBUG_SERIAL << F("> lowest available CAN id = ") << selected_id << endl;
 
     bCANenum = false;
-    CANenumTime = 0UL;
 
     // store the new CAN ID
     module_config->setCANID(selected_id);
 
-    // send NNACK
-    controller->sendMessageWithNN(OPC_NNACK);
+    // send NNACK if initiated by ENUM request.
+    if (startedFromEnumMessage)
+    {
+      controller->sendMessageWithNN(OPC_NNACK);
+    }
   }
 }
 
@@ -108,20 +111,11 @@ byte CanService::findFreeCanId()
 
 void CanService::process(UserInterface::RequestedAction requestedAction)
 {
-  if (enumeration_required)
+  if (enumeration_required || requestedAction == UserInterface::ENUMERATION)
   {
     // DEBUG_SERIAL << "> enumeration flag set" << endl;
     enumeration_required = false;
     startCANenumeration();
-  }
-
-  if (requestedAction == UserInterface::ENUMERATION)
-  {
-    // DEBUG_SERIAL << "> User request - enumerate" << endl;
-    if (module_config->currentMode != MODE_UNINITIALISED)
-    {
-      startCANenumeration();
-    }
   }
 
   checkCANenumTimout();
@@ -220,7 +214,7 @@ Processed CanService::handleEnumeration(const CANFrame *msg, unsigned int nn)
   if (nn == module_config->nodeNum && remoteCANID != module_config->CANID && !bCANenum)
   {
     // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-    startCANenumeration();
+    startCANenumeration(true);
   }
   return PROCESSED;
 }

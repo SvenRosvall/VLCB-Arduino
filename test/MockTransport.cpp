@@ -10,7 +10,7 @@
 
 void MockTransport::setController(VLCB::Controller *ctrl)
 {
-  Transport::setController(ctrl);
+  this->controller = ctrl;
 }
 
 bool MockTransport::available()
@@ -27,6 +27,11 @@ VLCB::CANFrame MockTransport::getNextMessage()
 
 bool MockTransport::sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority)
 {
+  // Update the message the same way as CAN2515 does.
+  msg->id = controller->getModuleCANID();
+  msg->rtr = rtr;
+  msg->ext = ext;
+
   sent_messages.push_back(*msg);
   return true;
 }

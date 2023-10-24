@@ -160,8 +160,6 @@ bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
   bool ret = canp->tryToSend(message);
   _numMsgsSent += ret;
 
-  controller->indicateActivity();
-
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.
   // TODO: Replace this with monitoring of the transmit queue.
   delay(1);
