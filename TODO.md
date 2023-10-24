@@ -43,6 +43,10 @@ These fields can be populated within the transport class.
 Once this refactoring is done, CANFrame can be renamed to something more generic
 such as ```VlcbMessage```.
 
+The CAN specifics are exposed to some services. 
+* CanService checks if RTR is set and checks for CANID collisions.
+* LongMessageService relies on CANID for stringing messages together.
+
 ### Event lookup
 Duncan use a hash value for quick search in the event table and reduce the 
 number of EEPROM reads.
