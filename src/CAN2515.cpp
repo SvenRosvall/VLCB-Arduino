@@ -132,28 +132,14 @@ CANMessage CAN2515::getNextCanMessage()
 //
 /// send a VLCB message
 //
-bool CAN2515::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
+bool CAN2515::sendCanMessage(CANMessage *msg)
 {
-  // caller must populate the message data
-  // this method will create the correct frame header (CAN ID and priority bits)
-  // rtr and ext default to false unless arguments are supplied - see method definition in .h
-  // priority defaults to 1011 low/medium
-
-  // TODO: Move this message translation to CanTransport
-  CANMessage message;       // ACAN2515 frame class
-  makeHeader(msg, priority);                      // default priority unless user overrides
-  message.id = msg->id;
-  message.len = msg->len;
-  message.rtr = rtr;
-  message.ext = ext;
-  memcpy(message.data, msg->data, msg->len);
-
-//  DEBUG_SERIAL << F("CAN2515 sendMessage id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
+//  DEBUG_SERIAL << F("CAN2515 sendCanMessage id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
 //  if (msg->len > 0)
 //    DEBUG_SERIAL << " op=" << _HEX(msg->data[0]);
 //  DEBUG_SERIAL << endl;
 
-  bool ret = canp->tryToSend(message);
+  bool ret = canp->tryToSend(*msg);
   _numMsgsSent += ret;
 
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.
@@ -227,25 +213,6 @@ void CAN2515::setNumBuffers(byte num_rx_buffers, byte num_tx_buffers)
 void CAN2515::setOscFreq(unsigned long freq)
 {
   _osc_freq = freq;
-}
-
-//
-/// actual implementation of the makeHeader method
-/// so it can be called directly or as a Controller class method
-/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CAN priority) + (7 bits of CAN ID)
-/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
-//
-inline void makeHeader_impl(CANFrame *msg, byte id, byte priority)
-{
-  msg->id = (priority << 7) + (id & 0x7f);
-}
-
-//
-/// utility method to populate a VLCB message header
-//
-void CAN2515::makeHeader(CANFrame *msg, byte priority)
-{
-  makeHeader_impl(msg, controller->getModuleCANID(), priority);
 }
 
 }

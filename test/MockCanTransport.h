@@ -20,12 +20,13 @@ class MockCanTransport : public VLCB::CanTransport
 public:
   virtual bool available() override;
   virtual CANMessage getNextCanMessage() override;
-  virtual bool sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority) override;
+  virtual bool sendCanMessage(CANMessage *msg) override;
+  
   virtual void reset() override;
 
   void setNextMessage(CANMessage msg);
   void clearMessages();
 
   std::deque<CANMessage> incoming_messages;
-  std::vector<VLCB::CANFrame> sent_messages;
+  std::vector<CANMessage> sent_messages;
 };

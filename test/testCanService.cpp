@@ -229,7 +229,7 @@ void testRtrMessage()
   assertEquals(1, mockCanTransport->sent_messages.size());
   assertEquals(0, mockCanTransport->sent_messages[0].len);
   assertEquals(false, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(3, mockCanTransport->sent_messages[0].id);
+  assertEquals(3, mockCanTransport->sent_messages[0].id & 0x7F);
 }
 
 void testFindFreeCanidOnPopulatedBus()

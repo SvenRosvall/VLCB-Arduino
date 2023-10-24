@@ -42,8 +42,8 @@ public:
   bool begin(bool poll = false, SPIClass spi = SPI);
 #endif
   bool available() override;
-  CANMessage getNextCanMessage();
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) override;    // note default arguments
+  CANMessage getNextCanMessage() override;
+  bool sendCanMessage(CANMessage *msg) override;
   void reset() override;
 
   // these methods are specific to this implementation
@@ -57,8 +57,6 @@ public:
 #else
   void setPins(byte cs_pin, byte int_pin);
 #endif
-
-  void makeHeader(CANFrame *msg, byte priority = DEFAULT_PRIORITY);
 
   ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 

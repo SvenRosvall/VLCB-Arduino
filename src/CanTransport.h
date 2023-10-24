@@ -19,9 +19,13 @@ public:
   void setController(Controller *ctrl) override { this->controller = ctrl; }
 
   void process(UserInterface::RequestedAction requestedAction);
-  CANFrame getNextMessage();
 
+  virtual CANFrame getNextMessage() override;
   virtual CANMessage getNextCanMessage() = 0;
+
+  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) override;
+  virtual bool sendCanMessage(CANMessage *msg) = 0;
+
   void startCANenumeration(bool fromENUM = false);
 
 protected: // TODO: CAN2515 needs access to controller during refactoring.
