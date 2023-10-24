@@ -98,7 +98,6 @@ CANFrame CanTransport::getNextMessage()
   }
 
   // The message is a real message.
-  message.id = canMsg.id;
   message.len = canMsg.len;
   memcpy(message.data, canMsg.data, canMsg.len);
 

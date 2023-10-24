@@ -208,7 +208,7 @@ void framehandler(VLCB::CANFrame *msg)
 {
   // as an example, format and display the received frame
 
-  Serial << "[ " << (msg->id & 0x7f) << "] [" << msg->len << "] [";
+  Serial << "[" << msg->len << "] [";
 
   for (byte d = 0; d < msg->len; d++)
   {

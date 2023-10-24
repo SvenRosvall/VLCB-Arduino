@@ -26,7 +26,6 @@ namespace VLCB
 //
 struct CANFrame
 {
-  uint32_t id;
   int8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
 };

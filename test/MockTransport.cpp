@@ -27,9 +27,6 @@ VLCB::CANFrame MockTransport::getNextMessage()
 
 bool MockTransport::sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority)
 {
-  // Update the message the same way as CAN2515 does.
-  msg->id = controller->getModuleCANID();
-
   sent_messages.push_back(*msg);
   return true;
 }
