@@ -50,10 +50,10 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
+  bool sendMessage(CANFrame *msg)
   {
     indicateActivity();
-    return transport->sendMessage(msg, rtr, ext, priority);
+    return transport->sendMessage(msg);
   }
   
   void begin();

@@ -299,7 +299,7 @@ bool LongMessageService::sendMessageFragment(CANFrame * frame, const byte priori
 	frame->len = 8;
 	frame->data[0] = OPC_DTXC;
 
-	return (controller->sendMessage(frame, false, false, priority));
+	return (controller->sendMessage(frame));
 }
 
 //

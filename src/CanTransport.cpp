@@ -40,7 +40,8 @@ void CanTransport::startCANenumeration(bool fromENUM)
   // send zero-length RTR frame
   CANFrame msg;
   msg.len = 0;
-  controller->sendMessage(&msg, true, false);          // fixed arg order in v 1.1.4, RTR - true, ext = false
+  sendMessage(&msg, true, false);
+  controller->indicateActivity();
 
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
@@ -66,7 +67,8 @@ CANFrame CanTransport::getNextMessage()
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
     // send an empty canMsg to show our CANID
     message.len = 0;
-    controller->sendMessage(&message);
+    sendMessage(&message);
+    controller->indicateActivity();
 
     message.len = -1;
     return message;
