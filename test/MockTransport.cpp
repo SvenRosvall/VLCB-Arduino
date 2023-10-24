@@ -25,7 +25,7 @@ VLCB::CANFrame MockTransport::getNextMessage()
   return frame;
 }
 
-bool MockTransport::sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority)
+bool MockTransport::sendMessage(VLCB::CANFrame *msg)
 {
   sent_messages.push_back(*msg);
   return true;

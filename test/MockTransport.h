@@ -18,7 +18,7 @@ public:
   virtual void setController(VLCB::Controller *ctrl) override;
   virtual bool available() override;
   virtual VLCB::CANFrame getNextMessage() override;
-  virtual bool sendMessage(VLCB::CANFrame *msg, bool rtr, bool ext, byte priority) override;
+  virtual bool sendMessage(VLCB::CANFrame *msg) override;
   virtual void reset() override;
   void setNextMessage(VLCB::CANFrame msg);
   void clearMessages();

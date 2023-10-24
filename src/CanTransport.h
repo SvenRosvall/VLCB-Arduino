@@ -23,7 +23,8 @@ public:
   virtual CANFrame getNextMessage() override;
   virtual CANMessage getNextCanMessage() = 0;
 
-  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) override;
+  virtual bool sendMessage(CANFrame *msg) override;
+  bool sendRtrMessage();
   virtual bool sendCanMessage(CANMessage *msg) = 0;
 
   void startCANenumeration(bool fromENUM = false);

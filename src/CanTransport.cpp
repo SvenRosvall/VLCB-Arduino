@@ -37,10 +37,7 @@ void CanTransport::startCANenumeration(bool fromENUM)
   memset(enum_responses, 0, sizeof(enum_responses));
   startedFromEnumMessage = fromENUM;
 
-  // send zero-length RTR frame
-  CANFrame msg;
-  msg.len = 0;
-  sendMessage(&msg, true, false);
+  sendRtrMessage();
   controller->indicateActivity();
 
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
@@ -115,7 +112,7 @@ inline uint32_t makeHeader_impl(byte id, byte priority)
   return (priority << 7) + (id & 0x7f);
 }
 
-bool CanTransport::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
+bool CanTransport::sendMessage(CANFrame *msg)
 {
   // caller must populate the message data
   // this method will create the correct frame header (CAN ID and priority bits)
@@ -123,11 +120,22 @@ bool CanTransport::sendMessage(CANFrame *msg, bool rtr, bool ext, byte priority)
   // priority defaults to 1011 low/medium
 
   CANMessage message;       // ACAN2515 frame class
-  message.id = makeHeader_impl(controller->getModuleCANID(), priority);
+  message.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
   message.len = msg->len;
-  message.rtr = rtr;
-  message.ext = ext;
+  message.rtr = false;
+  message.ext = false;
   memcpy(message.data, msg->data, msg->len);
+
+  return sendCanMessage(&message);
+}
+
+bool CanTransport::sendRtrMessage()
+{
+  CANMessage message;       // ACAN2515 frame class
+  message.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
+  message.rtr = true;
+  message.ext = false;
+  message.len = 0;
 
   return sendCanMessage(&message);
 }
