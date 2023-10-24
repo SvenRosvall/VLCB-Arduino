@@ -18,7 +18,7 @@
 #include <CAN2515.h>               // CAN controller
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include <LongMessageService.h>
@@ -43,7 +43,7 @@ VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
-VLCB::CanService canService;
+VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;

@@ -206,6 +206,12 @@ void Controller::process(byte num_messages)
     CANFrame msg = transport->getNextMessage();
     // DEBUG_SERIAL << "> Received a message" << endl;
 
+    if (msg.len < 0)
+    {
+      // received msg was something CAN specific, ignore it.
+      continue;
+    }
+
     callFrameHandler(&msg);
 
     for (Service * service : services)

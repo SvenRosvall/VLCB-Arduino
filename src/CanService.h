@@ -7,6 +7,7 @@
 
 #include "Service.h"
 #include "UserInterface.h"
+#include "CanTransport.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -18,6 +19,7 @@ class CanService : public Service
 {
 
 public:
+  CanService(CanTransport * tpt) : canTransport(tpt) {}
 
   virtual void setController(Controller *cntrl) override;
   virtual byte getServiceID() override { return SERVICE_ID_CAN; }
@@ -33,15 +35,7 @@ private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
-
-  bool enumeration_required = false;
-  bool bCANenum = false;
-  bool startedFromEnumMessage = false;
-  unsigned long CANenumTime;
-  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
-
-  void checkCANenumTimout();
-  byte findFreeCanId();
+  CanTransport * canTransport;
 
   Processed handleEnumeration(const CANFrame *msg, unsigned int nn);
   Processed handleSetCANID(const CANFrame *msg, unsigned int nn);

@@ -29,7 +29,7 @@ struct CANFrame
   uint32_t id;
   bool ext;
   bool rtr;
-  uint8_t len;
+  int8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
 };
 
