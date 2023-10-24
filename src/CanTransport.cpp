@@ -51,6 +51,15 @@ CANFrame CanTransport::getNextMessage()
   CANFrame message;
   //message.len = -1;
 
+  // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
+  if (canMsg.ext)
+  {
+    // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
+
+    message.len = -1;
+    return message;
+  }
+
   // is this a CANID enumeration request from another node (RTR set) ?
   if (canMsg.rtr)
   {
@@ -58,7 +67,7 @@ CANFrame CanTransport::getNextMessage()
     // send an empty canMsg to show our CANID
     message.len = 0;
     controller->sendMessage(&message);
-    
+
     message.len = -1;
     return message;
   }
@@ -91,8 +100,6 @@ CANFrame CanTransport::getNextMessage()
   // The message is a real message.
   message.id = canMsg.id;
   message.len = canMsg.len;
-  message.rtr = canMsg.rtr;
-  message.ext = canMsg.ext;
   memcpy(message.data, canMsg.data, canMsg.len);
 
   return message;

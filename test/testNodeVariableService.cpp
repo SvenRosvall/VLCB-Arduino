@@ -34,7 +34,7 @@ void testNumNVs()
   VLCB::Controller controller = createController();
 
   // read parameter 6 which stores number of NVs.
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 6}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_RQNPN, 0x01, 0x04, 6}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -53,7 +53,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -81,7 +81,7 @@ void testServiceDiscoveryNodeVarSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -101,7 +101,7 @@ void testSetAndReadNV()
   VLCB::Controller controller = createController();
 
   // Set NV 3 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSET, 0x01, 0x04, 3, 42}};
+  VLCB::CANFrame msg = {0x11, 5, {OPC_NVSET, 0x01, 0x04, 3, 42}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -113,7 +113,7 @@ void testSetAndReadNV()
   mockTransport->clearMessages();
   
   // Read NV 3
-  msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 3}};
+  msg = {0x11, 4, {OPC_NVRD, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -132,7 +132,7 @@ void testSetAndReadNVnew()
   VLCB::Controller controller = createController();
 
   // Set NV 3 to 17
-  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
+  VLCB::CANFrame msg = {0x11, 5, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -151,7 +151,7 @@ void testSetNVIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSET, 0x01, 0x04, 7, 42}};
+  VLCB::CANFrame msg = {0x11, 5, {OPC_NVSET, 0x01, 0x04, 7, 42}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -174,7 +174,7 @@ void testReadNVIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 7}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_NVRD, 0x01, 0x04, 7}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -201,7 +201,7 @@ void testReadNVAll()
   }
   
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVRD, 0x01, 0x04, 0}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_NVRD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -230,7 +230,7 @@ void testSetNVnewIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
+  VLCB::CANFrame msg = {0x11, 5, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -253,7 +253,7 @@ void testSetNVShortMessage()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVSET, 0x01, 0x04, 1}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_NVSET, 0x01, 0x04, 1}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -273,7 +273,7 @@ void testReadNVShortMessage()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 3, {OPC_NVRD, 0x01, 0x04}};
+  VLCB::CANFrame msg = {0x11, 3, {OPC_NVRD, 0x01, 0x04}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -293,7 +293,7 @@ void testSetNVnewShortMessage()
   VLCB::Controller controller = createController();
 
   // Set NV 7 to 42
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_NVSETRD, 0x01, 0x04, 1}};
+  VLCB::CANFrame msg = {0x11, 4, {OPC_NVSETRD, 0x01, 0x04, 1}};
   mockTransport->setNextMessage(msg);
 
   controller.process();

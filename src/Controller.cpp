@@ -117,22 +117,6 @@ void Controller::setName(const unsigned char *mname)
 }
 
 //
-/// is this an Extended CAN frame ?
-//
-bool Controller::isExt(CANFrame *amsg)
-{
-  return (amsg->ext);
-}
-
-//
-/// is this a Remote frame ?
-//
-bool Controller::isRTR(CANFrame *amsg)
-{
-  return (amsg->rtr);
-}
-
-//
 /// set the Controller LEDs to indicate the current mode
 //
 
@@ -225,13 +209,6 @@ void Controller::process(byte num_messages)
     }
 
     indicateActivity();
-
-    // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-    if (msg.ext)
-    {
-      // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
-      continue;
-    }
 
     //
     /// process the message opcode

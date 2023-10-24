@@ -27,8 +27,6 @@ namespace VLCB
 struct CANFrame
 {
   uint32_t id;
-  bool ext;
-  bool rtr;
   int8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
 };
@@ -72,8 +70,6 @@ public:
 
   void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
-  static bool isExt(CANFrame *msg);
-  static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void indicateMode(byte mode);
   void indicateActivity();
