@@ -16,7 +16,7 @@ class EventProducerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
   virtual void process(byte num); 
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override 
   {
@@ -35,7 +35,7 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  void (*eventhandler)(byte index, CANFrame *msg);
+  void (*eventhandler)(byte index, VlcbMessage *msg);
  
   void setProducedEvents();
 };

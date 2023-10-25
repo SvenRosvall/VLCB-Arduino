@@ -13,9 +13,15 @@ std::unique_ptr<VLCB::Configuration> configuration;
 
 VLCB::Controller createController(const std::initializer_list<VLCB::Service *> services)
 {
+  mockTransport.reset(new MockTransport);
+
+  return createController(mockTransport.get(), services);
+}
+
+VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_list<VLCB::Service *> services)
+{
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
-  mockTransport.reset(new MockTransport);
 
   mockUserInterface.reset(new MockUserInterface);
 
@@ -24,8 +30,7 @@ VLCB::Controller createController(const std::initializer_list<VLCB::Service *> s
 
   configuration.reset(new VLCB::Configuration(mockStorage.get()));
 
-  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), mockTransport.get(),
-                              services);
+  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), trp, services);
 
   configuration->EE_NVS_START = 10;
   configuration->EE_NUM_NVS = 4;

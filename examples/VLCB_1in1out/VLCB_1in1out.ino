@@ -20,7 +20,7 @@
 #include <LED.h>                // VLCB LEDs
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"
@@ -46,7 +46,7 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::SerialUserInterface userInterface(&modconfig, &can2515);
 VLCB::MinimumNodeService mnService;
-VLCB::CanService canService;
+VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
@@ -62,7 +62,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::CANFrame *, bool ison, byte evval);
+void eventhandler(byte, VLCB::VlcbMessage *, bool ison, byte evval);
 void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
@@ -84,7 +84,16 @@ void setupVLCB()
   // initialise and load configuration
   controller.begin();
 
-  Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
+  const char * modeString;
+  switch (modconfig.currentMode)
+  {
+    case MODE_NORMAL: modeString = "Normal"; break;
+    case MODE_SETUP: modeString = "Setup"; break;
+    case MODE_UNINITIALISED: modeString = "Uninitialised"; break;
+    default: modeString = "Unknown"; break;
+  }
+  Serial << F("> mode = (") << _HEX(modconfig.currentMode) << ") " << modeString;
+  Serial << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice
@@ -211,7 +220,7 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::CANFrame *msg, bool ison, byte evval)
+void eventhandler(byte index, VLCB::VlcbMessage *msg, bool ison, byte evval)
 {
   // as an example, control an LED
 

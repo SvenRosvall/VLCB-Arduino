@@ -7,6 +7,7 @@
 
 #include "Service.h"
 #include "UserInterface.h"
+#include "CanTransport.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -18,33 +19,26 @@ class CanService : public Service
 {
 
 public:
+  CanService(CanTransport * tpt) : canTransport(tpt) {}
 
   virtual void setController(Controller *cntrl) override;
   virtual byte getServiceID() override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleRawMessage(CANFrame *msg) override;
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleRawMessage(VlcbMessage *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
-  void startCANenumeration();
+  void startCANenumeration(bool fromENUM = false);
 
 private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
+  CanTransport * canTransport;
 
-  bool enumeration_required;
-  bool bCANenum;
-  unsigned long CANenumTime;
-  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
-
-  static byte getCANID(unsigned long header);
-  void checkCANenumTimout();
-  byte findFreeCanId();
-
-  Processed handleEnumeration(const CANFrame *msg, unsigned int nn);
-  Processed handleSetCANID(const CANFrame *msg, unsigned int nn);
+  Processed handleEnumeration(const VlcbMessage *msg, unsigned int nn);
+  Processed handleSetCANID(const VlcbMessage *msg, unsigned int nn);
 };
 
 }

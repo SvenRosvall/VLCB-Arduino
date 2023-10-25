@@ -152,7 +152,7 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 // MNS shall implement these opcodes in incoming requests
 // * RDGN - Request Diagnostic Data (0x87)
 
-Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
@@ -180,6 +180,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (bModeSetup)
       {
         bModeSetup = false;
+        instantMode = module_config->currentMode;
         controller->indicateMode(module_config->currentMode);
       }
       return PROCESSED;
@@ -247,7 +248,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
+Processed MinimumNodeService::handleRequestNodeParameters(VlcbMessage *msg)
 {
   // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
@@ -273,7 +274,7 @@ Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -310,7 +311,7 @@ Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, un
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
 {      // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
   if (bModeSetup)
@@ -341,7 +342,7 @@ Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -365,35 +366,23 @@ Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *ms
         controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
       }
     }
-    else
+    else if (serviceIndex <= controller->getServices().size())
     {
       // Request for details of a single service.
-      byte svcIndex = 0;
-      Service *theService = NULL;
-      for (auto svc: controller->getServices())
-      {
-        if (++svcIndex == serviceIndex)
-        {
-          theService = svc;
-          break;
-        }
-      }
-      if (theService)
-      {
-        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
-      }
-      else
-      {
-        // Couldn't find the service.
-        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+    }
+    else
+    {
+      // Couldn't find the service.
+      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }
   }
 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -402,23 +391,24 @@ Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsi
       controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
       return PROCESSED;
     }
-    byte svcIndex = msg->data[3];
-    for (Service *svc: controller->getServices())
+    byte serviceIndex = msg->data[3];
+    if (serviceIndex <= controller->getServices().size())
     {
-      if (svc->getServiceID() == svcIndex)
-      {
-        byte diagnosticCode = msg->data[4];
-        // TODO: more stuff to go in here    
-        return PROCESSED;
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      byte diagnosticCode = msg->data[4];
+      // TODO: more stuff to go in here    
+      return PROCESSED;
     }
-    controller->sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+    else
+    {
+      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_SERVICE);
+    }
   }
 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
   if (nn != module_config->nodeNum)

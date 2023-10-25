@@ -53,9 +53,10 @@ void Configuration::begin()
   
   if ((storage->read(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
-   resetModule();
-   clearResetFlag();
-   loadNVs();   
+    // DEBUG_SERIAL << "Configuration::begin() - EEPROM is factory reset. Resetting module." << endl;
+    resetModule();
+    clearResetFlag();
+    loadNVs();   
   }
   
   makeEvHashTable();  
@@ -71,14 +72,7 @@ void Configuration::setHeartbeat(bool beat)
 {
   heartbeat = beat;
   byte mode = storage->read(LOCATION_FLAGS);
-  if (beat)
-  {
-    bitSet(mode, HEARTBEAT_BIT);
-  }
-  else
-  {
-    bitClear(mode, HEARTBEAT_BIT);
-  }
+  bitWrite(mode, HEARTBEAT_BIT, beat);
   storage->write(LOCATION_FLAGS, mode);
 }
 
@@ -86,14 +80,7 @@ void Configuration::setEventAck(bool ea)
 {
   eventAck = ea;
   byte servicePersist = storage->read(LOCATION_FLAGS);
-  if (ea)
-  {
-    bitSet(servicePersist, EVENT_ACK_BIT);
-  }
-  else
-  {
-    bitClear(servicePersist, EVENT_ACK_BIT);
-  }
+  bitWrite(servicePersist, HEARTBEAT_BIT, ea);
   storage->write(LOCATION_FLAGS, servicePersist);
 }
 
@@ -639,11 +626,13 @@ void Configuration::resetModule()
 //
 void Configuration::loadNVs()
 {
-  currentMode = (VlcbModeParams) (storage->read(LOCATION_MODE) & 0x01); // Bit 0 persists Uninitialised / Normal mode
+  currentMode = (VlcbModeParams) (storage->read(LOCATION_MODE) ); // Bit 0 persists Uninitialised / Normal mode
   CANID = storage->read(LOCATION_CANID);
   nodeNum = (storage->read(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->read(LOCATION_NODE_NUMBER_LOW);
-  heartbeat = storage->read(LOCATION_FLAGS) & (1 << HEARTBEAT_BIT);
-  eventAck = storage->read(LOCATION_FLAGS) & (1 << EVENT_ACK_BIT);
+  byte flags = storage->read(LOCATION_FLAGS);
+  heartbeat = flags & (1 << HEARTBEAT_BIT);
+  eventAck = flags & (1 << EVENT_ACK_BIT);
+  // DEBUG_SERIAL << "Configuration::loadNVs() mode=" << currentMode << ", CANID=" << CANID << ", nodeNum=" << nodeNum << ", flags=" << _HEX(flags) << endl;
 }
 
 //

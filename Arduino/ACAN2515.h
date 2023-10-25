@@ -26,9 +26,9 @@ struct ACAN2515Settings
 struct CANMessage
 {
   uint32_t id;
-  uint8_t len;
-  bool rtr;
   bool ext;
+  bool rtr;
+  uint8_t len;
   uint8_t data[8];
 };
 
