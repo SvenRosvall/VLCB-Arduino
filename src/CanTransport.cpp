@@ -47,14 +47,13 @@ CANFrame CanTransport::getNextMessage()
 {
   CANMessage canMsg = getNextCanMessage();
   CANFrame message;
-  //message.len = -1;
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
   if (canMsg.ext)
   {
     // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
 
-    message.len = -1;
+    message.len = 0xFF;
     return message;
   }
 
@@ -67,7 +66,7 @@ CANFrame CanTransport::getNextMessage()
     sendMessage(&message);
     controller->indicateActivity();
 
-    message.len = -1;
+    message.len = 0xFF;
     return message;
   }
 
@@ -92,7 +91,7 @@ CANFrame CanTransport::getNextMessage()
       // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
     }
 
-    message.len = -1;
+    message.len = 0xFF;
     return message;
   }
 
