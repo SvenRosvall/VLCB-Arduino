@@ -17,14 +17,14 @@ class MockTransport : public VLCB::Transport
 public:
   virtual void setController(VLCB::Controller *ctrl) override;
   virtual bool available() override;
-  virtual VLCB::CANFrame getNextMessage() override;
-  virtual bool sendMessage(VLCB::CANFrame *msg) override;
+  virtual VLCB::VlcbMessage getNextMessage() override;
+  virtual bool sendMessage(VLCB::VlcbMessage *msg) override;
   virtual void reset() override;
-  void setNextMessage(VLCB::CANFrame msg);
+  void setNextMessage(VLCB::VlcbMessage msg);
   void clearMessages();
 
-  std::deque<VLCB::CANFrame> incoming_messages;
-  std::vector<VLCB::CANFrame> sent_messages;
+  std::deque<VLCB::VlcbMessage> incoming_messages;
+  std::vector<VLCB::VlcbMessage> sent_messages;
   
 private:
   VLCB::Controller * controller;

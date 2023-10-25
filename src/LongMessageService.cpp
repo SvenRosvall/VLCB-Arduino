@@ -33,7 +33,7 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
-Processed LongMessageService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed LongMessageService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   switch (opc)
   {
@@ -53,7 +53,7 @@ Processed LongMessageService::handleMessage(unsigned int opc, CANFrame *msg)
 //
 bool LongMessageService::sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority)
 {
-	CANFrame frame;
+	VlcbMessage frame;
 
 	// DEBUG_SERIAL << F("> L: sending message header packet, stream id = ") << stream_id << F(", message length = ") << msg_len << F(", first char = ") << (char)msg[0] << endl;
 
@@ -94,7 +94,7 @@ bool LongMessageService::process()
 {
 	bool ret = true;
 	byte i;
-	CANFrame frame;
+	VlcbMessage frame;
 
 	/// check receive timeout
 
@@ -141,7 +141,7 @@ bool LongMessageService::process()
 /// handle a received long message fragment
 /// this method is called by the main Controller object each time a long Controller message is received (opcode 0xe9)
 //
-void LongMessageService::processReceivedMessageFragment(const CANFrame *frame)
+void LongMessageService::processReceivedMessageFragment(const VlcbMessage *frame)
 {
 	/// handle a received message fragment
 
@@ -293,7 +293,7 @@ bool LongMessageService::is_sending()
 //
 /// send next message fragment
 //
-bool LongMessageService::sendMessageFragment(CANFrame * frame, const byte priority)
+bool LongMessageService::sendMessageFragment(VlcbMessage * frame, const byte priority)
 {
 	// these are common to all messages
 	frame->len = 8;
@@ -389,7 +389,7 @@ bool LongMessageServiceEx::sendLongMessage(const void *msg, const unsigned int m
 {
 	byte i;
 	uint16_t msg_crc = 0;
-	CANFrame frame;
+	VlcbMessage frame;
 
 	// DEBUG_SERIAL << F("> Lex: sending message header packet, stream id = ") << stream_id << F(", message length = ") << msg_len << endl;
 
@@ -459,7 +459,7 @@ bool LongMessageServiceEx::process()
 {
 	bool ret = true;
 	byte i;
-	CANFrame frame;
+	VlcbMessage frame;
 
 	static byte context = 0;				// we round-robin the context list when sending
 
@@ -553,7 +553,7 @@ byte LongMessageServiceEx::is_sending()
 //
 /// handle an incoming long message Controller message fragment
 //
-void LongMessageServiceEx::processReceivedMessageFragment(const CANFrame *frame)
+void LongMessageServiceEx::processReceivedMessageFragment(const VlcbMessage *frame)
 {
 	byte i, j, status;
 	uint16_t tmpcrc = 0;

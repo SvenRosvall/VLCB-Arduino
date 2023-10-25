@@ -24,7 +24,7 @@ namespace VLCB
 //
 /// CAN/Controller message type
 //
-struct CANFrame
+struct VlcbMessage
 {
   uint8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
@@ -50,7 +50,7 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(CANFrame *msg)
+  bool sendMessage(VlcbMessage *msg)
   {
     indicateActivity();
     return transport->sendMessage(msg);
@@ -75,7 +75,7 @@ public:
   void setLearnMode(byte reqMode);
   bool isSetProdEventTableFlag() { return setProdEventTable; }
   void clearProdEventTableFlag();
-  void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
+  void setFrameHandler(void (*fptr)(VlcbMessage *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
@@ -85,13 +85,13 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  void (*framehandler)(CANFrame *msg) = NULL;
+  void (*framehandler)(VlcbMessage *msg) = NULL;
   byte *_opcodes = NULL;
   byte _num_opcodes = 0;
   bool setProdEventTable = false;
 
-  bool filterByOpcodes(const CANFrame *msg) const;
-  void callFrameHandler(CANFrame *msg);
+  bool filterByOpcodes(const VlcbMessage *msg) const;
+  void callFrameHandler(VlcbMessage *msg);
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };

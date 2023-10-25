@@ -20,13 +20,13 @@ void EventConsumerService::setController(Controller *cntrl)
 //
 /// register the user handler for learned events
 //
-void EventConsumerService::setEventHandler(void (*fptr)(byte index, CANFrame *msg)) 
+void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage *msg)) 
 {
   eventhandler = fptr;
 }
 
 // overloaded form which receives the opcode on/off state and the first event variable
-void EventConsumerService::setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval)) 
+void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage *msg, bool ison, byte evval)) 
 {
   eventhandlerex = fptr;
 }
@@ -34,7 +34,7 @@ void EventConsumerService::setEventHandler(void (*fptr)(byte index, CANFrame *ms
 //
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
-void EventConsumerService::processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned int en, bool is_on_event) 
+void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event) 
 {
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);
@@ -51,7 +51,7 @@ void EventConsumerService::processAccessoryEvent(CANFrame *msg, unsigned int nn,
   }
 }
 
-Processed EventConsumerService::handleMessage(unsigned int opc, CANFrame *msg) 
+Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];

@@ -27,13 +27,13 @@ void CanService::process(UserInterface::RequestedAction requestedAction)
   canTransport->process(requestedAction);
 }
 
-Processed CanService::handleRawMessage(CANFrame *msg)
+Processed CanService::handleRawMessage(VlcbMessage *msg)
 {
 
   return NOT_PROCESSED;
 }
 
-Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed CanService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
@@ -53,7 +53,7 @@ Processed CanService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed CanService::handleSetCANID(const CANFrame *msg, unsigned int nn)
+Processed CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
@@ -77,7 +77,7 @@ Processed CanService::handleSetCANID(const CANFrame *msg, unsigned int nn)
   return PROCESSED;
 }
 
-Processed CanService::handleEnumeration(const CANFrame *msg, unsigned int nn)
+Processed CanService::handleEnumeration(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
   // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;

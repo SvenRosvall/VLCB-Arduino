@@ -152,7 +152,7 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 // MNS shall implement these opcodes in incoming requests
 // * RDGN - Request Diagnostic Data (0x87)
 
-Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
@@ -248,7 +248,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
+Processed MinimumNodeService::handleRequestNodeParameters(VlcbMessage *msg)
 {
   // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
@@ -274,7 +274,7 @@ Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -311,7 +311,7 @@ Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, un
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
 {      // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
   if (bModeSetup)
@@ -342,7 +342,7 @@ Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -382,7 +382,7 @@ Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *ms
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -408,7 +408,7 @@ Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsi
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
   if (nn != module_config->nodeNum)

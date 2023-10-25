@@ -71,7 +71,7 @@ void Controller::begin()
 /// register the user handler for CAN frames
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
-void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes)
+void Controller::setFrameHandler(void (*fptr)(VlcbMessage *msg), byte opcodes[], byte num_opcodes)
 {
   framehandler = fptr;
   _opcodes = opcodes;
@@ -187,7 +187,7 @@ void Controller::process(byte num_messages)
     // at least one CAN frame is available in the reception buffer
     // retrieve the next one
 
-    CANFrame msg = transport->getNextMessage();
+    VlcbMessage msg = transport->getNextMessage();
     // DEBUG_SERIAL << "> Received a message" << endl;
 
     if (msg.len == 0xFF)
@@ -239,7 +239,7 @@ void Controller::process(byte num_messages)
 }
 
 // Return true if framehandler shall be called for registered opcodes, if any.
-bool Controller::filterByOpcodes(const CANFrame *msg) const
+bool Controller::filterByOpcodes(const VlcbMessage *msg) const
 {
   if (_num_opcodes == 0)
   {
@@ -259,7 +259,7 @@ bool Controller::filterByOpcodes(const CANFrame *msg) const
   return false;
 }
 
-void Controller::callFrameHandler(CANFrame *msg)
+void Controller::callFrameHandler(VlcbMessage *msg)
 {
   if (framehandler != NULL)
   {
@@ -270,7 +270,7 @@ void Controller::callFrameHandler(CANFrame *msg)
   }
 }
 
-void setNN(CANFrame *msg, unsigned int nn)
+void setNN(VlcbMessage *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);
   msg->data[2] = lowByte(nn);
@@ -280,7 +280,7 @@ bool Controller::sendMessageWithNNandData(int opc, int len, ...)
 {
   va_list args;
   va_start(args, len);
-  CANFrame msg;
+  VlcbMessage msg;
   msg.len = len + 3;
   msg.data[0] = opc;
   setNN(&msg, module_config->nodeNum);

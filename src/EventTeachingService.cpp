@@ -31,7 +31,7 @@ void EventTeachingService::inhibitLearn()
   controller->setParamFlag(PF_LRN, false);
 }
 
-Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg) 
+Processed EventTeachingService::handleMessage(unsigned int opc, VlcbMessage *msg) 
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
@@ -99,7 +99,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed EventTeachingService::handleLearnMode(const CANFrame *msg)
+Processed EventTeachingService::handleLearnMode(const VlcbMessage *msg)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
   byte requestedMode = msg->data[3];
@@ -139,7 +139,7 @@ Processed EventTeachingService::handleLearn(unsigned int nn)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleUnlearnEvent(const CANFrame *msg, unsigned int nn, unsigned int en)
+Processed EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en)
 {  
   // DEBUG_SERIAL << F("> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
@@ -207,7 +207,7 @@ Processed EventTeachingService::handleRequestEventCount(unsigned int nn)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleReadEvents(CANFrame *msg, unsigned int nn)
+Processed EventTeachingService::handleReadEvents(VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
   
@@ -237,7 +237,7 @@ Processed EventTeachingService::handleReadEvents(CANFrame *msg, unsigned int nn)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleReadEventIndex(CANFrame *msg, unsigned int nn)
+Processed EventTeachingService::handleReadEventIndex(VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> NERD : request all stored events for nn = ") << nn << endl;
 
@@ -269,7 +269,7 @@ Processed EventTeachingService::handleReadEventIndex(CANFrame *msg, unsigned int
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleReadEventVariable(const CANFrame *msg, unsigned int nn)
+Processed EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -349,7 +349,7 @@ Processed EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleLearnEvent(CANFrame *msg, unsigned int nn, unsigned int en)
+Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int nn, unsigned int en)
 {
   // DEBUG_SERIAL << endl << F("> EVLRN for source nn = ") << nn << endl;
 
@@ -416,7 +416,7 @@ Processed EventTeachingService::handleLearnEvent(CANFrame *msg, unsigned int nn,
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleLearnEventIndex(CANFrame *msg)
+Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
 {
   //DEBUG_SERIAL << endl << F("> EVLRNI for source nn = ") << nn << endl;
 
@@ -473,7 +473,7 @@ Processed EventTeachingService::handleLearnEventIndex(CANFrame *msg)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleRequestEventVariable(const CANFrame *msg, unsigned int nn, unsigned int en)
+Processed EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en)
 {
   if (bLearn)
   {

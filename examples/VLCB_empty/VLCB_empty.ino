@@ -54,8 +54,8 @@ VLCB::Controller controller(&userInterface, &modconfig, &can2515,
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::CANFrame *);
-void framehandler(VLCB::CANFrame *);
+void eventhandler(byte, VLCB::VlcbMessage *);
+void framehandler(VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 
@@ -176,7 +176,7 @@ void loop()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::CANFrame *msg)
+void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   // as an example, display the opcode and the first EV of this event
 
@@ -189,7 +189,7 @@ void eventhandler(byte index, VLCB::CANFrame *msg)
 /// called from the VLCB library for *every* CAN frame received
 /// it receives a pointer to the received CAN frame
 //
-void framehandler(VLCB::CANFrame *msg)
+void framehandler(VLCB::VlcbMessage *msg)
 {
   // as an example, format and display the received frame
 

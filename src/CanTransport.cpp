@@ -43,10 +43,10 @@ void CanTransport::startCANenumeration(bool fromENUM)
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
-CANFrame CanTransport::getNextMessage()
+VlcbMessage CanTransport::getNextMessage()
 {
   CANMessage canMsg = getNextCanMessage();
-  CANFrame message;
+  VlcbMessage message;
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
   if (canMsg.ext)
@@ -111,7 +111,7 @@ inline uint32_t makeHeader_impl(byte id, byte priority)
   return (priority << 7) + (id & 0x7f);
 }
 
-bool CanTransport::sendMessage(CANFrame *msg)
+bool CanTransport::sendMessage(VlcbMessage *msg)
 {
   // caller must populate the message data
   // this method will create the correct frame header (CAN ID and priority bits)

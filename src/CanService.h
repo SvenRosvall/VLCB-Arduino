@@ -26,8 +26,8 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleRawMessage(CANFrame *msg) override;
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleRawMessage(VlcbMessage *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   void startCANenumeration(bool fromENUM = false);
 
@@ -37,8 +37,8 @@ private:
   Configuration * module_config;  // Shortcut to reduce indirection code.
   CanTransport * canTransport;
 
-  Processed handleEnumeration(const CANFrame *msg, unsigned int nn);
-  Processed handleSetCANID(const CANFrame *msg, unsigned int nn);
+  Processed handleEnumeration(const VlcbMessage *msg, unsigned int nn);
+  Processed handleSetCANID(const VlcbMessage *msg, unsigned int nn);
 };
 
 }

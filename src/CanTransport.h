@@ -20,10 +20,10 @@ public:
 
   void process(UserInterface::RequestedAction requestedAction);
 
-  virtual CANFrame getNextMessage() override;
+  virtual VlcbMessage getNextMessage() override;
   virtual CANMessage getNextCanMessage() = 0;
 
-  virtual bool sendMessage(CANFrame *msg) override;
+  virtual bool sendMessage(VlcbMessage *msg) override;
   bool sendRtrMessage();
   virtual bool sendCanMessage(CANMessage *msg) = 0;
 

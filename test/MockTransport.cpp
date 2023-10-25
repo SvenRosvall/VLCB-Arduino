@@ -18,14 +18,14 @@ bool MockTransport::available()
   return !incoming_messages.empty();
 }
 
-VLCB::CANFrame MockTransport::getNextMessage()
+VLCB::VlcbMessage MockTransport::getNextMessage()
 {
-  VLCB::CANFrame frame = incoming_messages.front();
+  VLCB::VlcbMessage frame = incoming_messages.front();
   incoming_messages.pop_front();
   return frame;
 }
 
-bool MockTransport::sendMessage(VLCB::CANFrame *msg)
+bool MockTransport::sendMessage(VLCB::VlcbMessage *msg)
 {
   sent_messages.push_back(*msg);
   return true;
@@ -36,7 +36,7 @@ void MockTransport::reset()
 
 }
 
-void MockTransport::setNextMessage(VLCB::CANFrame msg)
+void MockTransport::setNextMessage(VLCB::VlcbMessage msg)
 {
   incoming_messages.push_back(msg);
 }

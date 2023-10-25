@@ -12,7 +12,7 @@ namespace VLCB
 {
 
 class Controller;
-class CANFrame;
+class VlcbMessage;
 
 enum Processed
 {
@@ -29,8 +29,8 @@ public:
   virtual byte getServiceVersionID() = 0;
 
   virtual void process(UserInterface::RequestedAction requestedAction) {}
-  virtual Processed handleRawMessage(CANFrame *msg) { return NOT_PROCESSED; }
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) = 0;
+  virtual Processed handleRawMessage(VlcbMessage *msg) { return NOT_PROCESSED; }
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) = 0;
 };
 
 }

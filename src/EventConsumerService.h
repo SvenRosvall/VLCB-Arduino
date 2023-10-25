@@ -15,9 +15,9 @@ class Configuration;
 class EventConsumerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg));
-  void setEventHandler(void (*fptr)(byte index, CANFrame *msg, bool ison, byte evval));
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  void setEventHandler(void (*fptr)(byte index, VlcbMessage *msg));
+  void setEventHandler(void (*fptr)(byte index, VlcbMessage *msg, bool ison, byte evval));
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override 
   {
@@ -31,10 +31,10 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  void (*eventhandler)(byte index, CANFrame *msg);
-  void (*eventhandlerex)(byte index, CANFrame *msg, bool evOn, byte evVal);
+  void (*eventhandler)(byte index, VlcbMessage *msg);
+  void (*eventhandlerex)(byte index, VlcbMessage *msg, bool evOn, byte evVal);
 
-  void processAccessoryEvent(CANFrame *msg, unsigned int nn, unsigned int en, bool is_on_event);
+  void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event);
 };
 
 }  // VLCB
