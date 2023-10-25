@@ -43,6 +43,8 @@ add_library(core_library OBJECT
         src/Parameters.cpp
         src/Parameters.h
         src/Transport.h
+        src/CanTransport.cpp
+        src/CanTransport.h
         src/Storage.h
         src/UserInterface.h
         src/Service.h
@@ -52,10 +54,14 @@ add_library(core_library OBJECT
         src/CanService.cpp
         src/CanService.h
         src/EventConsumerService.cpp
+        src/EventConsumerService.h
         src/EventTeachingService.cpp
+        src/EventTeachingService.h
         src/EventProducerService.cpp
-        src/vlcbdefs.hpp
+        src/EventProducerService.h
         src/NodeVariableService.cpp
+        src/NodeVariableService.h
+        src/vlcbdefs.hpp
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -83,8 +89,12 @@ add_executable(testAll
         test/testAll.cpp
         test/testMinimumNodeService.cpp
         test/testNodeVariableService.cpp
+        test/testCanService.cpp
         test/MockUserInterface.cpp
         test/MockTransport.cpp
         test/MockStorage.cpp
+        test/MockTransport.h
+        test/MockCanTransport.cpp
+        test/MockCanTransport.h
         test/VlcbCommon.cpp
 )

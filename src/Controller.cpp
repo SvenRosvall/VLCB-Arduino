@@ -10,8 +10,7 @@
 #include <Controller.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"
-#include "EventTeachingService.h"
-#include <vlcbdefs.hpp>
+#include <stdarg.h>
 
 //
 /// construct a Controller object with an external Configuration object named "config" that is defined
@@ -72,7 +71,7 @@ void Controller::begin()
 /// register the user handler for CAN frames
 /// default args in .h declaration for opcodes array (NULL) and size (0)
 //
-void Controller::setFrameHandler(void (*fptr)(CANFrame *msg), byte opcodes[], byte num_opcodes)
+void Controller::setFrameHandler(void (*fptr)(VlcbMessage *msg), byte opcodes[], byte num_opcodes)
 {
   framehandler = fptr;
   _opcodes = opcodes;
@@ -115,22 +114,6 @@ void Controller::setParams(unsigned char *mparams)
 void Controller::setName(const unsigned char *mname)
 {
   _mname = mname;
-}
-
-//
-/// is this an Extended CAN frame ?
-//
-bool Controller::isExt(CANFrame *amsg)
-{
-  return (amsg->ext);
-}
-
-//
-/// is this a Remote frame ?
-//
-bool Controller::isRTR(CANFrame *amsg)
-{
-  return (amsg->rtr);
 }
 
 //
@@ -204,8 +187,14 @@ void Controller::process(byte num_messages)
     // at least one CAN frame is available in the reception buffer
     // retrieve the next one
 
-    CANFrame msg = transport->getNextMessage();
+    VlcbMessage msg = transport->getNextMessage();
     // DEBUG_SERIAL << "> Received a message" << endl;
+
+    if (msg.len == 0xFF)
+    {
+      // received msg was something CAN specific, ignore it.
+      continue;
+    }
 
     callFrameHandler(&msg);
 
@@ -220,13 +209,6 @@ void Controller::process(byte num_messages)
     }
 
     indicateActivity();
-
-    // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-    if (msg.ext)
-    {
-      // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
-      continue;
-    }
 
     //
     /// process the message opcode
@@ -257,7 +239,7 @@ void Controller::process(byte num_messages)
 }
 
 // Return true if framehandler shall be called for registered opcodes, if any.
-bool Controller::filterByOpcodes(const CANFrame *msg) const
+bool Controller::filterByOpcodes(const VlcbMessage *msg) const
 {
   if (_num_opcodes == 0)
   {
@@ -277,7 +259,7 @@ bool Controller::filterByOpcodes(const CANFrame *msg) const
   return false;
 }
 
-void Controller::callFrameHandler(CANFrame *msg)
+void Controller::callFrameHandler(VlcbMessage *msg)
 {
   if (framehandler != NULL)
   {
@@ -288,79 +270,26 @@ void Controller::callFrameHandler(CANFrame *msg)
   }
 }
 
-void setNN(CANFrame *msg, unsigned int nn)
+void setNN(VlcbMessage *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);
   msg->data[2] = lowByte(nn);
 }
 
-bool Controller::sendMessageWithNN(int opc)
+bool Controller::sendMessageWithNNandData(int opc, int len, ...)
 {
-  CANFrame msg;
-  msg.len = 3;
+  va_list args;
+  va_start(args, len);
+  VlcbMessage msg;
+  msg.len = len + 3;
   msg.data[0] = opc;
   setNN(&msg, module_config->nodeNum);
-  return sendMessage(&msg);
-}
-
-bool Controller::sendMessageWithNN(int opc, byte b1)
-{
-  CANFrame msg;
-  msg.len = 4;
-  msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
-  msg.data[3] = b1;
-  return sendMessage(&msg);
-}
-
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2)
-{
-  CANFrame msg;
-  msg.len = 5;
-  msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
-  msg.data[3] = b1;
-  msg.data[4] = b2;
-  return sendMessage(&msg);
-}
-
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
-{
-  CANFrame msg;
-  msg.len = 6;
-  msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
-  msg.data[3] = b1;
-  msg.data[4] = b2;
-  msg.data[5] = b3;
-  return sendMessage(&msg);
-}
-
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4)
-{
-  CANFrame msg;
-  msg.len = 7;
-  msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
-  msg.data[3] = b1;
-  msg.data[4] = b2;
-  msg.data[5] = b3;
-  msg.data[6] = b4;
-  return sendMessage(&msg);
-}
-
-bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5)
-{
-  CANFrame msg;
-  msg.len = 8;
-  msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
-  msg.data[3] = b1;
-  msg.data[4] = b2;
-  msg.data[5] = b3;
-  msg.data[6] = b4;
-  msg.data[7] = b5;
-  return sendMessage(&msg);
+  for (int i = 0 ; i < len ; ++i)
+  {
+    msg.data[3 + i] = va_arg(args, int);
+  }
+  va_end(args);
+  return sendMessage(&msg);  
 }
 
 //

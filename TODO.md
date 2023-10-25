@@ -31,3 +31,15 @@ The various storage implementations may choose to ignore this size value.
 The Storage interface provides a simple API to persistent storage regardless of
 type of storage. 
 The user code should be able to reserve a chunk of bytes in this space.
+
+## Potential bugs and opportunities for improvement
+
+### Event lookup
+Duncan use a hash value for quick search in the event table and reduce the 
+number of EEPROM reads.
+
+This code can probably be changed to loop over the hash table and for each
+match with the event hash, check the EEPROM for those locations.
+
+No need to know if there are any hash collisions in the table. 
+Searching the table will be fast enough as there will be less than 255 entries, all in RAM.

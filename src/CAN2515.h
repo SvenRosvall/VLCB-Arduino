@@ -7,8 +7,8 @@
 
 // header files
 
-#include <Controller.h>               // abstract base class
-#include <CAN2515.h>           // header for this class
+#include <Controller.h>
+#include <CanTransport.h>
 #include <ACAN2515.h>           // ACAN2515 library
 #include <SPI.h>
 
@@ -29,12 +29,11 @@ static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency
 /// to support the MCP2515/25625 CAN controllers
 //
 
-class CAN2515 : public Transport
+class CAN2515 : public CanTransport
 {
 public:
 
   CAN2515();
-  void setController(Controller * ctrl) override { this->controller = ctrl; }
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
 #ifdef ARDUINO_ARCH_RP2040
@@ -43,8 +42,8 @@ public:
   bool begin(bool poll = false, SPIClass spi = SPI);
 #endif
   bool available() override;
-  CANFrame getNextMessage() override;
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) override;    // note default arguments
+  CANMessage getNextCanMessage() override;
+  bool sendCanMessage(CANMessage *msg) override;
   void reset() override;
 
   // these methods are specific to this implementation
@@ -59,15 +58,11 @@ public:
   void setPins(byte cs_pin, byte int_pin);
 #endif
 
-  void makeHeader(CANFrame *msg, byte priority = DEFAULT_PRIORITY);
-
   ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 
   unsigned int _numMsgsSent, _numMsgsRcvd;
 
 private:
-  void initMembers();
-  Controller * controller;
   unsigned long _osc_freq;
   byte _csPin, _intPin;
   byte _num_rx_buffers, _num_tx_buffers;

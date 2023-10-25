@@ -17,7 +17,7 @@ void NodeVariableService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed NodeVariableService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
@@ -40,7 +40,7 @@ Processed NodeVariableService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed NodeVariableService::handleReadNV(const CANFrame *msg, unsigned int nn)
+Processed NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -75,7 +75,7 @@ Processed NodeVariableService::handleReadNV(const CANFrame *msg, unsigned int nn
   return PROCESSED;
 }
 
-Processed NodeVariableService::handleSetNV(const CANFrame *msg, unsigned int nn)
+Processed NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
@@ -105,7 +105,7 @@ Processed NodeVariableService::handleSetNV(const CANFrame *msg, unsigned int nn)
   return PROCESSED;
 }
 
-Processed NodeVariableService::handleSetAndReadNV(const CANFrame *msg, unsigned int nn)
+Processed NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
 

@@ -22,16 +22,16 @@ public:
   virtual byte getServiceID() override { return SERVICE_ID_NV; }
   virtual byte getServiceVersionID() override { return 1; }
 
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
 private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
 
-  Processed handleReadNV(const CANFrame *msg, unsigned int nn);
-  Processed handleSetNV(const CANFrame *msg, unsigned int nn);
-  Processed handleSetAndReadNV(const CANFrame *msg, unsigned int nn);
+  Processed handleReadNV(const VlcbMessage *msg, unsigned int nn);
+  Processed handleSetNV(const VlcbMessage *msg, unsigned int nn);
+  Processed handleSetAndReadNV(const VlcbMessage *msg, unsigned int nn);
 };
 
 }

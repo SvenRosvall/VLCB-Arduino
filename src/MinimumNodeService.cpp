@@ -152,7 +152,7 @@ void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
 // MNS shall implement these opcodes in incoming requests
 // * RDGN - Request Diagnostic Data (0x87)
 
-Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
+Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
@@ -180,6 +180,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       if (bModeSetup)
       {
         bModeSetup = false;
+        instantMode = module_config->currentMode;
         controller->indicateMode(module_config->currentMode);
       }
       return PROCESSED;
@@ -201,17 +202,16 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
       // sent during module transition, so no node number check
       // DEBUG_SERIAL << F("> RQMN received") << endl;
 
-      // only respond if in transition to Normal
+      // only respond if in transition to Normal, i.e. Setup mode, or in learn mode.
 
-      // respond with NAME
-      if (bModeSetup)
+      if (bModeSetup || (controller->getParam(PAR_FLAGS) & PF_LRN))
       {
+        // respond with NAME
         msg->len = 8;
         msg->data[0] = OPC_NAME;
         memcpy(msg->data + 1, controller->getModuleName(), 7);
         controller->sendMessage(msg);
       }
-
       return PROCESSED;
 
     case OPC_RQSD:
@@ -248,7 +248,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, CANFrame *msg)
   }
 }
 
-Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
+Processed MinimumNodeService::handleRequestNodeParameters(VlcbMessage *msg)
 {
   // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
@@ -274,7 +274,7 @@ Processed MinimumNodeService::handleRequestNodeParameters(CANFrame *msg)
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -311,7 +311,7 @@ Processed MinimumNodeService::handleRequestNodeParameter(const CANFrame *msg, un
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
 {      // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
   if (bModeSetup)
@@ -342,7 +342,7 @@ Processed MinimumNodeService::handleSetNodeNumber(const CANFrame *msg, unsigned 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -366,35 +366,23 @@ Processed MinimumNodeService::handleRequestServiceDefinitions(const CANFrame *ms
         controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
       }
     }
-    else
+    else if (serviceIndex <= controller->getServices().size())
     {
       // Request for details of a single service.
-      byte svcIndex = 0;
-      Service *theService = NULL;
-      for (auto svc: controller->getServices())
-      {
-        if (++svcIndex == serviceIndex)
-        {
-          theService = svc;
-          break;
-        }
-      }
-      if (theService)
-      {
-        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
-      }
-      else
-      {
-        // Couldn't find the service.
-        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+    }
+    else
+    {
+      // Couldn't find the service.
+      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }
   }
 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
@@ -403,29 +391,32 @@ Processed MinimumNodeService::handleRequestDiagnostics(const CANFrame *msg, unsi
       controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
       return PROCESSED;
     }
-    byte svcIndex = msg->data[3];
-    for (Service *svc: controller->getServices())
+    byte serviceIndex = msg->data[3];
+    if (serviceIndex <= controller->getServices().size())
     {
-      if (svc->getServiceID() == svcIndex)
-      {
-        byte diagnosticCode = msg->data[4];
-        // TODO: more stuff to go in here    
-        return PROCESSED;
-      }
+      Service *theService = controller->getServices()[serviceIndex - 1];
+      byte diagnosticCode = msg->data[4];
+      // TODO: more stuff to go in here    
+      return PROCESSED;
     }
-    controller->sendGRSP(OPC_RDGN, svcIndex, GRSP_INVALID_SERVICE);
+    else
+    {
+      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_SERVICE);
+    }
   }
 
   return PROCESSED;
 }
 
-Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned int nn)
+Processed MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
   if (nn != module_config->nodeNum)
   {
+    // Not for this module.
     return PROCESSED;
   }
+
   if (msg->len < 4)
   {
     controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
@@ -435,31 +426,60 @@ Processed MinimumNodeService::handleModeMessage(const CANFrame *msg, unsigned in
   byte requestedMode = msg->data[3];
   //DEBUG_SERIAL << F("> MODE -- requested = ") << requestedMode << endl;
   //DEBUG_SERIAL << F("> instant MODE  = ") << instantMode << endl;
-  if (instantMode != MODE_NORMAL)
-  {
-    return PROCESSED;
-  }
 
   switch (requestedMode)
   {
-    case 0xFF:
-      // Request Uninitialised
-      controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+    case MODE_UNINITIALISED:
+      // Request factory reset mode
+      if (instantMode == MODE_SETUP)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        setUninitialised();
+      }
+      else
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+      }
       return PROCESSED;
 
-    case 0x00:
+    case MODE_SETUP:
       // Request Setup
-      controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-      initSetupFromNormal();
+      switch (instantMode)
+      {
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetupFromNormal();
+          return PROCESSED;
+      
+        case MODE_UNINITIALISED:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetup();
+          return PROCESSED;
+
+        default:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          return PROCESSED;
+      }
+      
+    case MODE_NORMAL:
+      // Request Normal. Only OK if we are already in Normal mode.
+      if (instantMode == MODE_NORMAL)
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+      }
+      else
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+      }
       return PROCESSED;
 
-    case 0x0C:
+    case MODE_HEARTBEAT_ON:
       // Turn on Heartbeat
       noHeartbeat = false;
       module_config->setHeartbeat(!noHeartbeat);
       return PROCESSED;
 
-    case 0x0D:
+    case MODE_HEARTBEAT_OFF:
       // Turn off Heartbeat
       noHeartbeat = true;
       module_config->setHeartbeat(!noHeartbeat);

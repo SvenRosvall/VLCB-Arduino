@@ -20,7 +20,7 @@
 #include <LED.h>                // VLCB LEDs
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"
@@ -44,7 +44,7 @@ VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
-VLCB::CanService canService;
+VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
@@ -60,7 +60,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::CANFrame *, bool ison, byte evval);
+void eventhandler(byte, VLCB::VlcbMessage *, bool ison, byte evval);
 void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
@@ -82,7 +82,16 @@ void setupVLCB()
   // initialise and load configuration
   controller.begin();
 
-  Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
+  const char * modeString;
+  switch (modconfig.currentMode)
+  {
+    case MODE_NORMAL: modeString = "Normal"; break;
+    case MODE_SETUP: modeString = "Setup"; break;
+    case MODE_UNINITIALISED: modeString = "Uninitialised"; break;
+    default: modeString = "Unknown"; break;
+  }
+  Serial << F("> mode = (") << _HEX(modconfig.currentMode) << ") " << modeString;
+  Serial << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice
@@ -98,7 +107,7 @@ void setupVLCB()
   controller.setName(mname);
 
   // module reset - if switch is depressed at startup and module is in Uninitialised mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == VLCB::MODE_UNINITIALISED)
+  if (userInterface.isButtonPressed() && modconfig.currentMode == MODE_UNINITIALISED)
   {
     Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
     modconfig.resetModule(&userInterface);
@@ -196,7 +205,6 @@ void loop()
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
 /// then send a long VLCB event with opcode ACON for on and ACOF for off
-/// event number (EN) is 1
 
 /// you can just watch for this event in FCU or JMRI, or teach it to another VLCB consumer module
 //
@@ -205,7 +213,7 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte eventNumber = 1;
+    byte eventNumber = 1;  
     epService.sendEvent(state, eventNumber);
   }
 }
@@ -215,7 +223,7 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::CANFrame *msg, bool ison, byte evval)
+void eventhandler(byte index, VLCB::VlcbMessage *msg, bool ison, byte evval)
 {
   // as an example, control an LED
 
@@ -279,7 +287,7 @@ void processSerialInput()
 
       // node identity
       Serial << F("> VLCB node configuration") << endl;
-      Serial << F("> mode = ") << (modconfig.currentMode == VLCB::MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
+      Serial << F("> mode = ") << (modconfig.currentMode == MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
       Serial << endl;
       break;
 

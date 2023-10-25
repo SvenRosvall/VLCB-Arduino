@@ -43,8 +43,6 @@ void EventProducerService::setProducedEvents()
       data[3] = i;
       
       module_config->writeEvent(i, data);  //index = i
-      module_config->writeEventEV(i, 1, 1);  //set this event as a producer (ev value of 0 would be a consumer)
-      module_config->writeEventEV(i, 2, 0);  //set default produced event type
       module_config->updateEvHashEntry(i);
     }
   }    
@@ -74,7 +72,7 @@ void EventProducerService::sendEvent(bool state, byte index)
   else
   {
     opCode = (state ? OPC_ACON : OPC_ACOF);
-    CANFrame msg;
+    VlcbMessage msg;
     msg.len = 5;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
@@ -99,7 +97,7 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
   else
   {
     opCode = (state ? OPC_ACON1 : OPC_ACOF1);
-    CANFrame msg;
+    VlcbMessage msg;
     msg.len = 6;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
@@ -126,7 +124,7 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   else
   {
     opCode = (state ? OPC_ACON2 : OPC_ACOF2);
-    CANFrame msg;
+    VlcbMessage msg;
     msg.len = 7;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
@@ -153,7 +151,7 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   else
   {
     opCode = (state ? OPC_ACON3 : OPC_ACOF3);
-    CANFrame msg;
+    VlcbMessage msg;
     msg.len = 8;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
@@ -168,7 +166,7 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
     
 }
 
-Processed EventProducerService::handleMessage(unsigned int opc, CANFrame *msg) 
+Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];

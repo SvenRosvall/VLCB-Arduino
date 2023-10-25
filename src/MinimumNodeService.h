@@ -20,7 +20,7 @@ public:
 
   virtual void setController(Controller *cntrl) override;
   virtual void process(UserInterface::RequestedAction requestedAction) override; 
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }
@@ -30,6 +30,7 @@ public:
   // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
   void setSetupMode();
+  void setUninitialised();
 
 private:
 
@@ -44,7 +45,6 @@ private:
   void checkModeChangeTimeout();
   void initSetup();
   void setNormal();
-  void setUninitialised();
   void initSetupFromNormal();
 
   void heartbeat();
@@ -54,12 +54,12 @@ private:
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
 
-  Processed handleRequestNodeParameters(CANFrame *msg);
-  Processed handleRequestNodeParameter(const CANFrame *msg, unsigned int nn);
-  Processed handleSetNodeNumber(const CANFrame *msg, unsigned int nn);
-  Processed handleRequestServiceDefinitions(const CANFrame *msg, unsigned int nn);
-  Processed handleRequestDiagnostics(const CANFrame *msg, unsigned int nn);
-  Processed handleModeMessage(const CANFrame *msg, unsigned int nn);
+  Processed handleRequestNodeParameters(VlcbMessage *msg);
+  Processed handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
+  Processed handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
+  Processed handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
+  Processed handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn);
+  Processed handleModeMessage(const VlcbMessage *msg, unsigned int nn);
 };
 
 }

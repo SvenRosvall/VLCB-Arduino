@@ -24,12 +24,9 @@ namespace VLCB
 //
 /// CAN/Controller message type
 //
-struct CANFrame
+struct VlcbMessage
 {
-  uint32_t id;
-  bool ext;
-  bool rtr;
-  uint8_t len;
+  uint8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
 };
 
@@ -53,34 +50,32 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  // TODO: These methods deal with transportation. While refactoring they delegate to the transport.
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
+  bool sendMessage(VlcbMessage *msg)
   {
-    return transport->sendMessage(msg, rtr, ext, priority);
+    indicateActivity();
+    return transport->sendMessage(msg);
   }
   
   void begin();
-  bool sendMessageWithNN(int opc);
-  bool sendMessageWithNN(int opc, byte b1);
-  bool sendMessageWithNN(int opc, byte b1, byte b2);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4);
-  bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+  inline bool sendMessageWithNN(int opc);
+  inline bool sendMessageWithNN(int opc, byte b1);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4);
+  inline bool sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5);
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
   void sendGRSP(byte opCode, byte serviceType, byte errCode);
 
   void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
-  static bool isExt(CANFrame *msg);
-  static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
   bool isSetProdEventTableFlag() { return setProdEventTable; }
   void clearProdEventTableFlag();
-  void setFrameHandler(void (*fptr)(CANFrame *msg), byte *opcodes = NULL, byte num_opcodes = 0);
+  void setFrameHandler(void (*fptr)(VlcbMessage *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
@@ -90,13 +85,46 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  void (*framehandler)(CANFrame *msg) = NULL;
+  void (*framehandler)(VlcbMessage *msg) = NULL;
   byte *_opcodes = NULL;
   byte _num_opcodes = 0;
   bool setProdEventTable = false;
 
-  bool filterByOpcodes(const CANFrame *msg) const;
-  void callFrameHandler(CANFrame *msg);
+  bool filterByOpcodes(const VlcbMessage *msg) const;
+  void callFrameHandler(VlcbMessage *msg);
+  bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
+  bool sendMessageWithNNandData(int opc, int len, ...);
 };
+
+
+bool Controller::sendMessageWithNN(int opc)
+{
+  return sendMessageWithNNandData(opc);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1)
+{
+  return sendMessageWithNNandData(opc, 1, b1);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2)
+{
+  return sendMessageWithNNandData(opc, 2, b1, b2);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3)
+{
+  return sendMessageWithNNandData(opc, 3, b1, b2, b3);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4)
+{
+  return sendMessageWithNNandData(opc, 4, b1, b2, b3, b4);
+}
+
+bool Controller::sendMessageWithNN(int opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  return sendMessageWithNNandData(opc, 5, b1, b2, b3, b4, b5);
+}
 
 }

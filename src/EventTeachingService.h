@@ -17,7 +17,7 @@ class EventTeachingService : public Service
 {
 public:
   virtual void setController(Controller *cntrl) override;
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
@@ -31,19 +31,19 @@ private:
 
   bool bLearn = false;
 
-  Processed handleLearnMode(const CANFrame *msg);
+  Processed handleLearnMode(const VlcbMessage *msg);
   Processed handleLearn(unsigned int nn);
-  Processed handleUnlearnEvent(const CANFrame *msg, unsigned int nn, unsigned int en);
+  Processed handleUnlearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
   Processed handleUnlearn(unsigned int nn);
   Processed handleRequestEventCount(unsigned int nn);
-  Processed handleReadEvents(CANFrame *msg, unsigned int nn);
-  Processed handleReadEventIndex(CANFrame *msg, unsigned int nn);
-  Processed handleReadEventVariable(const CANFrame *msg, unsigned int nn);
+  Processed handleReadEvents(VlcbMessage *msg, unsigned int nn);
+  Processed handleReadEventIndex(VlcbMessage *msg, unsigned int nn);
+  Processed handleReadEventVariable(const VlcbMessage *msg, unsigned int nn);
   Processed handleClearEvents(unsigned int nn);
   Processed handleGetFreeEventSlots(unsigned int nn);
-  Processed handleLearnEvent(CANFrame *msg, unsigned int nn, unsigned int en);
-  Processed handleLearnEventIndex(CANFrame *msg);
-  Processed handleRequestEventVariable(const CANFrame *msg, unsigned int nn, unsigned int en);
+  Processed handleLearnEvent(VlcbMessage *msg, unsigned int nn, unsigned int en);
+  Processed handleLearnEventIndex(VlcbMessage *msg);
+  Processed handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB

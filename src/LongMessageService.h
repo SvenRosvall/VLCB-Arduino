@@ -42,11 +42,11 @@ class LongMessageService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
-  virtual Processed handleMessage(unsigned int opc, CANFrame *msg) override;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process();
-  virtual void processReceivedMessageFragment(const CANFrame *frame);
+  virtual void processReceivedMessageFragment(const VlcbMessage *frame);
   bool is_sending();
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
@@ -56,12 +56,12 @@ public:
 
 protected:
 
-  bool sendMessageFragment(CANFrame *frame, const byte priority);
+  bool sendMessageFragment(VlcbMessage *frame, const byte priority);
 
   bool _is_receiving = false;
   byte *_send_buffer, *_receive_buffer;
   byte _send_stream_id = 0, _receive_stream_id = 0, *_stream_ids = NULL, _num_stream_ids = 0;
-  byte _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY, _sender_canid = 0;
+  byte _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY;
   unsigned int _send_buffer_len = 0, _incoming_message_length = 0, _receive_buffer_len = 0, _receive_buffer_index = 0;
   unsigned int _send_buffer_index = 0, _incoming_message_crc = 0, _incoming_bytes_received = 0;
   unsigned int _receive_timeout = LONG_MESSAGE_RECEIVE_TIMEOUT, _send_sequence_num = 0, _expected_next_receive_sequence_num = 0;
@@ -78,7 +78,7 @@ protected:
 
 struct receive_context_t {
   bool in_use;
-  byte receive_stream_id, sender_canid;
+  byte receive_stream_id;
   byte *buffer;
   unsigned int receive_buffer_index, incoming_bytes_received, incoming_message_length, expected_next_receive_sequence_num, incoming_message_crc;
   unsigned long last_fragment_received;
@@ -103,7 +103,7 @@ public:
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
   bool process();
   void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
-  virtual void processReceivedMessageFragment(const CANFrame *frame);
+  virtual void processReceivedMessageFragment(const VlcbMessage *frame);
   byte is_sending();
   void use_crc(bool use_crc);
 
