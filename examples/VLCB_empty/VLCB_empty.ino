@@ -18,7 +18,7 @@
 #include <CAN2515.h>               // CAN controller
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"
@@ -42,7 +42,7 @@ VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::MinimumNodeService mnService;
-VLCB::CanService canService;
+VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
@@ -193,7 +193,7 @@ void framehandler(VLCB::CANFrame *msg)
 {
   // as an example, format and display the received frame
 
-  Serial << "[ " << (msg->id & 0x7f) << "] [" << msg->len << "] [";
+  Serial << "[" << msg->len << "] [";
 
   for (byte d = 0; d < msg->len; d++)
   {

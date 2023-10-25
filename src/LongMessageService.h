@@ -61,7 +61,7 @@ protected:
   bool _is_receiving = false;
   byte *_send_buffer, *_receive_buffer;
   byte _send_stream_id = 0, _receive_stream_id = 0, *_stream_ids = NULL, _num_stream_ids = 0;
-  byte _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY, _sender_canid = 0;
+  byte _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY;
   unsigned int _send_buffer_len = 0, _incoming_message_length = 0, _receive_buffer_len = 0, _receive_buffer_index = 0;
   unsigned int _send_buffer_index = 0, _incoming_message_crc = 0, _incoming_bytes_received = 0;
   unsigned int _receive_timeout = LONG_MESSAGE_RECEIVE_TIMEOUT, _send_sequence_num = 0, _expected_next_receive_sequence_num = 0;
@@ -78,7 +78,7 @@ protected:
 
 struct receive_context_t {
   bool in_use;
-  byte receive_stream_id, sender_canid;
+  byte receive_stream_id;
   byte *buffer;
   unsigned int receive_buffer_index, incoming_bytes_received, incoming_message_length, expected_next_receive_sequence_num, incoming_message_crc;
   unsigned long last_fragment_received;

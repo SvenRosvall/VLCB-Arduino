@@ -177,7 +177,6 @@ void LongMessageService::processReceivedMessageFragment(const CANFrame *frame)
             memset(_receive_buffer, 0, _receive_buffer_len);
             _receive_buffer_index = 0;
             _expected_next_receive_sequence_num = 0;
-            _sender_canid = (frame->id & 0x7f);
             // DEBUG_SERIAL << F("> L: received header packet for stream id = ") << _receive_stream_id << F(", message length = ") << _incoming_message_length << F(", user buffer len = ") << _receive_buffer_len << endl;
             break;
           }
@@ -194,77 +193,67 @@ void LongMessageService::processReceivedMessageFragment(const CANFrame *frame)
   {
     // we're part way through receiving a message
 
-    if ((frame->id & 0x7f) == _sender_canid)
+    // it's the same sender CANID
+
+    if (frame->data[1] == _receive_stream_id)
     {
-      // it's the same sender CANID
+      // it's the same stream id
 
-      if (frame->data[1] == _receive_stream_id)
+      if (frame->data[2] == _expected_next_receive_sequence_num)
       {
-        // it's the same stream id
+        // and it's the expected sequence id
 
-        if (frame->data[2] == _expected_next_receive_sequence_num)
+        // DEBUG_SERIAL << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
+
+        // for each of the maximum five payload bytes, up to the total message length and the user buffer length
+        for (j = 0; j < 5; j++)
         {
-          // and it's the expected sequence id
+          _receive_buffer[_receive_buffer_index] = frame->data[j + 3];                // take the next byte
+          ++_receive_buffer_index;                                                    // increment the buffer index
+          ++_incoming_bytes_received;
+          // DEBUG_SERIAL << F("> L: processing received data byte = ") << (char)frame->data[j + 3] << endl;
 
-          // DEBUG_SERIAL << F("> L: received continuation packet, seq = ") << _expected_next_receive_sequence_num << endl;
-
-          // for each of the maximum five payload bytes, up to the total message length and the user buffer length
-          for (j = 0; j < 5; j++)
+          // if we have read the entire message
+          if (_incoming_bytes_received >= _incoming_message_length)
           {
-            _receive_buffer[_receive_buffer_index] = frame->data[j + 3];                // take the next byte
-            ++_receive_buffer_index;                                                    // increment the buffer index
-            ++_incoming_bytes_received;
-            // DEBUG_SERIAL << F("> L: processing received data byte = ") << (char)frame->data[j + 3] << endl;
+            // DEBUG_SERIAL << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
+            (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
+                                      LONG_MESSAGE_COMPLETE);
+            _receive_buffer_index = 0;
+            memset(_receive_buffer, 0, _receive_buffer_len);
+            break;
 
-            // if we have read the entire message
-            if (_incoming_bytes_received >= _incoming_message_length)
-            {
-              // DEBUG_SERIAL << F("> L: bytes processed = ") << _incoming_bytes_received << F(", message data has been fully consumed") << endl;
-              (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
-                                        LONG_MESSAGE_COMPLETE);
-              _receive_buffer_index = 0;
-              memset(_receive_buffer, 0, _receive_buffer_len);
-              break;
-
-              // if the user buffer is full, give the user what we have so far
-            }
-            else if (_receive_buffer_index >= _receive_buffer_len)
-            {
-              // DEBUG_SERIAL << F("> L: user buffer is full") << endl;
-              (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
-                                        LONG_MESSAGE_INCOMPLETE);
-              _receive_buffer_index = 0;
-              memset(_receive_buffer, 0, _receive_buffer_len);
-            }
+            // if the user buffer is full, give the user what we have so far
           }
-
+          else if (_receive_buffer_index >= _receive_buffer_len)
+          {
+            // DEBUG_SERIAL << F("> L: user buffer is full") << endl;
+            (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
+                                      LONG_MESSAGE_INCOMPLETE);
+            _receive_buffer_index = 0;
+            memset(_receive_buffer, 0, _receive_buffer_len);
+          }
         }
-        else
-        {
-          // it's the wrong sequence id
 
-          // DEBUG_SERIAL << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
-          (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
-                                    LONG_MESSAGE_SEQUENCE_ERROR);
-          _incoming_message_length = 0;
-          _incoming_bytes_received = 0;
-          _is_receiving = false;
-        }
       }
       else
       {
-        // probably another stream in progress - we'll ignore it as we don't support concurrent streams
+        // it's the wrong sequence id
 
-        // DEBUG_SERIAL << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
+        // DEBUG_SERIAL << F("> L: ERROR: expected receive sequence num = ") << _expected_next_receive_sequence_num << F(" but got = ") << frame->data[2] << endl;
+        (void) (*_messagehandler)(_receive_buffer, _receive_buffer_index, _receive_stream_id,
+                                  LONG_MESSAGE_SEQUENCE_ERROR);
+        _incoming_message_length = 0;
+        _incoming_bytes_received = 0;
+        _is_receiving = false;
       }
     }
     else
     {
-      // a different sender CANID - ignore the fragment
+      // probably another stream in progress - we'll ignore it as we don't support concurrent streams
 
-      // DEBUG_SERIAL << F("> L: ignoring fragment from unexpected CANID") << endl;
+      // DEBUG_SERIAL << F("> L: ignoring unexpected stream id =") << _receive_stream_id << F(", got = ") << frame->data[2] << endl;
     }
-
 	}	// it's a continuation fragment
 
 	// the sequence number may wrap from 255 to 0, which is absolutely fine
@@ -310,7 +299,7 @@ bool LongMessageService::sendMessageFragment(CANFrame * frame, const byte priori
 	frame->len = 8;
 	frame->data[0] = OPC_DTXC;
 
-	return (controller->sendMessage(frame, false, false, priority));
+	return (controller->sendMessage(frame));
 }
 
 //
@@ -610,7 +599,6 @@ void LongMessageServiceEx::processReceivedMessageFragment(const CANFrame *frame)
             memset(_receive_context[i]->buffer, 0, _receive_buffer_len);
             _receive_context[i]->receive_buffer_index = 0;
             _receive_context[i]->expected_next_receive_sequence_num = 1;
-            _receive_context[i]->sender_canid = (frame->id & 0x7f);
             _receive_context[i]->last_fragment_received = millis();
             // DEBUG_SERIAL << F("> Lex: received header packet for stream id = ") << _receive_context[i]->receive_stream_id << F(", message length = ") << _receive_context[i]->incoming_message_length << endl;
           }
@@ -637,8 +625,7 @@ void LongMessageServiceEx::processReceivedMessageFragment(const CANFrame *frame)
     // find a matching receive context, using the stream ID and sender CANID
     for (i = 0; i < _num_receive_contexts; i++)
     {
-      if (_receive_context[i]->in_use && _receive_context[i]->receive_stream_id == frame->data[1] &&
-          _receive_context[i]->sender_canid == (frame->id & 0x7f))
+      if (_receive_context[i]->in_use && _receive_context[i]->receive_stream_id == frame->data[1])
       {
         // DEBUG_SERIAL << F("> Lex: found matching receive context = ") << i << endl;
         break;

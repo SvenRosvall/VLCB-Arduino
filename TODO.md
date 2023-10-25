@@ -34,15 +34,6 @@ The user code should be able to reserve a chunk of bytes in this space.
 
 ## Potential bugs and opportunities for improvement
 
-### Make CANFrame Generic
-The struct CANFrame is currently a copy of CANMessage from ACAN2515. 
-CANFrame doesn't need the CAN specific fields such as ```id```, ```ext``` and ```rtr```.
-These fields can be populated within the transport class.
-```id``` is already populated within the CAN2515 class with the value from module configuration.
-
-Once this refactoring is done, CANFrame can be renamed to something more generic
-such as ```VlcbMessage```.
-
 ### Event lookup
 Duncan use a hash value for quick search in the event table and reduce the 
 number of EEPROM reads.

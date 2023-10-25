@@ -207,7 +207,7 @@ void testRequestNodeNumberElsewhere()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQNN, 0x02, 0x07}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -227,7 +227,7 @@ void testSetNodeNumber()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_SNN, 0x02, 0x07}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -244,7 +244,7 @@ void testSetNodeNumberNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_SNN, 0x02, 0x07}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -259,7 +259,7 @@ void testSetNodeNumberShort()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 2, {OPC_SNN, 0x02}};
+  VLCB::CANFrame msg_rqsd = {2, {OPC_SNN, 0x02}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -278,7 +278,7 @@ void testQueryNodeNumber()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_QNN}};
+  VLCB::CANFrame msg_rqsd = {1, {OPC_QNN}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -298,7 +298,7 @@ void testReadNodeParametersNormalMode()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  VLCB::CANFrame msg_rqsd = {1, {OPC_RQNP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -313,7 +313,7 @@ void testReadNodeParametersSetupMode()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 1, {OPC_RQNP}};
+  VLCB::CANFrame msg_rqsd = {1, {OPC_RQNP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -332,7 +332,7 @@ void testReadNodeParameterCount()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 0}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -361,7 +361,7 @@ void testReadNodeParameterModuleId()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 3}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -380,7 +380,7 @@ void testReadNodeParameterInvalidIndex()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQNPN, 0x01, 0x04, 33}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 33}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -402,7 +402,7 @@ void testReadNodeParameterShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQNPN, 0x01, 0x04}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQNPN, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -422,7 +422,7 @@ void testModuleNameSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -445,7 +445,7 @@ void testModuleNameLearn()
   VLCB::Controller controller = createController();
   controller.setParamFlag(PF_LRN, true); // Should really use the event teaching service here.
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -460,7 +460,7 @@ void testModuleNameNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQMN}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -493,7 +493,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -531,7 +531,7 @@ void testServiceDiscoveryLongMessageSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 4}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 4}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -550,7 +550,7 @@ void testServiceDiscoveryIndexOutOfBand()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 7}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 7}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -569,7 +569,7 @@ void testServiceDiscoveryShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_RQSD, 0x01, 0x04}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_RQSD, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -589,7 +589,7 @@ void testModeUninitializedToSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -618,7 +618,7 @@ void testModeSetupToNormal()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -642,7 +642,7 @@ void testModeSetupToUnininitialized()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -664,7 +664,7 @@ void testModeNormalToSetup()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -696,7 +696,7 @@ void testModeUninitializedToOtherThanSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -716,7 +716,7 @@ void testModeSetupToOtherThanNormal()
   minimumNodeService->setUninitialised();
   minimumNodeService->setSetupMode();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0, 0, MODE_SETUP}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -734,7 +734,7 @@ void testModeNormalToNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
+  VLCB::CANFrame msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();
@@ -752,7 +752,7 @@ void testModeShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg_rqsd = {0x11, false, false, 3, {OPC_MODE, 0x01, 0x04}};
+  VLCB::CANFrame msg_rqsd = {3, {OPC_MODE, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
   controller.process();

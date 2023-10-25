@@ -22,7 +22,7 @@ public:
   virtual void setController(Controller * ctrl) { }
   virtual bool available() = 0;
   virtual CANFrame getNextMessage() = 0;
-  virtual bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY) = 0;
+  virtual bool sendMessage(CANFrame *msg) = 0;
   virtual void reset() = 0;
 };
 

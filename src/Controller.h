@@ -26,10 +26,7 @@ namespace VLCB
 //
 struct CANFrame
 {
-  uint32_t id;
-  bool ext;
-  bool rtr;
-  uint8_t len;
+  int8_t len; // Value 0-7 or -1 for messages handled in CanTransport
   uint8_t data[8];
 };
 
@@ -53,10 +50,10 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(CANFrame *msg, bool rtr = false, bool ext = false, byte priority = DEFAULT_PRIORITY)
+  bool sendMessage(CANFrame *msg)
   {
     indicateActivity();
-    return transport->sendMessage(msg, rtr, ext, priority);
+    return transport->sendMessage(msg);
   }
   
   void begin();
@@ -72,8 +69,6 @@ public:
 
   void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
-  static bool isExt(CANFrame *msg);
-  static bool isRTR(CANFrame *msg);
   void process(byte num_messages = 3);
   void indicateMode(byte mode);
   void indicateActivity();

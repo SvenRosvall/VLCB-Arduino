@@ -6,42 +6,37 @@
 //
 
 #include <Controller.h>
-#include "MockTransport.h"
+#include "MockCanTransport.h"
 
-void MockTransport::setController(VLCB::Controller *ctrl)
-{
-  this->controller = ctrl;
-}
-
-bool MockTransport::available()
+bool MockCanTransport::available()
 {
   return !incoming_messages.empty();
 }
 
-VLCB::CANFrame MockTransport::getNextMessage()
+CANMessage MockCanTransport::getNextCanMessage()
 {
-  VLCB::CANFrame frame = incoming_messages.front();
+  CANMessage msg = incoming_messages.front();
   incoming_messages.pop_front();
-  return frame;
+  return msg;
 }
 
-bool MockTransport::sendMessage(VLCB::CANFrame *msg)
+bool MockCanTransport::sendCanMessage(CANMessage *msg)
 {
   sent_messages.push_back(*msg);
   return true;
 }
 
-void MockTransport::reset()
+void MockCanTransport::reset()
 {
 
 }
 
-void MockTransport::setNextMessage(VLCB::CANFrame msg)
+void MockCanTransport::setNextMessage(CANMessage msg)
 {
   incoming_messages.push_back(msg);
 }
 
-void MockTransport::clearMessages()
+void MockCanTransport::clearMessages()
 {
   incoming_messages.clear();
   sent_messages.clear();
