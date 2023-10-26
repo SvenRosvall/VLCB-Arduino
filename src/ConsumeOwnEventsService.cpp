@@ -115,14 +115,14 @@ byte ConsumeOwnEventsService::bufUse(void)
 
 /// number of puts
 
-unsigned int ConsumeOwnEventsService::puts(void)
+unsigned int ConsumeOwnEventsService::getNumberOfPuts(void)
 {
   return numPuts;
 }
 
 /// number of gets
 
-unsigned int ConsumeOwnEventsService::gets(void)
+unsigned int ConsumeOwnEventsService::getNumberofGets(void)
 {
   return numGets;
 }

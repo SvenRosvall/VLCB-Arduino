@@ -34,27 +34,25 @@ public:
   VlcbMessage *get(void);
   void clear(void);
   byte bufUse(void);
-  unsigned int puts();
-  unsigned int gets();
+  unsigned int getNumberOfPuts();
+  unsigned int getNumberofGets();
   unsigned int overflows(void);
     
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  
-  byte numItems = 4;
-  
-  VlcbMessage *buffer = malloc(numItems * sizeof(VlcbMessage));
-  
+   
   byte head = 0;
   byte tail = 0;
   byte hwm = 0;
-  byte capacity = numItems;
+  byte capacity = 4;
   byte size = 0;
   byte numPuts = 0;
   byte numGets = 0;
   byte numOverflows = 0;
   bool full = false;
+  
+  VlcbMessage *buffer = malloc(capacity * sizeof(VlcbMessage));
   
 };
 

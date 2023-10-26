@@ -67,7 +67,7 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
   return handleEventMessage(msg);
 }
 
-Processed EventConsumerService::handleEventMessage(const VlcbMessage *msg)
+Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
 {
   DEBUG_SERIAL << ">Handle Message " << endl;
   byte opc = msg->data[0];
