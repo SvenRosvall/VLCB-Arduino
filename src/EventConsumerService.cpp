@@ -62,15 +62,14 @@ void EventConsumerService::process(UserInterface::RequestedAction requestedActio
   }
 }
 
-Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
+Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
 {
   return handleEventMessage(msg);
 }
 
-Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
+Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
-  DEBUG_SERIAL << ">Handle Message " << endl;
-  byte opc = msg->data[0];
+  //DEBUG_SERIAL << ">Handle Message " << endl;
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
   // DEBUG_SERIAL << ">ECService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;

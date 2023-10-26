@@ -60,7 +60,7 @@
 #include <CAN2515.h>               // CAN controller
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // MERG CBUS constants
+#include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
 #include "MinimumNodeService.h"
 #include "CanService.h"

@@ -10,10 +10,10 @@
 namespace VLCB
 {
 
-void ConsumeOwnEventsService::setController(Controller *cntrl)
+ConsumeOwnEventsService::ConsumeOwnEventsService(byte bufferCapacity)
+  : capacity(bufferCapacity)
 {
-  this->controller = cntrl;
-  this->module_config = cntrl->getModuleConfig();
+  buffer = new VlcbMessage[capacity];
 }
 
 /// if buffer has one or more stored items
@@ -97,20 +97,19 @@ void ConsumeOwnEventsService::clear(void)
 
 byte ConsumeOwnEventsService::bufUse(void)
 {
-  size = capacity;
-
-  if (!full) {
-    if (head >= tail)
-    {
-      size = head - tail;
-    }
-    else
-    {
-      size = capacity + head - tail;
-    }
+  if (full)
+  {
+    return capacity;
   }
 
-  return size;
+  if (head >= tail)
+  {
+    return head - tail;
+  }
+  else
+  {
+    return capacity + head - tail;
+  }
 }
 
 /// number of puts
@@ -133,6 +132,5 @@ unsigned int ConsumeOwnEventsService::overflows(void)
 {
   return numOverflows;
 }
-
 
 }

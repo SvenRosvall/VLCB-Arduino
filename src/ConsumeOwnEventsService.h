@@ -16,7 +16,7 @@ class Configuration;
 class ConsumeOwnEventsService : public Service
 {
 public:
-  virtual void setController(Controller *cntrl) override;
+  ConsumeOwnEventsService(byte bufferCapacity = 4);
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override {return NOT_PROCESSED;}
   
   virtual byte getServiceID() override 
@@ -29,31 +29,32 @@ public:
   }
   
   bool available(void);
-  void put(const VlcbMessage *msg);
   VlcbMessage *peek(void);
   VlcbMessage *get(void);
+  void put(const VlcbMessage *msg);
   void clear(void);
-  byte bufUse(void);
   unsigned int getNumberOfPuts();
   unsigned int getNumberofGets();
   unsigned int overflows(void);
     
 private:
+  byte bufUse(void);
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-   
+
+  byte capacity;
   byte head = 0;
   byte tail = 0;
-  byte hwm = 0;
-  byte capacity = 4;
   byte size = 0;
+  bool full = false;
+  
+  // Diagnostic metrics
+  byte hwm = 0;  // High watermark
   byte numPuts = 0;
   byte numGets = 0;
   byte numOverflows = 0;
-  bool full = false;
   
-  VlcbMessage *buffer = malloc(capacity * sizeof(VlcbMessage));
-  
+  VlcbMessage *buffer;
 };
 
 }  // VLCB
