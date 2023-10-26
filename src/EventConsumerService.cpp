@@ -1,4 +1,4 @@
-// Copyright (C) Sven Rosvall (sven@rosvall.ie)
+// Copyright (C) Martin Da Costa 2023 (martindc.merg@gmail.com)
 // This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
@@ -51,11 +51,29 @@ void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int 
   }
 }
 
-Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
+void EventConsumerService::process(UserInterface::RequestedAction requestedAction)
 {
+  if (coeService && (coeService->available()))
+  {
+    // DEBUG_SERIAL << ">Getting COE Message " << endl;
+    VlcbMessage *msg = coeService->get();
+    bool done = handleEventMessage(msg);
+    // DEBUG_SERIAL << ">COE Message handled " << endl;
+  }
+}
+
+Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
+{
+  byte opc = msg->data[0];
+  return handleMessage(opc, msg);
+}
+
+Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
+{
+  //DEBUG_SERIAL << ">Handle Message " << endl;
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
-  // DEBUG_SERIAL << ">CbusSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
+  // DEBUG_SERIAL << ">ECService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 
   {

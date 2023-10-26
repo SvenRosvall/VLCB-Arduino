@@ -48,7 +48,7 @@ void EventProducerService::setProducedEvents()
   }    
 }
 
-void EventProducerService::process(byte num)
+void EventProducerService::process(UserInterface::RequestedAction requestedAction)
 {
   // Do this if mode changes to normal
   if (controller->isSetProdEventTableFlag())
@@ -67,20 +67,27 @@ void EventProducerService::sendEvent(bool state, byte index)
   if (nn == 0)
   {
     opCode = (state ? OPC_ASON : OPC_ASOF);
-    controller->sendMessageWithNN(opCode, nn_en[2], nn_en[3]); 
+    nn_en[0] = highByte(module_config->nodeNum);
+    nn_en[1] = lowByte(module_config->nodeNum); 
   }
   else
   {
     opCode = (state ? OPC_ACON : OPC_ACOF);
-    VlcbMessage msg;
-    msg.len = 5;
-    msg.data[0] = opCode;
-    msg.data[1] = nn_en[0];
-    msg.data[2] = nn_en[1];
-    msg.data[3] = nn_en[2];
-    msg.data[4] = nn_en[3];
-    controller->sendMessage(&msg);
-  }  
+  }
+  
+  VlcbMessage msg;
+  msg.len = 5;
+  msg.data[0] = opCode;
+  msg.data[1] = nn_en[0];
+  msg.data[2] = nn_en[1];
+  msg.data[3] = nn_en[2];
+  msg.data[4] = nn_en[3];
+  controller->sendMessage(&msg);
+    
+  if (coeService)
+  {
+    coeService->put(&msg);
+  }
 }
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1)
@@ -92,22 +99,28 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON1 : OPC_ASOF1);
-    controller->sendMessageWithNN(opCode, nn_en[2], nn_en[3], data1);
+    nn_en[0] = highByte(module_config->nodeNum);
+    nn_en[1] = lowByte(module_config->nodeNum); 
   }
   else
   {
     opCode = (state ? OPC_ACON1 : OPC_ACOF1);
-    VlcbMessage msg;
-    msg.len = 6;
-    msg.data[0] = opCode;
-    msg.data[1] = nn_en[0];
-    msg.data[2] = nn_en[1];
-    msg.data[3] = nn_en[2];
-    msg.data[4] = nn_en[3];
-    msg.data[5] = data1;
-    controller->sendMessage(&msg);
   }
-    
+  
+  VlcbMessage msg;
+  msg.len = 6;
+  msg.data[0] = opCode;
+  msg.data[1] = nn_en[0];
+  msg.data[2] = nn_en[1];
+  msg.data[3] = nn_en[2];
+  msg.data[4] = nn_en[3];
+  msg.data[5] = data1;
+  controller->sendMessage(&msg);
+  
+  if (coeService)
+  {
+    coeService->put(&msg);
+  }
 }
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
@@ -119,22 +132,29 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON2 : OPC_ASOF2);
-    controller->sendMessageWithNN(opCode, nn_en[2], nn_en[3], data1, data2);
+    nn_en[0] = highByte(module_config->nodeNum);
+    nn_en[1] = lowByte(module_config->nodeNum); 
   }
   else
   {
     opCode = (state ? OPC_ACON2 : OPC_ACOF2);
-    VlcbMessage msg;
-    msg.len = 7;
-    msg.data[0] = opCode;
-    msg.data[1] = nn_en[0];
-    msg.data[2] = nn_en[1];
-    msg.data[3] = nn_en[2];
-    msg.data[4] = nn_en[3];
-    msg.data[5] = data1;
-    msg.data[6] = data2;
-    controller->sendMessage(&msg);
-  }    
+  }
+  
+  VlcbMessage msg;
+  msg.len = 7;
+  msg.data[0] = opCode;
+  msg.data[1] = nn_en[0];
+  msg.data[2] = nn_en[1];
+  msg.data[3] = nn_en[2];
+  msg.data[4] = nn_en[3];
+  msg.data[5] = data1;
+  msg.data[6] = data2;
+  controller->sendMessage(&msg);
+  
+  if (coeService)
+  {
+    coeService->put(&msg);
+  }   
 }
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
@@ -146,24 +166,30 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON3 : OPC_ASOF3);
-    controller->sendMessageWithNN(opCode, nn_en[2], nn_en[3], data1, data2, data3);
+    nn_en[0] = highByte(module_config->nodeNum);
+    nn_en[1] = lowByte(module_config->nodeNum);
   }
   else
   {
     opCode = (state ? OPC_ACON3 : OPC_ACOF3);
-    VlcbMessage msg;
-    msg.len = 8;
-    msg.data[0] = opCode;
-    msg.data[1] = nn_en[0];
-    msg.data[2] = nn_en[1];
-    msg.data[3] = nn_en[2];
-    msg.data[4] = nn_en[3];
-    msg.data[5] = data1;
-    msg.data[6] = data2;
-    msg.data[7] = data3;
-    controller->sendMessage(&msg);
   }
-    
+  
+  VlcbMessage msg;
+  msg.len = 8;
+  msg.data[0] = opCode;
+  msg.data[1] = nn_en[0];
+  msg.data[2] = nn_en[1];
+  msg.data[3] = nn_en[2];
+  msg.data[4] = nn_en[3];
+  msg.data[5] = data1;
+  msg.data[6] = data2;
+  msg.data[7] = data3;
+  controller->sendMessage(&msg);
+  
+  if (coeService)
+  {
+    coeService->put(&msg);
+  }    
 }
 
 Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 

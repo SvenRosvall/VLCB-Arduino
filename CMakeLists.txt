@@ -62,6 +62,8 @@ add_library(core_library OBJECT
         src/NodeVariableService.cpp
         src/NodeVariableService.h
         src/vlcbdefs.hpp
+        src/ConsumeOwnEventsService.h
+        src/ConsumeOwnEventsService.cpp
 )
 
 target_link_libraries(core_library PUBLIC)
