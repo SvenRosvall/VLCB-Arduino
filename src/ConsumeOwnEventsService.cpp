@@ -102,20 +102,6 @@ void ConsumeOwnEventsService::clear(void)
   return;
 }
 
-/// return high water mark
-/*
-byte ConsumeOwnEventsService::hwm(void)
-{
-  return hwm;
-}
-
-/// return full indicator
-
-bool ConsumeOwnEventsService::full(void)
-{
-  return full;
-}
-*/
 /// recalculate number of items in the buffer
 
 byte ConsumeOwnEventsService::bufUse(void)
@@ -135,21 +121,7 @@ byte ConsumeOwnEventsService::bufUse(void)
 
   return size;
 }
-/*
-/// return empty indicator
 
-bool ConsumeOwnEventsService::empty(void)
-{
-  return (!full && (head == tail));
-}
-
-/// return number of free slots
-
-byte ConsumeOwnEventsService::free_slots(void)
-{
-  return (capacity - size);
-}
-*/
 /// number of puts
 
 unsigned int ConsumeOwnEventsService::puts(void)

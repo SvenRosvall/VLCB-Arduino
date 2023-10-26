@@ -32,14 +32,10 @@ public:
   void put(const VlcbMessage *msg);
   VlcbMessage *peek(void);
   VlcbMessage *get(void);
-//  bool full(void);
   void clear(void);
-  bool empty(void);
   byte bufUse(void);
-  byte free_slots(void);
   unsigned int puts();
   unsigned int gets();
-//  byte hwm(void);
   unsigned int overflows(void);
     
 private:
