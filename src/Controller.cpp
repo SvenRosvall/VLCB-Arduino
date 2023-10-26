@@ -99,6 +99,9 @@ void Controller::setParams(unsigned char *mparams)
       case SERVICE_ID_CONSUMER:
         flags |= PF_CONSUMER;
         break;
+      case SERVICE_ID_CONSUME_OWN_EVENTS:
+        flags |= PF_COE;
+        break;
     }
   }
   if (module_config->currentMode == MODE_NORMAL)
