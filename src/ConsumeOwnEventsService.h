@@ -39,8 +39,6 @@ public:
     
 private:
   byte bufUse(void);
-  Controller *controller;
-  Configuration *module_config;  // Shortcut to reduce indirection code.
 
   byte capacity;
   byte head = 0;

@@ -64,7 +64,8 @@ void EventConsumerService::process(UserInterface::RequestedAction requestedActio
 
 Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
 {
-  return handleEventMessage(msg);
+  byte opc = msg->data[0];
+  return handleMessage(opc, msg);
 }
 
 Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
