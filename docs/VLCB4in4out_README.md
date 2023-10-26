@@ -114,7 +114,7 @@ If the Produced Events Service and the Consume Events Service are both applied,
 the Consume Own Events Service can also be enabled.  This service provides a 
 buffer that will pass the produced event back to the Consumed Event Service.
 A consumed Own Event still only has one entry in the Event Table.  If the Event
-Variables are left as ) or NULL, then the Consume Events Service will do nothing.
+Variables are left as 0 or NULL, then the Consume Events Service will do nothing.
 If the Event Variables are populated as shown in the table in the Consumed Events
 Section above, the LEDs will behave accordingly to a Produced Event.
 

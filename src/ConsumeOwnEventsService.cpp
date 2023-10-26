@@ -20,16 +20,7 @@ void ConsumeOwnEventsService::setController(Controller *cntrl)
 
 bool ConsumeOwnEventsService::available(void)
 {
-  if (size > 0)
-  {
-    return true;
-  }
-  else
-  {
-  return false;
-  }
-
- // return (size > 0);
+  return (size > 0);
 }
 
 /// store an item to the buffer - overwrite oldest item if buffer is full
