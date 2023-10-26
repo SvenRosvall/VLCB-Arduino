@@ -29,7 +29,7 @@ bool ConsumeOwnEventsService::available(void)
 void ConsumeOwnEventsService::put(const VlcbMessage * msg)
 {
 //  VlcbMessage msg;
-  memcpy((VlcbMessage*)&buffer[head], (const VlcbMessage *)msg, sizeof(VlcbMessage));
+  memcpy(&buffer[head], msg, sizeof(VlcbMessage));
 
   // if the buffer is full, this put will overwrite the oldest item
 
