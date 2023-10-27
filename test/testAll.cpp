@@ -7,9 +7,11 @@
 #include <string>
 #include <iostream>
 #include "testArduino.hpp"
-#include "testMinimumNodeService.h"
-#include "testNodeVariableService.h"
-#include "testCanService.h"
+
+void testMinimumNodeService();
+void testNodeVariableService();
+void testCanService();
+
 
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
