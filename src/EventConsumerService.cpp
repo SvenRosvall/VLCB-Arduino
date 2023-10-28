@@ -57,15 +57,17 @@ void EventConsumerService::process(UserInterface::RequestedAction requestedActio
   {
     // DEBUG_SERIAL << ">Getting COE Message " << endl;
     VlcbMessage *msg = coeService->get();
-    bool done = handleEventMessage(msg);
-    // DEBUG_SERIAL << ">COE Message handled " << endl;
+    byte opc = msg->data[0];
+    bool done = handleMessage(opc, msg);
+    /*if (done)
+    {
+      DEBUG_SERIAL << ">COE Message handled" << endl;
+    }
+    else
+    {
+      DEBUG_SERIAL << ">COE Message not handled" << endl;
+    }*/
   }
-}
-
-Processed EventConsumerService::handleEventMessage(VlcbMessage *msg)
-{
-  byte opc = msg->data[0];
-  return handleMessage(opc, msg);
 }
 
 Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
