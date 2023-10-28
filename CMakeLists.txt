@@ -100,4 +100,8 @@ add_executable(testAll
         test/MockCanTransport.h
         test/VlcbCommon.cpp
         test/testEventProducerService.cpp
+        test/testEventConsumerService.cpp
+        test/testEventTeachingService.cpp
+        test/testConsumeOwnEventsService.cpp
+        test/testLongMessageService.cpp
 )

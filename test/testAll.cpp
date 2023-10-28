@@ -12,12 +12,10 @@ void testMinimumNodeService();
 void testNodeVariableService();
 void testCanService();
 void testEventProducerService();
-
-// Remaining services to test:
-//Old (CBUS mechanism) Event Teaching Service #4
-//Event Consumer Service #5
-//Stream service #17
-//Consume Own Events Service #8
+void testEventConsumerService();
+void testEventTeachingService();
+void testConsumeOwnEventsService();
+void testLongMessageService();
 
 // Remaining services to implement
 //Bootloader (the CBUS PIC version) service #10
@@ -28,6 +26,11 @@ std::map<std::string, void (*)()> suites = {
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},
         {"CanService", testCanService},
+        {"EventProducerService", testEventProducerService},
+        {"EventConsumerService", testEventConsumerService},
+        {"EventTeachingService", testEventTeachingService},
+        {"ConsumeOwnEventsService", testConsumeOwnEventsService},
+        {"LongMessageService", testLongMessageService},
 };
 
 int main(int argc, const char * const * argv)
