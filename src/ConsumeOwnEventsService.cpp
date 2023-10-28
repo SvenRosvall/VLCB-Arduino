@@ -42,7 +42,7 @@ void ConsumeOwnEventsService::put(const VlcbMessage * msg)
   head = (head + 1) % capacity;
   full = head == tail;
   size = bufUse();
-  hwm = (size > hwm) ? size : hwm;
+  hwm = (size > hwm) ? size : hwm;   // Tracks high water mark (hwm)
   ++numPuts;        // Counts how many events put to buffer.
   // DEBUG_SERIAL << ">COE Puts = " << numPuts << " Size = " << size <<endl;
 
@@ -128,9 +128,14 @@ unsigned int ConsumeOwnEventsService::getNumberofGets(void)
 
 /// number of overflows
 
-unsigned int ConsumeOwnEventsService::overflows(void)
+unsigned int ConsumeOwnEventsService::getOverflows(void)
 {
   return numOverflows;
+}
+
+unsigned int ConsumeOwnEventsService::getHighWaterMark(void)
+{
+  return hwm;
 }
 
 }

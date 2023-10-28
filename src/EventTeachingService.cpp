@@ -450,6 +450,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
         module_config->readEvent(index, eventTableNNEN);
         if (memcmp(eventTableNNEN, &msg->data[1], 4) != 0)
         {
+          // DEBUG_SERIAL << F("> ETS > Writing EV Index = ") << F(" Node Number 0x") << _HEX((msg->data[1] << 8) + msg->data[2]) << F(" Event Number 0x") << _HEX((msg->data[3] << 8) + msg->data[4]) << endl;
           module_config->writeEvent(index, &msg->data[1]);
         }
 
