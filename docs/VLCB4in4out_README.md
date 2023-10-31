@@ -108,6 +108,16 @@ The following EV values are defined to control the LEDs in this example:
 Event Variables, whilst present, are not used in this application.  If used in an 
 application, they may be set in the normal manner using the FCU.
 
+#### Consume Own Events
+
+If the Produced Events Service and the Consume Events Service are both applied,
+the Consume Own Events Service can also be enabled.  This service provides a 
+buffer that will pass the produced event back to the Consumed Event Service.
+A consumed Own Event still only has one entry in the Event Table.  If the Event
+Variables are left as 0 or NULL, then the Consume Events Service will do nothing.
+If the Event Variables are populated as shown in the table in the Consumed Events
+Section above, the LEDs will behave accordingly to a Produced Event.
+
 ### Node Variables
 
 Node Variables control the action to take when a switch is pressed or depressed.
