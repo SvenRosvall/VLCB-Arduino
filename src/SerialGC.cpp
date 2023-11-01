@@ -79,14 +79,20 @@ namespace VLCB
     return result;
   }
 
-
+  // convert a gridconnect message to CANMessage object
+  // see Gridconnect format at beginning of file for byte positions
+  //
   bool SerialGC::encodeCANMessage(char * gcBuffer, CANMessage *message) {
-    Serial << " encode can frame ";
-    Serial << gcBuffer << endl;
+    Serial << " encode gridconnect message "<< gcBuffer << endl;
 
     int gcIndex = 0;          // index used to 'walk' gc message
     bool isValid = true;      // assume valid to begin with
+    int gcBufferLength = strlen(gcBuffer);
+    Serial << "gcBuffer length " << gcBufferLength << endl;
 
+    // must have start of message character
+    if (gcBuffer[0] != ':') isValid = false;
+    //
     // do CAN Identifier, must be either 'X' or 'S'
     if (gcBuffer[1] == 'X') {
       message->ext = true;
@@ -97,7 +103,7 @@ namespace VLCB
     } else {
       isValid = false;
     }
-
+    //
     // do RTR flag
     if (gcBuffer[gcIndex] == 'R') {
       message->rtr = true;
@@ -106,6 +112,10 @@ namespace VLCB
     } else {
       isValid = false;
     }
+    //
+    // must have end of message character
+    if (gcBuffer[gcBufferLength-1] != ';') isValid = false;
+
 
     Serial << "isValid " << isValid << endl;
 
@@ -115,9 +125,8 @@ namespace VLCB
 
 
   //
-  /// get the available GridConnect message and convert to CANMessage format
+  /// get the available CANMessage
   /// must call available first to ensure there is something to get
-  // see Gridconnect format at beginning of file for byte positions
   //
   CANMessage SerialGC::getNextCanMessage()
   {
