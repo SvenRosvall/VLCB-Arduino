@@ -38,7 +38,7 @@ namespace VLCB
         // check for 'end of message'
         if (c == ';'){
           rxBuffer[rxIndex++] = '\0';     // null terminate
-          Serial << " rxState " << rxState << " rxIndex " << rxIndex << "  ";
+          Serial << " rxIndex " << rxIndex << "  ";
           Serial << rxBuffer << endl;
           rxIndex = 0;
           result = true;
