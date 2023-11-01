@@ -38,8 +38,6 @@ namespace VLCB
         // check for 'end of message'
         if (c == ';'){
           rxBuffer[rxIndex++] = '\0';     // null terminate
-          Serial << " rxIndex " << rxIndex << "  ";
-          Serial << rxBuffer << endl;
           rxIndex = 0;
           result = true;
         }
@@ -65,6 +63,7 @@ namespace VLCB
   {
     CANMessage message;       // CAN frame class
       Serial << " encode can frame ";
+      Serial << rxBuffer << endl;
 /*
     char * gcMSG;
       gcMSG = strtok (rxBuffer,";");
