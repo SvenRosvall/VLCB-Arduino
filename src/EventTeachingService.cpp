@@ -440,24 +440,25 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
         //DEBUG_SERIAL << F("> invalid index") << endl;
         controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
       }
+      else if (evIndex == 0)  // Not a valid evIndex
+      {
+        controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_INVALID_COMMAND_PARAMETER);
+      }
       else
       {
         // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-        //DEBUG_SERIAL << F("> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+        //DEBUG_SERIAL << F("> ETS > writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
         // Writes the first four bytes NN & EN only if they have changed.
         byte eventTableNNEN[4];
         module_config->readEvent(index, eventTableNNEN);
-        if (memcmp(eventTableNNEN, &msg->data[1], 4) != 0)
+                if (memcmp(eventTableNNEN, &msg->data[1], 4) != 0)
         {
-          // DEBUG_SERIAL << F("> ETS > Writing EV Index = ") << F(" Node Number 0x") << _HEX((msg->data[1] << 8) + msg->data[2]) << F(" Event Number 0x") << _HEX((msg->data[3] << 8) + msg->data[4]) << endl;
           module_config->writeEvent(index, &msg->data[1]);
+          //DEBUG_SERIAL << F("> ETS > Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
         }
 
-        if (evIndex == 0)  // Not a valid evIndex
-        {
-          controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_INVALID_COMMAND_PARAMETER);
-        }
+        
         module_config->writeEventEV(index, evIndex, evVal);
 
         // recreate event hash table entry
