@@ -48,12 +48,18 @@ little EEPROM.
 The Transport interface encapsulates the transmission of VLCB message across some
 media such as CAN bus.
 
+The class ```CanTransport``` serves as a base class for implementations of CAN based transports. 
+It handles CANID enumeration and conflict detection that would be the same for all CAN based transports. 
+
 Current implementing transport classes:
 
 CAN2515
 : Transport over CAN bus using the MCP2515 chip.
 
 More transports implementations exist but have not yet been imported here.
+
+Read more about the ```Transport``` interface and how to implement new transports in
+[Transport documentation.](Transport.md)
 
 ### User Interface
 
@@ -70,17 +76,18 @@ VLCB offers up a message to each service in turn.
 If a service is able to handle that message no further services will be offered the message.
 Thus, the order of configured services is important.
 
+Examples of some services:
+
 MinimumNodeService
 : Handles all the mandatory op-codes that all VLCB modules must implement. 
 These op-codes involves running modes and basic node configuration such as node number and
 module parameters.
 
+EventConsumerService
+: Handles incoming events that shall result in actions on the module.
+
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.
-
-CbusService
-: All the op-codes in the original CBUS library were moved into this service as a 
-dumping ground while breaking out op-codes to their correct services.
 
 ### Details
 * There is no queuing in this diagram. Message queuing is expected to happen in the transport layer.
