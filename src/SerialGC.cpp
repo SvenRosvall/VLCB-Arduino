@@ -51,8 +51,9 @@ namespace VLCB
   {
     bool result = false;
     static int rxIndex = 0;
-    if (Serial.available()){
+    if (Serial.available()){     
       char c = Serial.read();
+      if(c >= 'a' && c <= 'z') bitClear(c,5);   // ensure letters are upper case
       //
       // if 'start of message' already seen, save the character, and check for 'end of message'
       if (rxIndex > 0) {
@@ -99,6 +100,8 @@ namespace VLCB
     } else if (gcBuffer[1] == 'S') {
       message->ext = false;
       message->id = 0;
+      // now get ID - convert from hex
+
       gcIndex = 6;
     } else {
       isValid = false;
