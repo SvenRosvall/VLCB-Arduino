@@ -6,7 +6,7 @@
 #include <SerialGC.h>
 // 3rd party libraries
 #include <Streaming.h>
-
+#include <string.h>
 
 namespace VLCB
 {
@@ -26,7 +26,33 @@ namespace VLCB
   //
   bool SerialGC::available()
   {
-    return true;
+    bool result = false;
+    static int rxIndex = 0;
+    if (Serial.available()){
+      char c = Serial.read();
+      //
+      // if 'start of message' already seen, save the character, and check for 'end of message'
+      if (rxIndex > 0) {
+        rxBuffer[rxIndex++] = c;
+        //
+        // check for 'end of message'
+        if (c == ';'){
+          rxBuffer[rxIndex++] = '\0';     // null terminate
+          Serial << " rxState " << rxState << " rxIndex " << rxIndex << "  ";
+          Serial << rxBuffer << endl;
+          rxIndex = 0;
+          result = true;
+        }
+      }
+      //
+      // always check for 'start of message'
+      if (c == ':') {
+        rxIndex = 0;                    // restart at beginning of buffer
+        rxBuffer[rxIndex++] = c;
+      }
+    }
+    //
+    return result;
   }
 
 
@@ -37,7 +63,14 @@ namespace VLCB
   //
   CANMessage SerialGC::getNextCanMessage()
   {
-    CANMessage message;       // ACAN2515 frame class
+    CANMessage message;       // CAN frame class
+      Serial << " encode can frame ";
+/*
+    char * gcMSG;
+      gcMSG = strtok (rxBuffer,";");
+      Serial << gcMSG << endl;
+*/
+    //message.ext
 
     return message;
   }
@@ -51,14 +84,15 @@ namespace VLCB
     // :SBBBBCDDDDDDDDDDDDDDDD;
     // 012345678901234567890123 - 24 characters maximum
     // where 'S' represents standard
+    // B is the CAN identifier, 4 hex characters for 11 digit identifier
     // and for extended identier
     // :XBBBBBBBBCDDDDDDDDDDDDDDDD;
     // 0123456789012345678901234567 - 28 characters maximum
     // where 'X' represents extended
+    // B is the CAN identifier, 8 hex characters for 29 digit identifier
     // in both, 
-    // B is the CAN identifier
     // C is 'R' for RTR or 'N' for normal
-    // D are databytes, variable length 0 to 16 (in hexadecimal pairs)
+    // DD are databytes, variable length 0 to 16 (in hexadecimal pairs)
 
     // start char array for output string
     char str[30];
@@ -66,12 +100,12 @@ namespace VLCB
     // set starting character & standard or extended CAN identifier
     if (msg->ext) {
       strcpy (str,":X");
-      // extended CAN idenfier in bytes 2 to 9
+      // extended 29 bit CAN idenfier in bytes 2 to 9
       sprintf(str + 2, "%08X", msg->id);
       offset = 10;
     } else {
       strcpy (str,":S");
-      // standard CAN idenfier in bytes 2 to 5
+      // standard 11 bit CAN idenfier in bytes 2 to 5
       sprintf(str + 2, "%04X", msg->id);
       offset = 6;
     }

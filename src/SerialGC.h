@@ -36,6 +36,9 @@ namespace VLCB
 
 
   private:
+
+    char rxBuffer[100]; // Define a byte array to store the incoming data
+
   };
 
 }
