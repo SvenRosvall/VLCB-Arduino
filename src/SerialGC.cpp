@@ -8,6 +8,29 @@
 #include <Streaming.h>
 #include <string.h>
 
+//
+// Class to transfer CAN messages using the GridConnect protocol over the serial port
+//
+
+// there are two basic types of CAN message, standard and extended
+//
+// Gridconnect format of a CAN message with standard Identifier
+// :SBBBBCDDDDDDDDDDDDDDDD;
+// 012345678901234567890123 - 24 characters maximum
+// where 'S' represents standard
+// B is the CAN identifier, 4 hex characters for 11 digit identifier
+
+// Gridconnect format of a CAN message with  extended identier
+// :XBBBBBBBBCDDDDDDDDDDDDDDDD;
+// 0123456789012345678901234567 - 28 characters maximum
+// where 'X' represents extended
+// B is the CAN identifier, 8 hex characters for 29 digit identifier
+
+// in both types
+// C is 'R' for RTR or 'N' for normal
+// DD are databytes, variable length 0 to 16 (in hexadecimal pairs)
+
+
 namespace VLCB
 {
 
@@ -50,49 +73,64 @@ namespace VLCB
       }
     }
     //
+
+    if (result) result = encodeCANMessage(rxBuffer, &rxCANMessage);
+
     return result;
   }
 
 
+  bool SerialGC::encodeCANMessage(char * gcBuffer, CANMessage *message) {
+    Serial << " encode can frame ";
+    Serial << gcBuffer << endl;
+
+    int gcIndex = 0;          // index used to 'walk' gc message
+    bool isValid = true;      // assume valid to begin with
+
+    // do CAN Identifier, must be either 'X' or 'S'
+    if (gcBuffer[1] == 'X') {
+      message->ext = true;
+    } else if (gcBuffer[1] == 'S') {
+      message->ext = false;
+      message->id = 0;
+      gcIndex = 6;
+    } else {
+      isValid = false;
+    }
+
+    // do RTR flag
+    if (gcBuffer[gcIndex] == 'R') {
+      message->rtr = true;
+    } else if (gcBuffer[gcIndex] == 'N'){
+      message->rtr = false;
+    } else {
+      isValid = false;
+    }
+
+    Serial << "isValid " << isValid << endl;
+
+    //if (isValid) return true;
+    return false; 
+  }
+
 
   //
-  /// get next unprocessed message from the buffer
+  /// get the available GridConnect message and convert to CANMessage format
   /// must call available first to ensure there is something to get
+  // see Gridconnect format at beginning of file for byte positions
   //
   CANMessage SerialGC::getNextCanMessage()
   {
-    CANMessage message;       // CAN frame class
-      Serial << " encode can frame ";
-      Serial << rxBuffer << endl;
-/*
-    char * gcMSG;
-      gcMSG = strtok (rxBuffer,";");
-      Serial << gcMSG << endl;
-*/
-    //message.ext
-
-    return message;
+    Serial << " getNextCanMessage "<< endl;
+    return rxCANMessage;
   }
 
   //
-  /// send a VLCB message
+  /// send a CANMessage message in GridConnect format
+  // see Gridconnect format at beginning of file for byte positions
   //
   bool SerialGC::sendCanMessage(CANMessage *msg)
   {
-    // Gridconnect format of a CAN message with standard Identifier, in hexadecimal
-    // :SBBBBCDDDDDDDDDDDDDDDD;
-    // 012345678901234567890123 - 24 characters maximum
-    // where 'S' represents standard
-    // B is the CAN identifier, 4 hex characters for 11 digit identifier
-    // and for extended identier
-    // :XBBBBBBBBCDDDDDDDDDDDDDDDD;
-    // 0123456789012345678901234567 - 28 characters maximum
-    // where 'X' represents extended
-    // B is the CAN identifier, 8 hex characters for 29 digit identifier
-    // in both, 
-    // C is 'R' for RTR or 'N' for normal
-    // DD are databytes, variable length 0 to 16 (in hexadecimal pairs)
-
     // start char array for output string
     char str[30];
     byte offset = 0;
