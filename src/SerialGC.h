@@ -40,6 +40,7 @@ namespace VLCB
     char rxBuffer[100]; // Define a byte array to store the incoming data
     bool encodeCANMessage(char *gcBuffer, CANMessage *message);
     CANMessage rxCANMessage;
+    int ascii_pair_to_byte(const char *pair);
 
   };
 
