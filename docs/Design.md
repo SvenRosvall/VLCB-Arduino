@@ -76,6 +76,9 @@ VLCB offers up a message to each service in turn.
 If a service is able to handle that message no further services will be offered the message.
 Thus, the order of configured services is important.
 
+Read more about the ```Service``` interface and how services work in 
+[Service documentation](Service.md).
+
 Examples of some services:
 
 MinimumNodeService
@@ -116,7 +119,7 @@ this event as a message to the transport object.
 
 ## User Sketch
 
-A user sketch needs to set up the required VLCB objects and then call ```VLCB.progress()``` from 
+A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
 the main loop.
 
 The setup code may look like:
@@ -136,7 +139,3 @@ setup()
   canTransport.begin();
 }
 ```
-
-## Design Decisions to Make
-
-
