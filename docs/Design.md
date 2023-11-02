@@ -86,6 +86,13 @@ module parameters.
 EventConsumerService
 : Handles incoming events that shall result in actions on the module.
 
+ConsumeOwnEventsService
+: Passes events produced by the producer service back to the consumer service.
+It is not posible to receive an event whilst transmitting it for self consumption. This service
+provides a buffer that holds a copy of produced events and allows them to be subsequently read
+by the consumer service for action as with any other received event.  It uses no op codes and
+is only a bridge between the producer and consumer services.
+
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.
 
@@ -132,16 +139,4 @@ setup()
 
 ## Design Decisions to Make
 
-### Self Consumed Events
-Duncan's library does not support self consumed events. 
 
-Events that the VLCB module consumes cannot be consumed/processed immediately as this might 
-create an infinite loop in case that processing generates new events.
-Instead, some queuing needs to be implemented. 
-
-One suggestion is to add a queue within the VLCB Controller object.
-When producing a new message it is passed to the transport object and put on the VLCB queue. 
-When VLCB checks for next message, it first checks this queue and if it is empty it checks 
-the transport object. 
-The queues within the transport object is not used as some implementations might not have 
-any such queues.
