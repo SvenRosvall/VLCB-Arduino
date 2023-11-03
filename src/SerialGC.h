@@ -15,6 +15,8 @@ namespace VLCB
 
   // constants
 
+  // grid connect should be 28 characters maximum
+  static const int RXBUFFERSIZE = 30;
 
   //
   /// an implementation of the Transport interface class
@@ -24,8 +26,6 @@ namespace VLCB
   class SerialGC : public CanTransport
   {
   public:
-
-    SerialGC();
 
     void begin();
 
@@ -37,10 +37,9 @@ namespace VLCB
 
   private:
 
-    char rxBuffer[100]; // Define a byte array to store the incoming data
-    bool encodeCANMessage(char *gcBuffer, CANMessage *message);
+    char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
+//    bool encodeCANMessage(char *gcBuffer, CANMessage *message);
     CANMessage rxCANMessage;
-    int ascii_pair_to_byte(const char *pair);
 
   };
 

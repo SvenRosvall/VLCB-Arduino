@@ -34,86 +34,65 @@
 namespace VLCB
 {
 
-  //
-  /// constructor
-  //
-  SerialGC::SerialGC()  { }
-
-
-   void SerialGC::begin()  {
-    Serial << F("> ** GridConnect over serial ** ") << endl;
- }
-
-  //
-  /// check for unprocessed messages in the buffer
-  //
-  bool SerialGC::available()
+  int ascii_pair_to_byte(const char *pair)
   {
-    bool result = false;
-    static int rxIndex = 0;
-    if (Serial.available()){     
-      char c = Serial.read();
-      if(c >= 'a' && c <= 'z') bitClear(c,5);   // ensure letters are upper case
-      //
-      // if 'start of message' already seen, save the character, and check for 'end of message'
-      if (rxIndex > 0) {
-        rxBuffer[rxIndex++] = c;
-        //
-        // check for 'end of message'
-        if (c == ';'){
-          rxBuffer[rxIndex++] = '\0';     // null terminate
-          rxIndex = 0;
-          result = true;
-        }
-      }
-      //
-      // always check for 'start of message'
-      if (c == ':') {
-        rxIndex = 0;                    // restart at beginning of buffer
-        rxBuffer[rxIndex++] = c;
-      }
-    }
-    //
-
-    if (result) result = encodeCANMessage(rxBuffer, &rxCANMessage);
-
-    return result;
+      unsigned char* data = (unsigned char*)pair;
+      int result;
+      if (data[1] < 'A') { result = data[1] - '0'; }
+      else { result = data[1] - 'A' + 10; }
+      if (data[0] < 'A') { result += (data[0] - '0') << 4; }
+      else { result += (data[0] - 'A' + 10) << 4; }
+      return result;
   }
 
   // convert a gridconnect message to CANMessage object
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool SerialGC::encodeCANMessage(char * gcBuffer, CANMessage *message) {
-//    Serial << " encode gridconnect message "<< gcBuffer << endl;
+  bool encodeCANMessage(char * gcBuffer, CANMessage *message) 
+  {
+    //Serial << " encode gridconnect message "<< gcBuffer << endl;
 
     bool isValid = true;                      // assume valid to begin with
     int gcIndex = 0;                          // index used to 'walk' gc message
     int gcBufferLength = strlen(gcBuffer);    // save for later use
 
     // must have start of message character
-    if (gcBuffer[gcIndex++] != ':') isValid = false;
+    if (gcBuffer[gcIndex++] != ':') 
+    {
+      isValid = false;
+    }
     //
     // do CAN Identifier, must be either 'X' or 'S'
-    if (gcBuffer[gcIndex] == 'X') {
+    if (gcBuffer[gcIndex] == 'X') 
+    {
       message->ext = true;
       // now get ID - convert from hex
       message->id = strtol(&gcBuffer[2], NULL, 16);
       gcIndex = 10;
-    } else if (gcBuffer[gcIndex] == 'S') {
+    }
+    else if (gcBuffer[gcIndex] == 'S') 
+    {
       message->ext = false;
       // now get ID - convert from hex
       message->id = strtol(&gcBuffer[2], NULL, 16);
       gcIndex = 6;
-    } else {
+    } 
+    else 
+    {
       isValid = false;
     }
     //
     // do RTR flag
-    if (gcBuffer[gcIndex] == 'R') {
+    if (gcBuffer[gcIndex] == 'R') 
+    {
       message->rtr = true;
-    } else if (gcBuffer[gcIndex] == 'N'){
+    } 
+    else if (gcBuffer[gcIndex] == 'N')
+    {
       message->rtr = false;
-    } else {
+    } 
+    else 
+    {
       isValid = false;
     }
     //
@@ -123,36 +102,101 @@ namespace VLCB
     // 2, because it starts from 0, and there's a single char end character
     int dataLength = gcBufferLength - gcIndex - 2;
     // must be even number of hex characters, and no more than 16
-    if ((dataLength % 2 ) || (dataLength > 16 )) {
+    if ((dataLength % 2 ) || (dataLength > 16 )) 
+    {
       isValid = false;
       message->len = 0;   // will prevent the data being decoded
-    } else {
+    } 
+    else 
+    {
       message->len = dataLength/2;
     }
-    for (int i = 0; i < dataLength/2; i++) {
+    for (int i = 0; i < dataLength/2; i++) 
+    {
       char hexByte[2];
       strncpy(hexByte, &gcBuffer[7+i*2], 2);
-      message->data[i] = SerialGC::ascii_pair_to_byte(hexByte);
-//        Serial << "hex " << hexByte[0] << hexByte[1]  << " byte " << message->data[i]  << endl;
+      message->data[i] = ascii_pair_to_byte(hexByte);
+      //Serial << "hex " << hexByte[0] << hexByte[1]  << " byte " << message->data[i]  << endl;
     }
     //
     // must have end of message character
-    if (gcBuffer[gcBufferLength-1] != ';') isValid = false;
-
-/*
-    Serial << "CANMessage:";
-    Serial << " isValid " << isValid << " id " << message->id << " length " << gcBufferLength;
-    Serial << " data ";
-    for (int i=0; i <message->len; i++) {
-      if( i>0 ) Serial << ",";
-      Serial << message->data[i];
+    if (gcBuffer[gcBufferLength-1] != ';') 
+    {
+      isValid = false;
     }
-    Serial << endl;
-*/
 
     if (isValid) return true;
     return false; 
   }
+
+
+  void debugCANMessage(CANMessage message)
+  {
+    Serial << "CANMessage:";
+    Serial << " id " << message.id << " length " << message.len;
+    Serial << " data ";
+    for (int i=0; i <message.len; i++) {
+      if( i>0 ) Serial << ",";
+      Serial << message.data[i];
+    }
+    Serial << endl;
+  }
+
+
+  void SerialGC::begin()  
+  {
+    Serial << F("> ** GridConnect over serial ** ") << endl;
+  }
+
+
+  //
+  // parse incoming characters & assemble message
+  // return true if valid message assembled & ready
+  //
+  bool SerialGC::available()
+  {
+    bool result = false;
+    static int rxIndex = 0;
+    if (Serial.available())
+    {     
+      char c = Serial.read();
+      if(c >= 'a' && c <= 'z') bitClear(c,5);   // ensure letters are upper case
+      //
+      // if 'start of message' already seen, save the character, and check for 'end of message'
+      if (rxIndex > 0) 
+      {
+        rxBuffer[rxIndex++] = c;
+        // check if end of buffer reached, and restart if so
+        if (rxIndex >= RXBUFFERSIZE) 
+        {
+          rxIndex = 0;
+        }
+        //
+        // check for 'end of message'
+        if (c == ';')
+        {
+          rxBuffer[rxIndex++] = '\0';     // null terminate
+          rxIndex = 0;
+          result = true;
+        }
+      }
+      //
+      // always check for 'start of message'
+      if (c == ':') 
+      {
+        rxIndex = 0;                    // restart at beginning of buffer
+        rxBuffer[rxIndex++] = c;
+      }
+    }
+    //
+    if (result) 
+    {
+      result = encodeCANMessage(rxBuffer, &rxCANMessage);
+    }
+    //
+    return result;
+  }
+
 
   //
   /// get the available CANMessage
@@ -212,16 +256,5 @@ namespace VLCB
   {
   }
 
-
- int SerialGC::ascii_pair_to_byte(const char *pair)
-    {
-        unsigned char* data = (unsigned char*)pair;
-        int result;
-        if (data[1] < 'A') { result = data[1] - '0'; }
-        else { result = data[1] - 'A' + 10; }
-        if (data[0] < 'A') { result += (data[0] - '0') << 4; }
-        else { result += (data[0] - 'A' + 10) << 4; }
-        return result;
-    }
 
 }
