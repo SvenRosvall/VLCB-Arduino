@@ -95,12 +95,12 @@ namespace VLCB
     {
       isValid = false;
     }
+    gcIndex++;  // set to next character afert RTR flag
     //
     // Do data segment - convert hex array to byte array
     // find out how many chars in data segment (0 to 16, in multiples of 2) 
-    // should be gcBufferLength minus gcIndex as it is now (after RTR flag), minus 2
-    // 2, because it starts from 0, and there's a single char end character
-    int dataLength = gcBufferLength - gcIndex - 2;
+    // should be gcBufferLength minus gcIndex as it is now (after RTR flag), minus 1
+    int dataLength = gcBufferLength - gcIndex - 1;
     // must be even number of hex characters, and no more than 16
     if ((dataLength % 2 ) || (dataLength > 16 )) 
     {
@@ -113,10 +113,8 @@ namespace VLCB
     }
     for (int i = 0; i < dataLength/2; i++) 
     {
-      char hexByte[2];
-      strncpy(hexByte, &gcBuffer[7+i*2], 2);
-      message->data[i] = ascii_pair_to_byte(hexByte);
-      //Serial << "hex " << hexByte[0] << hexByte[1]  << " byte " << message->data[i]  << endl;
+      message->data[i] = ascii_pair_to_byte(&gcBuffer[gcIndex]);
+      gcIndex += 2;
     }
     //
     // must have end of message character
@@ -192,6 +190,7 @@ namespace VLCB
     if (result) 
     {
       result = encodeCANMessage(rxBuffer, &rxCANMessage);
+      debugCANMessage(rxCANMessage);
     }
     //
     return result;
