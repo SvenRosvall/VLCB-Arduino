@@ -23,7 +23,7 @@ public:
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(byte i) override;
-  virtual RequestedAction checkRequestedAction()override;
+  virtual RequestedAction checkRequestedAction() override;
 
 private:
   Configuration * modconfig;
