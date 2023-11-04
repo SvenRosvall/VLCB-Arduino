@@ -29,6 +29,7 @@
 #include "EventProducerService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
+#include "CombinedUserInterface.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -41,17 +42,18 @@ const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
-//VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::SerialUserInterface userInterface(&modconfig, &can2515);
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
+VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
+VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
 
 // module objects
