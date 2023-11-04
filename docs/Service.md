@@ -94,9 +94,9 @@ The arguments provided to the handler function are:
 Facilitates sending events. 
 Call the ```sendEvent()``` from the application code.
 The parameters should be
-* a flag to say if the event is an on or off event.
-* an index for the produced event.
-* up to three data bytes to go with the event.
+* ```state``` : A flag to say if the event is an on or off event.
+* ```index``` : An index for the produced event that relates to the event table entry.
+* ```data1``` - ```data3``` : Up to three data bytes to go with the event.
 
 ### EventTeachingService
 Facilitates teaching events. 
