@@ -34,6 +34,8 @@
 namespace VLCB
 {
 
+  // Function to convert a pair of hexadecimal characters to a byte value
+  //
   int ascii_pair_to_byte(const char *pair)
   {
       unsigned char* data = (unsigned char*)pair;
@@ -45,6 +47,24 @@ namespace VLCB
       return result;
   }
 
+  // check supplied array is comprised of only hexadecimal characters
+  //
+  bool checkHexChars(char *charBuff, int count)
+  {
+    Serial << endl << "checkHexChars:  ";
+    for (int i = 0 ; i< count; i++)
+    {
+      Serial << charBuff[i] << "  ";
+      if (!isxdigit(charBuff[i]))
+      {
+        Serial << "  FAIL  ";
+        return false;
+      }
+    }
+    Serial << endl;
+    return true;
+  }
+
   // convert a gridconnect message to CANMessage object
   // see Gridconnect format at beginning of file for byte positions
   //
@@ -52,34 +72,41 @@ namespace VLCB
   {
     //Serial << " encode gridconnect message "<< gcBuffer << endl;
 
-    bool isValid = true;                      // assume valid to begin with
     int gcIndex = 0;                          // index used to 'walk' gc message
     int gcBufferLength = strlen(gcBuffer);    // save for later use
 
     // must have start of message character
     if (gcBuffer[gcIndex++] != ':') 
     {
-      isValid = false;
+      return false;
     }
     //
     // do CAN Identifier, must be either 'X' or 'S'
     if (gcBuffer[gcIndex] == 'X') 
     {
       message->ext = true;
-      // now get ID - convert from hex
+      // now get ID - convert from hex, but check they are all hex first
+      if (checkHexChars(&gcBuffer[2], 8) == false)
+      {
+        return false;
+      }
       message->id = strtol(&gcBuffer[2], NULL, 16);
       gcIndex = 10;
     }
     else if (gcBuffer[gcIndex] == 'S') 
     {
       message->ext = false;
-      // now get ID - convert from hex
+      // now get ID - convert from hex, but check they are all hex first
+      if (checkHexChars(&gcBuffer[2], 4) == false)
+      {
+        return false;
+      }
       message->id = strtol(&gcBuffer[2], NULL, 16);
       gcIndex = 6;
     } 
     else 
     {
-      isValid = false;
+      return false;
     }
     //
     // do RTR flag
@@ -93,7 +120,7 @@ namespace VLCB
     } 
     else 
     {
-      isValid = false;
+      return false;
     }
     gcIndex++;  // set to next character afert RTR flag
     //
@@ -104,15 +131,20 @@ namespace VLCB
     // must be even number of hex characters, and no more than 16
     if ((dataLength % 2 ) || (dataLength > 16 )) 
     {
-      isValid = false;
-      message->len = 0;   // will prevent the data being decoded
+      return false;
     } 
     else 
     {
       message->len = dataLength/2;
     }
+    // now convert hex data into bytes
     for (int i = 0; i < dataLength/2; i++) 
     {
+      // check they are hex chars first
+      if (checkHexChars(&gcBuffer[gcIndex], 2) == false)
+      {
+        return false;
+      }
       message->data[i] = ascii_pair_to_byte(&gcBuffer[gcIndex]);
       gcIndex += 2;
     }
@@ -120,17 +152,17 @@ namespace VLCB
     // must have end of message character
     if (gcBuffer[gcBufferLength-1] != ';') 
     {
-      isValid = false;
+      return false;
     }
-
-    if (isValid) return true;
-    return false; 
+    //
+    return true; 
   }
 
-
+  // Function to output a debug CANMessage to Serial
+  //
   void debugCANMessage(CANMessage message)
   {
-    Serial << "CANMessage:";
+    Serial << endl << "CANMessage:";
     Serial << " id " << message.id << " length " << message.len;
     Serial << " data ";
     for (int i=0; i <message.len; i++) {
@@ -141,9 +173,10 @@ namespace VLCB
   }
 
 
-  void SerialGC::begin()  
+  bool SerialGC::begin()  
   {
     Serial << F("> ** GridConnect over serial ** ") << endl;
+    return true;
   }
 
 
@@ -190,7 +223,6 @@ namespace VLCB
     if (result) 
     {
       result = encodeCANMessage(rxBuffer, &rxCANMessage);
-      debugCANMessage(rxCANMessage);
     }
     //
     return result;
@@ -203,7 +235,7 @@ namespace VLCB
   //
   CANMessage SerialGC::getNextCanMessage()
   {
-//    Serial << " getNextCanMessage "<< endl;
+    debugCANMessage(rxCANMessage);
     return rxCANMessage;
   }
 
@@ -243,8 +275,7 @@ namespace VLCB
       strcpy (str + offset + 2 + i*2,";");
     }
     // output the message
-    Serial << str;
-//  Serial << endl;    
+    Serial.print(str);
     return true;
   }
 

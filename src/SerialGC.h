@@ -27,7 +27,7 @@ namespace VLCB
   {
   public:
 
-    void begin();
+    bool begin();
 
     bool available() override;
     CANMessage getNextCanMessage() override;
