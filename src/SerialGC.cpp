@@ -19,6 +19,7 @@
 // 012345678901234567890123 - 24 characters maximum
 // where 'S' represents standard
 // B is the CAN identifier, 4 hex characters for 11 digit identifier
+// the 11 bits occupy the highest bits, so are left shifted 5
 
 // Gridconnect format of a CAN message with  extended identier
 // :XBBBBBBBBCDDDDDDDDDDDDDDDD;
@@ -81,7 +82,7 @@ namespace VLCB
     if (gcBuffer[gcIndex] == 'X') 
     {
       message->ext = true;
-      // now get ID - convert from hex, but check they are all hex first
+      // now get 29 bit ID - convert from hex, but check they are all hex first
       if (checkHexChars(&gcBuffer[2], 8) == false)
       {
         return false;
@@ -92,12 +93,13 @@ namespace VLCB
     else if (gcBuffer[gcIndex] == 'S') 
     {
       message->ext = false;
-      // now get ID - convert from hex, but check they are all hex first
+      // now get 11 bit ID - convert from hex, but check they are all hex first
       if (checkHexChars(&gcBuffer[2], 4) == false)
       {
         return false;
       }
-      message->id = strtol(&gcBuffer[2], NULL, 16);
+      // 11 bit identifier needs to be shifted right by 5
+      message->id = strtol(&gcBuffer[2], NULL, 16) >> 5;
       gcIndex = 6;
     } 
     else 
@@ -252,8 +254,8 @@ namespace VLCB
       offset = 10;
     } else {
       strcpy (str,":S");
-      // standard 11 bit CAN idenfier in bytes 2 to 5
-      sprintf(str + 2, "%04X", msg->id);
+      // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
+      sprintf(str + 2, "%04X", msg->id << 5);
       offset = 6;
     }
     // set RTR or normal - byte 6 or 10
