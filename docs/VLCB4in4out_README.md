@@ -90,7 +90,7 @@ The number of Event Variables (EV) is equal to the number of LEDs.
 Event Variable 1 (EV1) controls the first LED pin in the ```LED``` array. 
 EV2 controls the second LED pin, etc.
 
-The LEDs are controlled by the LEDContro class.  This allows for any LED to be
+The LEDs are controlled by the LEDControl class.  This allows for any LED to be
 switched on, switched off or flashed at a rate determined in the call:
 LEDControl::flash(unsigned int period)
 
@@ -107,6 +107,16 @@ The following EV values are defined to control the LEDs in this example:
 
 Event Variables, whilst present, are not used in this application.  If used in an 
 application, they may be set in the normal manner using the FCU.
+
+#### Consume Own Events
+
+If the Produced Events Service and the Consume Events Service are both applied,
+the Consume Own Events Service can also be enabled.  This service provides a 
+buffer that will pass the produced event back to the Consumed Event Service.
+A consumed Own Event still only has one entry in the Event Table.  If the Event
+Variables are left as 0 or NULL, then the Consume Events Service will do nothing.
+If the Event Variables are populated as shown in the table in the Consumed Events
+Section above, the LEDs will behave accordingly to a Produced Event.
 
 ### Node Variables
 
@@ -144,10 +154,12 @@ so nn will be 4 characters long.
 
 Next, the module is taught the short event using the "learn an event using event index"
 opcode. The message sent is:
-F5nneni0000 where n is the node number 0x0000, en is the event/device number in hex and
-i is the switch index byte in hex.  for example, if the event/device number was
-500 (0x01F4), and the switch indes was 03, the message would be:
-F5000001F4030000
+F5nnenij00 where n is the node number 0x0000, en is the event/device number in hex,
+i is the switch index byte in hex and j is the event variable index byte in hex which
+MUST NOT be less than 01.
+For example, if the event/device number was 500 (0x01F4), and the switch index was 03,
+the message would be:
+F5000001F4030100
 
 Finally, learn mode is switched of by sending the message:
 76nn09 where nn are the two bytes of the node number in hex.
