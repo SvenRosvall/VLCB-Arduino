@@ -51,17 +51,13 @@ namespace VLCB
   //
   bool checkHexChars(char *charBuff, int count)
   {
-    Serial << endl << "checkHexChars:  ";
     for (int i = 0 ; i< count; i++)
     {
-      Serial << charBuff[i] << "  ";
       if (!isxdigit(charBuff[i]))
       {
-        Serial << "  FAIL  ";
         return false;
       }
     }
-    Serial << endl;
     return true;
   }
 
