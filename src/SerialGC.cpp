@@ -9,27 +9,49 @@
 #include <string.h>
 
 //
-// Class to transfer CAN messages using the GridConnect protocol over the serial port
+// Class to transfer CAN frames using the GridConnect protocol over the serial port
 //
+// GridConnect is a format to encode a bit orientated CAN frame onto a byte orientated serial stream
+// The CBUS developers guide describes a slightly modified form of GridConnect, which has been used to 
+// enable communtion between computers and can adapters like the CANUSB4 module
+// this module follows this convention
 
-// there are two basic types of CAN message, standard and extended
+// the GridConnect message syntax for a normal message
+// : <S | X> <IDENTIFIER> <N> <DATA-0> <DATA-1> … <DATA-7> ;
+// where:
+//     ':' and ';' are message start and end characters respectively
+//     Identifier and data fields are treated as base-16 digits (hexadecimal).
+//     'S' & 'X' characters indicates standard or extended CAN frames
+//     'N' character indicates a normal (not RTR) message
+
+// the GridConnect message syntax for a 'Request to Transmit' (RTR) message (there is no data field)
+// : <S | X> <IDENTIFIER> <R> <LENGTH>;
+// where:
+//     ':' and ';' are message start and end characters respectively
+//     Identifier field is treated as base-16 digits (hexadecimal).
+//     'S' & 'X' characters indicates standard or extended CAN frames
+//     'R' character indicates an RTR message
+//     Length field is a single ASCII decimal character from ‘0’ to ‘8’ that specifies the length
+//     of the message
+
+// the difference in the GridConnect version used here is in the format of the Identifier field:
 //
-// Gridconnect format of a CAN message with standard Identifier
-// :SBBBBCDDDDDDDDDDDDDDDD;
-// 012345678901234567890123 - 24 characters maximum
-// where 'S' represents standard
-// B is the CAN identifier, 4 hex characters for 11 digit identifier
-// the 11 bits occupy the highest bits, so are left shifted 5
-
-// Gridconnect format of a CAN message with  extended identier
-// :XBBBBBBBBCDDDDDDDDDDDDDDDD;
-// 0123456789012345678901234567 - 28 characters maximum
-// where 'X' represents extended
-// B is the CAN identifier, 8 hex characters for 29 digit identifier
-
-// in both types
-// C is 'R' for RTR or 'N' for normal
-// DD are databytes, variable length 0 to 16 (in hexadecimal pairs)
+// For a standard can message with an 11 bit identifier, the GridConnect identifier field is 4 hex characters,
+// i.e. 16 bits
+// The CBUS implementation shifts the 11 bit ID by 5, i.e. fills the top bit, with the lower 5 bits being 0
+// (This was done to map directly onto SIDH and SIDL registers in the PIC processor family)
+// And the GridConnect Identifier field is also leading zero padded, so always 4 characters for a standard message
+// 
+// For an extended can message with an 29 bit identifier, the GridConnect identifier field is 8 hex characters,
+// i.e. 32 bits
+// In this case the mapping is a bit more complex
+// IDENTIFIER[0,1] - bits [28:21] of the can identifier
+// IDENTIFIER[2] - bits [20:18] of the can identifier, left shifted by 1, bottom bit set to zero
+// IDENTIFIER[3] - bits [17:16] of the can identifier, bottom two bits, top two bits set to 0
+// IDENTIFIER[4,5,6,7] - bits [17:16] of the can identifier
+// (This maps directly onto SIDH, SIDL, EIDH and EIDL registers the PIC processor family)
+// And the GridConnect Identifier field is also leading zero padded, so always 8 characters for an extended message
+// 
 
 
 namespace VLCB
@@ -243,6 +265,7 @@ namespace VLCB
   //
   bool SerialGC::sendCanMessage(CANMessage *msg)
   {
+    static int x = 0;
     // start char array for output string
     char str[30];
     byte offset = 0;
@@ -272,9 +295,10 @@ namespace VLCB
       // append terminator after every data byte - will be overwritten except for last one
       strcpy (str + offset + 2 + i*2,";");
     }
+    Serial << endl << x++ << " ";
     // output the message
     Serial.print(str);
-    return true;
+   return true;
   }
 
   //
