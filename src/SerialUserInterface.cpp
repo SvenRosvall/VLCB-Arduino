@@ -12,9 +12,9 @@ extern void printConfig();
 namespace VLCB
 {
 
-SerialUserInterface::SerialUserInterface(Configuration * modconfig, CAN2515 * can2515)
+SerialUserInterface::SerialUserInterface(Configuration * modconfig, Transport *transport)
   : modconfig(modconfig)
-  , can2515(can2515)
+  , transport(transport)
 {
 }
 
@@ -117,11 +117,11 @@ void SerialUserInterface::run()
 
         // CAN bus status
       case 'c':
-        Serial << F(" messages received = ") << can2515->_numMsgsRcvd 
-        << F(", sent = ") << can2515->_numMsgsSent 
-        << F(", receive errors = ") << can2515->canp->receiveErrorCounter()
-        << F(", transmit errors = ") << can2515->canp->transmitErrorCounter() 
-        << F(", error flag = ") << can2515->canp->errorFlagRegister()
+        Serial << F(" messages received = ") << transport->receiveCounter()
+               << F(", sent = ") << transport->transmitCounter()
+               << F(", receive errors = ") << transport->receiveErrorCounter()
+               << F(", transmit errors = ") << transport->transmitErrorCounter()
+               << F(", error status = ") << transport->errorStatus()
         << endl;
         break;
 
@@ -132,7 +132,7 @@ void SerialUserInterface::run()
 
       case 'y':
         // reset CAN bus and VLCB message processing
-        can2515->reset();
+        transport->reset();
         break;
 
       case '*':

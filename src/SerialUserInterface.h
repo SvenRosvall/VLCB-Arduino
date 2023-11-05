@@ -7,7 +7,7 @@
 
 #include "UserInterface.h"
 #include "Configuration.h"
-#include "CAN2515.h"
+#include "Transport.h"
 
 namespace VLCB
 {
@@ -15,7 +15,7 @@ namespace VLCB
 class SerialUserInterface : public UserInterface
 {
 public:
-  SerialUserInterface(Configuration * modconfig, CAN2515 * can2515);
+  SerialUserInterface(Configuration * modconfig, Transport * transport);
 
   virtual void run() override;
   virtual void indicateResetting() override;
@@ -27,7 +27,7 @@ public:
 
 private:
   Configuration * modconfig;
-  CAN2515 * can2515;
+  Transport * transport;
   bool isResetRequested = false;
   UserInterface::RequestedAction requestedAction;
 };
