@@ -32,6 +32,14 @@ The Storage interface provides a simple API to persistent storage regardless of
 type of storage. 
 The user code should be able to reserve a chunk of bytes in this space.
 
+## Split SerialUserInterface
+The SerialUserInterface class contains everything a developer could need.
+This adds code bloat. 
+Split this class in two: 
+  1. do the same things as the push-button does, i.e. initiate CAN enumeration, 
+     initiate setup mode.
+  1. all the other stuff a developer would want.
+
 ## Potential bugs and opportunities for improvement
 
 ### Event lookup
