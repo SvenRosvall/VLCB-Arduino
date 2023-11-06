@@ -174,7 +174,6 @@ void SerialUserInterface::indicateResetDone()
 
 void SerialUserInterface::indicateActivity()
 {
-  Serial << "Activity happened" << endl;
 }
 
 bool SerialUserInterface::resetRequested()
