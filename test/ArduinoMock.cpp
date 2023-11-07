@@ -4,6 +4,13 @@
 #include <iostream>
 #include "Arduino.hpp"
 #include "ArduinoMock.hpp"
+#include "ACAN2515.h"
+
+/* Functions provided by user sketch */
+
+void printConfig()
+{
+}
 
 /* Mocking implementation */
 
@@ -92,6 +99,17 @@ byte lowByte(unsigned int i)
 void Serial_T::begin(int baudRate)
 {
 }
+
+bool Serial_T::available()
+{
+  return true;
+}
+
+char Serial_T::read()
+{
+  return ' ';
+}
+
 void Serial_T::println(const char *)
 {
 }
@@ -140,4 +158,21 @@ uint8_t ADCH;
 
 void sei()
 {
+}
+
+/* ACAN2515 methods */
+
+uint8_t ACAN2515::receiveErrorCounter() 
+{
+  return 0; 
+}
+
+uint8_t ACAN2515::transmitErrorCounter()
+{
+  return 0; 
+}
+
+uint8_t ACAN2515::errorFlagRegister()
+{
+  return 0; 
 }

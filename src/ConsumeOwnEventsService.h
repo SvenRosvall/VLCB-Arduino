@@ -33,9 +33,12 @@ public:
   VlcbMessage *get(void);
   void put(const VlcbMessage *msg);
   void clear(void);
-  unsigned int getNumberOfPuts();
-  unsigned int getNumberofGets();
-  unsigned int overflows(void);
+  
+  // Diagnostic metrics access
+  unsigned int getNumberOfPuts(void);
+  unsigned int getNumberofGets(void);
+  unsigned int getOverflows(void);
+  unsigned int getHighWaterMark(void);   // High Watermark
     
 private:
   byte bufUse(void);

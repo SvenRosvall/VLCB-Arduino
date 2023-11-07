@@ -39,7 +39,6 @@ private:
   void (*eventhandlerex)(byte index, VlcbMessage *msg, bool evOn, byte evVal);
 
   void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event);
-  Processed handleEventMessage(VlcbMessage *msg);
 };
 
 }  // VLCB
