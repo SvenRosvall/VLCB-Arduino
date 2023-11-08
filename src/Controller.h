@@ -75,7 +75,6 @@ public:
   void setLearnMode(byte reqMode);
   bool isSetProdEventTableFlag() { return setProdEventTable; }
   void clearProdEventTableFlag();
-  void setFrameHandler(void (*fptr)(VlcbMessage *msg), byte *opcodes = NULL, byte num_opcodes = 0);
 
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
@@ -85,13 +84,8 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  void (*framehandler)(VlcbMessage *msg) = NULL;
-  byte *_opcodes = NULL;
-  byte _num_opcodes = 0;
   bool setProdEventTable = false;
 
-  bool filterByOpcodes(const VlcbMessage *msg) const;
-  void callFrameHandler(VlcbMessage *msg);
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };
