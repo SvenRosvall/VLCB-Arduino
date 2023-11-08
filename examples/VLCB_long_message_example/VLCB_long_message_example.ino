@@ -57,7 +57,6 @@ unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
 
 // forward function declarations
 void eventhandler(byte, VLCB::VlcbMessage *);
-void framehandler(VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 void longmessagehandler(void *, const unsigned int, const byte, const byte);
@@ -106,9 +105,6 @@ void setupVLCB()
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
-
-  // register our CAN frame handler, to receive *every* CAN frame
-  controller.setFrameHandler(framehandler);
 
   // subscribe to long message streams and register our handler function
   lmsg.subscribe(streams, sizeof(streams) / sizeof(byte), lmsg_in, 32, longmessagehandler);
@@ -197,25 +193,6 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
   Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
-}
-
-//
-/// user-defined frame processing function
-/// called from the VLCB library for *every* CAN frame received
-/// it receives a pointer to the received CAN frame
-//
-void framehandler(VLCB::VlcbMessage *msg)
-{
-  // as an example, format and display the received frame
-
-  Serial << "[" << msg->len << "] [";
-
-  for (byte d = 0; d < msg->len; d++)
-  {
-    Serial << " 0x" << _HEX(msg->data[d]);
-  }
-
-  Serial << " ]" << endl;
 }
 
 //
