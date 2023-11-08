@@ -73,9 +73,7 @@ public:
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
-  bool isSetProdEventTableFlag() { return setProdEventTable; }
-  void clearProdEventTableFlag();
-
+  
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
   Configuration *module_config;

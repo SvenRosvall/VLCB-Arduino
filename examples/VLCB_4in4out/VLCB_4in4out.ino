@@ -132,7 +132,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = NUM_LEDS;
+  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
   
 
   // initialise and load configuration
@@ -299,7 +299,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     case OPC_ASON:
     DEBUG_PRINT(F("> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
         DEBUG_PRINT(F("> EV = ") << ev << (" Value = ") << evval);
 
@@ -326,7 +326,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     case OPC_ASOF:
     DEBUG_PRINT(F("> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
 
         if (evval > 0) {
