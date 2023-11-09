@@ -115,16 +115,12 @@ void Controller::setName(const unsigned char *mname)
 void Controller::indicateMode(byte mode)
 {
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
-  if (_ui) {
+  if (_ui) 
+  {
     _ui->indicateMode(mode);
   }
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
- 
-  if (mode == MODE_NORMAL) // used by Event Producer Service
-  {
-    setProdEventTable = true;
-  }
 }
 
 void Controller::setParamFlag(unsigned char flag, bool set)
@@ -137,11 +133,6 @@ void Controller::setParamFlag(unsigned char flag, bool set)
   {
     _mparams[PAR_FLAGS] &= ~flag;
   }
-}
-
-void Controller::clearProdEventTableFlag()
-{
-  setProdEventTable = false;
 }
 
 void Controller::indicateActivity()

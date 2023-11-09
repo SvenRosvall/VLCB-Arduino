@@ -73,9 +73,7 @@ public:
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
-  bool isSetProdEventTableFlag() { return setProdEventTable; }
-  void clearProdEventTableFlag();
-
+  
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
   Configuration *module_config;
@@ -84,8 +82,7 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  bool setProdEventTable = false;
-
+  
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };
