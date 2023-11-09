@@ -62,20 +62,6 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
   }
 }
 
-void EventProducerService::createDefaultProducedEvent(byte evValue)
-{
-  byte data[4];
-  byte index = module_config->findEventSpace();
-  data[0] = highByte(module_config->nodeNum);
-  data[1] = lowByte(module_config->nodeNum);
-  data[2] = 0;
-  data[3] = evValue;
-  
-  module_config->writeEvent(index, data);
-  module_config->writeEventEV(index, 1, evValue);
-  module_config->updateEvHashEntry(index);   
-}
-
 void EventProducerService::sendEvent(bool state, byte evValue)
 {
   byte nn_en[4];
@@ -110,10 +96,6 @@ void EventProducerService::sendEvent(bool state, byte evValue)
     {
       coeService->put(&msg);
     }
-  }
-  else  // Produced event doesn't exist so create a default
-  {
-    createDefaultProducedEvent(evValue);
   }
 }
 
@@ -152,10 +134,6 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     {
       coeService->put(&msg);
     }
-  }
-  else  // Produced event doesn't exist so create a default
-  {
-    createDefaultProducedEvent(evValue);
   }
 }
 
@@ -196,10 +174,6 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
       coeService->put(&msg);
     }
   }
-  else  // Produced event doesn't exist so create a default
-  {
-    createDefaultProducedEvent(evValue);
-  }
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
@@ -239,10 +213,6 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     {
       coeService->put(&msg);
     }
-  }
-  else  // Produced event doesn't exist so create a default
-  {
-    createDefaultProducedEvent(evValue);
   }
 }
 

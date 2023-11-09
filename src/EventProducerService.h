@@ -33,7 +33,6 @@ public:
   void sendEvent(bool state, byte index, byte data1);
   void sendEvent(bool state, byte index, byte data1, byte data2);
   void sendEvent(bool state, byte index, byte data1, byte data2, byte data3);
-  void createDefaultProducedEvent(byte evValue);
 
 private:
   Controller *controller;
