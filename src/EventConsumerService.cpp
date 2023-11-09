@@ -42,9 +42,9 @@ void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int 
   // call any registered event handler
 
   if (index < module_config->EE_MAX_EVENTS) {
-    if (eventhandler != NULL) {
+    if (eventhandler != nullptr) {
       (void)(*eventhandler)(index, msg);
-    } else if (eventhandlerex != NULL) {
+    } else if (eventhandlerex != nullptr) {
       byte evVal = (module_config->EE_NUM_EVS > 0) ? module_config->getEventEVval(index, 1) : 0;
       (void)(*eventhandlerex)(index, msg, is_on_event, evVal);
     }
@@ -53,6 +53,7 @@ void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int 
 
 void EventConsumerService::process(UserInterface::RequestedAction requestedAction)
 {
+  // Are there any events we have just produced?
   if (coeService && (coeService->available()))
   {
     // DEBUG_SERIAL << ">Getting COE Message " << endl;
@@ -114,22 +115,6 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
       {
         processAccessoryEvent(msg, 0, en, (opc % 2 == 0));
       }
-
-      return PROCESSED;
-
-    case OPC_AREQ:
-      // AREQ message - request for node state, only producer nodes
-
-      if ((msg->data[1] == highByte(module_config->nodeNum)) && (msg->data[2] == lowByte(module_config->nodeNum))) 
-      {
-        (void)(*eventhandler)(0, msg);
-      }
-
-      return PROCESSED;
-
-    case OPC_ASRQ:
-
-
 
       return PROCESSED;
 
