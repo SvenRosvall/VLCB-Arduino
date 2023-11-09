@@ -7,7 +7,6 @@
 
 #include "UserInterface.h"
 #include "Configuration.h"
-#include "CAN2515.h"
 
 namespace VLCB
 {
