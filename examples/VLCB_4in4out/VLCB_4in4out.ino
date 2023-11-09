@@ -69,6 +69,8 @@
 #include "EventProducerService.h"
 #include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
+#include "SerialUserInterface.h"
+#include "CombinedUserInterface.h"
 
 #include "LEDControl.h"
 
@@ -83,9 +85,11 @@ const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
-VLCB::LEDUserInterface userInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
+VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
@@ -93,7 +97,7 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService(&coeService);
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService(&coeService);
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
+VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 
 // module name, must be 7 characters, space padded.
@@ -128,7 +132,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = NUM_LEDS;
+  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
   
 
   // initialise and load configuration
@@ -148,13 +152,6 @@ void setupVLCB()
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
-
-  // module reset - if switch is depressed at startup and module is in Uninitialised mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == MODE_UNINITIALISED)
-  {
-    Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
-    modconfig.resetModule(&userInterface);
-  }
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
@@ -216,12 +213,7 @@ void loop()
   //
   controller.process();
 
-  //
-  /// process console commands
-  //
-  processSerialInput();
-
-  // Run the LED code
+   // Run the LED code
   for (int i = 0; i < NUM_LEDS; i++) {
     moduleLED[i].run();
   }
@@ -307,7 +299,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     case OPC_ASON:
     DEBUG_PRINT(F("> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
         DEBUG_PRINT(F("> EV = ") << ev << (" Value = ") << evval);
 
@@ -334,7 +326,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     case OPC_ASOF:
     DEBUG_PRINT(F("> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
 
         if (evval > 0) {
@@ -358,139 +350,3 @@ void printConfig()
   Serial << F("> © Martin Da Costa (MERG M62237) 2023") << endl;
 }
 
-//
-/// command interpreter for serial console input
-//
-void processSerialInput()
-{
-  byte uev = 0;
-  char msgstr[32], dstr[32];
-
-  if (Serial.available())
-  {
-    char c = Serial.read();
-
-    switch (c)
-    {
-    case 'n':
-      // node config
-      printConfig();
-
-      // node identity
-      Serial << F("> VLCB node configuration") << endl;
-      Serial << F("> mode = ") << (modconfig.currentMode == MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
-      Serial << endl;
-      break;
-
-    case 'e':
-      // EEPROM learned event data table
-      Serial << F("> stored events ") << endl;
-      Serial << F("  max events = ") << modconfig.EE_MAX_EVENTS << F(" EVs per event = ") << modconfig.EE_NUM_EVS << F(" bytes per event = ") << modconfig.EE_BYTES_PER_EVENT << endl;
-
-      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
-      {
-        if (modconfig.getEvTableEntry(j) != 0)
-        {
-          ++uev;
-        }
-      }
-
-      Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig.EE_MAX_EVENTS - uev) << endl;
-      Serial << F("  using ") << (uev * modconfig.EE_BYTES_PER_EVENT) << F(" of ") << (modconfig.EE_MAX_EVENTS * modconfig.EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
-
-      Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
-
-      for (byte j = 0; j < (modconfig.EE_NUM_EVS); j++)
-      {
-        sprintf(dstr, "EV%03d | ", j + 1);
-        Serial << dstr;
-      }
-
-      Serial << F("Hash |") << endl;
-      Serial << F(" --------------------------------------------------------------") << endl;
-
-      // for each event data line
-      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
-      {
-        if (modconfig.getEvTableEntry(j) != 0)
-        {
-          sprintf(dstr, "  %03d  | ", j);
-          Serial << dstr;
-
-          // for each data byte of this event
-          byte evarray[4];
-          modconfig.readEvent(j, evarray);
-          for (byte e = 0; e < 4; e++)
-          {
-            sprintf(dstr, " 0x%02hx | ", evarray[e]);
-            Serial << dstr;
-          }
-          for (byte ev = 1; ev <= modconfig.EE_NUM_EVS; ev++)
-          {
-            sprintf(dstr, " 0x%02hx | ", modconfig.getEventEVval(j, ev));
-            Serial << dstr;
-          }
-
-          sprintf(dstr, "%4d |", modconfig.getEvTableEntry(j));
-          Serial << dstr << endl;
-        }
-      }
-
-      Serial << endl;
-
-      break;
-
-    // NVs
-    case 'v':
-      // note NVs number from 1, not 0
-      Serial << "> Node variables" << endl;
-      Serial << F("   NV   Val") << endl;
-      Serial << F("  --------------------") << endl;
-
-      for (byte j = 1; j <= modconfig.EE_NUM_NVS; j++)
-      {
-        byte v = modconfig.readNV(j);
-        sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
-        Serial << msgstr << endl;
-      }
-
-      Serial << endl << endl;
-
-      break;
-
-    // CAN bus status
-    case 'c':
-      can2515.printStatus();
-      break;
-
-    case 'h':
-      // event hash table
-      modconfig.printEvHashTable(false);
-      break;
-
-    case 'y':
-      // reset CAN bus and VLCB message processing
-      can2515.reset();
-      break;
-
-    case '*':
-      // reboot
-      modconfig.reboot();
-      break;
-
-    case 'm':
-      // free memory
-      Serial << F("> free SRAM = ") << modconfig.freeSRAM() << F(" bytes") << endl;
-      break;
-
-    case '\r':
-    case '\n':
-      Serial << endl;
-      break;
-
-    default:
-      // Serial << F("> unknown command ") << c << endl;
-      break;
-    }
-  }
-}

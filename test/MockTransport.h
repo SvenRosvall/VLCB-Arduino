@@ -23,6 +23,12 @@ public:
   void setNextMessage(VLCB::VlcbMessage msg);
   void clearMessages();
 
+  virtual unsigned int receiveCounter() override { return 0; }
+  virtual unsigned int transmitCounter() override { return 0; }
+  virtual unsigned int receiveErrorCounter() override { return 0; }
+  virtual unsigned int transmitErrorCounter() override { return 0; }
+  virtual unsigned int errorStatus() override { return 0; }
+
   std::deque<VLCB::VlcbMessage> incoming_messages;
   std::vector<VLCB::VlcbMessage> sent_messages;
   

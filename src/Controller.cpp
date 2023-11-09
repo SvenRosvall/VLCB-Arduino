@@ -68,17 +68,6 @@ void Controller::begin()
 }
 
 //
-/// register the user handler for CAN frames
-/// default args in .h declaration for opcodes array (NULL) and size (0)
-//
-void Controller::setFrameHandler(void (*fptr)(VlcbMessage *msg), byte opcodes[], byte num_opcodes)
-{
-  framehandler = fptr;
-  _opcodes = opcodes;
-  _num_opcodes = num_opcodes;
-}
-
-//
 /// assign the module parameter set
 //
 void Controller::setParams(unsigned char *mparams)
@@ -126,16 +115,12 @@ void Controller::setName(const unsigned char *mname)
 void Controller::indicateMode(byte mode)
 {
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
-  if (_ui) {
+  if (_ui) 
+  {
     _ui->indicateMode(mode);
   }
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
- 
-  if (mode == MODE_NORMAL) // used by Event Producer Service
-  {
-    setProdEventTable = true;
-  }
 }
 
 void Controller::setParamFlag(unsigned char flag, bool set)
@@ -148,11 +133,6 @@ void Controller::setParamFlag(unsigned char flag, bool set)
   {
     _mparams[PAR_FLAGS] &= ~flag;
   }
-}
-
-void Controller::clearProdEventTableFlag()
-{
-  setProdEventTable = false;
 }
 
 void Controller::indicateActivity()
@@ -199,8 +179,6 @@ void Controller::process(byte num_messages)
       continue;
     }
 
-    callFrameHandler(&msg);
-
     for (Service * service : services)
     {
       // DEBUG_SERIAL << "> Passing raw message to " << endl;
@@ -239,38 +217,6 @@ void Controller::process(byte num_messages)
   //
   /// end of Controller message processing
   //
-}
-
-// Return true if framehandler shall be called for registered opcodes, if any.
-bool Controller::filterByOpcodes(const VlcbMessage *msg) const
-{
-  if (_num_opcodes == 0)
-  {
-    return true;
-  }
-  if (msg->len > 0)
-  {
-    unsigned int opc = msg->data[0];
-    for (byte i = 0; i < _num_opcodes; i++)
-    {
-      if (opc == _opcodes[i])
-      {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-void Controller::callFrameHandler(VlcbMessage *msg)
-{
-  if (framehandler != NULL)
-  {
-    if (filterByOpcodes(msg))
-    {
-      (void)(*framehandler)(msg);
-    }
-  }
 }
 
 void setNN(VlcbMessage *msg, unsigned int nn)

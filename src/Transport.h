@@ -24,6 +24,12 @@ public:
   virtual VlcbMessage getNextMessage() = 0;
   virtual bool sendMessage(VlcbMessage *msg) = 0;
   virtual void reset() = 0;
+
+  virtual unsigned int receiveCounter() = 0;
+  virtual unsigned int transmitCounter() = 0;
+  virtual unsigned int receiveErrorCounter() = 0;
+  virtual unsigned int transmitErrorCounter() = 0;
+  virtual unsigned int errorStatus() = 0;
 };
 
 }
