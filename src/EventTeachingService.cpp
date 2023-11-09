@@ -364,15 +364,31 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
     {
       byte evindex = msg->data[5];
       byte evval = msg->data[6];
+      byte index;
       if ((evindex == 0) || (evindex > module_config->EE_NUM_EVS))
       {
         controller->sendCMDERR(CMDERR_INV_EV_IDX);
         controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
         return PROCESSED;
       }
+      // Is this a produced event that we know about?
+      // Search the events table by evindex = 1 for a value match with evval.
+      if ((evindex == 1) && (evval > 0))
+      {
+        index = module_config->findExistingEventByEv(evindex, evval);
+        if (index < module_config->EE_MAX_EVENTS)
+        {
+          module_config->writeEvent(index, &msg->data[1]);
+          // no need to write eventEV as, by definition, it hasn't changed
+          // recreate event hash table entry
+          module_config->updateEvHashEntry(index);
+          return PROCESSED;
+        }
+      }     
+      
       // search for this NN, EN as we may just be adding an EV to an existing learned event
       // DEBUG_SERIAL << F("> searching for existing event to update") << endl;
-      byte index = module_config->findExistingEvent(nn, en);
+      index = module_config->findExistingEvent(nn, en);
 
       // not found - it's a new event
       if (index >= module_config->EE_MAX_EVENTS)
