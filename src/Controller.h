@@ -82,8 +82,7 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  bool setProdEventTable = false;
-
+  
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };

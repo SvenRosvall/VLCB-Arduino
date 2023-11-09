@@ -62,7 +62,7 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
   }
 }
 
-void EventProducerService::createDefault(byte evValue)
+void EventProducerService::createDefaultProducedEvent(byte evValue)
 {
   byte data[4];
   byte index = module_config->findEventSpace();
@@ -113,7 +113,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   }
   else  // Produced event doesn't exist so create a default
   {
-    createDefault(evValue);
+    createDefaultProducedEvent(evValue);
   }
 }
 
@@ -139,7 +139,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     }
     
     VlcbMessage msg;
-    msg.len = 5;
+    msg.len = 6;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
     msg.data[2] = nn_en[1];
@@ -155,7 +155,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   }
   else  // Produced event doesn't exist so create a default
   {
-    createDefault(evValue);
+    createDefaultProducedEvent(evValue);
   }
 }
 
@@ -181,7 +181,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     
     VlcbMessage msg;
-    msg.len = 5;
+    msg.len = 7;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
     msg.data[2] = nn_en[1];
@@ -198,7 +198,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   }
   else  // Produced event doesn't exist so create a default
   {
-    createDefault(evValue);
+    createDefaultProducedEvent(evValue);
   }
 }
 
@@ -242,7 +242,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   }
   else  // Produced event doesn't exist so create a default
   {
-    createDefault(evValue);
+    createDefaultProducedEvent(evValue);
   }
 }
 
