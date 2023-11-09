@@ -198,7 +198,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     
     VlcbMessage msg;
-    msg.len = 5;
+    msg.len = 8;
     msg.data[0] = opCode;
     msg.data[1] = nn_en[0];
     msg.data[2] = nn_en[1];
