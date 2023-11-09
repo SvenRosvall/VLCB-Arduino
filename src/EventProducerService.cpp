@@ -62,12 +62,25 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
   }
 }
 
+void EventProducerService::createDefault(byte evValue)
+{
+  byte data[4];
+  byte index = module_config->findEventSpace();
+  data[0] = highByte(module_config->nodeNum);
+  data[1] = lowByte(module_config->nodeNum);
+  data[2] = 0;
+  data[3] = evValue;
+  
+  module_config->writeEvent(index, data);
+  module_config->writeEventEV(index, 1, evValue);
+  module_config->updateEvHashEntry(index);   
+}
+
 void EventProducerService::sendEvent(bool state, byte evValue)
 {
   byte nn_en[4];
   byte index;
   byte opCode;
-  byte data[4];
   index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
@@ -100,118 +113,137 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   }
   else  // Produced event doesn't exist so create a default
   {
-    index = module_config->findEventSpace();
-    data[0] = highByte(module_config->nodeNum);
-    data[1] = lowByte(module_config->nodeNum);
-    data[2] = 0;
-    data[3] = evValue;
+    createDefault(evValue);
+  }
+}
+
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
+{
+  byte nn_en[4];
+  byte index;
+  byte opCode;
+  index = module_config->findExistingEventByEv(1, evValue);
+  if (index < module_config->EE_MAX_EVENTS)
+  {
+    module_config->readEvent(index, nn_en);
+    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
+    if (nn == 0)
+    {
+      opCode = (state ? OPC_ASON1 : OPC_ASOF1);
+      nn_en[0] = highByte(module_config->nodeNum);
+      nn_en[1] = lowByte(module_config->nodeNum); 
+    }
+    else
+    {
+      opCode = (state ? OPC_ACON1 : OPC_ACOF1);
+    }
     
-    module_config->writeEvent(index, data);
-    module_config->writeEventEV(index, 1, evValue);
-    module_config->updateEvHashEntry(index); 
+    VlcbMessage msg;
+    msg.len = 5;
+    msg.data[0] = opCode;
+    msg.data[1] = nn_en[0];
+    msg.data[2] = nn_en[1];
+    msg.data[3] = nn_en[2];
+    msg.data[4] = nn_en[3];
+    msg.data[5] = data1;
+    controller->sendMessage(&msg);
+      
+    if (coeService)
+    {
+      coeService->put(&msg);
+    }
+  }
+  else  // Produced event doesn't exist so create a default
+  {
+    createDefault(evValue);
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
   byte nn_en[4];
-  module_config->readEvent(index, nn_en);
+  byte index;
   byte opCode;
-  
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  index = module_config->findExistingEventByEv(1, evValue);
+  if (index < module_config->EE_MAX_EVENTS)
   {
-    opCode = (state ? OPC_ASON1 : OPC_ASOF1);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    module_config->readEvent(index, nn_en);
+    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
+    if (nn == 0)
+    {
+      opCode = (state ? OPC_ASON2 : OPC_ASOF2);
+      nn_en[0] = highByte(module_config->nodeNum);
+      nn_en[1] = lowByte(module_config->nodeNum); 
+    }
+    else
+    {
+      opCode = (state ? OPC_ACON2 : OPC_ACOF2);
+    }
+    
+    VlcbMessage msg;
+    msg.len = 5;
+    msg.data[0] = opCode;
+    msg.data[1] = nn_en[0];
+    msg.data[2] = nn_en[1];
+    msg.data[3] = nn_en[2];
+    msg.data[4] = nn_en[3];
+    msg.data[5] = data1;
+    msg.data[6] = data2;
+    controller->sendMessage(&msg);
+      
+    if (coeService)
+    {
+      coeService->put(&msg);
+    }
   }
-  else
+  else  // Produced event doesn't exist so create a default
   {
-    opCode = (state ? OPC_ACON1 : OPC_ACOF1);
-  }
-  
-  VlcbMessage msg;
-  msg.len = 6;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
-  msg.data[5] = data1;
-  controller->sendMessage(&msg);
-  
-  if (coeService)
-  {
-    coeService->put(&msg);
+    createDefault(evValue);
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
   byte nn_en[4];
-  module_config->readEvent(index, nn_en);
+  byte index;
   byte opCode;
-  
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  index = module_config->findExistingEventByEv(1, evValue);
+  if (index < module_config->EE_MAX_EVENTS)
   {
-    opCode = (state ? OPC_ASON2 : OPC_ASOF2);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    module_config->readEvent(index, nn_en);
+    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
+    if (nn == 0)
+    {
+      opCode = (state ? OPC_ASON3 : OPC_ASOF3);
+      nn_en[0] = highByte(module_config->nodeNum);
+      nn_en[1] = lowByte(module_config->nodeNum); 
+    }
+    else
+    {
+      opCode = (state ? OPC_ACON3 : OPC_ACOF3);
+    }
+    
+    VlcbMessage msg;
+    msg.len = 5;
+    msg.data[0] = opCode;
+    msg.data[1] = nn_en[0];
+    msg.data[2] = nn_en[1];
+    msg.data[3] = nn_en[2];
+    msg.data[4] = nn_en[3];
+    msg.data[5] = data1;
+    msg.data[6] = data2;
+    msg.data[7] = data3;
+    controller->sendMessage(&msg);
+      
+    if (coeService)
+    {
+      coeService->put(&msg);
+    }
   }
-  else
+  else  // Produced event doesn't exist so create a default
   {
-    opCode = (state ? OPC_ACON2 : OPC_ACOF2);
+    createDefault(evValue);
   }
-  
-  VlcbMessage msg;
-  msg.len = 7;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
-  msg.data[5] = data1;
-  msg.data[6] = data2;
-  controller->sendMessage(&msg);
-  
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }   
-}
-
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
-{
-  byte nn_en[4];
-  module_config->readEvent(index, nn_en);
-  byte opCode;
-  
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ASON3 : OPC_ASOF3);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ACON3 : OPC_ACOF3);
-  }
-  
-  VlcbMessage msg;
-  msg.len = 8;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
-  msg.data[5] = data1;
-  msg.data[6] = data2;
-  msg.data[7] = data3;
-  controller->sendMessage(&msg);
-  
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }    
 }
 
 Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
