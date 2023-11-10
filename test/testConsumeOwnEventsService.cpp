@@ -24,7 +24,10 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::ConsumeOwnEventsService> consumeOwnEventsService;
   consumeOwnEventsService.reset(new VLCB::ConsumeOwnEventsService);
 
-  return ::createController({minimumNodeService.get(), consumeOwnEventsService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get()});
+  controller.begin();
+  
+  return controller;
 }
 
 void testServiceDiscovery()

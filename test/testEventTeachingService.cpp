@@ -24,7 +24,10 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventTeachingService> eventTeachingService;
   eventTeachingService.reset(new VLCB::EventTeachingService);
 
-  return ::createController({minimumNodeService.get(), eventTeachingService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventTeachingService.get()});
+  controller.begin();
+  
+  return controller;
 }
 
 void testServiceDiscovery()

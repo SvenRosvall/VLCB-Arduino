@@ -24,7 +24,10 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::NodeVariableService> nodeVariableService;
   nodeVariableService.reset(new VLCB::NodeVariableService);
 
-  return ::createController({minimumNodeService.get(), nodeVariableService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), nodeVariableService.get()});
+  controller.begin();
+  
+  return controller;
 }
 
 void testNumNVs()

@@ -15,16 +15,18 @@
 
 namespace
 {
+std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 std::unique_ptr<VLCB::EventProducerService> eventProducerService;
 
 VLCB::Controller createController()
 {
-  static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
   eventProducerService.reset(new VLCB::EventProducerService);
 
-  return ::createController({minimumNodeService.get(), eventProducerService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get()});
+  
+  return controller;
 }
 
 void testServiceDiscovery()
@@ -32,6 +34,7 @@ void testServiceDiscovery()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
@@ -60,6 +63,7 @@ void testServiceDiscoveryEventProdSvc()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
@@ -79,6 +83,7 @@ void testSendOn()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
@@ -101,6 +106,7 @@ void testSend1Off()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
@@ -124,6 +130,7 @@ void testSendShort2On()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
@@ -148,6 +155,7 @@ void testSendShort3Off()
   test();
 
   VLCB::Controller controller = createController();
+  controller.begin();
 
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
@@ -168,6 +176,27 @@ void testSendShort3Off()
   assertEquals(234, mockTransport->sent_messages[0].data[7]);
 }
 
+void testSetProducedDefaultEventsOnNewBoard()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Set module into Uninitialized mode to get unitialized memory.
+  minimumNodeService->setUninitialised();
+
+  controller.begin();
+  
+  minimumNodeService->setNormal();
+  
+  // Should have no events configured at start
+  assertEquals(0, controller.getModuleConfig()->numEvents());
+
+  controller.process();
+
+  assertEquals(1, controller.getModuleConfig()->numEvents());
+}
+
 }
 
 void testEventProducerService()
@@ -178,4 +207,5 @@ void testEventProducerService()
   testSend1Off();
   testSendShort2On();
   testSendShort3Off();
+  testSetProducedDefaultEventsOnNewBoard();
 }

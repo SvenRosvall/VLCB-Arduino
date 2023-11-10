@@ -24,7 +24,10 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
 
-  return ::createController({minimumNodeService.get(), longMessageService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), longMessageService.get()});
+  controller.begin();
+
+  return controller;
 }
 
 void testServiceDiscovery()

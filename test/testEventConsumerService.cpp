@@ -24,7 +24,10 @@ VLCB::Controller createController()
 
   eventConsumerService.reset(new VLCB::EventConsumerService);
 
-  return ::createController({minimumNodeService.get(), eventConsumerService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventConsumerService.get()});
+  controller.begin();
+  
+  return controller;
 }
 
 void testServiceDiscovery()

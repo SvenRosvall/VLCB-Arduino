@@ -9,7 +9,7 @@
 #include "Configuration.h"
 
 MockStorage::MockStorage()
-  : eeprom(1000)
+  : eeprom(1000, 0xFF)
 {}
 
 void MockStorage::begin()
