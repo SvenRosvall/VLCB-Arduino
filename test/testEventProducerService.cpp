@@ -15,13 +15,13 @@
 
 namespace
 {
+std::unique_ptr<VLCB::EventProducerService> eventProducerService;
 
 VLCB::Controller createController()
 {
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
-  static std::unique_ptr<VLCB::EventProducerService> eventProducerService;
   eventProducerService.reset(new VLCB::EventProducerService);
 
   return ::createController({minimumNodeService.get(), eventProducerService.get()});
@@ -74,10 +74,108 @@ void testServiceDiscoveryEventProdSvc()
   // Not testing service data bytes.
 }
 
+void testSendOn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Initialize a produced event
+  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
+
+  eventProducerService->sendEvent(true, 1);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
+}
+
+void testSend1Off()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Initialize a produced event
+  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
+
+  eventProducerService->sendEvent(false, 1, 42);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ACOF1, mockTransport->sent_messages[0].data[0]);
+  assertEquals(6, mockTransport->sent_messages[0].len);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
+  assertEquals(42, mockTransport->sent_messages[0].data[5]);
+}
+
+void testSendShort2On()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Initialize a produced event
+  byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 7);
+
+  eventProducerService->sendEvent(true, 7, 42, 17);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ASON2, mockTransport->sent_messages[0].data[0]);
+  assertEquals(7, mockTransport->sent_messages[0].len);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[4]);
+  assertEquals(42, mockTransport->sent_messages[0].data[5]);
+  assertEquals(17, mockTransport->sent_messages[0].data[6]);
+}
+
+void testSendShort3Off()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Initialize a produced event
+  byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 7);
+
+  eventProducerService->sendEvent(false, 7, 42, 17, 234);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ASOF3, mockTransport->sent_messages[0].data[0]);
+  assertEquals(8, mockTransport->sent_messages[0].len);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[4]);
+  assertEquals(42, mockTransport->sent_messages[0].data[5]);
+  assertEquals(17, mockTransport->sent_messages[0].data[6]);
+  assertEquals(234, mockTransport->sent_messages[0].data[7]);
+}
+
 }
 
 void testEventProducerService()
 {
   testServiceDiscovery();
   testServiceDiscoveryEventProdSvc();
+  testSendOn();
+  testSend1Off();
+  testSendShort2On();
+  testSendShort3Off();
 }
