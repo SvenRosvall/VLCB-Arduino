@@ -6,6 +6,10 @@
 #pragma once
 
 #include "Storage.h"
+#ifdef __SAM3X8E__
+#include <DueFlashStorage.h>
+#endif
+
 
 namespace VLCB
 {
@@ -13,8 +17,8 @@ namespace VLCB
 class DueEepromEmulationStorage : public Storage
 {
 public:
-#ifndef __SAM38E__
-// If not SAM38E then this file shall be compilable but this class shall not be instantiatable.
+#ifndef __SAM3X8E__
+// If not SAM3X8E then this file shall be compilable but this class shall not be instantiatable and will not compile if used anyway.
   DueEepromEmulationStorage() = delete;
 #endif
   virtual void begin() override;
@@ -29,7 +33,7 @@ private:
   byte getChipEEPROMVal(unsigned int eeaddress);
   void setChipEEPROMVal(unsigned int eeaddress, byte val);
 
-#ifdef __SAM38E__
+#ifdef __SAM3X8E__
   DueFlashStorage dueFlashStorage;
 #endif
 };
