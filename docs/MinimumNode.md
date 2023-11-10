@@ -44,7 +44,7 @@ the tool issuing a node number. There is no data with this op-code and is only r
 by a module that is in Setup Mode.  The module will respond with OPC-PARAMS followed by the
 first seven parameters bytes:
 
-|------|-------------------------------------------------------------------------|
+
 | Para |                           Description                                   |
 |------|-------------------------------------------------------------------------|
 |  1   |The manufacturer ID as a HEX numeric                                     |
@@ -55,7 +55,7 @@ first seven parameters bytes:
 |  5   |Number of Event Variables per event as a HEX numeric                     |
 |  6   |Number of supported Node Variables as a HEX numeric                      |
 |  7   |Major version as a HEX numeric. (can be 0 if no major version allocated) |
-|------|-------------------------------------------------------------------------|
+
 
 ### Request Module Name - OPC_RQMN(0x11)
 
@@ -84,7 +84,6 @@ every node on the network.  The OPC_QNN(0xB6) response is the Node Number (2 byt
 the Manufacturers ID (1 byte), the ModuleID )1 byte) and the Moduel Flags (1 byte).  The flags
 are:
 
-|-----|-----------------------------------------------------|
 | Bit |                Description                          |
 |-----|-----------------------------------------------------|
 |  0  | Set to 1 for consumer node                          |
@@ -94,7 +93,6 @@ are:
 |  4  | Set to 1 if able to consume its own produced events |
 |  5  | Set to 1 if module is in Learn mode                 |
 |  6  | Set to 1 if module supports service discovery       |
-|-----|-----------------------------------------------------|
 
 ### Reset to Manufacturers Defaults - OPC_NNRSM(0x4F)
 
@@ -123,7 +121,6 @@ Controller will offer it, in sequence, to other services.
 
 The following caommand values are used by the Minimum Node Service:
 
-|--------------|-----------|-------------------------------|
 |    Value     |   Type    |        Request Command        |
 |--------------|-----------|-------------------------------|
 |    0xFF      | Exclusive | Change to Unitialised Request |
@@ -133,7 +130,6 @@ The following caommand values are used by the Minimum Node Service:
 |--------------|-----------|-------------------------------|
 |    0x0C      | Service   | Turn on Heartbeat             |
 |    0x0D      | Usage     | Turn off Heartbeat            |
-|--------------|-----------|-------------------------------|
 
 Service Usage Command Code Turn on Heartbeat will cause a OPC_HEARTB(0xAB) to be sent every
 5000mS.  Turn of Heartbeat will stop the transmission of OPC_HEARTB.
