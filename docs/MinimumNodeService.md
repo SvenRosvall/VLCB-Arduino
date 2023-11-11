@@ -1,4 +1,4 @@
-# Minimum Node Service
+# Minimum Node Service Interface
 
 The Minimum Node Service provides the basic VLCB interface and functions for the library. As such,
 it is the only service whose inclusion is mandatory.
@@ -23,6 +23,35 @@ public:
   void setUninitialised();
 };
 ```
+
+The methods in this interface are:
+
+setController
+: set a pointer to the controller object in the implementing class.
+
+process
+: Performs periodic actions for timeouts, heartbeat and polling the user interface.
+
+handleMessage
+: Handle an incoming message.
+The op-code is provided to help the service deciding what to do for the message.
+Return a value ```PROCESSED``` if the message was handled and no other services need
+to see this message. 
+Otherwise, return ```NOT_PROCESSED``` so that the system knows that this message was not
+processed and other services shall get a chance to process this message.
+
+getServiceID
+: Shall return a unique ID for this service.
+This ID is used by configuration utilities to identify the service type.
+
+getServiceVersionID
+: Shall return the version of the implementation of this service.
+This version is used by configuration utilities to identify any updated features in the
+service. 
+There is no need to bump up the version number for minor changes and bug fixes.
+
+begin
+: Defines the setup required at the beginning. 
 
 ## Operating Mode
 
