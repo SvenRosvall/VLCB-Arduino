@@ -6,4 +6,8 @@
 .DS_Store
 .idea
 build
+build-test
 
+*~
+*#
+.#*
