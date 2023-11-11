@@ -3,6 +3,27 @@
 The Minimum Node Service provides the basic VLCB interface and functions for the library. As such,
 it is the only service whose inclusion is mandatory.
 
+The interface looks like this:
+```
+class MinimumNodeService : public Service
+{
+public:
+  virtual void setController(Controller *cntrl) override;
+  virtual void process(UserInterface::RequestedAction requestedAction) override; 
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+
+  virtual byte getServiceID() override { return SERVICE_ID_MNS; }
+  virtual byte getServiceVersionID() override { return 1; }
+  
+  virtual void begin() override;
+  
+  // backdoors for testing
+  void setHeartBeat(bool f) { noHeartbeat = !f; }
+  void setSetupMode();
+  void setUninitialised();
+};
+```
+
 ## Operating Mode
 
 A newly programmed module will be in Uninitialised Mode and will have default node number of 0x0000.
@@ -149,3 +170,37 @@ services supported.  It will then send an OPC_DGN for each of those services.
 
 If the Service Index is greater than zero, then a single OPC_DGN(0xAC) will be sent relating
 to that specific service.
+
+## User Sketch
+
+A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
+the main loop.
+
+The include files may look like this:
+```
+// VLCB library header files
+#include <Controller.h>               // Controller class
+#include <Configuration.h>            // module configuration
+#include <Parameters.h>               // VLCB parameters
+#include <vlcbdefs.hpp>               // VLCB constants
+#include <LEDUserInterface.h>
+#include "MinimumNodeService.h"
+```
+This represents the minimum, mandatory libraries.  To this list optional libraries need to be
+added for Transport service and other services required, such as Event Consumer.
+
+The setup code may look like:
+```
+// Controller objects
+VLCB::Configuration modconfig;               // configuration object
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::MinimumNodeService mnService;
+VLCB::Controller controller( &modconfig, ledUserInterface,
+                            { &mnService }); // Controller object
+
+
+setup()
+{
+  See examples for what needs to be added depending upon services included.
+}
+```
