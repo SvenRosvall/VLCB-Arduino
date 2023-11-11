@@ -12,9 +12,13 @@
 #include "ConsumeOwnEventsService.h"
 #include "Parameters.h"
 #include "VlcbCommon.h"
+#include "EventConsumerService.h"
+#include "EventProducerService.h"
 
 namespace
 {
+std::unique_ptr<VLCB::EventProducerService> eventProducerService;
+std::unique_ptr<VLCB::EventConsumerService> eventConsumerService;
 
 VLCB::Controller createController()
 {
@@ -24,7 +28,12 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::ConsumeOwnEventsService> consumeOwnEventsService;
   consumeOwnEventsService.reset(new VLCB::ConsumeOwnEventsService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get()});
+  eventConsumerService.reset(new VLCB::EventConsumerService(consumeOwnEventsService.get()));
+
+  eventProducerService.reset(new VLCB::EventProducerService(consumeOwnEventsService.get()));
+  
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get(),
+                                                    eventProducerService.get(), eventConsumerService.get()});
   controller.begin();
   
   return controller;
@@ -42,10 +51,10 @@ void testServiceDiscovery()
   controller.process();
 
   // Verify sent messages.
-  assertEquals(3, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(4, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
@@ -77,10 +86,47 @@ void testServiceDiscoveryEventProdSvc()
   // Not testing service data bytes.
 }
 
+byte capturedIndex = -1;
+VLCB::VlcbMessage capturedMessage;
+
+void eventHandler(byte index, VLCB::VlcbMessage *msg)
+{
+  capturedIndex = index;
+  capturedMessage = *msg;
+}
+
+void testConsumeOwnEvent()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  
+  eventConsumerService->setEventHandler(eventHandler);
+
+  // Add some long events
+  byte eventData[] = {0x01, 0x04, 0x03, 0x02};
+  configuration->writeEvent(0, eventData);
+  configuration->writeEventEV(0, 1, 1);
+  configuration->updateEvHashEntry(0);
+
+  eventProducerService->sendEvent(true, 1);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
+
+  controller.process();
+
+  assertEquals(0, capturedIndex);
+  assertEquals(5, capturedMessage.len);
+  assertEquals(OPC_ACON, capturedMessage.data[0]);
+}
+
 }
 
 void testConsumeOwnEventsService()
 {
   testServiceDiscovery();
   testServiceDiscoveryEventProdSvc();
+  testConsumeOwnEvent();
 }
