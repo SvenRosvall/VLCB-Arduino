@@ -53,8 +53,11 @@ if(isMultiConfig)
     if(NOT "Asan" IN_LIST CMAKE_CONFIGURATION_TYPES)
         list(APPEND CMAKE_CONFIGURATION_TYPES Asan)
     endif()
+    if(NOT "Coverage" IN_LIST CMAKE_CONFIGURATION_TYPES)
+        list(APPEND CMAKE_CONFIGURATION_TYPES Coverage)
+    endif()
 else()
-    set(allowedBuildTypes Asan Debug Release RelWithDebInfo MinSizeRel)
+    set(allowedBuildTypes Asan Coverage Debug Release RelWithDebInfo MinSizeRel)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${allowedBuildTypes}")
 
     if(CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST allowedBuildTypes)
@@ -63,19 +66,35 @@ else()
 endif()
 
 set(CMAKE_C_FLAGS_ASAN
-    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer" CACHE STRING
+    "${CMAKE_C_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined" CACHE STRING
     "Flags used by the C compiler for Asan build type or configuration." FORCE)
 
 set(CMAKE_CXX_FLAGS_ASAN
-    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer" CACHE STRING
+    "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined" CACHE STRING
     "Flags used by the C++ compiler for Asan build type or configuration." FORCE)
 
 set(CMAKE_EXE_LINKER_FLAGS_ASAN
-    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address" CACHE STRING
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined" CACHE STRING
     "Linker flags to be used to create executables for Asan build type." FORCE)
 
 set(CMAKE_SHARED_LINKER_FLAGS_ASAN
-    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address" CACHE STRING
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address -fsanitize=undefined" CACHE STRING
+    "Linker flags to be used to create shared libraries for Asan build type." FORCE)
+
+set(CMAKE_C_FLAGS_COVERAGE
+    "${CMAKE_C_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping" CACHE STRING
+    "Flags used by the C compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_CXX_FLAGS_COVERAGE
+    "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping" CACHE STRING
+    "Flags used by the C++ compiler for Asan build type or configuration." FORCE)
+
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
+    "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fprofile-instr-generate" CACHE STRING
+    "Linker flags to be used to create executables for Asan build type." FORCE)
+
+set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
+    "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fprofile-instr-generate" CACHE STRING
     "Linker flags to be used to create shared libraries for Asan build type." FORCE)
 
 endif()
