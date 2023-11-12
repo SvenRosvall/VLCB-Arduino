@@ -1,0 +1,19 @@
+{
+    "buildType": {
+        "default": "Debug",
+        "choices": {
+            "Debug": {
+                "short": "Debug",
+                "buildType": "Debug"
+            },
+            "Asan": {
+                "short": "Asan",
+                "buildType": "Asan"
+            },
+            "MinSizeRel": {
+                "short": "MinSizeRel",
+                "buildType": "MinSizeRel"
+            }
+        }
+    }
+}
