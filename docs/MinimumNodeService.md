@@ -17,10 +17,6 @@ public:
   
   virtual void begin() override;
   
-  // backdoors for testing
-  void setHeartBeat(bool f) { noHeartbeat = !f; }
-  void setSetupMode();
-  void setUninitialised();
 };
 ```
 
