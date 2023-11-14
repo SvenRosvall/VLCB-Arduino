@@ -48,33 +48,7 @@ Instead, we should introduce a CAN Frame struct that holds CAN information.
 This will be used to with the CAN driver who in turn converts this to/from a data structure
 type used here.
 
-### Let CanTransport be a template that takes a CAN frame type as parameter
-To avoid conversion of a new CAN Frame type to implementation specific data structures,
-that often hold the same fields, we can make CanTransport a template class and let it
-populate this data structure directly so the driver doesn't need to do another conversion.
-
-The code may look like this:
-```C++
-template <typename CanFrame>
-class CanTransport
-{
-public:
-  ...
-  virtual CanFrame getNextCanMessage() = 0;
-  virtual bool sendCanMessage(CANMessage *msg) = 0;
-  ...
-};
-
-class CanXxxDriver : public CanTransport<CanXxxFrame>
-{
-  ...
-  virtual CanXxxFrame getNextCanMessage() override;
-  virtual bool sendCanMessage(CanXxxFrame *msg) override;
-  ...
-};
-```
-
-### Make CAN drivers objects instead of child of CanTransport
+## Make CAN drivers objects instead of child of CanTransport
 The relationship between CanTransport and CAN driver can be confusing as ```CanTransport```
 implements some methods in the ```Transport``` interface and also introduces a some
 new virtual methods that the CAN driver must implement.
