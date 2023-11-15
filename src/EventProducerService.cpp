@@ -25,7 +25,7 @@ void EventProducerService::begin()
 {  
   if (module_config->currentMode == MODE_UNINITIALISED)
   {
-    uninit = 1;    
+    uninit = true;    
   }
 }
 
@@ -58,7 +58,7 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
   if ((uninit) && (module_config->currentMode == MODE_NORMAL))
   {
     setProducedEvents();
-    uninit = 0;
+    uninit = false;
   }
 }
 

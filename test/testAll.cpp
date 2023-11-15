@@ -7,15 +7,30 @@
 #include <string>
 #include <iostream>
 #include "testArduino.hpp"
-#include "testMinimumNodeService.h"
-#include "testNodeVariableService.h"
-#include "testCanService.h"
+
+void testMinimumNodeService();
+void testNodeVariableService();
+void testCanService();
+void testEventProducerService();
+void testEventConsumerService();
+void testEventTeachingService();
+void testConsumeOwnEventsService();
+void testLongMessageService();
+
+// Remaining services to implement
+//Bootloader (the CBUS PIC version) service #10
+//Event Acknowledge Service #9
 
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},
         {"CanService", testCanService},
+        {"EventProducerService", testEventProducerService},
+        {"EventConsumerService", testEventConsumerService},
+        {"EventTeachingService", testEventTeachingService},
+        {"ConsumeOwnEventsService", testConsumeOwnEventsService},
+        {"LongMessageService", testLongMessageService},
 };
 
 int main(int argc, const char * const * argv)

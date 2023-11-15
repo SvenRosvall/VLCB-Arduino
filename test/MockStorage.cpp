@@ -9,7 +9,7 @@
 #include "Configuration.h"
 
 MockStorage::MockStorage()
-  : eeprom(1000)
+  : eeprom(1000, 0xFF)
 {}
 
 void MockStorage::begin()
@@ -34,7 +34,10 @@ byte MockStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 
 void MockStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
-
+  for (byte i = 0; i < numbytes; i++)
+  {
+    eeprom[eeaddress + i] = src[i];
+  }
 }
 
 void MockStorage::reset()

@@ -31,6 +31,7 @@ public:
   void setHeartBeat(bool f) { noHeartbeat = !f; }
   void setSetupMode();
   void setUninitialised();
+  void setNormal();
 
 private:
 
@@ -44,7 +45,6 @@ private:
   
   void checkModeChangeTimeout();
   void initSetup();
-  void setNormal();
   void initSetupFromNormal();
 
   void heartbeat();

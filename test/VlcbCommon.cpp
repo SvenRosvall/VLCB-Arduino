@@ -48,6 +48,5 @@ VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_
   // assign to Controller
   controller.setParams(params->getParams());
   controller.setName(moduleName);
-  controller.begin();
   return controller;
 }

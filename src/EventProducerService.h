@@ -41,7 +41,7 @@ private:
   void (*eventhandler)(byte index, VlcbMessage *msg);
  
   void setProducedEvents();
-  bool uninit = 0;
+  bool uninit = false;
 };
 
 }  // VLCB
