@@ -1,4 +1,6 @@
 # Design Overview
+This document describes the main components within the VLCB library and how they interact.
+
 
 This VLCB library is based on Duncan Greenwood's [CBUS library](https://github.com/MERG-DEV/CBUS)
 and extended with VLCB specific features.
@@ -33,11 +35,27 @@ Such incoming messages are offered to each of the service objects in turn.
 The service object responds with a code to say if the message has been taken care of and no other
 services need to look at this.
 
-The EventConsumerService may react to consumed events by calling a user registered callback so that
+The ```EventConsumerService``` may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
-The user sketch may produce events when are passed on the VLCB Controller object which in turn passes
-this event as a message to the transport object.
+The user sketch may produce events when are passed on the ```EventProducerService``` object which in turn passes
+this event as a message via the Controller to the transport object.
+
+### Dataflow
+Within most of VLCB components a message object ```VlcbMessage``` is used to pass incoming and
+outgoing messages around. 
+The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
+are any optional data bytes for that op-code.
+
+The ```CanTransport``` object translates the VlcbMessage object to from an object that represents
+a CAN frame which contains an id, 8 bytes of data (same as the VlcbMessage) and the flags
+```rtr``` and ```ext```.
+This CAN frame is then passed to/from the CAN driver such as CAN2515. 
+CAN drivers may need to convert this CAN frame to a data structure used by any library
+that is used by that driver.
+
+Currently, this CAN frame is stored in a ```CANMessage``` object defined in the ACAN2515 library.
+This should be replaced with another class that doesn't depend on an external library
 
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
