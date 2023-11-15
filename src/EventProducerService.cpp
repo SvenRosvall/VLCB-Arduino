@@ -31,16 +31,15 @@ void EventProducerService::begin()
 
 void EventProducerService::setProducedEvents()
 { 
-  byte data[4];
-  byte index;
   for (byte i = 1; i <= module_config->EE_PRODUCED_EVENTS; i++)
   {
+    byte data[4];
     data[0] = highByte(module_config->nodeNum);
     data[1] = lowByte(module_config->nodeNum);
     data[2] = 0;
     data[3] = i;
     
-    index = module_config->findExistingEventByEv(1, i);
+    byte index = module_config->findExistingEventByEv(1, i);
     if (index >= module_config->EE_MAX_EVENTS)  //event does not exist so creat default
     {
       index = module_config->findEventSpace();
@@ -64,15 +63,13 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
 
 void EventProducerService::sendEvent(bool state, byte evValue)
 {
-  byte nn_en[4];
-  byte index;
-  byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
-    if (nn == 0)
+    if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
       opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -101,15 +98,13 @@ void EventProducerService::sendEvent(bool state, byte evValue)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
-  byte nn_en[4];
-  byte index;
-  byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
-    if (nn == 0)
+    if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
       opCode = (state ? OPC_ASON1 : OPC_ASOF1);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -139,15 +134,13 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
-  byte nn_en[4];
-  byte index;
-  byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
-    if (nn == 0)
+    if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
       opCode = (state ? OPC_ASON2 : OPC_ASOF2);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -178,15 +171,13 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
-  byte nn_en[4];
-  byte index;
-  byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    unsigned int nn = ((nn_en[0] << 8) && nn_en[1]);
-    if (nn == 0)
+    if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
       opCode = (state ? OPC_ASON3 : OPC_ASOF3);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -218,8 +209,8 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
 
 Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
 {
-  unsigned int nn = (msg->data[1] << 8) + msg->data[2];
-  unsigned int en = (msg->data[3] << 8) + msg->data[4];
+  //unsigned int nn = (msg->data[1] << 8) + msg->data[2];
+  //unsigned int en = (msg->data[3] << 8) + msg->data[4];
   // DEBUG_SERIAL << ">VLCBSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 
