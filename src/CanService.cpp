@@ -27,12 +27,6 @@ void CanService::process(UserInterface::RequestedAction requestedAction)
   canTransport->process(requestedAction);
 }
 
-Processed CanService::handleRawMessage(VlcbMessage *msg)
-{
-
-  return NOT_PROCESSED;
-}
-
 Processed CanService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
