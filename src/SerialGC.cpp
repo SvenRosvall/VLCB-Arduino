@@ -3,7 +3,7 @@
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
-#include <SerialGC.h>
+#include "SerialGC.h"
 // 3rd party libraries
 #include <Streaming.h>
 #include <string.h>
@@ -48,7 +48,7 @@
 // IDENTIFIER[0,1] - bits [28:21] of the can identifier
 // IDENTIFIER[2] - bits [20:18] of the can identifier, left shifted by 1, bottom bit set to zero
 // IDENTIFIER[3] - bits [17:16] of the can identifier, bottom two bits, top two bits set to 0
-// IDENTIFIER[4,5,6,7] - bits [17:16] of the can identifier
+// IDENTIFIER[4,5,6,7] - bits [15:0] of the can identifier
 // (This maps directly onto SIDH, SIDL, EIDH and EIDL registers the PIC processor family)
 // And the GridConnect Identifier field is also leading zero padded, so always 8 characters for an extended message
 // 
@@ -67,6 +67,7 @@ namespace VLCB
       else { result = data[1] - 'A' + 10; }
       if (data[0] < 'A') { result += (data[0] - '0') << 4; }
       else { result += (data[0] - 'A' + 10) << 4; }
+      Serial << "ascii_pair:" << result << endl;
       return result;
   }
 
@@ -109,7 +110,17 @@ namespace VLCB
       {
         return false;
       }
-      message->id = strtol(&gcBuffer[2], NULL, 16);
+      // ok, all hex, so build up id from characters 2 to 9
+      // chars 2 & 3 are bits 21 to 28
+      message->id = uint32_t(ascii_pair_to_byte(&gcBuffer[2])) << 21;
+      // chars 4 & 5 -  bits 5 to 7 are bits 18 to 20
+      message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0xE0) << 13;
+      // chars 4 & 5 -  bits 0 to 1 are bits 16 & 17
+      message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0x3) << 16;
+      // chars 6 & 7 are bits 8 to 18
+      message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[6])) << 8;
+      // chars 8 & 9 are bits 0 to 7 
+      message->id += ascii_pair_to_byte(&gcBuffer[8]);
       gcIndex = 10;
     }
     else if (gcBuffer[gcIndex] == 'S') 
@@ -178,9 +189,49 @@ namespace VLCB
     return true; 
   }
 
+  bool encodeGridConnect(char * txBuffer, CANMessage *msg) {
+    byte offset = 0;
+    // set starting character & standard or extended CAN identifier
+    if (msg->ext) {
+      // mark as extended message
+      strcpy (txBuffer,":X");
+      // extended 29 bit CAN idenfier in bytes 2 to 9
+      // chars 2 & 3 are ID bits 21 to 28
+      sprintf(txBuffer + 2, "%02X", (msg->id) >> 21);
+      // char 4 -  bits 1 to 3 are ID bits 18 to 20
+      sprintf(txBuffer + 4, "%01X", ((msg->id) >> 18) & 0x7);
+      // char 5 -  bits 0 to 1 are ID bits 16 & 17
+      sprintf(txBuffer + 5, "%01X", ((msg->id) >> 16) & 0x3);
+      // chars 6 to 9 are ID bits 0 to 15
+      sprintf(txBuffer + 6, "%04X", msg->id & 0xFFFF);
+      offset = 10;
+    } else {#// mark sas standard message
+      strcpy (txBuffer,":S");
+      // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
+      sprintf(txBuffer + 2, "%04X", msg->id << 5);
+      offset = 6;
+    }
+    // set RTR or normal - byte 6 or 10
+    if (msg->rtr) {
+      strcpy (txBuffer + offset++,"R");
+    } else {
+      strcpy (txBuffer + offset++,"N");
+    }
+    // add terminator in case len = 0, will be overwritten if len >0
+    strcpy (txBuffer + offset,";");
+    //now data from byte 7 if len > 0
+    for (int i=0; i<msg->len; i++){
+      sprintf(txBuffer + offset + i*2, "%02X", msg->data[i]);
+      // append terminator after every data byte - will be overwritten except for last one
+      strcpy (txBuffer + offset + 2 + i*2,";");
+    }
+    return true;
+  }
+
   // Function to output a debug CANMessage to Serial
+  // needs to be a class memeber to get private variables
   //
-  void debugCANMessage(CANMessage message)
+  void SerialGC::debugCANMessage(CANMessage message)
   {
     Serial << endl << "CANMessage:";
     Serial << " id " << message.id << " length " << message.len;
@@ -190,12 +241,17 @@ namespace VLCB
       Serial << message.data[i];
     }
     Serial << endl;
+    Serial << "Counts: Rx: " << receivedCount << " RxErr: " << receiveErrorCount;
+    Serial << " Tx: " << transmitCount << " TxErr " << transmitErrorCount << endl;
   }
+
 
 
   bool SerialGC::begin()  
   {
     Serial << F("> ** GridConnect over serial ** ") << endl;
+    receivedCount = 0;
+    transmitCount = 0;
     return true;
   }
 
@@ -242,9 +298,15 @@ namespace VLCB
     //
     if (result) 
     {
+      // We have received a message between a ':' and a ';', so increment count
+      receivedCount++;
       result = encodeCANMessage(rxBuffer, &rxCANMessage);
+      if (result == false)
+      {
+        // must have been an error in the message, so increment error counter
+        receiveErrorCount++;
+      }
     }
-    //
     return result;
   }
 
@@ -259,6 +321,7 @@ namespace VLCB
     return rxCANMessage;
   }
 
+
   //
   /// send a CANMessage message in GridConnect format
   // see Gridconnect format at beginning of file for byte positions
@@ -266,40 +329,14 @@ namespace VLCB
   bool SerialGC::sendCanMessage(CANMessage *msg)
   {
     static int x = 0;
-    // start char array for output string
-    char str[30];
-    byte offset = 0;
-    // set starting character & standard or extended CAN identifier
-    if (msg->ext) {
-      strcpy (str,":X");
-      // extended 29 bit CAN idenfier in bytes 2 to 9
-      sprintf(str + 2, "%08X", msg->id);
-      offset = 10;
-    } else {
-      strcpy (str,":S");
-      // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
-      sprintf(str + 2, "%04X", msg->id << 5);
-      offset = 6;
-    }
-    // set RTR or normal - byte 6 or 10
-    if (msg->rtr) {
-      strcpy (str + offset++,"R");
-    } else {
-      strcpy (str + offset++,"N");
-    }
-    // add terminator in case len = 0, will be overwritten if len >0
-    strcpy (str + offset,";");
-    //now data from byte 7 if len > 0
-    for (int i=0; i<msg->len; i++){
-      sprintf(str + offset + i*2, "%02X", msg->data[i]);
-      // append terminator after every data byte - will be overwritten except for last one
-      strcpy (str + offset + 2 + i*2,";");
-    }
-    Serial << endl << x++ << " ";
+    encodeGridConnect(txBuffer, msg);
+//    Serial << endl << x++ << " ";
     // output the message
-    Serial.print(str);
+    Serial.print(txBuffer);
+    transmitCount++;
    return true;
   }
+
 
   //
   /// reset
