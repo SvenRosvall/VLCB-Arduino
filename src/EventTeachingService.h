@@ -18,7 +18,7 @@ class EventTeachingService : public Service
 public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-
+  void setCheckProduced(void (*fptr)());
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
@@ -28,8 +28,10 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
+  byte (*checkProduced)();
 
   bool bLearn = false;
+  unsigned long timeOut = 5000;
 
   Processed handleLearnMode(const VlcbMessage *msg);
   Processed handleLearn(unsigned int nn);
