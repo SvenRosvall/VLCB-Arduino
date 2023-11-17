@@ -115,8 +115,6 @@ Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
 LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
-bool check;
-
 // forward function declarations
 byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
@@ -242,7 +240,7 @@ byte checkInputProduced(void)
       return 0xFF;   
 }
 
-byte processSwitches(void) {
+void processSwitches(void) {
     
   
   for (byte i = 0; i < NUM_SWITCHES; i++) 
