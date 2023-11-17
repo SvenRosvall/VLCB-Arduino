@@ -13,12 +13,16 @@ Key Features:
 The program is written in C++ but you do not need to understand this to use the program.
 The program includes a library that manages the LED functionality.
 
+NOTE: It can get difficult when using DEBUG to know where the message has come from. Those
+emanating from the sketch are preceded with the letters sk for sketch. 
+
 ## Using VLCB4in4out
 
 The MCP2515 interface requires five Arduino pins to be allocated. Three of these are fixed
 in the architecture of the Arduino processor. One pin must be connected to an interrupt
-capable Arduino pin. You can only use pin 2 or 3 on an Uno. The Chip Select pin can be freely defined. This example is configured
-for use with an Uno but can easily be adapted for use with other Arduino types.
+capable Arduino pin. You can only use pin 2 or 3 on an Uno. The Chip Select pin can be 
+freely defined. This example is configured for use with an Uno but can easily be adapted
+for use with other Arduino types.
 
 If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
 
