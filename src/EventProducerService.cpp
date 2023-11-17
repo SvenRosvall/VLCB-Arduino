@@ -92,12 +92,11 @@ void EventProducerService::sendEvent(bool state, byte index)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
+void EventProducerService::sendEvent(bool state, byte index, byte data1)
 {
   byte nn_en[4];
-  byte index;
   byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  
   if (index < module_config->EE_MAX_EVENTS)
   {
     module_config->readEvent(index, nn_en);
@@ -129,12 +128,11 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
+void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
 {
   byte nn_en[4];
-  byte index;
   byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  
   if (index < module_config->EE_MAX_EVENTS)
   {
     module_config->readEvent(index, nn_en);
@@ -167,12 +165,11 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
+void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
 {
   byte nn_en[4];
-  byte index;
   byte opCode;
-  index = module_config->findExistingEventByEv(1, evValue);
+  
   if (index < module_config->EE_MAX_EVENTS)
   {
     module_config->readEvent(index, nn_en);

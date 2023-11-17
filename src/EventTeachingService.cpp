@@ -18,9 +18,9 @@ void EventTeachingService::setController(Controller *cntrl)
 }
 
 // Register the user handler for produced event checking
-void EventTeachingService::setCheckProduced(void (*fptr)())
+void EventTeachingService::setcheckInputProduced(void (*fptr)())
 {
-  checkProduced = fptr;
+  checkInputProduced = fptr;
 }
 
 void EventTeachingService::enableLearn() 
@@ -393,14 +393,13 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
           {
             //DEBUG_SERIAL << F("ets> Update candidate") << endl;
             unsigned long timeStart = millis();
-            bool terminate = false;
-            while ((timeOut > millis() - timeStart) && !terminate)
+            while (TIME_OUT > millis() - timeStart)
             {
-              index = (byte)(*checkProduced)();
+              index = (byte)(*checkInputProduced)();
               if (index < module_config->EE_PRODUCED_EVENTS)
               {
                 // DEBUG_SERIAL << F("ets> Update index ") << index << endl;
-                terminate = true;
+                break;
               }
             }
           }

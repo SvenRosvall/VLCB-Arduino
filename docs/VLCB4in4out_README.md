@@ -89,7 +89,7 @@ The module is initialised by pressing the VLCB button (formerly CBUS button) for
 6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
 Node Number can then be set via the FCU in the normal manner.
 
-## Event Variables
+## Events
 
 ### Consumed Events
 

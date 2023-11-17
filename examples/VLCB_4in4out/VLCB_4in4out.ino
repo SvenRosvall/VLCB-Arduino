@@ -118,7 +118,7 @@ byte switchState[NUM_SWITCHES];
 bool check;
 
 // forward function declarations
-byte checkProduced();
+byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
 void printConfig();
 
@@ -158,7 +158,7 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
  
   // register check produced handler for assigning short and spoof codes
-  etService.setCheckProduced(checkProduced);
+  etService.setcheckInputProduced(checkInputProduced);
   
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
@@ -223,24 +223,14 @@ void loop()
   }
 
   // test for switch input
-  check = false;
-  processSwitches(check);
+  processSwitches();
 
   // bottom of loop()
 }
 
-byte checkProduced(void)
+byte checkInputProduced(void)
 {
-  check = true;
-  byte pIndex = processSwitches(check);
-  return pIndex;
-}
-
-byte processSwitches(bool check) {
-    
-  if (check)
-  {
-    for (byte i = 0; i < NUM_SWITCHES; i++) 
+ for (byte i = 0; i < NUM_SWITCHES; i++) 
     {
       moduleSwitch[i].update();      
       if (moduleSwitch[i].changed())
@@ -249,64 +239,65 @@ byte processSwitches(bool check) {
         return i;
       } 
     }      
-      return 0xFF;      
-  }
-  else
-  {    
-    for (byte i = 0; i < NUM_SWITCHES; i++) 
-    {
-      moduleSwitch[i].update();
-      if (moduleSwitch[i].changed())
-      {      
-        byte nv = i+1;
-        byte nvval = modconfig.readNV(nv);
-        bool state;
+      return 0xFF;   
+}
 
-        // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
+byte processSwitches(void) {
+    
+  
+  for (byte i = 0; i < NUM_SWITCHES; i++) 
+  {
+    moduleSwitch[i].update();
+    if (moduleSwitch[i].changed())
+    {      
+      byte nv = i+1;
+      byte nvval = modconfig.readNV(nv);
+      bool state;
 
-        switch (nvval) {
-          case 0:
-            // ON and OFF
-            state = (moduleSwitch[i].fell());
+      // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
+
+      switch (nvval) {
+        case 0:
+          // ON and OFF
+          state = (moduleSwitch[i].fell());
+          //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
+          epService.sendEvent(state, i);
+          break;
+
+        case 1:
+          // Only ON
+          if (moduleSwitch[i].fell()) {
+            state = true;
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
+            epService.sendEvent(state, i);
+          }
+          break;
+
+        case 2:
+          // Only OFF
+          if (moduleSwitch[i].fell()) {
+            state = false;
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
+            epService.sendEvent(state, i);
+          }
+          break;
+
+        case 3:
+          // Toggle button
+          if (moduleSwitch[i].fell()) {
+            switchState[i] = !switchState[i];
+            state = (switchState[i]);
             //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
             epService.sendEvent(state, i);
-            break;
+          }
+          break;
 
-          case 1:
-            // Only ON
-            if (moduleSwitch[i].fell()) {
-              state = true;
-              //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-              epService.sendEvent(state, i);
-            }
-            break;
-
-          case 2:
-            // Only OFF
-            if (moduleSwitch[i].fell()) {
-              state = false;
-              //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-              epService.sendEvent(state, i);
-            }
-            break;
-
-          case 3:
-            // Toggle button
-            if (moduleSwitch[i].fell()) {
-              switchState[i] = !switchState[i];
-              state = (switchState[i]);
-              //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
-              epService.sendEvent(state, i);
-            }
-            break;
-
-          default:
-            //DEBUG_PRINT(F("sk> Invalid NV value."));
-            break;
-        }
-      } 
-    }
-  }
+        default:
+          //DEBUG_PRINT(F("sk> Invalid NV value."));
+          break;
+      }
+    } 
+  }  
 }
 
 //
