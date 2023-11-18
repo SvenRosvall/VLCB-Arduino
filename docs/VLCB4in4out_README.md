@@ -13,12 +13,16 @@ Key Features:
 The program is written in C++ but you do not need to understand this to use the program.
 The program includes a library that manages the LED functionality.
 
+NOTE: It can get difficult when using DEBUG to know where the message has come from. Those
+emanating from the sketch are preceded with the letters sk for sketch. 
+
 ## Using VLCB4in4out
 
 The MCP2515 interface requires five Arduino pins to be allocated. Three of these are fixed
 in the architecture of the Arduino processor. One pin must be connected to an interrupt
-capable Arduino pin. You can only use pin 2 or 3 on an Uno. The Chip Select pin can be freely defined. This example is configured
-for use with an Uno but can easily be adapted for use with other Arduino types.
+capable Arduino pin. You can only use pin 2 or 3 on an Uno. The Chip Select pin can be 
+freely defined. This example is configured for use with an Uno but can easily be adapted
+for use with other Arduino types.
 
 If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
 
@@ -68,7 +72,6 @@ In this case it will be necessary to change the code at or about line 173 approp
 ```
 can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
 ```
-
 ### VLCB Op Codes
 
 The following Op codes are supported:
@@ -80,18 +83,21 @@ OP_CODE | HEX | Function
  OPC_ASON | 0x98 | Short event on
  OPC_ASOF | 0x99 | Short event off
 
-### Event Variables
+## Set Up
 
-Event Variable 1 (EV1) is reserved for system use to identify the source of
-produced event.
+The module is initialised by pressing the VLCB button (formerly CBUS button) for
+6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
+Node Number can then be set via the FCU in the normal manner.
 
-#### Consumed Events
+## Events
+
+### Consumed Events
 
 Event Variables control the action to take when a consumed event is received.
-The number of Event Variables (EV) is equal to the number of LEDs plus one.
+The number of Event Variables (EV) is equal to the number of LEDs.
 
-Event Variable 2 (EV2) controls the first LED pin in the ```LED``` array. 
-EV3 controls the second LED pin, etc.
+Event Variable 1 (EV1) controls the first LED pin in the ```LED``` array. 
+EV2 controls the second LED pin, etc.
 
 The LEDs are controlled by the LEDControl class.  This allows for any LED to be
 switched on, switched off or flashed at a rate determined in the call:
@@ -106,37 +112,31 @@ The following EV values are defined to control the LEDs in this example:
  2 | LED flash at 500mS
  3 | LED flash at 250mS
 
-#### Produced Events
+### Produced Events
 
 The Events Table in an Uninitiailised module is empty. When the module changes to
 Normal Mode from Uninitialised, the Events Table is populated with a default
 producer event for each of the four switches (or, in general, each producer item).
-These default events can be removed by using OPC_EVULN whist the module is in
-learn mode.
 
 A module can also be taught a short event or, indeed, a spoof event. This is
 easily done using any of the normal FCU teach techniques.  For example, a short
 event can be dragged from the Software Node and dropped onto the VLCB4in4out in
-the Node Window.  When the event variable dialgue opens, put the index number of
-the switch to be associated with the event in EV1 and press OK.  The selected
-switch will now generate that short event.
+the Node Window.  When the event variable dialogue opens, put the EV Value into the
+relevant EV box for any LEDs that you wish to use for Consume Own Events (see below)
+and press OK.  Now, within 5 seconds, press the switch that you wish to become the
+short or spoof event 
 
-If a switch default has been unlearnt and that switch not been assigned to an
-event by the FCU, operation of the switch will result in a new default event
-being generated.
-
-#### Consume Own Events
+### Consume Own Events
 
 If the Produced Events Service and the Consume Events Service are both applied,
 the Consume Own Events Service can also be enabled.  This service provides a 
 buffer that will pass the produced event back to the Consumed Event Service.
 A consumed Own Event still only has one entry in the Event Table.  If the Event
-Variables 2 onwards are left as 0 or NULL, then the Consume Events Service will
-do nothing.  Event Variable 1 will contain the value of the producer trigger 
-or switch. If the Event Variables are populated as shown in the table in the
-Consumed Events Section above, the LEDs will behave accordingly to a Produced Event.
+Variables are left as 0 or NULL, then the Consume Events Service will do nothing.
+If the Event Variables are populated as shown in the table in the Consumed Events
+Section above, the LEDs will behave accordingly to a Produced Event.
 
-### Node Variables
+## Node Variables
 
 Node Variables control the action to take when a switch is pressed or depressed.
 
@@ -152,44 +152,8 @@ NV Value | Function
  1 | On only push button
  2 | Off only push button
  3 | On/Off toggle push button
- 
-## Set Up
 
-The module is initialised by pressing the VLCB button (formerly CBUS button) for
-6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
-Node Number can then be set via the FCU in the normal manner.
 
-## Teaching Produced Short Events
-
-The FCU does not provide a generic method for teaching short codes to produced events.
-It is, therefore, necessary to teach these manually using the FCU Debug feature.  This
-is enabled from the menu bar Settings / Advance / Debug Mode. There will now be a
-window at the bottom of the page called "Cbus message".
-
-The module is first put into Teach Mode using the opcode 76.  The message to send is:
-76nn08 where nn are the two bytes of the node number in hex.  Remember these are bytes and
-so nn will be 4 characters long.
-
-Next, the module is taught the short event using the "learn an event using event index"
-opcode. The message sent is:
-F5nnenij00 where n is the node number 0x0000, en is the event/device number in hex,
-i is the switch index byte in hex and j is the event variable index byte in hex which
-MUST NOT be less than 01.
-For example, if the event/device number was 500 (0x01F4), and the switch index was 03,
-the message would be:
-F5000001F4030100
-
-Finally, learn mode is switched of by sending the message:
-76nn09 where nn are the two bytes of the node number in hex.
-
-If you now send the character 'e' in the Arduino IDE Serial Monitor (see below),
-it will now show the 4 events with the appropriate index number changed to the short
-event node number and event number.  Remember, any further changes must reference the 
-appropriate index number shown in this table.
-
-The FCU will show a new event produced by the Software Node in the VLCB4in4out event
-table.  It will not, for some reason, remove the now gone original event automatically.
-It is necessary to highlight the redundant event and use alt-D to remove it.
 
 
  

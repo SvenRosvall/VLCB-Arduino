@@ -116,10 +116,9 @@ LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
 // forward function declarations
+byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
-void processSerialInput();
 void printConfig();
-void processModuleSwitchChange();
 
 //
 /// setup VLCB - runs once at power on from setup()
@@ -132,7 +131,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
+  modconfig.EE_NUM_EVS = NUM_LEDS;
   
 
   // initialise and load configuration
@@ -155,12 +154,15 @@ void setupVLCB()
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
-
+ 
+  // register check produced handler for assigning short and spoof codes
+  etService.setcheckInputProduced(checkInputProduced);
+  
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
 
   // configure and start CAN bus and VLCB message processing
-  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
+  can2515.setNumBuffers(6, 1);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   if (!can2515.begin())
@@ -224,23 +226,39 @@ void loop()
   // bottom of loop()
 }
 
+byte checkInputProduced(void)
+{
+ for (byte i = 0; i < NUM_SWITCHES; i++) 
+    {
+      moduleSwitch[i].update();      
+      if (moduleSwitch[i].changed())
+      {
+        //DEBUG_PRINT(F("sk> Check index is ") << i);
+        return i;
+      } 
+    }      
+      return 0xFF;   
+}
+
 void processSwitches(void) {
-  bool isSuccess = true;
-  for (byte i = 0; i < NUM_SWITCHES; i++) {
+    
+  
+  for (byte i = 0; i < NUM_SWITCHES; i++) 
+  {
     moduleSwitch[i].update();
-    if (moduleSwitch[i].changed()) {      
+    if (moduleSwitch[i].changed())
+    {      
       byte nv = i+1;
       byte nvval = modconfig.readNV(nv);
       bool state;
 
-      //DEBUG_PRINT(F("> Button ") << i << F(" state change detected"));
-      //DEBUG_PRINT(F(" NV Value = ") << nvval);
+      // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
       switch (nvval) {
         case 0:
           // ON and OFF
           state = (moduleSwitch[i].fell());
-          //DEBUG_PRINT(F("> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
+          //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
           epService.sendEvent(state, i);
           break;
 
@@ -248,7 +266,7 @@ void processSwitches(void) {
           // Only ON
           if (moduleSwitch[i].fell()) {
             state = true;
-            //DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
           }
           break;
@@ -257,7 +275,7 @@ void processSwitches(void) {
           // Only OFF
           if (moduleSwitch[i].fell()) {
             state = false;
-            //DEBUG_PRINT(F("> Button ") << i << F(" pressed, send state: ") << state);
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
           }
           break;
@@ -267,17 +285,17 @@ void processSwitches(void) {
           if (moduleSwitch[i].fell()) {
             switchState[i] = !switchState[i];
             state = (switchState[i]);
-            //DEBUG_PRINT(F("> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
+            //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
             epService.sendEvent(state, i);
           }
           break;
 
         default:
-          DEBUG_PRINT(F("> Invalid EV value."));
+          //DEBUG_PRINT(F("sk> Invalid NV value."));
           break;
       }
     } 
-  }
+  }  
 }
 
 //
@@ -287,21 +305,21 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 
-  DEBUG_PRINT(F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
+  //DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
 
   unsigned int node_number = (msg->data[1] << 8) + msg->data[2];
   unsigned int event_number = (msg->data[3] << 8) + msg->data[4];
-  DEBUG_PRINT(F("> NN = ") << node_number << F(", EN = ") << event_number);
-  DEBUG_PRINT(F("> op_code = ") << opc);
+  //DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
+  //DEBUG_PRINT(F("sk> op_code = ") << opc);
 
   switch (opc) {
     case OPC_ACON:
     case OPC_ASON:
-    DEBUG_PRINT(F("> case is opCode ON"));
+      //DEBUG_PRINT(F("sk> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 2;
+        byte ev = i + 1;
         byte evval = modconfig.getEventEVval(index, ev);
-        DEBUG_PRINT(F("> EV = ") << ev << (" Value = ") << evval);
+        //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
         switch (evval) {
           case 1:
@@ -324,9 +342,9 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
 
     case OPC_ACOF:
     case OPC_ASOF:
-    DEBUG_PRINT(F("> case is opCode OFF"));
+    //DEBUG_PRINT(F("sk> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++) {
-        byte ev = i + 2;
+        byte ev = i + 1;
         byte evval = modconfig.getEventEVval(index, ev);
 
         if (evval > 0) {
