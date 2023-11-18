@@ -226,6 +226,10 @@ void loop()
   // bottom of loop()
 }
 
+//
+// Callback used when teaching produced events. 
+// Returns the index of the switch that was pressed which is the taught event shall relate to.
+//
 byte checkInputProduced(void)
 {
  for (byte i = 0; i < NUM_SWITCHES; i++) 

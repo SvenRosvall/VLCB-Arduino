@@ -18,7 +18,7 @@ class EventTeachingService : public Service
 public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-  void setcheckInputProduced(void (*fptr)());
+  void setcheckInputProduced(byte (*fptr)());
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
