@@ -106,10 +106,9 @@ void testConsumeOwnEvent()
   // Add some long events
   byte eventData[] = {0x01, 0x04, 0x03, 0x02};
   configuration->writeEvent(0, eventData);
-  configuration->writeEventEV(0, 1, 1);
   configuration->updateEvHashEntry(0);
 
-  eventProducerService->sendEvent(true, 1);
+  eventProducerService->sendEvent(true, 0);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
