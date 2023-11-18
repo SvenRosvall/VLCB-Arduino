@@ -25,28 +25,21 @@ void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage 
   eventhandler = fptr;
 }
 
-// overloaded form which receives the opcode on/off state and the first event variable
-void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage *msg, bool ison, byte evval)) 
-{
-  eventhandlerex = fptr;
-}
-
 //
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
-void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event) 
+void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en) 
 {
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);
 
   // call any registered event handler
 
-  if (index < module_config->EE_MAX_EVENTS) {
-    if (eventhandler != nullptr) {
+  if (index < module_config->EE_MAX_EVENTS)
+  {
+    if (eventhandler != nullptr)
+    {
       (void)(*eventhandler)(index, msg);
-    } else if (eventhandlerex != nullptr) {
-      byte evVal = (module_config->EE_NUM_EVS > 0) ? module_config->getEventEVval(index, 1) : 0;
-      (void)(*eventhandlerex)(index, msg, is_on_event, evVal);
     }
   }
 }
@@ -94,8 +87,8 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
     case OPC_AROF:
 
       // lookup this accessory event in the event table and call the user's registered callback function
-      if (eventhandler || eventhandlerex) {
-        processAccessoryEvent(msg, nn, en, (opc % 2 == 0));
+      if (eventhandler) {
+        processAccessoryEvent(msg, nn, en);
       }
 
       return PROCESSED;
@@ -111,9 +104,9 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
     case OPC_ASOF3:
 
       // lookup this accessory event in the event table and call the user's registered callback function
-      if (eventhandler || eventhandlerex) 
+      if (eventhandler) 
       {
-        processAccessoryEvent(msg, 0, en, (opc % 2 == 0));
+        processAccessoryEvent(msg, 0, en);
       }
 
       return PROCESSED;

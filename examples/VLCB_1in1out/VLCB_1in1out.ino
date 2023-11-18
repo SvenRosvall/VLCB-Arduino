@@ -64,7 +64,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::VlcbMessage *, bool ison, byte evval);
+void eventhandler(byte, VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
@@ -222,9 +222,12 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg, bool ison, byte evval)
+void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
+
+  byte evval = modconfig.getEventEVval(index, 1);
+  bool ison = msg->data[0] & 0x01;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 

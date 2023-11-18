@@ -79,21 +79,11 @@ void testServiceDiscoveryEventProdSvc()
 
 byte capturedIndex;
 VLCB::VlcbMessage capturedMessage;
-bool capturedState;
-byte capturedValue;
 
 void eventHandler(byte index, VLCB::VlcbMessage *msg) 
 {
   capturedIndex = index;
   capturedMessage = *msg;
-}
-
-void eventHandlerEx(byte index, VLCB::VlcbMessage *msg, bool evOn, byte evVal)
-{
-  capturedIndex = index;
-  capturedMessage = *msg;
-  capturedState = evOn;
-  capturedValue = evVal;
 }
 
 void testEventHandlerOff()
@@ -125,12 +115,12 @@ void testEventHandlerOff()
   assertEquals(OPC_ACOF, capturedMessage.data[0]);
 }
 
-void testEventHandlerExShortOn()
+void testEventHandlerShortOn()
 {
   test();
 
   VLCB::Controller controller = createController();
-  eventConsumerService->setEventHandler(eventHandlerEx);
+  eventConsumerService->setEventHandler(eventHandler);
 
   // Add some short events
   byte eventData[] = {0x00, 0x00, 0x00, 0x01};
@@ -152,8 +142,6 @@ void testEventHandlerExShortOn()
   assertEquals(0, mockTransport->sent_messages.size());
 
   assertEquals(1, capturedIndex);
-  assertEquals(true, capturedState);
-  assertEquals(42, capturedValue);
   assertEquals(5, capturedMessage.len);
   assertEquals(OPC_ASON, capturedMessage.data[0]);
 }
@@ -165,5 +153,5 @@ void testEventConsumerService()
   testServiceDiscovery();
   testServiceDiscoveryEventProdSvc();
   testEventHandlerOff();
-  testEventHandlerExShortOn();
+  testEventHandlerShortOn();
 }
