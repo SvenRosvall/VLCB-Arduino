@@ -88,9 +88,8 @@ void testSendOn()
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
   controller.getModuleConfig()->writeEvent(0, nnen);
-  controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEvent(true, 1);
+  eventProducerService->sendEvent(true, 0);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
@@ -111,9 +110,8 @@ void testSend1Off()
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
   controller.getModuleConfig()->writeEvent(0, nnen);
-  controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEvent(false, 1, 42);
+  eventProducerService->sendEvent(false, 0, 42);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ACOF1, mockTransport->sent_messages[0].data[0]);
@@ -135,9 +133,8 @@ void testSendShort2On()
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
   controller.getModuleConfig()->writeEvent(0, nnen);
-  controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEvent(true, 7, 42, 17);
+  eventProducerService->sendEvent(true, 0, 42, 17);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ASON2, mockTransport->sent_messages[0].data[0]);
@@ -160,9 +157,8 @@ void testSendShort3Off()
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
   controller.getModuleConfig()->writeEvent(0, nnen);
-  controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEvent(false, 7, 42, 17, 234);
+  eventProducerService->sendEvent(false, 0, 42, 17, 234);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ASOF3, mockTransport->sent_messages[0].data[0]);

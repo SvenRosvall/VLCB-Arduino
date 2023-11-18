@@ -18,7 +18,7 @@ void EventTeachingService::setController(Controller *cntrl)
 }
 
 // Register the user handler for produced event checking
-void EventTeachingService::setcheckInputProduced(void (*fptr)())
+void EventTeachingService::setcheckInputProduced(byte (*fptr)())
 {
   checkInputProduced = fptr;
 }
@@ -361,89 +361,86 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
   // DEBUG_SERIAL << endl << F("ets> EVLRN for source nn = ") << nn << endl;
 
   // we must be in learn mode
-  if (bLearn)
+  if (!bLearn)
   {
-    if (msg->len < 7)
+    return PROCESSED;
+  }
+
+  if (msg->len < 7)
+  {
+    controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
+    return PROCESSED;
+  }
+
+  byte evindex = msg->data[5];
+  byte evval = msg->data[6];
+  if ((evindex == 0) || (evindex > module_config->EE_NUM_EVS))
+  {
+    controller->sendCMDERR(CMDERR_INV_EV_IDX);
+    controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
+    return PROCESSED;
+  }
+
+  // Is this an existing event? 
+  //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
+  byte index = module_config->findExistingEvent(nn, en);
+
+  // not found in event table
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    // Are we a producer and is this a produced event to update?
+    if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex ==1))       
     {
-      controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
+      // Wait TIME_OUT seconds to see if producer button pressed.
+      //DEBUG_SERIAL << F("ets> Update candidate") << endl;
+      unsigned long timeStart = millis();
+      while (TIME_OUT > millis() - timeStart)
+      {
+        index = (byte)(*checkInputProduced)();
+        if (index < module_config->EE_PRODUCED_EVENTS)
+        {
+          // DEBUG_SERIAL << F("ets> Update index ") << index << endl;
+          break;
+        }
+      }
     }
-    else
+          
+    if (index >= module_config->EE_PRODUCED_EVENTS)
     {
-      byte evindex = msg->data[5];
-      byte evval = msg->data[6];
-      byte index;
-      if ((evindex == 0) || (evindex > module_config->EE_NUM_EVS))
-      {
-        controller->sendCMDERR(CMDERR_INV_EV_IDX);
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
-        return PROCESSED;
-      }
-    
-      // Is this an existing event? 
-      {
-        //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
-        index = module_config->findExistingEvent(nn, en);
-
-        // not found in event table
-        if (index >= module_config->EE_MAX_EVENTS)
-        {
-          // Are we a producer and is this a produced event to update?
-          // Wait timeOut seconds to see if producer button pressed.
-          if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex ==1))       
-          {
-            //DEBUG_SERIAL << F("ets> Update candidate") << endl;
-            unsigned long timeStart = millis();
-            while (TIME_OUT > millis() - timeStart)
-            {
-              index = (byte)(*checkInputProduced)();
-              if (index < module_config->EE_PRODUCED_EVENTS)
-              {
-                // DEBUG_SERIAL << F("ets> Update index ") << index << endl;
-                break;
-              }
-            }
-          }
-                
-          if (index >= module_config->EE_PRODUCED_EVENTS)
-          {
-            //DEBUG_SERIAL << F("ets> Not for update. Create a new event if space available") << endl;
-            index = module_config->findEventSpace();
-          }
-        }
-
-        // if existing or new event space found, write the event data
-        if (index < module_config->EE_MAX_EVENTS)
-        {
-          // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-          // DEBUG_SERIAL << F("ets> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
-
-          // don't repeat this for subsequent EVs
-          if (evindex < 2)
-          {
-            module_config->writeEvent(index, &msg->data[1]);
-          }
-
-          module_config->writeEventEV(index, evindex, evval);
-
-          // recreate event hash table entry
-          // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
-          module_config->updateEvHashEntry(index);
-
-          // respond with WRACK
-          controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-          // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
-          controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
-        }
-        else
-        {
-          // DEBUG_SERIAL << F("ets> no free event storage, index = ") << index << endl;
-          // respond with CMDERR & GRSP
-          controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
-          controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
-        }
-      }
+      //DEBUG_SERIAL << F("ets> Not for update. Create a new event if space available") << endl;
+      index = module_config->findEventSpace();
     }
   }
+
+  // if existing or new event space found, write the event data
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    // DEBUG_SERIAL << F("ets> no free event storage, index = ") << index << endl;
+    // respond with CMDERR & GRSP
+    controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
+    controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
+    return PROCESSED;
+  }
+
+  // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
+  // DEBUG_SERIAL << F("ets> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+
+  // don't repeat this for subsequent EVs
+  if (evindex <= 1)
+  {
+    module_config->writeEvent(index, &msg->data[1]);
+  }
+
+  module_config->writeEventEV(index, evindex, evval);
+
+  // recreate event hash table entry
+  // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
+  module_config->updateEvHashEntry(index);
+
+  // respond with WRACK
+  controller->sendWRACK();  // Deprecated in favour of GRSP_OK
+  // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
+  controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
   return PROCESSED;
 }
 
@@ -508,51 +505,50 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
 
 Processed EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en)
 {
-  if (bLearn)
+  if (!bLearn)
   {
-    if (msg->len < 6)
-    {
-      controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
-      controller->sendCMDERR(CMDERR_INV_CMD);
-      return PROCESSED;
-    }
+    return PROCESSED;
+  }
 
-    byte index = module_config->findExistingEvent(nn, en);
-    byte evIndex = msg->data[5];
+  if (msg->len < 6)
+  {
+    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
+    controller->sendCMDERR(CMDERR_INV_CMD);
+    return PROCESSED;
+  }
 
-    if (index >= module_config->EE_MAX_EVENTS)
-    {
-      //DEBUG_SERIAL << F("ets> event not found") << endl;
-      controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
-      controller->sendCMDERR(CMDERR_INVALID_EVENT);
-      return PROCESSED;
-    }
+  byte index = module_config->findExistingEvent(nn, en);
+  byte evIndex = msg->data[5];
 
-    if (evIndex > module_config->EE_NUM_EVS)
-    {
-      controller->sendCMDERR(CMDERR_INV_EV_IDX);
-      controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
-      return PROCESSED;
-    }
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    //DEBUG_SERIAL << F("ets> event not found") << endl;
+    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
+    controller->sendCMDERR(CMDERR_INVALID_EVENT);
+    return PROCESSED;
+  }
 
-    // event found
-    if (index < module_config->EE_MAX_EVENTS)
+  if (evIndex > module_config->EE_NUM_EVS)
+  {
+    controller->sendCMDERR(CMDERR_INV_EV_IDX);
+    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
+    return PROCESSED;
+  }
+
+  // event found
+  //DEBUG_SERIAL << F("ets> event found. evIndex = ") << evIndex << endl;
+  if (evIndex == 0)
+  {
+    //send all event variables one after the other starting with the number of variables
+    controller->sendMessageWithNN(OPC_EVANS, 0, module_config->EE_NUM_EVS);
+    for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
     {
-      //DEBUG_SERIAL << F("ets> event found. evIndex = ") << evIndex << endl;
-      if (evIndex == 0)
-      {
-        //send all event variables one after the other starting with the number of variables
-        controller->sendMessageWithNN(OPC_EVANS, 0, module_config->EE_NUM_EVS);
-        for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
-        {
-          controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
-        }
-      }
-      else
-      {
-        controller->sendMessageWithNN(OPC_EVANS, evIndex, module_config->getEventEVval(index, evIndex));
-      }
+      controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
     }
+  }
+  else
+  {
+    controller->sendMessageWithNN(OPC_EVANS, evIndex, module_config->getEventEVval(index, evIndex));
   }
   return PROCESSED;
 }
