@@ -5,7 +5,7 @@
 
 #include "DueEepromEmulationStorage.h"
 
-#ifdef __SAM38E__
+#ifdef __SAM3X8E__
 #include <DueFlashStorage.h>
 #endif
 
@@ -43,7 +43,7 @@ byte DueEepromEmulationStorage::readBytes(unsigned int eeaddress, byte nbytes, b
 
 byte DueEepromEmulationStorage::getChipEEPROMVal(unsigned int eeaddress)
 {
-#ifdef __SAM38E__
+#ifdef __SAM3X8E__
   return dueFlashStorage.read(eeaddress);
 #endif
 }
@@ -76,7 +76,7 @@ void DueEepromEmulationStorage::writeBytes(unsigned int eeaddress, byte src[], b
 //
 void DueEepromEmulationStorage::setChipEEPROMVal(unsigned int eeaddress, byte val)
 {
-#ifdef __SAM38E__
+#ifdef __SAM3X8E__
   dueFlashStorage.write(eeaddress, val);
 #endif
 }

@@ -116,6 +116,7 @@ enum CbusMergModuleTypes
   MTYP_CANSOUT = 77, // Q series PIC input module (Ian Hart)
   MTYP_CANSBIP = 78, // Q series PIC input module (Ian Hart)
   MTYP_CANBUFFER = 79, // Message buffer (Phil Silver)
+  MTYP_CANLEVER = 80, // Lever frame module (Tim Coombs)
   MTYP_VLCB = 0xFC, // All VLCB modules have the same ID
   // 
   // At the time of writing the list of defined MERG module types is maintained by Pete Brownlow software@upsys.co.uk
@@ -137,10 +138,10 @@ enum CbusSprogModuleTypes
   MTYP_CANSPROG = 3, // CAN SPROG programmer/command station
   MTYP_CANSBOOST = 4, // System Booster
   MTYP_CANPiSPRGP = 5, // Pi-SPROG 3 Plus programmer/command station
-  MTYP_CANISB = 6, // CAN ISB Isolated CAN USB Interface
-  MTYP_CANIO = 7, // 8-channel I/O module
-  MTYP_CANSERVOIO = 8, // 8-channel Servo I/O module
-  MTYP_CANSOLIO = 9, // 8-channel (4-pairs) Solenoid I/O module
+  MTYP_CANSOLNOID  = 8, // 8-channel (4-pairs) Solenoid I/O module
+  MTYP_CANSERVOIO = 50, // 8-channel Servo I/O module
+  MTYP_CANISB = 100, // CAN ISB Isolated CAN USB Interface
+  MTYP_CANSOLIO  = 101, // 8-channel (4-pairs) Solenoid I/O module
 };
 
 enum CbusRocRailModuleTypes

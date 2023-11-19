@@ -36,7 +36,6 @@ std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 VLCB::Controller createController()
 {
   minimumNodeService.reset(new VLCB::MinimumNodeService);
-  minimumNodeService->setHeartBeat(false);
 
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
@@ -47,7 +46,12 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventProducerService> epService;
   epService.reset(new VLCB::EventProducerService);
 
-  return ::createController({minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get()});
+  VLCB::Controller controller = ::createController(
+          {minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get()});
+  controller.begin();
+  minimumNodeService->setHeartBeat(false);
+
+  return controller;
 }
 
 void testUninitializedRequestNodeNumber()

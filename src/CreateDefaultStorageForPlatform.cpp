@@ -5,7 +5,7 @@
 
 #include "Storage.h"
 
-#if defined(__SAM38E__)
+#if defined(__SAM3X8E__)
 #include "DueEepromEmulationStorage.h"
 #elif defined(DXCORE)
 #include "FlashStorage.h"
@@ -18,7 +18,7 @@ namespace VLCB
 
 Storage * createDefaultStorageForPlatform()
 {
-#if defined(__SAM38E__)
+#if defined(__SAM3X8E__)
   static DueEepromEmulationStorage storage;
   return &storage;
 

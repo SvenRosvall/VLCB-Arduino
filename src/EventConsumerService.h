@@ -35,8 +35,8 @@ private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
   ConsumeOwnEventsService *coeService;
-  void (*eventhandler)(byte index, VlcbMessage *msg);
-  void (*eventhandlerex)(byte index, VlcbMessage *msg, bool evOn, byte evVal);
+  void (*eventhandler)(byte index, VlcbMessage *msg) = nullptr;
+  void (*eventhandlerex)(byte index, VlcbMessage *msg, bool evOn, byte evVal) = nullptr;
 
   void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event);
 };
