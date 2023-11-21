@@ -3,18 +3,11 @@
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
-#include "SerialGC.h"
-// 3rd party libraries
-#include <Streaming.h>
-#include <string.h>
 
 //
-// Class to transfer CAN frames using the GridConnect protocol over the serial port
+// Functions to convert between GridConnect format messages and CANMessage objects
 //
-// GridConnect is a format to encode a bit orientated CAN frame onto a byte orientated serial stream
-// The CBUS developers guide describes a slightly modified form of GridConnect, which has been used to 
-// enable communtion between computers and can adapters like the CANUSB4 module
-// this module follows this convention
+
 
 // the GridConnect message syntax for a normal message
 // : <S | X> <IDENTIFIER> <N> <DATA-0> <DATA-1> … <DATA-7> ;
@@ -53,9 +46,65 @@
 // And the GridConnect Identifier field is also leading zero padded, so always 8 characters for an extended message
 // 
 
+#include <iostream>
+#include "GridConnect.h"
 
 namespace VLCB
 {
+
+  bool encodeGridConnect(char * gcBuffer, CANMessage *msg){
+      byte offset = 0;
+      gcBuffer[0] = 0;  // null terminate buffer to start with
+      // set starting character & standard or extended CAN identifier
+      if (msg->ext) {
+        if (msg->id > 0x1FFFFFFF)
+        {
+          // id is greater than 29 bits, so fail the encoding
+          return false;
+        }
+        // mark as extended message
+        strcpy (gcBuffer,":X");
+        // extended 29 bit CAN idenfier in bytes 2 to 9
+        // chars 2 & 3 are ID bits 21 to 28
+        sprintf(gcBuffer + 2, "%02X", (msg->id) >> 21);
+        // char 4 -  bits 1 to 3 are ID bits 18 to 20
+        sprintf(gcBuffer + 4, "%01X", ((msg->id) >> 17) & 0xE);
+        // char 5 -  bits 0 to 1 are ID bits 16 & 17
+        sprintf(gcBuffer + 5, "%01X", ((msg->id) >> 16) & 0x3);
+        // chars 6 to 9 are ID bits 0 to 15
+        sprintf(gcBuffer + 6, "%04X", msg->id & 0xFFFF);
+        offset = 10;
+      } else {// mark sas standard message
+        if (msg->id > 0x7FF)
+        {
+          // id is greater than 11 bits, so fail the encoding
+          return false;
+        }
+        strcpy (gcBuffer,":S");
+        // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
+        sprintf(gcBuffer + 2, "%04X", msg->id << 5);
+        offset = 6;
+      }
+      // set RTR or normal - byte 6 or 10
+      if (msg->rtr) {
+        strcpy (gcBuffer + offset++,"R");
+      } else {
+        strcpy (gcBuffer + offset++,"N");
+      }
+      // add terminator in case len = 0, will be overwritten if len >0
+      strcpy (gcBuffer + offset,";");
+      if (msg->len > 8){  // if greater than 8 then faulty msg
+        gcBuffer[0] = 0;
+        return false;
+      }
+      //now data from byte 7 if len > 0
+      for (int i=0; i<msg->len; i++){
+        sprintf(gcBuffer + offset + i*2, "%02X", msg->data[i]);
+        // append terminator after every data byte - will be overwritten except for last one
+        strcpy (gcBuffer + offset + 2 + i*2,";");
+      }
+      return true;
+  }
 
   // Function to convert a pair of hexadecimal characters to a byte value
   //
@@ -67,9 +116,9 @@ namespace VLCB
       else { result = data[1] - 'A' + 10; }
       if (data[0] < 'A') { result += (data[0] - '0') << 4; }
       else { result += (data[0] - 'A' + 10) << 4; }
-      Serial << "ascii_pair:" << result << endl;
       return result;
   }
+
 
   // check supplied array is comprised of only hexadecimal characters
   //
@@ -85,10 +134,11 @@ namespace VLCB
     return true;
   }
 
+
   // convert a gridconnect message to CANMessage object
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool encodeCANMessage(char * gcBuffer, CANMessage *message) 
+  bool decodeGridConnect(char * gcBuffer, CANMessage *message) 
   {
     //Serial << " encode gridconnect message "<< gcBuffer << endl;
 
@@ -189,161 +239,8 @@ namespace VLCB
     return true; 
   }
 
-  bool encodeGridConnect(char * txBuffer, CANMessage *msg) {
-    byte offset = 0;
-    // set starting character & standard or extended CAN identifier
-    if (msg->ext) {
-      // mark as extended message
-      strcpy (txBuffer,":X");
-      // extended 29 bit CAN idenfier in bytes 2 to 9
-      // chars 2 & 3 are ID bits 21 to 28
-      sprintf(txBuffer + 2, "%02X", (msg->id) >> 21);
-      // char 4 -  bits 1 to 3 are ID bits 18 to 20
-      sprintf(txBuffer + 4, "%01X", ((msg->id) >> 18) & 0x7);
-      // char 5 -  bits 0 to 1 are ID bits 16 & 17
-      sprintf(txBuffer + 5, "%01X", ((msg->id) >> 16) & 0x3);
-      // chars 6 to 9 are ID bits 0 to 15
-      sprintf(txBuffer + 6, "%04X", msg->id & 0xFFFF);
-      offset = 10;
-    } else {// mark sas standard message
-      strcpy (txBuffer,":S");
-      // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
-      sprintf(txBuffer + 2, "%04X", msg->id << 5);
-      offset = 6;
-    }
-    // set RTR or normal - byte 6 or 10
-    if (msg->rtr) {
-      strcpy (txBuffer + offset++,"R");
-    } else {
-      strcpy (txBuffer + offset++,"N");
-    }
-    // add terminator in case len = 0, will be overwritten if len >0
-    strcpy (txBuffer + offset,";");
-    //now data from byte 7 if len > 0
-    for (int i=0; i<msg->len; i++){
-      sprintf(txBuffer + offset + i*2, "%02X", msg->data[i]);
-      // append terminator after every data byte - will be overwritten except for last one
-      strcpy (txBuffer + offset + 2 + i*2,";");
-    }
-    return true;
-  }
-
-  // Function to output a debug CANMessage to Serial
-  // needs to be a class memeber to get private variables
-  //
-  void SerialGC::debugCANMessage(CANMessage message)
-  {
-    Serial << endl << "CANMessage:";
-    Serial << " id " << message.id << " length " << message.len;
-    Serial << " data ";
-    for (int i=0; i <message.len; i++) {
-      if( i>0 ) Serial << ",";
-      Serial << message.data[i];
-    }
-    Serial << endl;
-    Serial << "Counts: Rx: " << receivedCount << " RxErr: " << receiveErrorCount;
-    Serial << " Tx: " << transmitCount << " TxErr " << transmitErrorCount << endl;
-  }
 
 
-
-  bool SerialGC::begin()  
-  {
-    Serial << F("> ** GridConnect over serial ** ") << endl;
-    receivedCount = 0;
-    transmitCount = 0;
-    return true;
-  }
-
-
-  //
-  // parse incoming characters & assemble message
-  // return true if valid message assembled & ready
-  //
-  bool SerialGC::available()
-  {
-    bool result = false;
-    static int rxIndex = 0;
-    if (Serial.available())
-    {     
-      char c = Serial.read();
-      if(c >= 'a' && c <= 'z') bitClear(c,5);   // ensure letters are upper case
-      //
-      // if 'start of message' already seen, save the character, and check for 'end of message'
-      if (rxIndex > 0) 
-      {
-        rxBuffer[rxIndex++] = c;
-        // check if end of buffer reached, and restart if so
-        if (rxIndex >= RXBUFFERSIZE) 
-        {
-          rxIndex = 0;
-        }
-        //
-        // check for 'end of message'
-        if (c == ';')
-        {
-          rxBuffer[rxIndex++] = '\0';     // null terminate
-          rxIndex = 0;
-          result = true;
-        }
-      }
-      //
-      // always check for 'start of message'
-      if (c == ':') 
-      {
-        rxIndex = 0;                    // restart at beginning of buffer
-        rxBuffer[rxIndex++] = c;
-      }
-    }
-    //
-    if (result) 
-    {
-      // We have received a message between a ':' and a ';', so increment count
-      receivedCount++;
-      result = encodeCANMessage(rxBuffer, &rxCANMessage);
-      if (result == false)
-      {
-        // must have been an error in the message, so increment error counter
-        receiveErrorCount++;
-      }
-    }
-    return result;
-  }
-
-
-  //
-  /// get the available CANMessage
-  /// must call available first to ensure there is something to get
-  //
-  CANMessage SerialGC::getNextCanMessage()
-  {
-    debugCANMessage(rxCANMessage);
-    return rxCANMessage;
-  }
-
-
-  //
-  /// send a CANMessage message in GridConnect format
-  // see Gridconnect format at beginning of file for byte positions
-  //
-  bool SerialGC::sendCanMessage(CANMessage *msg)
-  {
-    static int x = 0;
-    encodeGridConnect(txBuffer, msg);
-//    Serial << endl << x++ << " ";
-    // output the message
-    Serial.print(txBuffer);
-    transmitCount++;
-   return true;
-  }
-
-
-  //
-  /// reset
-  //
-  void SerialGC::reset()
-  {
-  }
 
 
 }

@@ -6,7 +6,7 @@
 #pragma once
 
 // header files
-
+#include <Arduino.h>
 #include <Controller.h>
 #include <CanTransport.h>
 

@@ -35,7 +35,9 @@ add_library(hardware_library OBJECT
         src/SerialUserInterface.h
         src/CombinedUserInterface.h
         src/CombinedUserInterface.cpp
-)
+        src/SerialGC.h
+        src/SerialGC.cpp
+        )
 
 add_library(core_library OBJECT
 
@@ -68,6 +70,8 @@ add_library(core_library OBJECT
         src/vlcbdefs.hpp
         src/ConsumeOwnEventsService.h
         src/ConsumeOwnEventsService.cpp
+        src/GridConnect.cpp
+        src/GridConnect.h
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -108,4 +112,5 @@ add_executable(testAll
         test/testEventTeachingService.cpp
         test/testConsumeOwnEventsService.cpp
         test/testLongMessageService.cpp
+        test/testGridConnect.cpp
 )
