@@ -122,7 +122,7 @@ namespace VLCB
 
   // check supplied array is comprised of only hexadecimal characters
   //
-  bool checkHexChars(char *charBuff, int count)
+  bool checkHexChars(const char *charBuff, int count)
   {
     for (int i = 0 ; i< count; i++)
     {
@@ -138,10 +138,8 @@ namespace VLCB
   // convert a gridconnect message to CANMessage object
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool decodeGridConnect(char * gcBuffer, CANMessage *message) 
+  bool decodeGridConnect(const char * gcBuffer, CANMessage *message) 
   {
-    //Serial << " encode gridconnect message "<< gcBuffer << endl;
-
     int gcIndex = 0;                          // index used to 'walk' gc message
     int gcBufferLength = strlen(gcBuffer);    // save for later use
 
