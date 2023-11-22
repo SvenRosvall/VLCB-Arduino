@@ -46,7 +46,7 @@
 // And the GridConnect Identifier field is also leading zero padded, so always 8 characters for an extended message
 // 
 
-#include <iostream>
+//#include <iostream>
 #include "GridConnect.h"
 
 namespace VLCB

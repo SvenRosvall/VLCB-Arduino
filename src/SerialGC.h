@@ -9,6 +9,7 @@
 #include <Arduino.h>
 #include <Controller.h>
 #include <CanTransport.h>
+#include <GridConnect.h>
 
 namespace VLCB
 {
