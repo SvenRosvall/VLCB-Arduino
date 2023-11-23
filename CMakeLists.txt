@@ -1,19 +1,9 @@
-# CMake definition for VLCB-Arduino project
-# This is necessary for working with the CLion IDE.
-
 cmake_minimum_required(VERSION 3.22.1)
 project(VLCB_Arduino LANGUAGES C CXX ASM)
 
 set(CMAKE_CXX_STANDARD 11)
 
 include(cmake/lto.cmake)
-include(cmake/arduino_core.cmake)
-include(cmake/arduino_libs.cmake)
-include(cmake/arduino_Streaming.cmake)
-include(cmake/arduino_ACAN2515.cmake)
-include(cmake/arduino_Bounce2.cmake)
-include(cmake/arduino_hex.cmake)
-include(cmake/arduino_upload.cmake)
 include(cmake/arduino_flags.cmake)
 
 include_directories(examples)
@@ -67,10 +57,15 @@ target_include_directories(core_library INTERFACE
         )
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-        target_link_libraries(core_library PUBLIC ArduinoFlags)
-        target_link_libraries(core_library PUBLIC ArduinoLibs)
-        target_link_libraries(core_library PUBLIC ArduinoStreaming)
-        target_link_libraries(core_library PUBLIC ArduinoACAN2515)
+  set(ARDUINO_PORT "/dev/ttyACM0" CACHE STRING
+    "The serial port for uploading using avrdude")
+
+  include(cmake/arduino_sdk.cmake)
+
+  include(examples/VLCB_1in1out/VLCB_1in1out.cmake)
+  include(examples/VLCB_4in4out/VLCB_4in4out.cmake)
+  include(examples/VLCB_empty/VLCB_empty.cmake)
+  include(examples/VLCB_long_message_example/VLCB_long_message_example.cmake)
 else()
         target_link_libraries(core_library PUBLIC ArduinoFlags)
         target_link_libraries(core_library PUBLIC ArduinoMock)
@@ -120,4 +115,11 @@ if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
 else()
         enable_testing()
         add_test(NAME testAll COMMAND $<TARGET_FILE:testAll>)
+=======
+  add_subdirectory(Arduino)
+  add_subdirectory(test)
+
+  enable_testing()
+  add_test(NAME testAll COMMAND $<TARGET_FILE:testAll>)
+>>>>>>> 432f251 (Ensure only relevant targets are configured.)
 endif()

@@ -1,0 +1,7 @@
+include(cmake/arduino_core.cmake)
+include(cmake/arduino_libs.cmake)
+include(cmake/arduino_Streaming.cmake)
+include(cmake/arduino_ACAN2515.cmake)
+include(cmake/arduino_Bounce2.cmake)
+include(cmake/arduino_hex.cmake)
+include(cmake/arduino_upload.cmake)
