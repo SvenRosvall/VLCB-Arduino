@@ -614,6 +614,24 @@ void CBUSbase::process(byte num_messages) {
         }
 
         break;
+        
+      case OPC_RQNN:
+        // Another module has entered setup.
+        // If we are in setup, abort as only one module can be in setup
+
+        if (bModeChanging)
+        {
+          bModeChanging = false;
+          indicateMode(module_config->FLiM);
+          // respond with NNACK
+          _msg.len = 3;
+          _msg.data[0] = OPC_NNACK;
+          _msg.data[1] = highByte(module_config->nodeNum);
+          _msg.data[2] = lowByte(module_config->nodeNum);
+
+          sendMessage(&_msg);
+        }
+        break;
 
       case OPC_CANID:
         // CAN -- set CANID
