@@ -100,6 +100,9 @@ extern "C" {
 // 		                              Resolve changes from PR #13,  move proposed and/or agreed opcodes not yet in the published spec to below the others
 // 		Pete Brownlow,5/08/2022, Ver 8w  Add module type 79 for CANBUFFER
 // 		Pete Brownlow,5/01/2023, Ver 8w  Add module type 80 for CANPMSense
+// 		Ian Hogg,14/08/2023, Ver 8x  Add manufacturer code for VLCB. This is a way to allocate a block of module Id to VLCB even though VLCB group is not a manufacturer per se. The VLCB module IDs will be defined in the VLCB repo
+// 		Pete Brownlow,2/11/23, Ver 8x  Add module id for CANLEVER (Tim Coombs)
+// 		Pete Brownlow,3/11/23, Ver 8x  Update SPROG module type ids (Andrew Crosland)
 // 
 // CBUS Manufacturer definitions
 // Where the manufacturer already has an NMRA code, this is used
@@ -109,6 +112,7 @@ extern "C" {
 #define MANU_SPROG	44	// https://www.sprog-dcc.co.uk/
 #define MANU_ROCRAIL	70	// http://www.rocrail.net
 #define MANU_SPECTRUM	80	// http://animatedmodeler.com  (Spectrum Engineering)
+#define MANU_VLCB	250	// VLCB range of modules
 #define MANU_SYSPIXIE	249	// Konrad Orlowski
 #define MANU_RME	248	// http://rmeuk.com  (Railway Modelling Experts Limited)
 // 
@@ -199,6 +203,7 @@ extern "C" {
 #define MTYP_CANSOUT	77	// Q series PIC input module (Ian Hart)
 #define MTYP_CANSBIP	78	// Q series PIC input module (Ian Hart)
 #define MTYP_CANBUFFER	79	// Message buffer (Phil Silver)
+#define MTYP_CANLEVER	80	// Lever frame module (Tim Coombs)
 // 
 // 
 // 
@@ -217,10 +222,10 @@ extern "C" {
 #define MTYP_CANSPROG	3	// CAN SPROG programmer/command station
 #define MTYP_CANSBOOST	4	// System Booster
 #define MTYP_CANPiSPRGP	5	// Pi-SPROG 3 Plus programmer/command station
-#define MTYP_CANISB	6	// CAN ISB Isolated CAN USB Interface
-#define MTYP_CANIO	7	// 8-channel I/O module
-#define MTYP_CANSERVOIO	8	// 8-channel Servo I/O module
-#define MTYP_CANSOLIO	9	// 8-channel (4-pairs) Solenoid I/O module
+#define MTYP_CANSOLNOID 	8	// 8-channel (4-pairs) Solenoid I/O module
+#define MTYP_CANSERVOIO	50	// 8-channel Servo I/O module
+#define MTYP_CANISB	100	// CAN ISB Isolated CAN USB Interface
+#define MTYP_CANSOLIO 	101	// 8-channel (4-pairs) Solenoid I/O module
 // 
 // 
 // Rocrail Module types
@@ -590,4 +595,3 @@ extern "C" {
 #endif
 
 #endif // __CBUSDEFS
-

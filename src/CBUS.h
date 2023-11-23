@@ -54,7 +54,6 @@
 #define LONG_MESSAGE_RECEIVE_TIMEOUT 5000  // timeout waiting for next long message packet
 #define NUM_EX_CONTEXTS 4                  // number of send and receive contexts for extended implementation = number of concurrent messages
 #define EX_BUFFER_LEN 64                   // size of extended send and receive buffers
-// #define OPC_DTXC 0xe9                      // temp opcode for CBUS long message
 
 //
 /// CBUS modes
@@ -98,7 +97,9 @@ public:
 /// it must be implemented by a derived subclass
 //
 
-class CBUSLongMessage;      // forward reference
+// forward references
+class CBUSLongMessage;
+class CBUScoe;
 
 class CBUSbase {
 
@@ -145,6 +146,7 @@ public:
   void processAccessoryEvent(unsigned int nn, unsigned int en, bool is_on_event);
 
   void setLongMessageHandler(CBUSLongMessage *handler);
+  void consumeOwnEvents(CBUScoe *coe);
 
   unsigned int _numMsgsSent, _numMsgsRcvd;
 
@@ -166,7 +168,8 @@ protected:                                          // protected members become 
   bool enumeration_required;
   bool UI = false;
 
-  CBUSLongMessage *longMessageHandler = NULL;       // CBUS long message object to receive relevant frames
+  CBUSLongMessage *longMessageHandler = nullptr;    // CBUS long message object to receive relevant frames
+  CBUScoe *coe_obj = nullptr;                       // consume-own-events
 };
 
 //
@@ -247,7 +250,62 @@ private:
 
   bool _use_crc = false;
   byte _num_receive_contexts = NUM_EX_CONTEXTS, _num_send_contexts = NUM_EX_CONTEXTS;
-  receive_context_t **_receive_context = NULL;
-  send_context_t **_send_context = NULL;
+  receive_context_t **_receive_context = nullptr;
+  send_context_t **_send_context = nullptr;
+};
+
+//
+/// a circular buffer class
+//
+
+// buffer item type
+
+typedef struct _buffer_entry2 {
+  unsigned long _item_insert_time;
+  CANFrame _item;
+} buffer_entry2_t;
+
+//
+
+class circular_buffer2 {
+
+public:
+  circular_buffer2(byte num_items);
+  ~circular_buffer2();
+  bool available(void);
+  void put(const CANFrame *cf);
+  CANFrame *peek(void);
+  CANFrame *get(void);
+  unsigned long insert_time(void);
+  bool full(void);
+  void clear(void);
+  bool empty(void);
+  byte size(void);
+  byte free_slots(void);
+  unsigned int puts();
+  unsigned int gets();
+  byte hwm(void);
+  unsigned int overflows(void);
+
+private:
+  bool _full;
+  byte _head, _tail, _capacity, _size, _hwm;
+  unsigned int _puts, _gets, _overflows;
+  buffer_entry2_t *_buffer;
+};
+
+// consume-own-events class
+
+class CBUScoe {
+
+public:
+  CBUScoe(const byte num_items = 4);
+  ~CBUScoe();
+  void put(const CANFrame *msg);
+  CANFrame get(void);
+  bool available(void);
+
+private:
+  circular_buffer2 *coe_buff;
 };
 

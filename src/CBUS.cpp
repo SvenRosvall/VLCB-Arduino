@@ -383,15 +383,18 @@ void CBUSbase::process(byte num_messages) {
 
   byte mcount = 0;
 
-  while (available() && mcount < num_messages) {
+  while ((available() || (coe_obj != NULL && coe_obj->available())) && mcount < num_messages) {
 
     ++mcount;
 
-    // at least one CAN frame is available in the reception buffer
+    // at least one CAN frame is available in either the reception buffer or the COE buffer
     // retrieve the next one
 
-    // memset(&_msg, 0, sizeof(CANFrame));
-    _msg = getNextMessage();
+    if (coe_obj != NULL && coe_obj->available()) {
+      _msg = coe_obj->get();
+    } else {
+      _msg = getNextMessage();
+    }
 
     // extract OPC, NN, EN
     opc = _msg.data[0];
@@ -462,7 +465,7 @@ void CBUSbase::process(byte num_messages) {
       // store this response in the responses array
       if (remoteCANID > 0) {
         // fix to correctly record the received CANID
-        bitWrite(enum_responses[(remoteCANID / 8)], remoteCANID % 8, 1);
+        bitWrite(enum_responses[(remoteCANID / 16)], remoteCANID % 8, 1);
         // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
       }
 
@@ -509,9 +512,6 @@ void CBUSbase::process(byte num_messages) {
       case OPC_ASOF1:
       case OPC_ASOF2:
       case OPC_ASOF3:
-
-      case OPC_ARSON:
-      case OPC_ARSOF:
 
         // lookup this accessory event in the event table and call the user's registered callback function
         if (eventhandler || eventhandlerex) {
@@ -1027,7 +1027,7 @@ void CBUSbase::checkCANenum(void) {
     // iterate through the 128 bit field
     for (byte i = 0; i < 16; i++) {
 
-      // ignore if this byte is all 1's -> there are no unused IDs in this group of bits
+      // ignore if this byte is all 1's -> there are no unused IDs in this group of numbers
       if (enum_responses[i] == 0xff) {
         continue;
       }
@@ -1042,9 +1042,9 @@ void CBUSbase::checkCANenum(void) {
 
         // if the bit is not set
         if (bitRead(enum_responses[i], b) == 0) {
-          selected_id = ((i * 8) + b);
+          selected_id = ((i * 16) + b);
           // DEBUG_SERIAL << F("> bit ") << b << F(" of byte ") << i << F(" is not set, first free CAN ID = ") << selected_id << endl;
-          // i = 8; // ugh ... but probably better than a goto :)
+          // i = 16; // ugh ... but probably better than a goto :)
           // but using a goto saves 4 bytes of program size ;)
           goto check_done;
           break;
@@ -1102,6 +1102,10 @@ void CBUSbase::setLongMessageHandler(CBUSLongMessage *handler) {
   longMessageHandler = handler;
 }
 
+void CBUSbase::consumeOwnEvents(CBUScoe *coe) {
+  coe_obj = coe;
+}
+
 //
 /// utility method to populate a CBUS message header
 //
@@ -1124,3 +1128,209 @@ void makeHeader_impl(CANFrame *msg, byte id, byte priority) {
   msg->id = (priority << 7) + (id & 0x7f);
   return;
 }
+
+//
+/// consume own events class
+//
+
+CBUScoe::CBUScoe(const byte num_items) {
+
+  coe_buff = new circular_buffer2(num_items);
+}
+
+CBUScoe::~CBUScoe() {
+
+  free(coe_buff);
+}
+
+void CBUScoe::put(const CANFrame *msg) {
+
+  coe_buff->put(msg);
+}
+
+bool CBUScoe::available(void) {
+
+  return coe_buff->available();
+}
+
+CANFrame CBUScoe::get(void) {
+
+  CANFrame msg;
+  memcpy(&msg, coe_buff->get(), sizeof(CANFrame));
+  return msg;
+}
+
+///
+/// a circular buffer class
+///
+
+/// constructor and destructor
+
+circular_buffer2::circular_buffer2(byte num_items) {
+
+  _head = 0;
+  _tail = 0;
+  _hwm = 0;
+  _capacity = num_items;
+  _size = 0;
+  _puts = 0;
+  _gets = 0;
+  _overflows = 0;
+  _full = false;
+  _buffer = (buffer_entry2_t *)malloc(num_items * sizeof(buffer_entry2_t));
+}
+
+circular_buffer2::~circular_buffer2() {
+  free(_buffer);
+}
+
+/// if buffer has one or more stored items
+
+bool circular_buffer2::available(void) {
+
+  return (_size > 0);
+}
+
+/// store an item to the buffer - overwrite oldest item if buffer is full
+/// never called from an interrupt context so we don't need to worry about interrupts
+
+void circular_buffer2::put(const CANFrame * item) {
+
+  memcpy((CANFrame*)&_buffer[_head]._item, (const CANFrame *)item, sizeof(CANFrame));
+  _buffer[_head]._item_insert_time = micros();
+
+  // if the buffer is full, this put will overwrite the oldest item
+
+  if (_full) {
+    _tail = (_tail + 1) % _capacity;
+    ++_overflows;
+  }
+
+  _head = (_head + 1) % _capacity;
+  _full = _head == _tail;
+  _size = size();
+  _hwm = (_size > _hwm) ? _size : _hwm;
+  ++_puts;
+
+  return;
+}
+
+/// retrieve the next item from the buffer
+
+CANFrame *circular_buffer2::get(void) {
+
+  CANFrame *p = nullptr;
+
+  // should always call ::available first to avoid returning null pointer
+
+  if (_size > 0) {
+    p = &_buffer[_tail]._item;
+    _full = false;
+    _tail = (_tail + 1) % _capacity;
+    _size = size();
+    ++_gets;
+  }
+
+  return p;
+}
+
+/// get the insert time of the current buffer tail item
+/// must be called before the item is removed by ::get
+
+unsigned long circular_buffer2::insert_time(void) {
+
+  return (_buffer[_tail]._item_insert_time);
+}
+
+/// peek at the next item in the buffer without removing it
+
+CANFrame *circular_buffer2::peek(void) {
+
+  // should always call ::available first to avoid this
+
+  if (_size == 0) {
+    return nullptr;
+  }
+
+  return (&_buffer[_tail]._item);
+}
+
+/// clear all items
+
+void circular_buffer2::clear(void) {
+
+  _head = 0;
+  _tail = 0;
+  _full = false;
+  _size = 0;
+
+  return;
+}
+
+/// return high water mark
+
+byte circular_buffer2::hwm(void) {
+
+  return _hwm;
+}
+
+/// return full indicator
+
+bool circular_buffer2::full(void) {
+
+  return _full;
+}
+
+/// recalculate number of items in the buffer
+
+byte circular_buffer2::size(void) {
+
+  byte size = _capacity;
+
+  if (!_full) {
+    if (_head >= _tail) {
+      size = _head - _tail;
+    } else {
+      size = _capacity + _head - _tail;
+    }
+  }
+
+  _size = size;
+  return _size;
+}
+
+/// return empty indicator
+
+bool circular_buffer2::empty(void) {
+
+  return (!_full && (_head == _tail));
+}
+
+/// return number of free slots
+
+byte circular_buffer2::free_slots(void) {
+
+  return (_capacity - _size);
+}
+
+/// number of puts
+
+unsigned int circular_buffer2::puts(void) {
+
+  return _puts;
+}
+
+/// number of gets
+
+unsigned int circular_buffer2::gets(void) {
+
+  return _gets;
+}
+
+/// number of overflows
+
+unsigned int circular_buffer2::overflows(void) {
+
+  return _overflows;
+}
+
