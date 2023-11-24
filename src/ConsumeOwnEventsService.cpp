@@ -16,6 +16,11 @@ ConsumeOwnEventsService::ConsumeOwnEventsService(byte bufferCapacity)
   buffer = new VlcbMessage[capacity];
 }
 
+ConsumeOwnEventsService::~ConsumeOwnEventsService()
+{
+  delete[] buffer;
+}
+
 /// if buffer has one or more stored items
 
 bool ConsumeOwnEventsService::available(void)

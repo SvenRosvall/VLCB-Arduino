@@ -25,7 +25,7 @@ VLCB::Controller createController()
   eventProducerService.reset(new VLCB::EventProducerService);
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get()});
-  
+
   return controller;
 }
 
@@ -182,9 +182,9 @@ void testSetProducedDefaultEventsOnNewBoard()
   minimumNodeService->setUninitialised();
 
   controller.begin();
-  
+
   minimumNodeService->setNormal();
-  
+
   // Should have no events configured at start
   assertEquals(0, controller.getModuleConfig()->numEvents());
 

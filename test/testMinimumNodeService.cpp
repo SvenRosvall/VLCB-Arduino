@@ -62,7 +62,7 @@ void testUninitializedRequestNodeNumber()
 
   // Set module into Uninitialized mode:
   minimumNodeService->setUninitialised();
-  
+
   // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
@@ -352,7 +352,7 @@ void testReadNodeParameterCount()
   assertEquals(OPC_PARAN, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]);
   assertEquals(MANU_VLCB, mockTransport->sent_messages[1].data[4]);
-  
+
   // Flags
   assertEquals(OPC_PARAN, mockTransport->sent_messages[8].data[0]);
   assertEquals(8, mockTransport->sent_messages[8].data[3]);
@@ -683,7 +683,7 @@ void testModeNormalToSetup()
   assertEquals(OPC_NNREL, mockTransport->sent_messages[1].data[0]);
   assertEquals(0x01, mockTransport->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[1].data[2]);
- 
+
   assertEquals(OPC_RQNN, mockTransport->sent_messages[2].data[0]);
   assertEquals(0x01, mockTransport->sent_messages[2].data[1]);
   assertEquals(0x04, mockTransport->sent_messages[2].data[2]);

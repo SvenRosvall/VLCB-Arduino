@@ -97,11 +97,11 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService(&coeService);
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService(&coeService);
-VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
+VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515,
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', ' U', ' T' };
+unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -119,6 +119,7 @@ byte switchState[NUM_SWITCHES];
 byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
 void printConfig();
+void processSwitches();
 
 //
 /// setup VLCB - runs once at power on from setup()
@@ -132,7 +133,7 @@ void setupVLCB()
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
   modconfig.EE_NUM_EVS = NUM_LEDS;
-  
+
 
   // initialise and load configuration
   controller.begin();
@@ -147,17 +148,17 @@ void setupVLCB()
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
   params.setModuleId(MODULE_ID);
- 
+
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
- 
+
   // register check produced handler for assigning short and spoof codes
   etService.setcheckInputProduced(checkInputProduced);
-  
+
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
 
@@ -227,31 +228,31 @@ void loop()
 }
 
 //
-// Callback used when teaching produced events. 
+// Callback used when teaching produced events.
 // Returns the index of the switch that was pressed which is the taught event shall relate to.
 //
 byte checkInputProduced(void)
 {
- for (byte i = 0; i < NUM_SWITCHES; i++) 
+ for (byte i = 0; i < NUM_SWITCHES; i++)
     {
-      moduleSwitch[i].update();      
+      moduleSwitch[i].update();
       if (moduleSwitch[i].changed())
       {
         //DEBUG_PRINT(F("sk> Check index is ") << i);
         return i;
-      } 
-    }      
-      return 0xFF;   
+      }
+    }
+      return 0xFF;
 }
 
 void processSwitches(void) {
-    
-  
-  for (byte i = 0; i < NUM_SWITCHES; i++) 
+
+
+  for (byte i = 0; i < NUM_SWITCHES; i++)
   {
     moduleSwitch[i].update();
     if (moduleSwitch[i].changed())
-    {      
+    {
       byte nv = i+1;
       byte nvval = modconfig.readNV(nv);
       bool state;
@@ -298,8 +299,8 @@ void processSwitches(void) {
           //DEBUG_PRINT(F("sk> Invalid NV value."));
           break;
       }
-    } 
-  }  
+    }
+  }
 }
 
 //
@@ -371,4 +372,3 @@ void printConfig()
   // copyright
   Serial << F("> © Martin Da Costa (MERG M62237) 2023") << endl;
 }
-
