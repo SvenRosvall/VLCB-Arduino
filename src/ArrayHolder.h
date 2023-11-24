@@ -29,7 +29,7 @@ public:
   // One past the last element.
   constexpr const E*
   end() const noexcept { return begin() + size(); }
-  
+
   constexpr const E
   operator[](size_t index) const noexcept { return array[index]; }
 
@@ -49,7 +49,7 @@ ArrayHolder<E>::ArrayHolder(const std::initializer_list<E> &il)
 template<typename E>
 ArrayHolder<E>::~ArrayHolder()
 {
-  delete array;
+  delete[] array;
   array = 0;
   len = 0;
 }
@@ -58,7 +58,7 @@ template<typename E>
 E* ArrayHolder<E>::copyArray(const E * a, size_t len)
 {
   E * array = new E[len];
-  for (int i = 0 ; i < len ; ++i)
+  for (size_t i = 0 ; i < len ; ++i)
   {
     array[i] = a[i];
   }

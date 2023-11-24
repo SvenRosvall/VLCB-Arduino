@@ -101,7 +101,7 @@ VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515,
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', ' U', ' T' };
+unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -119,6 +119,7 @@ byte switchState[NUM_SWITCHES];
 byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
 void printConfig();
+void processSwitches();
 
 //
 /// setup VLCB - runs once at power on from setup()
@@ -371,4 +372,3 @@ void printConfig()
   // copyright
   Serial << F("> © Martin Da Costa (MERG M62237) 2023") << endl;
 }
-

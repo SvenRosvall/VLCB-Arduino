@@ -5,15 +5,13 @@
 
 #pragma once
 
-#include <SPI.h>
-
 namespace VLCB
 {
 
 const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
 class Controller;
-class VlcbMessage;
+struct VlcbMessage;
 
 // Interface for sending and receiving Controller messages.
 class Transport
