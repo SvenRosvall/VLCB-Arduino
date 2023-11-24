@@ -26,7 +26,7 @@ VLCB::Controller createController()
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), eventConsumerService.get()});
   controller.begin();
-  
+
   return controller;
 }
 
@@ -82,7 +82,7 @@ VLCB::VlcbMessage capturedMessage;
 bool capturedState;
 byte capturedValue;
 
-void eventHandler(byte index, VLCB::VlcbMessage *msg) 
+void eventHandler(byte index, VLCB::VlcbMessage *msg)
 {
   capturedIndex = index;
   capturedMessage = *msg;
@@ -102,12 +102,12 @@ void testEventHandlerOff()
 
   VLCB::Controller controller = createController();
   eventConsumerService->setEventHandler(eventHandler);
-  
+
   // Add some long events
   byte eventData[] = {0x01, 0x04, 0x00, 0x00};
   configuration->writeEvent(0, eventData);
   configuration->updateEvHashEntry(0);
-  
+
   eventData[3] = 0x01;
   configuration->writeEvent(1, eventData);
   configuration->updateEvHashEntry(1);
@@ -137,7 +137,7 @@ void testEventHandlerExShortOn()
   configuration->writeEvent(0, eventData);
   configuration->updateEvHashEntry(0);
   configuration->writeEventEV(0, 1, 17);
-  
+
   eventData[3] = 0x02;
   configuration->writeEvent(1, eventData);
   configuration->updateEvHashEntry(1);

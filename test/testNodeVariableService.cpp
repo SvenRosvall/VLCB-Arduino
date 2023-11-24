@@ -26,7 +26,7 @@ VLCB::Controller createController()
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), nodeVariableService.get()});
   controller.begin();
-  
+
   return controller;
 }
 
@@ -112,9 +112,9 @@ void testSetAndReadNV()
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
-  
+
   mockTransport->clearMessages();
-  
+
   // Read NV 3
   msg = {4, {OPC_NVRD, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg);
@@ -165,7 +165,7 @@ void testSetNVIndexOutOfBand()
   assertEquals(OPC_NVSET, mockTransport->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_NV, mockTransport->sent_messages[0].data[4]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]);
-  
+
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
 }
@@ -188,7 +188,7 @@ void testReadNVIndexOutOfBand()
   assertEquals(OPC_NVRD, mockTransport->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_NV, mockTransport->sent_messages[0].data[4]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]);
-  
+
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
 }
@@ -202,7 +202,7 @@ void testReadNVAll()
   {
     configuration->writeNV(i, 20 + i);
   }
-  
+
   // Set NV 7 to 42
   VLCB::VlcbMessage msg = {4, {OPC_NVRD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
@@ -244,7 +244,7 @@ void testSetNVnewIndexOutOfBand()
   assertEquals(OPC_NVSETRD, mockTransport->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_NV, mockTransport->sent_messages[0].data[4]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[0].data[5]);
-  
+
   assertEquals(OPC_CMDERR, mockTransport->sent_messages[1].data[0]);
   assertEquals(CMDERR_INV_NV_IDX, mockTransport->sent_messages[1].data[3]);
 }

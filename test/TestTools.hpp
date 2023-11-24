@@ -1,3 +1,5 @@
+#include <string>
+
 #define assertEquals(EXPECTED, ACTUAL) \
         doAssertEquals(__FILE__, __LINE__, EXPECTED, ACTUAL, #ACTUAL)
 
@@ -11,3 +13,9 @@ void doAssertEquals(const char * file, int line,
         newTest(__FUNCTION__, __FILE__)
 
 void newTest(const char * methodName, const char * fileName);
+
+void suite(const std::string &name);
+
+void fail();
+
+int failures();
