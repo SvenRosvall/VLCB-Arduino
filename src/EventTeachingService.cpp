@@ -389,7 +389,7 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
   if (index >= module_config->EE_MAX_EVENTS)
   {
     // Are we a producer and is this a produced event to update?
-    if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex ==1))       
+    if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex == 1) && (checkInputProduced != nullptr))
     {
       // Wait TIME_OUT seconds to see if producer button pressed.
       //DEBUG_SERIAL << F("ets> Update candidate") << endl;
