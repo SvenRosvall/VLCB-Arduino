@@ -36,7 +36,7 @@ namespace VLCB
     if (Serial.available())
     {     
       char c = Serial.read();
-      if(c >= 'a' && c <= 'z') bitClear(c,5);   // ensure letters are upper case
+      c = tolower(c);
       //
       // if 'start of message' already seen, save the character, and check for 'end of message'
       if (rxIndex > 0) 
