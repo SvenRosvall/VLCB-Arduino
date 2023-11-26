@@ -86,23 +86,18 @@ namespace VLCB
         offset = 6;
       }
       // set RTR or normal - byte 6 or 10
-      if (msg->rtr) {
-        strcpy (gcBuffer + offset++,"R");
-      } else {
-        strcpy (gcBuffer + offset++,"N");
-      }
-      // add terminator in case len = 0, will be overwritten if len >0
-      strcpy (gcBuffer + offset,";");
+      strcpy(gcBuffer + offset++, msg->rtr ? "R" : "N");
       if (msg->len > 8){  // if greater than 8 then faulty msg
         gcBuffer[0] = 0;
         return false;
       }
-      //now data from byte 7 if len > 0
+      //now add hex data from byte 7 if len > 0
       for (int i=0; i<msg->len; i++){
-        sprintf(gcBuffer + offset + i*2, "%02X", msg->data[i]);
-        // append terminator after every data byte - will be overwritten except for last one
-        strcpy (gcBuffer + offset + 2 + i*2,";");
+        sprintf(gcBuffer + offset, "%02X", msg->data[i]);
+        offset += 2;
       }
+      // add terminator
+      strcpy (gcBuffer + offset,";");
       return true;
   }
 
@@ -165,7 +160,7 @@ namespace VLCB
       message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0xE0) << 13;
       // chars 4 & 5 -  bits 0 to 1 are bits 16 & 17
       message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0x3) << 16;
-      // chars 6 & 7 are bits 8 to 18
+      // chars 6 & 7 are bits 8 to 15
       message->id += uint32_t(ascii_pair_to_byte(&gcBuffer[6])) << 8;
       // chars 8 & 9 are bits 0 to 7 
       message->id += ascii_pair_to_byte(&gcBuffer[8]);
@@ -212,10 +207,8 @@ namespace VLCB
     {
       return false;
     } 
-    else 
-    {
-      message->len = dataLength/2;
-    }
+    // set length of data segment
+    message->len = dataLength/2;
     // now convert hex data into bytes
     for (int i = 0; i < dataLength/2; i++) 
     {
