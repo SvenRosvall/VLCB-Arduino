@@ -36,7 +36,7 @@ namespace VLCB
     if (Serial.available())
     {     
       char c = Serial.read();
-      c = tolower(c);
+      c = toupper(c);
       //
       // if 'start of message' already seen, save the character, and check for 'end of message'
       if (rxIndex > 0) 

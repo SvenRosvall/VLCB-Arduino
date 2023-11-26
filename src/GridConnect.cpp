@@ -121,6 +121,13 @@ namespace VLCB
   {
     for (int i = 0 ; i< count; i++)
     {
+      // must be upper case, so fail if lower case
+      if(isalpha(charBuff[i]))
+      {
+        if (islower (charBuff[i])){
+          return false;
+        }
+      }
       if (!isxdigit(charBuff[i]))
       {
         return false;

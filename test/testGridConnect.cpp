@@ -171,10 +171,12 @@ void testGridConnect(void){
   testGridConnectEncode_DATA(8, ":SFFE0N0102030405060708;", true);
   testGridConnectEncode_DATA(9, "", false);
 
-  // test decoding ID field, expectedEXT is false
+  // test decoding standard ID field, expectedEXT is false
   testGridConnectDecode_ID(":S0000N;", false, 0x0, true);             // all bits clear
   testGridConnectDecode_ID(":S0020N;", false, 0x1, true);             // bit 1 set
   testGridConnectDecode_ID(":SFFE0N;", false, 0x7FF, true);           // bits 0 to 10 set
+  testGridConnectDecode_ID(":sFFE0N;", false, 0x7FF, false);          // bits 0 to 10 set - lower case
+  testGridConnectDecode_ID(":Sffe0N;", false, 0x7FF, false);          // bits 0 to 10 set - lower case
   testGridConnectDecode_ID(":SQFE0N;", false, 0x0, false);            // non hex char in ID
   testGridConnectDecode_ID(":SFFEQN;", false, 0x0, false);            // non hex char in ID
 
@@ -186,6 +188,8 @@ void testGridConnect(void){
   testGridConnectDecode_ID(":X00200000N;", true, 0x40000, true);      // bit 18 set
   testGridConnectDecode_ID(":XFFE00000N;", true, 0x1FFC0000, true);   // bits 18 to 28 set
   testGridConnectDecode_ID(":XFFE3FFFFN;", true, 0x1FFFFFFF, true);   // all bits 0 to 28 set
+  testGridConnectDecode_ID(":xFFE3FFFFN;", true, 0x1FFFFFFF, false);  // all bits 0 to 28 set - lower case
+  testGridConnectDecode_ID(":Xffe3ffffN;", true, 0x1FFFFFFF, false);  // all bits 0 to 28 set - lower case
   testGridConnectDecode_ID(":XFFFFFFFFN;", true, 0x1FFFFFFF, true);   // check it ignores unused bits
   testGridConnectDecode_ID(":XQ0000000N;", true, 0x0, false);         // non hex char in ID
   testGridConnectDecode_ID(":X0000000QN;", true, 0x0, false);         // non hex char in ID
@@ -193,30 +197,36 @@ void testGridConnect(void){
   // test decode RTR - params are inoput msg, expected RTR, expected result from decode
   testGridConnectDecode_RTR(":S0000N;", false, true);             // standard msg, RTR false
   testGridConnectDecode_RTR(":S0000R;", true, true);              // standard msg, RTR true
+  testGridConnectDecode_RTR(":S0000n;", false, false);            // standard msg, lower case
+  testGridConnectDecode_RTR(":S0000r;", true, false);             // standard msg, lower case
   testGridConnectDecode_RTR(":S0000Q;", true, false);             // standard msg, invalid char in RTR field
   testGridConnectDecode_RTR(":X00000000N;", false, true);         // extended msg, RTR false
   testGridConnectDecode_RTR(":X00000000R;", true, true);          // extended msg, RTR true
-  testGridConnectDecode_RTR(":X00000000Q;", true, false);          // extended msg, invalid char in RTR field
+  testGridConnectDecode_RTR(":X00000000n;", false, false);        // extended msg, lower case
+  testGridConnectDecode_RTR(":X00000000r;", true, false);         // extended msg, lower case
+  testGridConnectDecode_RTR(":X00000000Q;", true, false);         // extended msg, invalid char in RTR field
 
   // test decode data field, standard message
   testGridConnectDecode_DATA(":S0000N;", 0, true);                          // standard msg, zero data
   testGridConnectDecode_DATA(":S0000N01;", 1, true);                        // standard msg, 1 data byte
-  testGridConnectDecode_DATA(":S0000N0102030405060708;", 8, true);          // standard msg, 8 data bytes
+  testGridConnectDecode_DATA(":S0000N000102030405FEFF;", 8, true);          // standard msg, 8 data bytes
+  testGridConnectDecode_DATA(":S0000N000102030405feff;", 8, false);          // standard msg, lower case should fail
   testGridConnectDecode_DATA(":S0000N0;", 1, false);                        // standard msg, wrong number of data chars
-  testGridConnectDecode_DATA(":S0000N010203040506070;", 8, false);          // standard msg, wrong number of data chars
-  testGridConnectDecode_DATA(":S0000N010203040506070809;", 9, false);       // standard msg, too many data bytes
-  testGridConnectDecode_DATA(":S0000NQ102030405060708;", 8, false);          // standard msg, invalid char in data
-  testGridConnectDecode_DATA(":S0000N010203040506070Q;", 8, false);          // standard msg, invalid char in data
+  testGridConnectDecode_DATA(":S0000N000102030405FEF;", 8, false);          // standard msg, wrong number of data chars
+  testGridConnectDecode_DATA(":S0000N000102030405FEFF09;", 9, false);       // standard msg, too many data bytes
+  testGridConnectDecode_DATA(":S0000NQ00102030405FEFF;", 8, false);          // standard msg, invalid char in data
+  testGridConnectDecode_DATA(":S0000N000102030405FEFQ;", 8, false);          // standard msg, invalid char in data
 
   // test decode data field, extended message
   testGridConnectDecode_DATA(":X00000000N;", 0, true);                      // extended msg, zero data
   testGridConnectDecode_DATA(":X00000000N01;", 1, true);                    // extended msg, 1 data byte
-  testGridConnectDecode_DATA(":X00000000N0102030405060708;", 8, true);      // extended msg, 8 data bytes
+  testGridConnectDecode_DATA(":X00000000N000102030405FEFF;", 8, true);      // extended msg, 8 data bytes
+  testGridConnectDecode_DATA(":X00000000N000102030405feff;", 8, false);     // extended msg, lower case should fail
   testGridConnectDecode_DATA(":X00000000N0;", 1, false);                    // extended msg, wrong number of data chars
-  testGridConnectDecode_DATA(":X00000000N010203040506070;", 8, false);      // extended msg, wrong number of data chars
-  testGridConnectDecode_DATA(":X00000000N010203040506070809;", 9, false);   // extended msg, too many data bytes
-  testGridConnectDecode_DATA(":X00000000NQ102030405060708;", 8, false);     // extended msg, invalid char in data
-  testGridConnectDecode_DATA(":X00000000N010203040506070Q;", 8, false);     // extended msg, invalid char in data
+  testGridConnectDecode_DATA(":X00000000N000102030405FEF;", 8, false);      // extended msg, wrong number of data chars
+  testGridConnectDecode_DATA(":X00000000N000102030405FEFF09;", 9, false);   // extended msg, too many data bytes
+  testGridConnectDecode_DATA(":X00000000NQ00102030405FEFF;", 8, false);     // extended msg, invalid char in data
+  testGridConnectDecode_DATA(":X00000000N000102030405FEFQ;", 8, false);     // extended msg, invalid char in data
 
 
 }
