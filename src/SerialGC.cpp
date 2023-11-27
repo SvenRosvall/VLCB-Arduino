@@ -7,6 +7,7 @@
 // 3rd party libraries
 #include <Streaming.h>
 #include <string.h>
+#include <ctype.h>
 
 //
 // Class to transfer CAN frames using the GridConnect protocol over the serial port
