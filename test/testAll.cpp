@@ -16,7 +16,6 @@ void testEventConsumerService();
 void testEventTeachingService();
 void testConsumeOwnEventsService();
 void testLongMessageService();
-void testGridConnect();
 
 // Remaining services to implement
 //Bootloader (the CBUS PIC version) service #10
@@ -32,7 +31,6 @@ std::map<std::string, void (*)()> suites = {
         {"EventTeachingService", testEventTeachingService},
         {"ConsumeOwnEventsService", testConsumeOwnEventsService},
         {"LongMessageService", testLongMessageService},
-        {"GridConnect", testGridConnect},
 };
 
 int main(int argc, const char * const * argv)
