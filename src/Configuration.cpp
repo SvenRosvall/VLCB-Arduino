@@ -50,16 +50,16 @@ void Configuration::begin()
 
   storage->begin();
   loadNVs();
-  
+
   if ((storage->read(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
   {
     // DEBUG_SERIAL << "Configuration::begin() - EEPROM is factory reset. Resetting module." << endl;
     resetModule();
     clearResetFlag();
-    loadNVs();   
+    loadNVs();
   }
-  
-  makeEvHashTable();  
+
+  makeEvHashTable();
 }
 
 void Configuration::setModuleMode(VlcbModeParams f)
@@ -526,20 +526,21 @@ unsigned int Configuration::freeSRAM()
 #ifdef __AVR__
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
-#endif
 
-#if defined ESP32 || defined ESP8266
+#elif defined ESP32 || defined ESP8266
   return ESP.getFreeHeap();
-#endif
 
-#ifdef __SAM3X8E__
+#elif defined __SAM3X8E__
   char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
-#endif
 
-#ifdef ARDUINO_ARCH_RP2040
+#elif defined ARDUINO_ARCH_RP2040
   char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
+
+#else
+  return 0;
+
 #endif
 
   // For other platforms you will get a warning about missing return.

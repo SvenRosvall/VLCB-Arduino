@@ -38,7 +38,7 @@ class Controller
 public:
   Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
   Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
-  
+
   Configuration * getModuleConfig() { return module_config; }
 
   void setName(const unsigned char *mname);
@@ -55,7 +55,7 @@ public:
     indicateActivity();
     return transport->sendMessage(msg);
   }
-  
+
   void begin();
   inline bool sendMessageWithNN(int opc);
   inline bool sendMessageWithNN(int opc, byte b1);
@@ -73,7 +73,7 @@ public:
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
-  
+
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
   Configuration *module_config;
@@ -82,7 +82,7 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
-  
+
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };

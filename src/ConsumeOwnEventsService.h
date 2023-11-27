@@ -17,29 +17,30 @@ class ConsumeOwnEventsService : public Service
 {
 public:
   ConsumeOwnEventsService(byte bufferCapacity = 4);
+  ~ConsumeOwnEventsService();
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override {return NOT_PROCESSED;}
-  
-  virtual byte getServiceID() override 
+
+  virtual byte getServiceID() override
   {
     return SERVICE_ID_CONSUME_OWN_EVENTS;
   }
-  virtual byte getServiceVersionID() override 
+  virtual byte getServiceVersionID() override
   {
     return 1;
   }
-  
+
   bool available(void);
   VlcbMessage *peek(void);
   VlcbMessage *get(void);
   void put(const VlcbMessage *msg);
   void clear(void);
-  
+
   // Diagnostic metrics access
   unsigned int getNumberOfPuts(void);
   unsigned int getNumberofGets(void);
   unsigned int getOverflows(void);
   unsigned int getHighWaterMark(void);   // High Watermark
-    
+
 private:
   byte bufUse(void);
 
@@ -48,13 +49,13 @@ private:
   byte tail = 0;
   byte size = 0;
   bool full = false;
-  
+
   // Diagnostic metrics
   byte hwm = 0;  // High watermark
   byte numPuts = 0;
   byte numGets = 0;
   byte numOverflows = 0;
-  
+
   VlcbMessage *buffer;
 };
 

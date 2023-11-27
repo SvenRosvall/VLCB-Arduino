@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #include "TestTools.hpp"
 #include "ArduinoMock.hpp"
@@ -13,6 +14,7 @@ void doAssertEquals(const char * file, int line,
            file, line,
            expression, actual, expected);
     fflush(stdout);
+    fail();
   }
 }
 
@@ -25,6 +27,7 @@ void doAssertEquals(const char * file, int line,
     printf("%s:%d: '%s' is '%s', but expected '%s'\n",
            file, line,
            expression, actual, expected);
+    fail();
   }
 }
 
@@ -33,4 +36,22 @@ void newTest(const char * methodName, const char * fileName)
   printf("Running test %s in %s\n",
          methodName, fileName);
   clearArduinoValues();
+}
+
+static int suiteFailures;
+
+void suite(const std::string &name)
+{
+  printf("Running suite %s\n", name.c_str());
+  suiteFailures = 0;
+}
+
+void fail()
+{
+  suiteFailures++;
+}
+
+int failures()
+{
+  return suiteFailures;
 }

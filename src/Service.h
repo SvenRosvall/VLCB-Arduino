@@ -12,7 +12,7 @@ namespace VLCB
 {
 
 class Controller;
-class VlcbMessage;
+struct VlcbMessage;
 
 enum Processed
 {
@@ -34,4 +34,3 @@ public:
 };
 
 }
-

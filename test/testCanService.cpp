@@ -35,7 +35,7 @@ VLCB::Controller createController()
 
   VLCB::Controller controller = ::createController(mockCanTransport.get(), {minimumNodeService.get(), canService.get()});
   controller.begin();
-  
+
   return controller;
 }
 
@@ -151,8 +151,8 @@ void testCanidEnumerationOnSetUp()
 
   // Expect no further messages
   assertEquals(0, mockCanTransport->sent_messages.size());
-  
-  // Note: RQNN shouldn't really be sent until a CANID has been set. 
+
+  // Note: RQNN shouldn't really be sent until a CANID has been set.
   // But this works so going to leave as is.
 }
 
@@ -196,7 +196,7 @@ void testCanidEnumerationOnConflict()
 
   controller.process();
   assertEquals(0, mockCanTransport->sent_messages.size());
-  
+
   // Collision above only sets a flag. Enumeration happens next.
   controller.process();
 
@@ -265,7 +265,7 @@ void testFindFreeCanidOnPopulatedBus()
     mockCanTransport->incoming_messages.clear();
   }
   assertEquals(0, mockCanTransport->sent_messages.size());
-  
+
   // Processing after enumeration timeout
   addMillis(101);
   mockCanTransport->sent_messages.clear();

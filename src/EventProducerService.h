@@ -17,18 +17,18 @@ class EventProducerService : public Service {
 public:
   EventProducerService(ConsumeOwnEventsService *s = nullptr) : coeService(s) {}
   virtual void setController(Controller *cntrl) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override; 
+  virtual void process(UserInterface::RequestedAction requestedAction) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
-  virtual byte getServiceID() override 
+  virtual byte getServiceID() override
   {
     return SERVICE_ID_PRODUCER;
   }
-  virtual byte getServiceVersionID() override 
+  virtual byte getServiceVersionID() override
   {
     return 1;
   }
-  void begin();
+  void begin() override;
   void sendEvent(bool state, byte index);
   void sendEvent(bool state, byte index, byte data1);
   void sendEvent(bool state, byte index, byte data1, byte data2);
@@ -39,7 +39,7 @@ private:
   Configuration *module_config;  // Shortcut to reduce indirection code.
   ConsumeOwnEventsService *coeService;
   void (*eventhandler)(byte index, VlcbMessage *msg);
- 
+
   void setProducedEvents();
   bool uninit = false;
 };

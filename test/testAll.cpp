@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include "testArduino.hpp"
+#include "TestTools.hpp"
 
 void testMinimumNodeService();
 void testNodeVariableService();
@@ -30,16 +31,19 @@ std::map<std::string, void (*)()> suites = {
         {"EventConsumerService", testEventConsumerService},
         {"EventTeachingService", testEventTeachingService},
         {"ConsumeOwnEventsService", testConsumeOwnEventsService},
-        {"LongMessageService", testLongMessageService},
+        {"LongMessageService", testLongMessageService}
 };
 
 int main(int argc, const char * const * argv)
 {
+  int totalFailures = 0;
   if (*++argv == nullptr)
   {
     for (auto const &i : suites)
     {
+      suite(i.first);
       i.second();
+      totalFailures += failures(); 
     }
   }
   else
@@ -51,6 +55,7 @@ int main(int argc, const char * const * argv)
       if (found != suites.end())
       {
         found->second();
+        totalFailures += failures();
       }
       else
       {
@@ -67,5 +72,9 @@ int main(int argc, const char * const * argv)
       }
     }
   }
-  return 0;
+  if (totalFailures > 0)
+  {
+    std::cout << "Completed with totalFailures. " << totalFailures << " test(s) failed." << std::endl;
+  }
+  return totalFailures;
 }

@@ -26,7 +26,7 @@ VLCB::Controller createController()
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), eventTeachingService.get()});
   controller.begin();
-  
+
   return controller;
 }
 

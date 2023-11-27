@@ -31,11 +31,11 @@ VLCB::Controller createController()
   eventConsumerService.reset(new VLCB::EventConsumerService(consumeOwnEventsService.get()));
 
   eventProducerService.reset(new VLCB::EventProducerService(consumeOwnEventsService.get()));
-  
+
   VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get(),
                                                     eventProducerService.get(), eventConsumerService.get()});
   controller.begin();
-  
+
   return controller;
 }
 
@@ -100,7 +100,7 @@ void testConsumeOwnEvent()
   test();
 
   VLCB::Controller controller = createController();
-  
+
   eventConsumerService->setEventHandler(eventHandler);
 
   // Add some long events
