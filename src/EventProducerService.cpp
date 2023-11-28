@@ -31,16 +31,15 @@ void EventProducerService::begin()
 
 void EventProducerService::setProducedEvents()
 { 
-  byte data[4];
-  byte index;
   for (byte i = 1; i <= module_config->EE_PRODUCED_EVENTS; i++)
   {
+    byte data[4];
     data[0] = highByte(module_config->nodeNum);
     data[1] = lowByte(module_config->nodeNum);
     data[2] = 0;
     data[3] = i;
  
-    index = i - 1;
+    byte index = i - 1;
     module_config->writeEvent(index, data);
     module_config->updateEvHashEntry(index);    
   }    
@@ -58,11 +57,10 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
 
 void EventProducerService::sendEvent(bool state, byte index)
 {
-  byte nn_en[4];
-  byte opCode;
-
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
     //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -94,11 +92,10 @@ void EventProducerService::sendEvent(bool state, byte index)
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1)
 {
-  byte nn_en[4];
-  byte opCode;
-  
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
@@ -130,11 +127,10 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
 {
-  byte nn_en[4];
-  byte opCode;
-  
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
@@ -167,11 +163,10 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
 
 void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
 {
-  byte nn_en[4];
-  byte opCode;
-  
   if (index < module_config->EE_MAX_EVENTS)
   {
+    byte opCode;
+    byte nn_en[4];
     module_config->readEvent(index, nn_en);
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
@@ -205,8 +200,8 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
 
 Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
 {
-  unsigned int nn = (msg->data[1] << 8) + msg->data[2];
-  unsigned int en = (msg->data[3] << 8) + msg->data[4];
+  //unsigned int nn = (msg->data[1] << 8) + msg->data[2];
+  //unsigned int en = (msg->data[3] << 8) + msg->data[4];
   // DEBUG_SERIAL << ">VLCBSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 

@@ -18,7 +18,6 @@ public:
   EventConsumerService(ConsumeOwnEventsService *s = nullptr) : coeService(s) {}
   virtual void setController(Controller *cntrl) override;
   void setEventHandler(void (*fptr)(byte index, VlcbMessage *msg));
-  void setEventHandler(void (*fptr)(byte index, VlcbMessage *msg, bool ison, byte evval));
   virtual void process(UserInterface::RequestedAction requestedAction) override; 
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
@@ -36,9 +35,8 @@ private:
   Configuration *module_config;  // Shortcut to reduce indirection code.
   ConsumeOwnEventsService *coeService;
   void (*eventhandler)(byte index, VlcbMessage *msg) = nullptr;
-  void (*eventhandlerex)(byte index, VlcbMessage *msg, bool evOn, byte evVal) = nullptr;
 
-  void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en, bool is_on_event);
+  void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB

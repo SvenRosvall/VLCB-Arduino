@@ -179,16 +179,6 @@ void Controller::process(byte num_messages)
       continue;
     }
 
-    for (Service * service : services)
-    {
-      // DEBUG_SERIAL << "> Passing raw message to " << endl;
-      if (service->handleRawMessage(&msg) == PROCESSED)
-      {
-        // DEBUG_SERIAL << "> Service handled raw message" << endl;
-        break;
-      }
-    }
-
     indicateActivity();
 
     //

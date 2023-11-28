@@ -65,7 +65,7 @@ unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
 byte checkInputProduced();
-void eventhandler(byte, VLCB::VlcbMessage *, bool ison, byte evval);
+void eventhandler(byte, VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
@@ -210,7 +210,17 @@ void loop()
 //
 byte checkInputProduced()
 {
-  return moduleSwitch.stateChanged() ? 1 : 0;
+  moduleSwitch.run();
+  if (moduleSwitch.stateChanged())
+  {
+    // Button was pressed so event is for it. Index 0.
+    return 0;
+  }
+  else
+  {
+    // No button pressed. Event is for consumed event.
+    return 0xFF;
+  }
 }
 
 //
@@ -235,9 +245,13 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg, bool ison, byte evval)
+void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
+
+  byte evval = modconfig.getEventEVval(index, 1);
+  // Event Off op-codes have odd numbers.
+  bool ison = (msg->data[0] & 0x01) == 0;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 
