@@ -210,7 +210,17 @@ void loop()
 //
 byte checkInputProduced()
 {
-  return moduleSwitch.stateChanged() ? 1 : 0;
+  moduleSwitch.run();
+  if (moduleSwitch.stateChanged())
+  {
+    // Button was pressed so event is for it. Index 0.
+    return 0;
+  }
+  else
+  {
+    // No button pressed. Event is for consumed event.
+    return 0xFF;
+  }
 }
 
 //
@@ -240,7 +250,8 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
   // as an example, control an LED
 
   byte evval = modconfig.getEventEVval(index, 1);
-  bool ison = msg->data[0] & 0x01;
+  // Event Off op-codes have odd numbers.
+  bool ison = (msg->data[0] & 0x01) == 0;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
 
