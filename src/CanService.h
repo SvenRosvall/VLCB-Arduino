@@ -26,7 +26,6 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleRawMessage(VlcbMessage *msg) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   void startCANenumeration(bool fromENUM = false);

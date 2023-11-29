@@ -29,7 +29,6 @@ public:
   virtual byte getServiceVersionID() = 0;
 
   virtual void process(UserInterface::RequestedAction requestedAction) {}
-  virtual Processed handleRawMessage(VlcbMessage *msg) { return NOT_PROCESSED; }
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) = 0;
 };
 
