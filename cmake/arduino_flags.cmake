@@ -41,7 +41,6 @@ target_compile_definitions(ArduinoFlags INTERFACE
     "__HOST__"
 )
 target_link_options(ArduinoFlags INTERFACE
-    "-fuse-ld=lld"
     "-fuse-linker-plugin"
     "LINKER:--gc-sections"
 )
