@@ -100,7 +100,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, VlcbMessage *msg
     
   default:
     // unknown or unhandled OPC
-    // DEBUG_SERIAL << F("ets> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
+    //DEBUG_SERIAL << F("ets> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
     return NOT_PROCESSED;
   }
 }
@@ -320,6 +320,11 @@ Processed EventTeachingService::handleClearEvents(unsigned int nn)
       // recreate the hash table
       module_config->clearEvHashTable();
       // DEBUG_SERIAL << F("ets> cleared all events") << endl;
+      
+      if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
+      {
+        module_config->setResetFlag();
+      }
 
       controller->sendWRACK();
       controller->sendGRSP(OPC_NNCLR, getServiceID(), GRSP_OK);
