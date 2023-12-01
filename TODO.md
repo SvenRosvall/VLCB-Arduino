@@ -91,6 +91,14 @@ This idea can even go further and make the Transport a service (as originally en
 Having the Transport as a service also allows for multiple transport connections and implement bridges
 between different types of transport media such as CAN and Ethernet.
 
+The UserInterface also generates actions that could be passed on as a Command on this queue instead of
+being passed as a parameter to the Service process(). 
+Thus, the UserInterface could also be converted to a service and will receive commands such as indicate
+activity from other services.
+
+The ```CombinedUserInterface``` won't be needed anymore as the ```LedUserInterface``` and
+```SerialUserInterface``` can now be added to the list of services side by side.
+
 ## Documentation
 
 ### Split documentation based on audience
