@@ -12,11 +12,11 @@
 //NNEVN - Done
 //NERD (Read all events)
 //RQEVN - Done
-//NENRD (Read Event by Index)
+//NENRD - Done (Read Event by Index)
 //EVULN
-//REVAL (Request EV Read)
-//REQEV (Read Event Variable)
-//EVLRN (Teach an EV)
+//REVAL - Done (Request EV Read)
+//REQEV - Done (Read Event Variable in learn mode)
+//EVLRN - Done (Teach an EV)
 //EVLRNI
 
 #include <memory>
