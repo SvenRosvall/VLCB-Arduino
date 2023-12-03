@@ -150,7 +150,7 @@ Processed EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsig
   // DEBUG_SERIAL << F("ets> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
   // we must be in learn mode
-  if (bLearn == true)
+  if (bLearn)
   {
     if (msg->len < 5)
     {
@@ -308,7 +308,7 @@ Processed EventTeachingService::handleClearEvents(unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
-    if (bLearn == true)
+    if (bLearn)
     {
       // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 

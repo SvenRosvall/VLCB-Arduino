@@ -29,20 +29,20 @@ public:
     return 1;
   }
 
-  bool available(void);
-  VlcbMessage *peek(void);
-  VlcbMessage *get(void);
+  bool available();
+  VlcbMessage *peek();
+  VlcbMessage *get();
   void put(const VlcbMessage *msg);
-  void clear(void);
+  void clear();
 
   // Diagnostic metrics access
-  unsigned int getNumberOfPuts(void);
-  unsigned int getNumberofGets(void);
-  unsigned int getOverflows(void);
-  unsigned int getHighWaterMark(void);   // High Watermark
+  unsigned int getNumberOfPuts();
+  unsigned int getNumberofGets();
+  unsigned int getOverflows();
+  unsigned int getHighWaterMark();   // High Watermark
 
 private:
-  byte bufUse(void);
+  byte bufUse();
 
   byte capacity;
   byte head = 0;
