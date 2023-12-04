@@ -398,7 +398,7 @@ void testTeachEvent()
   mockTransport->clearMessages();
 }
 
-void testTeachEventIndexedAndUnlearn()
+void testTeachEventIndexedAndClear()
 {
   test();
 
@@ -442,9 +442,9 @@ void testTeachEventIndexedAndUnlearn()
   assertEquals(42, mockTransport->sent_messages[0].data[6]);
   mockTransport->clearMessages();
   
-  // Unlearn the event.
+  // Clear all events.
   // Data: OP, NN, EN
-  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x07, 0x08}};
+  msg = {3, {OPC_NNCLR, 0x01, 0x04}};
   mockTransport->setNextMessage(msg);
 
   controller.process();
@@ -466,6 +466,124 @@ void testTeachEventIndexedAndUnlearn()
   mockTransport->clearMessages();
 }
 
+void testEventHashCollisionAndUnlearn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Teach an event
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+  
+  // Teach second event with same hash.
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x08, 0x07, 1, 43}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Verify the second event, variable 1. Ensure we can get it despite duplicate hash
+  // Note: CBUS lib does not implement OPC_REQEV.
+  // Data: OP, NN, EN, EV#
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x08, 0x07, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_EVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[4]);
+  assertEquals(1, mockTransport->sent_messages[0].data[5]);
+  assertEquals(43, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+
+  // Finished learning
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  
+  // Verify there are two events now.
+  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NUMEV, mockTransport->sent_messages[0].data[0]);
+  assertEquals(2, mockTransport->sent_messages[0].data[3]);
+  mockTransport->clearMessages();
+
+  // Learn mode
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Unlearn the second event
+  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Leave Learn mode
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify events left.
+  // Data: OP, NN, Event index
+  msg = {3, {OPC_NERD, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ENRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[4]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[5]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+}
+
 }
 
 void testEventTeachingService()
@@ -477,8 +595,8 @@ void testEventTeachingService()
   testEnterLearnModeOld();
   testEnterLearnModeViaMode();
   testTeachEvent();
-  testTeachEventIndexedAndUnlearn();
+  testTeachEventIndexedAndClear();
+  testEventHashCollisionAndUnlearn(); // test event lookup in Configuration::findExistingEvent()
   // TODO:
-  // testEventHashCollisionAndClear(); // test event lookup in Configuration::findExistingEvent()
   // test error conditions.
 }
