@@ -45,7 +45,7 @@ private:
   Processed handleGetFreeEventSlots(unsigned int nn);
   Processed handleLearnEvent(VlcbMessage *msg, unsigned int nn, unsigned int en);
   Processed handleLearnEventIndex(VlcbMessage *msg);
-  Processed handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en);
+  Processed handleRequestEventVariable(VlcbMessage *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB
