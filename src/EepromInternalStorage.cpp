@@ -40,10 +40,11 @@ byte EepromInternalStorage::read(unsigned int eeaddress)
 //
 byte EepromInternalStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
-  byte count;
-    for (count = 0; count < nbytes; count++) {
-      dest[count] = getChipEEPROMVal(eeaddress + count);
-    }
+  byte count;   
+  for (count = 0; count < nbytes; count++)
+  {
+    dest[count] = getChipEEPROMVal(eeaddress + count);
+  }
 
   return count;
 }
@@ -59,7 +60,7 @@ byte EepromInternalStorage::getChipEEPROMVal(unsigned int eeaddress)
 //
 void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 {
-// DEBUG_SERIAL << F("> write, addr = ") << eeaddress << F(", data = ") << data << endl;
+  // DEBUG_SERIAL << F("> write, addr = ") << eeaddress << F(", data = ") << data << endl;
 
   setChipEEPROMVal(eeaddress, data);
 }

@@ -52,11 +52,13 @@
 namespace VLCB
 {
 
-  bool encodeGridConnect(char * gcBuffer, CANMessage *msg){
+  bool encodeGridConnect(char * gcBuffer, CANMessage *msg)
+  {
       byte offset = 0;
       gcBuffer[0] = 0;  // null terminate buffer to start with
       // set starting character & standard or extended CAN identifier
-      if (msg->ext) {
+      if (msg->ext)
+      {
         if (msg->id > 0x1FFFFFFF)
         {
           // id is greater than 29 bits, so fail the encoding
@@ -74,7 +76,10 @@ namespace VLCB
         // chars 6 to 9 are ID bits 0 to 15
         sprintf(gcBuffer + 6, "%04X", msg->id & 0xFFFF);
         offset = 10;
-      } else {// mark sas standard message
+      } 
+      else
+      {
+        // mark sas standard message
         if (msg->id > 0x7FF)
         {
           // id is greater than 11 bits, so fail the encoding
@@ -87,12 +92,15 @@ namespace VLCB
       }
       // set RTR or normal - byte 6 or 10
       strcpy(gcBuffer + offset++, msg->rtr ? "R" : "N");
-      if (msg->len > 8){  // if greater than 8 then faulty msg
+      if (msg->len > 8)
+      { 
+        // if greater than 8 then faulty msg
         gcBuffer[0] = 0;
         return false;
       }
       //now add hex data from byte 7 if len > 0
-      for (int i=0; i<msg->len; i++){
+      for (int i=0; i<msg->len; i++)
+      {
         sprintf(gcBuffer + offset, "%02X", msg->data[i]);
         offset += 2;
       }
@@ -122,7 +130,8 @@ namespace VLCB
     for (int i = 0 ; i< count; i++)
     {
       // must be upper case, so fail if lower case
-      if (islower(charBuff[i])){
+      if (islower(charBuff[i]))
+      {
         return false;
       }
       if (!isxdigit(charBuff[i]))

@@ -9,7 +9,8 @@ void debugCANMessage(CANMessage message)
     std::cout << std::endl << "CANMessage:";
     std::cout << " id " << message.id << " length " << message.len;
     std::cout << " data ";
-    for (int i=0; i <message.len; i++) {
+    for (int i=0; i <message.len; i++)
+    {
       if( i>0 ) std::cout << ",";
       std::cout << message.data[i];
     }
@@ -18,13 +19,14 @@ void debugCANMessage(CANMessage message)
 
 
 
-void testGridConnectEncode_StandardID(int ID, const char * expectedMessage, bool expectedResult){
+void testGridConnectEncode_StandardID(int ID, const char * expectedMessage, bool expectedResult)
+{
   test();
   char msgBuffer[28]; 
   CANMessage msg;
-  msg.ext = 0;
+  msg.ext = false;
   msg.len = 2;
-  msg.rtr = 0;
+  msg.rtr = false;
   msg.id = ID;
   msg.data[0] = 1;
   msg.data[1] = 2;
@@ -38,13 +40,14 @@ void testGridConnectEncode_StandardID(int ID, const char * expectedMessage, bool
 }
 
 
-void testGridConnectEncode_ExtendedID(int ID, const char * expectedMessage, bool expectedResult){
+void testGridConnectEncode_ExtendedID(int ID, const char * expectedMessage, bool expectedResult)
+{
   test();
   char msgBuffer[28]; 
   CANMessage msg;
   msg.ext = true;
   msg.len = 2;
-  msg.rtr = 0;
+  msg.rtr = false;
   msg.id = ID;
   msg.data[0] = 1;
   msg.data[1] = 2;
@@ -58,11 +61,12 @@ void testGridConnectEncode_ExtendedID(int ID, const char * expectedMessage, bool
 }
 
 
-void testGridConnectEncode_RTR(bool rtr, const char * expectedMessage, bool expectedResult){
+void testGridConnectEncode_RTR(bool rtr, const char * expectedMessage, bool expectedResult)
+{
   test();
   char msgBuffer[28]; 
   CANMessage msg;
-  msg.ext = 0;
+  msg.ext = false;
   msg.len = 2;
   msg.rtr = rtr;
   msg.id = 0x7FF;
@@ -77,7 +81,8 @@ void testGridConnectEncode_RTR(bool rtr, const char * expectedMessage, bool expe
 //  std::cout << "encoded message " << msgBuffer << std::endl;  
 }
 
-void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expectedResult){
+void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expectedResult)
+{
   test();
   char msgBuffer[30]; 
   CANMessage msg;
@@ -85,7 +90,8 @@ void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expe
   msg.len = len;
   msg.rtr = false;
   msg.id = 0x7FF;
-  for (int i = 0; i<8; i++){
+  for (int i = 0; i<8; i++)
+  {
     msg.data[i] = i+1;
   }
 
@@ -139,8 +145,8 @@ void testGridConnectDecode_DATA(const char * inputMessage, int expectedLEN, bool
   }
 }
 
-void testGridConnect(void){
-
+void testGridConnect()
+{
   // test encoding standard ID - 11 bits, max id 0x7FF
   testGridConnectEncode_StandardID(0x0, ":S0000N0102;", true);
   testGridConnectEncode_StandardID(0x1, ":S0020N0102;", true);

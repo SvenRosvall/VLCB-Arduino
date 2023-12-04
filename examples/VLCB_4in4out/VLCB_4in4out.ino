@@ -184,7 +184,8 @@ void setupModule()
   }
 
   // configure the module LEDs
-  for (byte i = 0; i < NUM_LEDS; i++) {
+  for (byte i = 0; i < NUM_LEDS; i++)
+  {
     moduleLED[i].setPin(LED[i]);
   }
 
@@ -217,7 +218,8 @@ void loop()
   controller.process();
 
    // Run the LED code
-  for (int i = 0; i < NUM_LEDS; i++) {
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
     moduleLED[i].run();
   }
 
@@ -245,9 +247,8 @@ byte checkInputProduced(void)
       return 0xFF;
 }
 
-void processSwitches(void) {
-
-
+void processSwitches(void) 
+{
   for (byte i = 0; i < NUM_SWITCHES; i++)
   {
     moduleSwitch[i].update();
@@ -259,7 +260,8 @@ void processSwitches(void) {
 
       // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
-      switch (nvval) {
+      switch (nvval)
+      {
         case 0:
           // ON and OFF
           state = (moduleSwitch[i].fell());
@@ -269,7 +271,8 @@ void processSwitches(void) {
 
         case 1:
           // Only ON
-          if (moduleSwitch[i].fell()) {
+          if (moduleSwitch[i].fell()) 
+          {
             state = true;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
@@ -278,7 +281,8 @@ void processSwitches(void) {
 
         case 2:
           // Only OFF
-          if (moduleSwitch[i].fell()) {
+          if (moduleSwitch[i].fell())
+          {
             state = false;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
@@ -287,7 +291,8 @@ void processSwitches(void) {
 
         case 3:
           // Toggle button
-          if (moduleSwitch[i].fell()) {
+          if (moduleSwitch[i].fell())
+          {
             switchState[i] = !switchState[i];
             state = (switchState[i]);
             //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
@@ -317,16 +322,19 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
   //DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
   //DEBUG_PRINT(F("sk> op_code = ") << opc);
 
-  switch (opc) {
+  switch (opc) 
+  {
     case OPC_ACON:
     case OPC_ASON:
       //DEBUG_PRINT(F("sk> case is opCode ON"));
-      for (byte i = 0; i < NUM_LEDS; i++) {
+      for (byte i = 0; i < NUM_LEDS; i++)
+      {
         byte ev = i + 1;
         byte evval = modconfig.getEventEVval(index, ev);
         //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
-        switch (evval) {
+        switch (evval) 
+        {
           case 1:
             moduleLED[i].on();
             break;
@@ -348,11 +356,13 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     case OPC_ACOF:
     case OPC_ASOF:
     //DEBUG_PRINT(F("sk> case is opCode OFF"));
-      for (byte i = 0; i < NUM_LEDS; i++) {
+      for (byte i = 0; i < NUM_LEDS; i++)
+      {
         byte ev = i + 1;
         byte evval = modconfig.getEventEVval(index, ev);
 
-        if (evval > 0) {
+        if (evval > 0)
+        {
           moduleLED[i].off();
         }
       }

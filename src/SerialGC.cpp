@@ -71,7 +71,7 @@ namespace VLCB
       // We have received a message between a ':' and a ';', so increment count
       receivedCount++;
       result = decodeGridConnect(rxBuffer, &rxCANMessage);
-      if (result == false)
+      if (!result)
       {
         // must have been an error in the message, so increment error counter
         receiveErrorCount++;

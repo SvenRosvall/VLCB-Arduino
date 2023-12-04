@@ -23,7 +23,7 @@ ConsumeOwnEventsService::~ConsumeOwnEventsService()
 
 /// if buffer has one or more stored items
 
-bool ConsumeOwnEventsService::available(void)
+bool ConsumeOwnEventsService::available()
 {
   return (size > 0);
 }
@@ -50,13 +50,11 @@ void ConsumeOwnEventsService::put(const VlcbMessage * msg)
   hwm = (size > hwm) ? size : hwm;   // Tracks high water mark (hwm)
   ++numPuts;        // Counts how many events put to buffer.
   // DEBUG_SERIAL << ">COE Puts = " << numPuts << " Size = " << size <<endl;
-
-  return;
 }
 
 /// retrieve the next item from the buffer
 
-VlcbMessage *ConsumeOwnEventsService::get(void)
+VlcbMessage *ConsumeOwnEventsService::get()
 {
   VlcbMessage *p = nullptr;
 
@@ -75,7 +73,7 @@ VlcbMessage *ConsumeOwnEventsService::get(void)
 
 /// peek at the next item in the buffer without removing it
 
-VlcbMessage *ConsumeOwnEventsService::peek(void)
+VlcbMessage *ConsumeOwnEventsService::peek()
 {
   // should always call ::available first to avoid this
   if (size == 0)
@@ -88,19 +86,17 @@ VlcbMessage *ConsumeOwnEventsService::peek(void)
 
 /// clear all items
 
-void ConsumeOwnEventsService::clear(void)
+void ConsumeOwnEventsService::clear()
 {
   head = 0;
   tail = 0;
   full = false;
   size = 0;
-
-  return;
 }
 
 /// recalculate number of items in the buffer
 
-byte ConsumeOwnEventsService::bufUse(void)
+byte ConsumeOwnEventsService::bufUse()
 {
   if (full)
   {
@@ -119,26 +115,26 @@ byte ConsumeOwnEventsService::bufUse(void)
 
 /// number of puts
 
-unsigned int ConsumeOwnEventsService::getNumberOfPuts(void)
+unsigned int ConsumeOwnEventsService::getNumberOfPuts()
 {
   return numPuts;
 }
 
 /// number of gets
 
-unsigned int ConsumeOwnEventsService::getNumberofGets(void)
+unsigned int ConsumeOwnEventsService::getNumberofGets()
 {
   return numGets;
 }
 
 /// number of overflows
 
-unsigned int ConsumeOwnEventsService::getOverflows(void)
+unsigned int ConsumeOwnEventsService::getOverflows()
 {
   return numOverflows;
 }
 
-unsigned int ConsumeOwnEventsService::getHighWaterMark(void)
+unsigned int ConsumeOwnEventsService::getHighWaterMark()
 {
   return hwm;
 }

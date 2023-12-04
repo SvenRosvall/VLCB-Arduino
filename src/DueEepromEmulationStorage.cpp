@@ -34,7 +34,8 @@ byte DueEepromEmulationStorage::readBytes(unsigned int eeaddress, byte nbytes, b
 {
   byte count;
 
-  for (count = 0; count < nbytes; count++) {
+  for (count = 0; count < nbytes; count++)
+  {
     dest[count] = getChipEEPROMVal(eeaddress + count);
   }
 
@@ -65,7 +66,8 @@ void DueEepromEmulationStorage::write(unsigned int eeaddress, byte data)
 //
 void DueEepromEmulationStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
 {
-  for (byte i = 0; i < numbytes; i++) {
+  for (byte i = 0; i < numbytes; i++) 
+  {
     setChipEEPROMVal(eeaddress + i, src[i]);
   }
 }

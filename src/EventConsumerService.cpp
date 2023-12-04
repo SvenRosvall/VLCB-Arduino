@@ -87,7 +87,8 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
     case OPC_AROF:
 
       // lookup this accessory event in the event table and call the user's registered callback function
-      if (eventhandler) {
+      if (eventhandler) 
+      {
         processAccessoryEvent(msg, nn, en);
       }
 
