@@ -5,20 +5,6 @@
 
 // Test cases for EventTeachingService.
 
-// TODO: Error tests
-//NNLRN - Done
-//NNULN - Done
-//NNCLR - Done
-//NNEVN - 
-//NERD -  (Read all events)
-//RQEVN - 
-//NENRD -  (Read Event by Index)
-//EVULN - 
-//REVAL -  (Request EV Read)
-//REQEV -  (Read Event Variable in learn mode)
-//EVLRN -  (Teach an EV)
-//EVLRNI - 
-
 #include <memory>
 #include "TestTools.hpp"
 #include "Controller.h"
@@ -582,6 +568,178 @@ void testEventHashCollisionAndUnlearn()
   mockTransport->clearMessages();
 }
 
+void testIgnoreMsgsForOtherNodes()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN to other node
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[5] & PF_LRN);
+  mockTransport->clearMessages();
+
+  // Send NNCLR to other node
+  msg = {3, {OPC_NNCLR, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send NNEVN to other node
+  msg = {3, {OPC_NNEVN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send NERD to other node
+  msg = {3, {OPC_NERD, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send RQEVN to other node
+  msg = {3, {OPC_RQEVN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Send NENRD to other node
+  msg = {4, {OPC_NENRD, 0x01, 0x05, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send REVAL to other node
+  msg = {4, {OPC_REVAL, 0x01, 0x05, 0,1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+}
+
+void testIgnoreUnlearnForOtherNodes()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
+  mockTransport->clearMessages();
+
+  // Send NNULN to other node
+  msg = {3, {OPC_NNULN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify node is still in learn mode.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
+}
+
+void testIgnoreIfNotInLearnMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send EVULN
+  VLCB::VlcbMessage msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+  
+  // Send EVLRN
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send EVLRNI
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send REQEV
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+}
+
 void testEnterLearnModeOldOtherNode()
 {
   test();
@@ -683,7 +841,25 @@ void testEventTeachingService()
   testTeachEventIndexedAndClear();
   testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
   // test error conditions.
+
+// TODO: Error tests
+//NNLRN - Done
+//NNULN - Done
+//NNCLR - Done
+//NNEVN - 
+//NERD -  (Read all events)
+//RQEVN - 
+//NENRD -  (Read Event by Index)
+//EVULN - 
+//REVAL -  (Request EV Read)
+//REQEV -  (Read Event Variable in learn mode)
+//EVLRN -  (Teach an EV)
+//EVLRNI - 
+
   testEnterLearnModeOldOtherNode();
   //testEnterLearnModeViaModeInSetup(); // This error condition is not implemented.
   testClearEventsNotLearnMode();
+  testIgnoreMsgsForOtherNodes();
+  testIgnoreUnlearnForOtherNodes();
+  testIgnoreIfNotInLearnMode();
 }
