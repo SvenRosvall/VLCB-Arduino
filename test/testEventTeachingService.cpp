@@ -8,9 +8,9 @@
 // TODO: 
 //NNLRN - Done
 //NNULN - Done
-//NNCLR
+//NNCLR - Done
 //NNEVN - Done
-//NERD (Read all events)
+//NERD - Done (Read all events)
 //RQEVN - Done
 //NENRD - Done (Read Event by Index)
 //EVULN - Done
