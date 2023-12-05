@@ -800,10 +800,10 @@ void testEnterLearnModeViaModeInSetup()
   controller.process();
 
   assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
-  assertEquals(OPC_MODE, mockTransport->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
-  assertEquals(GRSP_INVALID_MODE, mockTransport->sent_messages[1].data[5]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]); // Yes, filtering is done in MNS.
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
 }
 
 void testClearEventsNotLearnMode()
@@ -857,7 +857,7 @@ void testEventTeachingService()
 //EVLRNI - 
 
   testEnterLearnModeOldOtherNode();
-  //testEnterLearnModeViaModeInSetup(); // This error condition is not implemented.
+  testEnterLearnModeViaModeInSetup();
   testClearEventsNotLearnMode();
   testIgnoreMsgsForOtherNodes();
   testIgnoreUnlearnForOtherNodes();
