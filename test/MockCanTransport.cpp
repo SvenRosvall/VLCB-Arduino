@@ -5,7 +5,6 @@
 //
 //
 
-#include <Controller.h>
 #include "MockCanTransport.h"
 
 bool MockCanTransport::available()

@@ -357,8 +357,10 @@ void Configuration::printEvHashTable(bool raw)
   /*
     DEBUG_SERIAL << F("> Event hash table - ") << hash_collision << endl;
 
-    for (byte i = 0; i < EE_MAX_EVENTS; i++) {
-      if (evhashtbl[i] > 0) {
+    for (byte i = 0; i < EE_MAX_EVENTS; i++) 
+    {
+      if (evhashtbl[i] > 0)
+      {
         if (raw)
           DEBUG_SERIAL << evhashtbl[i] << endl;
         else

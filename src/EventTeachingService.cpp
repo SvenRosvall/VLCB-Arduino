@@ -100,7 +100,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, VlcbMessage *msg
     
   default:
     // unknown or unhandled OPC
-    // DEBUG_SERIAL << F("ets> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
+    //DEBUG_SERIAL << F("ets> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
     return NOT_PROCESSED;
   }
 }
@@ -150,7 +150,7 @@ Processed EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsig
   // DEBUG_SERIAL << F("ets> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
   // we must be in learn mode
-  if (bLearn == true)
+  if (bLearn)
   {
     if (msg->len < 5)
     {
@@ -308,7 +308,7 @@ Processed EventTeachingService::handleClearEvents(unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
-    if (bLearn == true)
+    if (bLearn)
     {
       // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 
@@ -320,6 +320,11 @@ Processed EventTeachingService::handleClearEvents(unsigned int nn)
       // recreate the hash table
       module_config->clearEvHashTable();
       // DEBUG_SERIAL << F("ets> cleared all events") << endl;
+      
+      if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
+      {
+        module_config->setResetFlag();
+      }
 
       controller->sendWRACK();
       controller->sendGRSP(OPC_NNCLR, getServiceID(), GRSP_OK);
@@ -440,6 +445,8 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
   // respond with WRACK
   controller->sendWRACK();  // Deprecated in favour of GRSP_OK
   // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
+  
+  // Note that the op-code spec only lists WRACK as successful response.
   controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
   return PROCESSED;
 }
@@ -503,7 +510,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
   return PROCESSED;
 }
 
-Processed EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en)
+Processed EventTeachingService::handleRequestEventVariable(VlcbMessage *msg, unsigned int nn, unsigned int en)
 {
   if (!bLearn)
   {
@@ -540,15 +547,26 @@ Processed EventTeachingService::handleRequestEventVariable(const VlcbMessage *ms
   if (evIndex == 0)
   {
     //send all event variables one after the other starting with the number of variables
-    controller->sendMessageWithNN(OPC_EVANS, 0, module_config->EE_NUM_EVS);
+    // Reuse the incoming message as it contains the event NN/EN and event index.
+    msg->len = 7;
+    msg->data[0] = OPC_EVANS;
+    msg->data[5] = 0;
+    msg->data[6] = module_config->EE_NUM_EVS;
+    controller->sendMessage(msg);
     for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
     {
-      controller->sendMessageWithNN(OPC_EVANS, i, module_config->getEventEVval(index, i));
+      msg->data[5] = i;
+      msg->data[6] = module_config->getEventEVval(index, i);
+      controller->sendMessage(msg);
     }
   }
   else
   {
-    controller->sendMessageWithNN(OPC_EVANS, evIndex, module_config->getEventEVval(index, evIndex));
+    // Reuse the incoming message as it contains the event NN/EN and event index.
+    msg->len = 7;
+    msg->data[0] = OPC_EVANS;
+    msg->data[6] = module_config->getEventEVval(index, evIndex);    
+    controller->sendMessage(msg);
   }
   return PROCESSED;
 }

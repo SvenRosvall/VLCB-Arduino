@@ -137,7 +137,8 @@ void Controller::setParamFlag(unsigned char flag, bool set)
 
 void Controller::indicateActivity()
 {
-  if (_ui) {
+  if (_ui)
+  {
     _ui->indicateActivity();
   }
 }

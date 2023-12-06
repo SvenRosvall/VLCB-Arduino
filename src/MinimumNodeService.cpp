@@ -484,9 +484,18 @@ Processed MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned
       noHeartbeat = true;
       module_config->setHeartbeat(!noHeartbeat);
       return PROCESSED;
+      
+    default:
+      if (instantMode == MODE_NORMAL) // let another service see message
+      { 
+        return NOT_PROCESSED;
+      }
+      else      
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+        return PROCESSED;
+      }
   }
-  // if in MODE_NORMAL but none of the above commands, let another service see message
-  return NOT_PROCESSED;
 }
 
 void MinimumNodeService::setSetupMode()

@@ -183,7 +183,8 @@ byte CanTransport::findFreeCanId()
     for (byte b = 0; b < 8; b++)
     {
       // ignore first bit of first byte -- CAN ID zero is not used for nodes
-      if (i == 0 && b == 0) {
+      if (i == 0 && b == 0) 
+      {
         continue;
       }
 

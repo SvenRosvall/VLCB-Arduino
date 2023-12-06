@@ -37,6 +37,8 @@ by email to vlcb@rosvall.ie or create an issue in GitHub.
 * Sven Rosvall - Converted the CBUS library into this code base.
 * Martin Da Costa - Contributor
 * John Fletcher - Contributor
+* Chris Andrews - Contributor
+* David Ellis - Contributor
 * brocci - Contributor to the CBUS library
 
 ## License

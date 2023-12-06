@@ -48,7 +48,7 @@ void EventProducerService::setProducedEvents()
 void EventProducerService::process(UserInterface::RequestedAction requestedAction)
 {
   // Do this if mode changes from uninitialised to normal
-  if ((uninit) && (module_config->currentMode == MODE_NORMAL))
+  if (((uninit) && (module_config->currentMode == MODE_NORMAL)) || module_config->isResetFlagSet())
   {
     setProducedEvents();
     uninit = false;
