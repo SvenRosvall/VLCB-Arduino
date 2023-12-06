@@ -34,6 +34,8 @@
 
 */
 
+#pragma once
+
 #include <CBUSconfig.h>
 #include <cbusdefs.h>               // MERG CBUS constants
 
