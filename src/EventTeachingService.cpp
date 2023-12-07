@@ -476,8 +476,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
   {
     if (msg->len < 8)
     {
-      controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
-      controller->sendCMDERR(CMDERR_INV_CMD);
+      controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_CMD);
     }
     else
     {
@@ -489,11 +488,12 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
       if (index >= module_config->EE_MAX_EVENTS)
       {
         //DEBUG_SERIAL << F("> invalid index") << endl;
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EN_IDX);
       }
-      else if (evIndex == 0)  // Not a valid evIndex
+      else if ((evIndex == 0) || (evIndex > module_config->EE_NUM_EVS))  // Not a valid evIndex
       {
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_INVALID_COMMAND_PARAMETER);
+        controller->sendCMDERR(CMDERR_INV_EV_IDX);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
       }
       else
       {
@@ -518,7 +518,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
 
         // respond with WRACK
         controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
       }
     }
   }
