@@ -5,20 +5,6 @@
 
 // Test cases for EventTeachingService.
 
-// TODO: 
-//NNLRN - Done
-//NNULN - Done
-//NNCLR
-//NNEVN - Done
-//NERD (Read all events)
-//RQEVN - Done
-//NENRD - Done (Read Event by Index)
-//EVULN
-//REVAL - Done (Request EV Read)
-//REQEV - Done (Read Event Variable in learn mode)
-//EVLRN - Done (Teach an EV)
-//EVLRNI
-
 #include <memory>
 #include "TestTools.hpp"
 #include "Controller.h"
@@ -29,10 +15,10 @@
 
 namespace
 {
+std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 VLCB::Controller createController()
 {
-  static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
   static std::unique_ptr<VLCB::EventTeachingService> eventTeachingService;
@@ -127,7 +113,6 @@ void testEventsStoredAtStart()
 
 void testEnterLearnModeOld()
 {
-  const int LEARN_BIT = 1 << 5;
   test();
 
   VLCB::Controller controller = createController();
@@ -149,7 +134,7 @@ void testEnterLearnModeOld()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(LEARN_BIT, mockTransport->sent_messages[0].data[5] & LEARN_BIT);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
   mockTransport->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
@@ -161,7 +146,7 @@ void testEnterLearnModeOld()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
   assertEquals(8, mockTransport->sent_messages[0].data[3]);
-  assertEquals(LEARN_BIT, mockTransport->sent_messages[0].data[4] & LEARN_BIT);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[4] & PF_LRN);
   mockTransport->clearMessages();
   
   // Send NNULN
@@ -181,7 +166,7 @@ void testEnterLearnModeOld()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0, mockTransport->sent_messages[0].data[5] & LEARN_BIT);
+  assertEquals(0, mockTransport->sent_messages[0].data[5] & PF_LRN);
   mockTransport->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
@@ -193,18 +178,17 @@ void testEnterLearnModeOld()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
   assertEquals(8, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0, mockTransport->sent_messages[0].data[4] & LEARN_BIT);
+  assertEquals(0, mockTransport->sent_messages[0].data[4] & PF_LRN);
   mockTransport->clearMessages();
 }
 
 void testEnterLearnModeViaMode()
 {
-  const int LEARN_BIT = 1 << 5;
   test();
 
   VLCB::Controller controller = createController();
 
-  // Send NNLRN
+  // Learn mode
   VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
   mockTransport->setNextMessage(msg);
 
@@ -221,7 +205,7 @@ void testEnterLearnModeViaMode()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(LEARN_BIT, mockTransport->sent_messages[0].data[5] & LEARN_BIT);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
   mockTransport->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
@@ -233,10 +217,10 @@ void testEnterLearnModeViaMode()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
   assertEquals(8, mockTransport->sent_messages[0].data[3]);
-  assertEquals(LEARN_BIT, mockTransport->sent_messages[0].data[4] & LEARN_BIT);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[4] & PF_LRN);
   mockTransport->clearMessages();
   
-  // Send NNULN
+  // Leave Learn mode
   msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
   mockTransport->setNextMessage(msg);
 
@@ -253,7 +237,7 @@ void testEnterLearnModeViaMode()
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0, mockTransport->sent_messages[0].data[5] & LEARN_BIT);
+  assertEquals(0, mockTransport->sent_messages[0].data[5] & PF_LRN);
   mockTransport->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
@@ -265,7 +249,7 @@ void testEnterLearnModeViaMode()
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAN, mockTransport->sent_messages[0].data[0]);
   assertEquals(8, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0, mockTransport->sent_messages[0].data[4] & LEARN_BIT);
+  assertEquals(0, mockTransport->sent_messages[0].data[4] & PF_LRN);
   mockTransport->clearMessages();
 }
 
@@ -398,6 +382,825 @@ void testTeachEvent()
   mockTransport->clearMessages();
 }
 
+void testTeachEventIndexedAndClear()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Teach an event
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Verify the event variable 1
+  // Note: CBUS lib does not implement OPC_REQEV.
+  // Data: OP, NN, EN, EV#
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_EVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[4]);
+  assertEquals(1, mockTransport->sent_messages[0].data[5]);
+  assertEquals(42, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+  
+  // Clear all events.
+  // Data: OP, NN, EN
+  msg = {3, {OPC_NNCLR, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Verify there are no events.
+  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NUMEV, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[3]);
+  mockTransport->clearMessages();
+}
+
+void testEventHashCollisionAndUnlearn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Teach an event
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+  
+  // Teach second event with same hash.
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x08, 0x07, 1, 43}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Verify the second event, variable 1. Ensure we can get it despite duplicate hash
+  // Note: CBUS lib does not implement OPC_REQEV.
+  // Data: OP, NN, EN, EV#
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x08, 0x07, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_EVANS, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[4]);
+  assertEquals(1, mockTransport->sent_messages[0].data[5]);
+  assertEquals(43, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+
+  // Finished learning
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  
+  // Verify there are two events now.
+  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_NUMEV, mockTransport->sent_messages[0].data[0]);
+  assertEquals(2, mockTransport->sent_messages[0].data[3]);
+  mockTransport->clearMessages();
+
+  // Learn mode
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Unlearn the second event
+  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Leave Learn mode
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify events left.
+  // Data: OP, NN, Event index
+  msg = {3, {OPC_NERD, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ENRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[4]);
+  assertEquals(0x07, mockTransport->sent_messages[0].data[5]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+}
+
+void testIgnoreMsgsForOtherNodes()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN to other node
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[5] & PF_LRN);
+  mockTransport->clearMessages();
+
+  // Send NNCLR to other node
+  msg = {3, {OPC_NNCLR, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send NNEVN to other node
+  msg = {3, {OPC_NNEVN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send NERD to other node
+  msg = {3, {OPC_NERD, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send RQEVN to other node
+  msg = {3, {OPC_RQEVN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Send NENRD to other node
+  msg = {4, {OPC_NENRD, 0x01, 0x05, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send REVAL to other node
+  msg = {4, {OPC_REVAL, 0x01, 0x05, 0,1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  // Expect no response or error messages.
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+}
+
+void testIgnoreUnlearnForOtherNodes()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
+  mockTransport->clearMessages();
+
+  // Send NNULN to other node
+  msg = {3, {OPC_NNULN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify node is still in learn mode.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
+}
+
+void testIgnoreIfNotInLearnMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send EVULN
+  VLCB::VlcbMessage msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+  
+  // Send EVLRN
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send EVLRNI
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+
+  // Send REQEV
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+  mockTransport->clearMessages();
+}
+
+void testEnterLearnModeOldOtherNode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  // Send QNN - PNN response contains bit 5 as learn mode.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(PF_LRN, mockTransport->sent_messages[0].data[5] & PF_LRN);
+  mockTransport->clearMessages();
+
+  // Send NNLRN for another node
+   msg = {3, {OPC_NNLRN, 0x01, 0x05}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Verify parameter learn set.
+  // Send QNN - PNN response contains bit 5 as learn mode.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0, mockTransport->sent_messages[0].data[5] & PF_LRN);
+}
+
+void testEnterLearnModeViaModeInSetup()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[0].data[4]); // Yes, filtering is done in MNS.
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
+}
+
+void testClearEventsNotLearnMode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  
+  VLCB::VlcbMessage msg = {3, {OPC_NNCLR, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_NOT_LRN, mockTransport->sent_messages[0].data[3]);
+  
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_NNCLR, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_NOT_LRN, mockTransport->sent_messages[1].data[5]);
+}
+
+void testNenrdWithBadIndex()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg = {4, {OPC_NENRD, 0x01, 0x04, 30}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_NENRD, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[1].data[5]);
+}
+
+void testEvulnErrors()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Short message
+  msg = {4, {OPC_EVULN, 0x05, 0x06, 0x08}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_EVULN, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Unlearn unknown event
+  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x17}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INVALID_EVENT, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_EVULN, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INVALID_EVENT, mockTransport->sent_messages[1].data[5]);
+}
+
+void testRevalErrors()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Short message
+  VLCB::VlcbMessage msg = {4, {OPC_REVAL, 0x01, 0x04, 0}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REVAL, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Event index out of range
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 20, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REVAL, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Missing event - none taught yet.
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REVAL, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Teach an event for following tests
+  msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+  controller.process();
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Event variable out of range
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 3}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REVAL, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Note: Opcode spec says to check for EV not set for event. Doesn't apply in this implementation
+}
+
+void testReqevErrors()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Short message
+  msg = {5, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REQEV, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // No such event
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INVALID_EVENT, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REQEV, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INVALID_EVENT, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Teach an event for following tests
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // EV# too large
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 3}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_REQEV, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+}
+
+void testLearnErrors()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Short message
+  msg = {6, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_EVLRN, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
+  mockTransport->clearMessages();
+
+  // EV index out of range
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 3, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_EVLRN, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+
+  // Event table full
+  for (byte i = 1 ; i <= configuration->EE_MAX_EVENTS ; ++i)
+  {
+    msg = {7, {OPC_EVLRN, 0x05, 0x06, 0, i, 1, 42}};
+    mockTransport->setNextMessage(msg);
+    controller.process();
+    assertEquals(2, mockTransport->sent_messages.size());
+    assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+    mockTransport->clearMessages();
+  }
+  
+
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_TOO_MANY_EVENTS, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_EVLRN, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_TOO_MANY_EVENTS, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+}
+
+void testLearnIndexErrors()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Short message
+  msg = {7, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_EVLRNI, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
+  mockTransport->clearMessages();
+
+  // Event index out of range
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 20, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_EVLRNI, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransport->sent_messages[0].data[5]);
+  mockTransport->clearMessages();
+
+  // EV index out of range
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 3, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  assertEquals(OPC_EVLRNI, mockTransport->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EV_IDX, mockTransport->sent_messages[1].data[5]);
+  mockTransport->clearMessages();
+}
+
 }
 
 void testEventTeachingService()
@@ -409,4 +1212,20 @@ void testEventTeachingService()
   testEnterLearnModeOld();
   testEnterLearnModeViaMode();
   testTeachEvent();
+  testTeachEventIndexedAndClear();
+  testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
+
+  // test error conditions.
+  testEnterLearnModeOldOtherNode();
+  testEnterLearnModeViaModeInSetup();
+  testClearEventsNotLearnMode();
+  testIgnoreMsgsForOtherNodes();
+  testIgnoreUnlearnForOtherNodes();
+  testIgnoreIfNotInLearnMode();
+  testNenrdWithBadIndex();
+  testEvulnErrors();
+  testRevalErrors();
+  testReqevErrors();
+  testLearnErrors();
+  testLearnIndexErrors();
 }
