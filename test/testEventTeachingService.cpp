@@ -869,15 +869,12 @@ void testEvulnErrors()
 
   controller.process();
 
-  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(1, mockTransport->sent_messages.size());
 
-  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
-
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
-  assertEquals(OPC_EVULN, mockTransport->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_EVULN, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
   mockTransport->clearMessages();
 
   // Unlearn unknown event
@@ -909,15 +906,12 @@ void testRevalErrors()
 
   controller.process();
 
-  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(1, mockTransport->sent_messages.size());
 
-  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
-
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
-  assertEquals(OPC_REVAL, mockTransport->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_REVAL, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
   mockTransport->clearMessages();
 
   // Event index out of range
@@ -1010,15 +1004,12 @@ void testReqevErrors()
 
   controller.process();
 
-  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(1, mockTransport->sent_messages.size());
 
-  assertEquals(OPC_CMDERR, mockTransport->sent_messages[0].data[0]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[3]);
-
-  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
-  assertEquals(OPC_REQEV, mockTransport->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[1].data[4]);
-  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[1].data[5]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_REQEV, mockTransport->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransport->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransport->sent_messages[0].data[5]);
   mockTransport->clearMessages();
 
   // No such event

@@ -154,7 +154,6 @@ Processed EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsig
   {
     if (msg->len < 5)
     {
-      controller->sendCMDERR(CMDERR_INV_CMD);
       controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_CMD);
     }
     else
@@ -281,7 +280,6 @@ Processed EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, 
   {
     if (msg->len < 5)
     {
-      controller->sendCMDERR(CMDERR_INV_CMD);
       controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_CMD);
       return PROCESSED;
     }
@@ -535,7 +533,6 @@ Processed EventTeachingService::handleRequestEventVariable(VlcbMessage *msg, uns
 
   if (msg->len < 6)
   {
-    controller->sendCMDERR(CMDERR_INV_CMD);
     controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
     return PROCESSED;
   }
