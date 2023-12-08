@@ -1,0 +1,10 @@
+set_source_files_properties(examples/VLCB_long_message_example/VLCB_long_message_example.ino PROPERTIES LANGUAGE CXX)
+add_executable(VLCB_long_message_example examples/VLCB_long_message_example/VLCB_long_message_example.ino)
+target_link_libraries(VLCB_long_message_example PUBLIC hardware_library)
+target_link_libraries(VLCB_long_message_example PUBLIC core_library)
+target_link_libraries(VLCB_long_message_example PUBLIC ArduinoFlags)
+target_link_libraries(VLCB_long_message_example PUBLIC ArduinoCore)
+target_link_libraries(VLCB_long_message_example PUBLIC ArduinoLibs)
+
+arduino_avr_hex(VLCB_long_message_example)
+arduino_avr_upload(VLCB_long_message_example ${ARDUINO_PORT})

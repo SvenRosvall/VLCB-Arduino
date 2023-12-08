@@ -1,0 +1,10 @@
+set_source_files_properties(examples/VLCB_empty/VLCB_empty.ino PROPERTIES LANGUAGE CXX)
+add_executable(VLCB_empty examples/VLCB_empty/VLCB_empty.ino)
+target_link_libraries(VLCB_empty PUBLIC hardware_library)
+target_link_libraries(VLCB_empty PUBLIC core_library)
+target_link_libraries(VLCB_empty PUBLIC ArduinoFlags)
+target_link_libraries(VLCB_empty PUBLIC ArduinoCore)
+target_link_libraries(VLCB_empty PUBLIC ArduinoLibs)
+
+arduino_avr_hex(VLCB_empty)
+arduino_avr_upload(VLCB_empty ${ARDUINO_PORT})
