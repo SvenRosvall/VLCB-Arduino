@@ -109,8 +109,6 @@ void Configuration::setNodeNum(unsigned int nn)
 byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
 {
   byte tarray[EE_HASH_BYTES];
-  byte tmphash, i, j, matches;
-  bool confirmed = false;
 
   // DEBUG_SERIAL << F("> looking for match with ") << nn << ", " << en << endl;
 
@@ -120,78 +118,24 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
   tarray[3] = lowByte(en);
 
   // calc the hash of the incoming event to match
-  tmphash = makeHash(tarray);
+  byte tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (i = 0; i < EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < EE_MAX_EVENTS; i++)
   {
     if (evhashtbl[i] == tmphash)
     {
-      if (!hash_collision)
+      // check the EEPROM for a match with the incoming NN and EN
+      readEvent(i, tarray);
+      if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)
       {
-        // NN + EN hash matches and there are no hash collisions in the hash table
+        return i;
       }
-      else
-      {
-        // there is a potential hash collision, so we have to check the slower way
-        // first, check if this hash appears in the table more than once
-
-        // DEBUG_SERIAL << F("> there are hash collisions") << endl;
-
-        for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++)
-        {
-          if (evhashtbl[j] == tmphash)
-          {
-            ++matches;
-          }
-        }
-
-        if (matches > 1)
-        {
-          // one or more collisions for this hash exist, so check the very slow way
-          // DEBUG_SERIAL << F("> this hash matches = ") << matches << endl;
-
-          for (i = 0; i < EE_MAX_EVENTS; i++)
-          {
-            if (evhashtbl[i] == tmphash)
-            {
-              // check the EEPROM for a match with the incoming NN and EN
-              readEvent(i, tarray);
-              if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)
-              {
-                // the stored NN and EN match this event, so no further checking is required
-                confirmed = true;
-                break;
-              }
-            }
-          }
-        }
-        else
-        {
-          // no collisions for this specific hash, so no further checking is required
-          break;
-        }
-      }
-
-      break;
     }
   }
 
-  // finally, there may be a collision with an event that we haven't seen before
-  // so we still need to check the candidate match to be certain, if we haven't done so already
-  if (i < EE_MAX_EVENTS && !confirmed)
-  {
-    readEvent(i, tarray);
-    if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en))
-    {
-      // the stored NN and EN do not match this event
-      // DEBUG_SERIAL << F("> hash result does not match stored event") << endl;
-      i = EE_MAX_EVENTS;
-    }
-  }
-
-  // if (i >= EE_MAX_EVENTS) DEBUG_SERIAL << F("> unable to find matching event") << endl;
-  return i;
+  // DEBUG_SERIAL << F("> unable to find matching event") << endl;
+  return EE_MAX_EVENTS;
 }
 
 //
@@ -299,8 +243,6 @@ void Configuration::makeEvHashTable()
       evhashtbl[idx] = makeHash(evarray);
     }
   }
-
-  hash_collision = check_hash_collisions();
 }
 
 //
@@ -324,8 +266,6 @@ void Configuration::updateEvHashEntry(byte idx)
     evhashtbl[idx] = makeHash(evarray);
   }
 
-  hash_collision = check_hash_collisions();
-
   // DEBUG_SERIAL << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
 }
 
@@ -341,8 +281,6 @@ void Configuration::clearEvHashTable()
   {
     evhashtbl[i] = 0;
   }
-
-  hash_collision = false;
 }
 
 //
@@ -355,7 +293,7 @@ void Configuration::printEvHashTable(bool raw)
   (void)raw;
 
   /*
-    DEBUG_SERIAL << F("> Event hash table - ") << hash_collision << endl;
+    DEBUG_SERIAL << F("> Event hash table - ") << endl;
 
     for (byte i = 0; i < EE_MAX_EVENTS; i++) 
     {
@@ -636,27 +574,6 @@ void Configuration::loadNVs()
   heartbeat = flags & (1 << HEARTBEAT_BIT);
   eventAck = flags & (1 << EVENT_ACK_BIT);
   // DEBUG_SERIAL << "Configuration::loadNVs() mode=" << currentMode << ", CANID=" << CANID << ", nodeNum=" << nodeNum << ", flags=" << _HEX(flags) << endl;
-}
-
-//
-/// check whether there is a collision for any hash in the event hash table
-//
-bool Configuration::check_hash_collisions()
-{
-  for (byte i = 0; i < EE_MAX_EVENTS - 1; i++)
-  {
-    for (byte j = i + 1; j < EE_MAX_EVENTS; j++)
-    {
-      if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0)
-      {
-        // DEBUG_SERIAL << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
-        // return when first collision detected
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 //

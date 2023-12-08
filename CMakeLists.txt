@@ -113,4 +113,5 @@ add_executable(testAll
         test/testConsumeOwnEventsService.cpp
         test/testLongMessageService.cpp
         test/testGridConnect.cpp
+        test/testConfiguration.cpp
 )
