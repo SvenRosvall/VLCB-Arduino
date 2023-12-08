@@ -69,8 +69,9 @@ void EventProducerService::sendEvent(bool state, byte evValue)
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
+    unsigned int nn = ((nn_en[0] << 8) + nn_en[1]);
     //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn) << endl;
-    if ((nn_en[0] == 0) && (nn_en[1] == 0))
+    if (nn == 0)
     {
       opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -104,7 +105,8 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    if ((nn_en[0] == 0) && (nn_en[1] == 0))
+    unsigned int nn = ((nn_en[0] << 8) + nn_en[1]);
+    if (nn == 0)
     {
       opCode = (state ? OPC_ASON1 : OPC_ASOF1);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -139,7 +141,8 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    if ((nn_en[0] == 0) && (nn_en[1] == 0))
+    unsigned int nn = ((nn_en[0] << 8) + nn_en[1]);
+    if (nn == 0)
     {
       opCode = (state ? OPC_ASON2 : OPC_ASOF2);
       nn_en[0] = highByte(module_config->nodeNum);
@@ -175,7 +178,8 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    if ((nn_en[0] == 0) && (nn_en[1] == 0))
+    unsigned int nn = ((nn_en[0] << 8) + nn_en[1]);
+    if (nn == 0)
     {
       opCode = (state ? OPC_ASON3 : OPC_ASOF3);
       nn_en[0] = highByte(module_config->nodeNum);
