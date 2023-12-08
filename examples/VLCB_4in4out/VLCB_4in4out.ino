@@ -115,6 +115,8 @@ Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
 LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
+bool check;
+
 // forward function declarations
 void eventhandler(byte, VLCB::VlcbMessage *);
 void printConfig();
