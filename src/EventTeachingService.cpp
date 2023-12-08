@@ -154,9 +154,8 @@ Processed EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsig
   {
     if (msg->len < 5)
     {
-      controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_CMD);
       controller->sendCMDERR(CMDERR_INV_CMD);
-
+      controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_CMD);
     }
     else
     {
@@ -253,8 +252,8 @@ Processed EventTeachingService::handleReadEventIndex(VlcbMessage *msg, unsigned 
     byte i = msg->data[3];
     if ((i >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(i) == 0))
     {
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
       controller->sendCMDERR(CMDERR_INV_EN_IDX);
+      controller->sendGRSP(OPC_NENRD, getServiceID(), CMDERR_INV_EN_IDX);
     }
     else
     {
@@ -282,23 +281,40 @@ Processed EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, 
   {
     if (msg->len < 5)
     {
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_CMD);
       controller->sendCMDERR(CMDERR_INV_CMD);
+      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_CMD);
+      return PROCESSED;
     }
-    else
+
+    uint8_t eventIndex = msg->data[3];
+    uint8_t evnum = msg->data[4];
+
+    if (eventIndex >= module_config->EE_MAX_EVENTS)
     {
-      if (module_config->getEvTableEntry(msg->data[3]) != 0)
-      {
-        byte value = module_config->getEventEVval(msg->data[3], msg->data[4]);
-        controller->sendMessageWithNN(OPC_NEVAL, msg->data[3], msg->data[4], value);
-      }
-      else
-      {
-        // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
-        controller->sendCMDERR(CMDERR_INV_EV_IDX);
-        controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EV_IDX);
-      }
+      // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
+      controller->sendCMDERR(CMDERR_INV_EN_IDX);
+      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
+      return PROCESSED;
     }
+
+    if (module_config->getEvTableEntry(eventIndex) == 0)
+    {
+      // DEBUG_SERIAL << F("ets> request for non-existing event") << endl;
+      controller->sendCMDERR(CMDERR_INV_EN_IDX);
+      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
+      return PROCESSED;
+    }
+    
+    if (evnum > module_config->EE_NUM_EVS)
+    {
+      // DEBUG_SERIAL << F("ets> request for invalid event variable") << endl;
+      controller->sendCMDERR(CMDERR_INV_EV_IDX);
+      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EV_IDX);
+      return PROCESSED;
+    }
+
+    byte value = module_config->getEventEVval(eventIndex, evnum);
+    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, value);
   }
 
   return PROCESSED;
@@ -460,8 +476,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
   {
     if (msg->len < 8)
     {
-      controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
-      controller->sendCMDERR(CMDERR_INV_CMD);
+      controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_CMD);
     }
     else
     {
@@ -473,11 +488,12 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
       if (index >= module_config->EE_MAX_EVENTS)
       {
         //DEBUG_SERIAL << F("> invalid index") << endl;
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EN_IDX);
       }
-      else if (evIndex == 0)  // Not a valid evIndex
+      else if ((evIndex == 0) || (evIndex > module_config->EE_NUM_EVS))  // Not a valid evIndex
       {
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_INVALID_COMMAND_PARAMETER);
+        controller->sendCMDERR(CMDERR_INV_EV_IDX);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
       }
       else
       {
@@ -502,7 +518,7 @@ Processed EventTeachingService::handleLearnEventIndex(VlcbMessage *msg)
 
         // respond with WRACK
         controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+        controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
       }
     }
   }
@@ -519,8 +535,8 @@ Processed EventTeachingService::handleRequestEventVariable(VlcbMessage *msg, uns
 
   if (msg->len < 6)
   {
-    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
     controller->sendCMDERR(CMDERR_INV_CMD);
+    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_CMD);
     return PROCESSED;
   }
 
@@ -530,8 +546,8 @@ Processed EventTeachingService::handleRequestEventVariable(VlcbMessage *msg, uns
   if (index >= module_config->EE_MAX_EVENTS)
   {
     //DEBUG_SERIAL << F("ets> event not found") << endl;
-    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
     controller->sendCMDERR(CMDERR_INVALID_EVENT);
+    controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INVALID_EVENT);
     return PROCESSED;
   }
 
