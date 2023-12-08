@@ -98,8 +98,9 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
@@ -134,8 +135,9 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
@@ -171,8 +173,9 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;

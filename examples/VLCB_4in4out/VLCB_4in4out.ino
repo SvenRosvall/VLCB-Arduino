@@ -219,7 +219,8 @@ void loop()
   }
 
   // test for switch input
-  processSwitches();
+  check = false;
+  processSwitches(check);
 
   // bottom of loop()
 }
@@ -235,10 +236,10 @@ void processSwitches(void)
       byte nvval = modconfig.readNV(nv);
       bool state;
 
-      // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
+        // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
       switch (nvval)
-      {
+        {
         case 0:
           // ON and OFF
           state = (moduleSwitch[i].fell());
@@ -246,10 +247,10 @@ void processSwitches(void)
           epService.sendEvent(state, i);
           break;
 
-        case 1:
-          // Only ON
-          if (moduleSwitch[i].fell()) 
-          {
+          case 1:
+            // Only ON
+            if (moduleSwitch[i].fell()) 
+            {
             state = true;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
@@ -259,7 +260,7 @@ void processSwitches(void)
         case 2:
           // Only OFF
           if (moduleSwitch[i].fell())
-          {
+            {
             state = false;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
             epService.sendEvent(state, i);
@@ -269,7 +270,7 @@ void processSwitches(void)
         case 3:
           // Toggle button
           if (moduleSwitch[i].fell())
-          {
+            {
             switchState[i] = !switchState[i];
             state = (switchState[i]);
             //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
@@ -282,7 +283,7 @@ void processSwitches(void)
           break;
       }
     }
-  }
+  }}
 }
 
 //
