@@ -99,14 +99,12 @@ private:
   byte makeHash(byte tarr[]);
   void getEvArray(byte idx);
   void makeEvHashTable();
-  bool check_hash_collisions();
 
   void loadNVs();
 
   unsigned int getEVAddress(byte idx, byte evnum);
 
   byte *evhashtbl;
-  bool hash_collision;
 };
 
 }
