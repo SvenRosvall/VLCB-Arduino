@@ -116,7 +116,6 @@ LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
 // forward function declarations
-byte checkInputProduced();
 void eventhandler(byte, VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
@@ -132,8 +131,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = NUM_LEDS;
-
+  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
 
   // initialise and load configuration
   controller.begin();
@@ -155,9 +153,6 @@ void setupVLCB()
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
-
-  // register check produced handler for assigning short and spoof codes
-  etService.setcheckInputProduced(checkInputProduced);
 
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
@@ -227,24 +222,6 @@ void loop()
   processSwitches();
 
   // bottom of loop()
-}
-
-//
-// Callback used when teaching produced events.
-// Returns the index of the switch that was pressed which is the taught event shall relate to.
-//
-byte checkInputProduced(void)
-{
- for (byte i = 0; i < NUM_SWITCHES; i++)
-    {
-      moduleSwitch[i].update();
-      if (moduleSwitch[i].changed())
-      {
-        //DEBUG_PRINT(F("sk> Check index is ") << i);
-        return i;
-      }
-    }
-      return 0xFF;
 }
 
 void processSwitches(void) 
@@ -329,7 +306,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
       //DEBUG_PRINT(F("sk> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
         //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
@@ -358,7 +335,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     //DEBUG_PRINT(F("sk> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
 
         if (evval > 0)

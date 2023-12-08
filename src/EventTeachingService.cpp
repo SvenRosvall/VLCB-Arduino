@@ -17,12 +17,6 @@ void EventTeachingService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-// Register the user handler for produced event checking
-void EventTeachingService::setcheckInputProduced(byte (*fptr)())
-{
-  checkInputProduced = fptr;
-}
-
 void EventTeachingService::enableLearn() 
 {
   bLearn = true;
@@ -100,7 +94,7 @@ Processed EventTeachingService::handleMessage(unsigned int opc, VlcbMessage *msg
     
   default:
     // unknown or unhandled OPC
-    //DEBUG_SERIAL << F("ets> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
+    //DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
     return NOT_PROCESSED;
   }
 }
@@ -305,7 +299,7 @@ Processed EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, 
     
     if (evnum > module_config->EE_NUM_EVS)
     {
-      // DEBUG_SERIAL << F("ets> request for invalid event variable") << endl;
+      // DEBUG_SERIAL << F("> request for invalid event variable") << endl;
       controller->sendCMDERR(CMDERR_INV_EV_IDX);
       controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EV_IDX);
       return PROCESSED;
@@ -399,37 +393,31 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return PROCESSED;
   }
-
-  // Is this an existing event? 
-  //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
+// Is this a produced event that we know about?
+      // Search the events table by evindex = 1 for a value match with evval.
+  if ((evindex == 1) && (evval > 0))
+      {
+        index = module_config->findExistingEventByEv(evindex, evval);
+        if (index < module_config->EE_MAX_EVENTS)
+        {
+          module_config->writeEvent(index, &msg->data[1]);
+          // no need to write eventEV as, by definition, it hasn't changed
+          // recreate event hash table entry
+          module_config->updateEvHashEntry(index);
+          return PROCESSED;
+        }
+      }     
+      
+      // search for this NN, EN as we may just be adding an EV to an existing learned event 
+  //DEBUG_SERIAL << F("> searching for existing event to update") << endl;
   byte index = module_config->findExistingEvent(nn, en);
 
-  // not found in event table
-  if (index >= module_config->EE_MAX_EVENTS)
-  {
-    // Are we a producer and is this a produced event to update?
-    if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex == 1) && (checkInputProduced != nullptr))
-    {
-      // Wait TIME_OUT seconds to see if producer button pressed.
-      //DEBUG_SERIAL << F("ets> Update candidate") << endl;
-      unsigned long timeStart = millis();
-      while (TIME_OUT > millis() - timeStart)
+      // not found - it's a new event
+      if (index >= module_config->EE_MAX_EVENTS)
       {
-        index = (byte)(*checkInputProduced)();
-        if (index < module_config->EE_PRODUCED_EVENTS)
-        {
-          // DEBUG_SERIAL << F("ets> Update index ") << index << endl;
-          break;
-        }
+        // DEBUG_SERIAL << F("> existing event not found - creating a new one if space available") << endl;
+        index = module_config->findEventSpace();
       }
-    }
-          
-    if (index >= module_config->EE_PRODUCED_EVENTS)
-    {
-      //DEBUG_SERIAL << F("ets> Not for update. Create a new event if space available") << endl;
-      index = module_config->findEventSpace();
-    }
-  }
 
   // if existing or new event space found, write the event data
   if (index >= module_config->EE_MAX_EVENTS)
@@ -442,7 +430,7 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
   }
 
   // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-  // DEBUG_SERIAL << F("ets> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+  // DEBUG_SERIAL << F("> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
   // don't repeat this for subsequent EVs
   if (evindex <= 1)
@@ -453,7 +441,7 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
   module_config->writeEventEV(index, evindex, evval);
 
   // recreate event hash table entry
-  // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
+  // DEBUG_SERIAL << F("> updating hash table entry for idx = ") << index << endl;
   module_config->updateEvHashEntry(index);
 
   // respond with WRACK
