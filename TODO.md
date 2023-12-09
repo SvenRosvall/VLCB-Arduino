@@ -114,15 +114,3 @@ How to create service objects and the controller object.
 How to configure any parameters and service specifics.
 
 This can only be started once we have finalized how VLCB will be set up.
-
-## Potential bugs and opportunities for improvement
-
-### Event lookup
-Duncan use a hash value for quick search in the event table and reduce the 
-number of EEPROM reads.
-
-This code can probably be changed to loop over the hash table and for each
-match with the event hash, check the EEPROM for those locations.
-
-No need to know if there are any hash collisions in the table. 
-Searching the table will be fast enough as there will be less than 255 entries, all in RAM.

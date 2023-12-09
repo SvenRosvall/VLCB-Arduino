@@ -11,6 +11,29 @@ std::unique_ptr<MockUserInterface> mockUserInterface;
 std::unique_ptr<MockTransport> mockTransport;
 std::unique_ptr<VLCB::Configuration> configuration;
 
+// For use by tests of Configuration
+VLCB::Configuration * createConfiguration()
+{
+  static std::unique_ptr<MockStorage> mockStorage;
+  mockStorage.reset(new MockStorage);
+  VLCB::Configuration *configuration = createConfiguration(mockStorage.get());
+  configuration->begin();
+  return configuration;
+}
+
+// For use with createController()
+VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage)
+{
+  auto configuration = new VLCB::Configuration(mockStorage);
+  configuration->EE_NVS_START = 10;
+  configuration->EE_NUM_NVS = 4;
+  configuration->EE_EVENTS_START = 20;
+  configuration->EE_MAX_EVENTS = 20;
+  configuration->EE_PRODUCED_EVENTS = 1;
+  configuration->EE_NUM_EVS = 2;
+  return configuration;
+}
+
 VLCB::Controller createController(const std::initializer_list<VLCB::Service *> services)
 {
   mockTransport.reset(new MockTransport);
@@ -28,16 +51,10 @@ VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_
   static std::unique_ptr<MockStorage> mockStorage;
   mockStorage.reset(new MockStorage);
 
-  configuration.reset(new VLCB::Configuration(mockStorage.get()));
+  configuration.reset(createConfiguration(mockStorage.get()));
 
   VLCB::Controller controller(mockUserInterface.get(), configuration.get(), trp, services);
 
-  configuration->EE_NVS_START = 10;
-  configuration->EE_NUM_NVS = 4;
-  configuration->EE_EVENTS_START = 20;
-  configuration->EE_MAX_EVENTS = 20;
-  configuration->EE_PRODUCED_EVENTS = 1;
-  configuration->EE_NUM_EVS = 2;
   configuration->setModuleMode(MODE_NORMAL);
   configuration->setNodeNum(0x0104);
   static std::unique_ptr<VLCB::Parameters> params;

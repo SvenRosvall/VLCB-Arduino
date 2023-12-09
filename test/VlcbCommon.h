@@ -17,6 +17,9 @@ extern std::unique_ptr<MockUserInterface> mockUserInterface;
 extern std::unique_ptr<MockTransport> mockTransport;
 extern std::unique_ptr<VLCB::Configuration> configuration;
 
+// Create a Configuration object.
+VLCB::Configuration * createConfiguration();
+VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage);
 // Use MockTransport to mock out the whole transport part.
 VLCB::Controller createController(std::initializer_list<VLCB::Service *> services);
 // Use a provided transport.
