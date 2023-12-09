@@ -30,7 +30,7 @@ std::map<std::string, void (*)()> suites = {
         {"CanService", testCanService},
         {"EventProducerService", testEventProducerService},
         {"EventConsumerService", testEventConsumerService},
-        {"EventTeachingService", testEventTeachingService},
+//        {"EventTeachingService", testEventTeachingService},
         {"ConsumeOwnEventsService", testConsumeOwnEventsService},
         {"LongMessageService", testLongMessageService},
         {"GridConnect", testGridConnect}

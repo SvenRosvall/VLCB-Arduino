@@ -221,8 +221,7 @@ void loop()
   }
 
   // test for switch input
-  check = false;
-  processSwitches(check);
+  processSwitches();
 
   // bottom of loop()
 }
