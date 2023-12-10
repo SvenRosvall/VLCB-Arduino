@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include "CircularBuffer.h"
 #include <Controller.h>
 #include <vlcbdefs.hpp>
 
@@ -16,8 +17,9 @@ class Configuration;
 class ConsumeOwnEventsService : public Service
 {
 public:
-  ConsumeOwnEventsService(byte bufferCapacity = 4);
-  ~ConsumeOwnEventsService();
+  ConsumeOwnEventsService(byte bufferCapacity = 4)
+    : buffer(bufferCapacity) {}
+
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override {return NOT_PROCESSED;}
 
   virtual byte getServiceID() override
@@ -29,34 +31,21 @@ public:
     return 1;
   }
 
-  bool available();
-  VlcbMessage *peek();
-  VlcbMessage *get();
-  void put(const VlcbMessage *msg);
-  void clear();
+  bool available() { return buffer.available(); }
+  VlcbMessage *peek() { return buffer.peek(); }
+  VlcbMessage *get() { return buffer.get(); }
+  void put(const VlcbMessage *msg) { buffer.put(msg); }
+  void clear() { buffer.clear(); }
 
   // Diagnostic metrics access
-  unsigned int getNumberOfPuts();
-  unsigned int getNumberofGets();
-  unsigned int getOverflows();
-  unsigned int getHighWaterMark();   // High Watermark
+  unsigned int getNumberOfPuts() { return buffer.getNumberOfPuts(); }
+  unsigned int getNumberofGets() { return buffer.getNumberofGets(); }
+  unsigned int getOverflows() { return buffer.getOverflows(); }
+  unsigned int getHighWaterMark() { return buffer.getHighWaterMark(); }
 
 private:
-  byte bufUse();
 
-  byte capacity;
-  byte head = 0;
-  byte tail = 0;
-  byte size = 0;
-  bool full = false;
-
-  // Diagnostic metrics
-  byte hwm = 0;  // High watermark
-  byte numPuts = 0;
-  byte numGets = 0;
-  byte numOverflows = 0;
-
-  VlcbMessage *buffer;
+  CircularBuffer<VlcbMessage> buffer;
 };
 
 }  // VLCB

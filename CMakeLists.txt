@@ -72,6 +72,7 @@ add_library(core_library OBJECT
         src/ConsumeOwnEventsService.cpp
         src/GridConnect.cpp
         src/GridConnect.h
+        src/CircularBuffer.h
 )
 
 target_link_libraries(core_library PUBLIC)
