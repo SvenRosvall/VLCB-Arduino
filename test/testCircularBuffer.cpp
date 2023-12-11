@@ -88,6 +88,37 @@ void testOverflow()
   assertEquals(2, *buffer.get());
 }
 
+void testHeadWrapAround()
+{
+  test();
+  
+  VLCB::CircularBuffer<int> buffer(4);
+  int entry = 1;
+  buffer.put(&entry);
+  entry = 2;
+  buffer.put(&entry);
+
+  assertEquals(1, *buffer.get());
+  assertEquals(2, *buffer.get());
+
+  entry = 3;
+  buffer.put(&entry);
+  entry = 4;
+  buffer.put(&entry);
+  entry = 5;
+  buffer.put(&entry);
+
+  assertEquals(3, *buffer.get());
+  assertEquals(4, *buffer.get());
+  assertEquals(5, *buffer.get());
+
+  assertEquals(false, buffer.available());
+  assertEquals(3, buffer.getHighWaterMark());
+  assertEquals(0, buffer.getOverflows());
+  assertEquals(5, buffer.getNumberOfGets());
+  assertEquals(5, buffer.getNumberOfPuts());
+}
+
 }
 
 void testCircularBuffer()
@@ -96,4 +127,5 @@ void testCircularBuffer()
   testHasOne();
   testFull();
   testOverflow();
+  testHeadWrapAround();
 }

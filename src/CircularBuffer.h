@@ -35,7 +35,6 @@ private:
   uint8_t capacity;
   uint8_t head = 0;
   uint8_t tail = 0;
-  uint8_t size = 0;
   bool full = false;
 
   // Diagnostic metrics
@@ -64,7 +63,7 @@ CircularBuffer<E>::~CircularBuffer()
 template <typename E>
 bool CircularBuffer<E>::available()
 {
-  return (size > 0);
+  return full || (head != tail);
 }
 
 /// store an item to the buffer - overwrite oldest item if buffer is full
@@ -84,8 +83,12 @@ void CircularBuffer<E>::put(const E * msg)
 
   head = (head + 1) % capacity;
   full = head == tail;
-  size = bufUse();
-  hwm = (size > hwm) ? size : hwm;   // Tracks high water mark (hwm)
+  uint8_t size = bufUse();
+  if (size > hwm)
+  {
+    // Tracks high water mark (hwm)
+    hwm = size;
+  }
   ++numPuts;        // Counts how many events put to buffer.
   // DEBUG_SERIAL << ">COE Puts = " << numPuts << " Size = " << size <<endl;
 }
@@ -96,12 +99,11 @@ E *CircularBuffer<E>::get()
 {
   E *p = nullptr;
 
-  if (size > 0)
+  if (available())
   {
     p = &buffer[tail];
     full = false;
     tail = (tail + 1) % capacity;
-    size = bufUse();
     ++numGets;        // Counts how many events got from buffer.
     // DEBUG_SERIAL << ">COE Gets = " << numGets << endl;
   }
@@ -114,12 +116,14 @@ template <typename E>
 E *CircularBuffer<E>::peek()
 {
   // should always call ::available first to avoid this
-  if (size == 0)
+  if (available())
+  {
+    return &buffer[tail];
+  }
+  else
   {
     return nullptr;
   }
-
-  return &buffer[tail];
 }
 
 /// clear all items
@@ -129,26 +133,22 @@ void CircularBuffer<E>::clear()
   head = 0;
   tail = 0;
   full = false;
-  size = 0;
 }
 
 /// recalculate number of items in the buffer
 template <typename E>
 uint8_t CircularBuffer<E>::bufUse()
 {
-  if (full)
+  int8_t size = capacity;
+  if (!full)
   {
-    return capacity;
+    size = head - tail;
+    if (size < 0)
+    {
+      size += capacity;
+    }
   }
-
-  if (head >= tail)
-  {
-    return head - tail;
-  }
-  else
-  {
-    return capacity + head - tail;
-  }
+  return size;
 }
 
 /// number of puts
