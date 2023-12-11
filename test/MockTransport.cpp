@@ -13,16 +13,14 @@ void MockTransport::setController(VLCB::Controller *ctrl)
   this->controller = ctrl;
 }
 
-bool MockTransport::available()
+void MockTransport::process()
 {
-  return !incoming_messages.empty();
-}
-
-VLCB::VlcbMessage MockTransport::getNextMessage()
-{
-  VLCB::VlcbMessage frame = incoming_messages.front();
-  incoming_messages.pop_front();
-  return frame;
+  if (!incoming_messages.empty())
+  {
+    VLCB::Command cmd = {VLCB::MESSAGE_IN, incoming_messages.front()};
+    controller->putCommand(cmd);
+    incoming_messages.pop_front();
+  }
 }
 
 bool MockTransport::sendMessage(VLCB::VlcbMessage *msg)

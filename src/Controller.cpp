@@ -163,47 +163,39 @@ void Controller::process(byte num_messages)
   {
     service->process(requestedAction);
   }
+  
+  transport->process(); // Let Transport check for incoming messages and put it on the command queue.
 
-  // get received CAN frames from buffer
-  // process by default 3 messages per run so the user's application code doesn't appear unresponsive under load
-  for (byte mcount = 0 ; transport->available() && mcount < num_messages ; ++mcount)
+  if (commandQueue.available())
   {
-    // at least one CAN frame is available in the reception buffer
-    // retrieve the next one
-
-    VlcbMessage msg = transport->getNextMessage();
-    // DEBUG_SERIAL << "> Received a message" << endl;
-
-    if (msg.len == 0xFF)
+    Command cmd = *commandQueue.get();
+    
+    // TODO: Pass this to each Service::process(cmd);
+    // But for now just call handleMessage()
+    switch (cmd.commandType)
     {
-      // received msg was something CAN specific, ignore it.
-      continue;
-    }
-
-    indicateActivity();
-
-    //
-    /// process the message opcode
-    /// if we got this far, it's a standard CAN frame (not extended, not RTR) with a data payload length > 0
-    //
-
-    if (msg.len > 0) 
-    {
-      unsigned int opc = msg.data[0];
-      // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
-      for (Service * service : services)
+      case MESSAGE_IN:
       {
-        if (service->handleMessage(opc, &msg) == PROCESSED)
+        indicateActivity();
+        VlcbMessage &msg = cmd.vlcbMessage;
+        unsigned int opc = msg.data[0];
+        // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
+        for (Service *service: services)
         {
-          break;
+          if (service->handleMessage(opc, &msg) == PROCESSED)
+          {
+            break;
+          }
         }
+        // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
       }
-    } else {
-      // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
+      break;
+      
+      default:
+        break;
     }
-  }  // while messages available
+  }
 
-  // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
 
   //
   /// end of Controller message processing

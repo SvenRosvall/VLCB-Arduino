@@ -18,9 +18,12 @@ class CanTransport : public Transport
 public:
   void setController(Controller *ctrl) override { this->controller = ctrl; }
 
+  virtual void process() override;
+
   void process(UserInterface::RequestedAction requestedAction);
 
-  virtual VlcbMessage getNextMessage() override;
+  // Interface for implementing classes.
+  virtual bool available() = 0;
   virtual CANMessage getNextCanMessage() = 0;
 
   virtual bool sendMessage(VlcbMessage *msg) override;

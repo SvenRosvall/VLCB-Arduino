@@ -18,8 +18,7 @@ class Transport
 {
 public:
   virtual void setController(Controller * ctrl) { }
-  virtual bool available() = 0;
-  virtual VlcbMessage getNextMessage() = 0;
+  virtual void process() = 0;
   virtual bool sendMessage(VlcbMessage *msg) = 0;
   virtual void reset() = 0;
 

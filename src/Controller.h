@@ -17,6 +17,7 @@
 #include "Service.h"
 #include "initializer_list.h"
 #include "ArrayHolder.h"
+#include "CircularBuffer.h"
 
 namespace VLCB
 {
@@ -28,6 +29,24 @@ struct VlcbMessage
 {
   uint8_t len; // Value 0-7 or FF for messages handled in CanTransport
   uint8_t data[8];
+};
+
+// Command type
+enum COMMAND
+{
+  MESSAGE_IN,
+  MESSAGE_OUT,
+  START_CAN_ENUMERATION,
+  // ...
+};
+
+struct Command
+{
+  byte commandType;
+  union
+  {
+    VlcbMessage vlcbMessage;
+  };
 };
 
 //
@@ -73,6 +92,8 @@ public:
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
+  
+  void putCommand(const Command & cmd) { commandQueue.put(&cmd); }
 
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;
@@ -82,6 +103,8 @@ private:                                          // protected members become pr
 
   unsigned char *_mparams;
   const unsigned char *_mname;
+  
+  CircularBuffer<Command> commandQueue;
 
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);

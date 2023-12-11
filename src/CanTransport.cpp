@@ -43,18 +43,19 @@ void CanTransport::startCANenumeration(bool fromENUM)
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
-VlcbMessage CanTransport::getNextMessage()
+void CanTransport::process()
 {
+  // Check concrete transport for messages and put on controller command queue.
+  if (!available())
+  {
+    return;
+  }
   CANMessage canMsg = getNextCanMessage();
-  VlcbMessage message;
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
   if (canMsg.ext)
   {
-    // DEBUG_SERIAL << F("> extended frame ignored, from CANID = ") << remoteCANID << endl;
-
-    message.len = 0xFF;
-    return message;
+    return;
   }
 
   // is this a CANID enumeration request from another node (RTR set) ?
@@ -62,12 +63,14 @@ VlcbMessage CanTransport::getNextMessage()
   {
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
     // send an empty canMsg to show our CANID
+
+    // TODO: introduce a sendMessage() with zero length. Doesn't need a VlcbMessage.
+    VlcbMessage message;
     message.len = 0;
     sendMessage(&message);
     controller->indicateActivity();
 
-    message.len = 0xFF;
-    return message;
+    return;
   }
 
   byte remoteCANID = getCANID(canMsg.id);
@@ -91,15 +94,14 @@ VlcbMessage CanTransport::getNextMessage()
       // DEBUG_SERIAL << F("> stored CANID ") << remoteCANID << F(" at index = ") << (remoteCANID / 8) << F(", bit = ") << (remoteCANID % 8) << endl;
     }
 
-    message.len = 0xFF;
-    return message;
+    return;
   }
 
   // The message is a real message.
-  message.len = canMsg.len;
-  memcpy(message.data, canMsg.data, canMsg.len);
+  Command cmd = {MESSAGE_IN, { canMsg.len}};
+  memcpy(cmd.vlcbMessage.data, canMsg.data, canMsg.len);
 
-  return message;
+  controller->putCommand(cmd);
 }
 
 /// actual implementation of the makeHeader method
