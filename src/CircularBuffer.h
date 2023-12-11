@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <stddef.h>
+#include <stdint.h>
 
 namespace VLCB
 {
@@ -14,7 +14,7 @@ template <typename E>
 class CircularBuffer
 {
 public:
-  CircularBuffer(size_t bufferCapacity = 4);
+  explicit CircularBuffer(uint8_t bufferCapacity = 4);
   ~CircularBuffer();
 
   bool available();
@@ -25,31 +25,31 @@ public:
 
   // Diagnostic metrics access
   unsigned int getNumberOfPuts();
-  unsigned int getNumberofGets();
+  unsigned int getNumberOfGets();
   unsigned int getOverflows();
   unsigned int getHighWaterMark();   // High Watermark
 
 private:
-  size_t bufUse();
+  uint8_t bufUse();
 
-  size_t capacity;
-  size_t head = 0;
-  size_t tail = 0;
-  size_t size = 0;
+  uint8_t capacity;
+  uint8_t head = 0;
+  uint8_t tail = 0;
+  uint8_t size = 0;
   bool full = false;
 
   // Diagnostic metrics
-  size_t hwm = 0;  // High watermark
-  size_t numPuts = 0;
-  size_t numGets = 0;
-  size_t numOverflows = 0;
+  uint8_t hwm = 0;  // High watermark
+  uint8_t numPuts = 0;
+  uint8_t numGets = 0;
+  uint8_t numOverflows = 0;
 
   E *buffer;
 };
 
 
 template <typename E>
-CircularBuffer<E>::CircularBuffer(size_t bufferCapacity)
+CircularBuffer<E>::CircularBuffer(uint8_t bufferCapacity)
         : capacity(bufferCapacity)
         , buffer(new E[capacity])
 {}
@@ -73,12 +73,11 @@ template <typename E>
 void CircularBuffer<E>::put(const E * msg)
 {
 //  E msg;
-  memcpy(&buffer[head], msg, sizeof(E));
-
-  // if the buffer is full, this put will overwrite the oldest item
+  buffer[head] = *msg;
 
   if (full)
   {
+    // if the buffer is full, this put will overwrite the oldest item
     tail = (tail + 1) % capacity;
     ++numOverflows;
   }
@@ -120,7 +119,7 @@ E *CircularBuffer<E>::peek()
     return nullptr;
   }
 
-  return (&buffer[tail]);
+  return &buffer[tail];
 }
 
 /// clear all items
@@ -135,7 +134,7 @@ void CircularBuffer<E>::clear()
 
 /// recalculate number of items in the buffer
 template <typename E>
-size_t CircularBuffer<E>::bufUse()
+uint8_t CircularBuffer<E>::bufUse()
 {
   if (full)
   {
@@ -161,7 +160,7 @@ unsigned int CircularBuffer<E>::getNumberOfPuts()
 
 /// number of gets
 template <typename E>
-unsigned int CircularBuffer<E>::getNumberofGets()
+unsigned int CircularBuffer<E>::getNumberOfGets()
 {
   return numGets;
 }

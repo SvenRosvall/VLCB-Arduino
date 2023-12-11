@@ -115,4 +115,5 @@ add_executable(testAll
         test/testLongMessageService.cpp
         test/testGridConnect.cpp
         test/testConfiguration.cpp
+        test/testCircularBuffer.cpp
 )

@@ -39,7 +39,7 @@ public:
 
   // Diagnostic metrics access
   unsigned int getNumberOfPuts() { return buffer.getNumberOfPuts(); }
-  unsigned int getNumberofGets() { return buffer.getNumberofGets(); }
+  unsigned int getNumberofGets() { return buffer.getNumberOfGets(); }
   unsigned int getOverflows() { return buffer.getOverflows(); }
   unsigned int getHighWaterMark() { return buffer.getHighWaterMark(); }
 
