@@ -40,7 +40,7 @@ void testNumNVs()
   VLCB::VlcbMessage msg = {4, {OPC_RQNPN, 0x01, 0x04, 6}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -59,7 +59,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(3, mockTransport->sent_messages.size());
@@ -87,7 +87,7 @@ void testServiceDiscoveryNodeVarSvc()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -107,7 +107,7 @@ void testSetAndReadNV()
   VLCB::VlcbMessage msg = {5, {OPC_NVSET, 0x01, 0x04, 3, 42}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -119,7 +119,7 @@ void testSetAndReadNV()
   msg = {4, {OPC_NVRD, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -138,7 +138,7 @@ void testSetAndReadNVnew()
   VLCB::VlcbMessage msg = {5, {OPC_NVSETRD, 0x01, 0x04, 3, 17}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -157,7 +157,7 @@ void testSetNVIndexOutOfBand()
   VLCB::VlcbMessage msg = {5, {OPC_NVSET, 0x01, 0x04, 7, 42}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(2, mockTransport->sent_messages.size());
@@ -180,7 +180,7 @@ void testReadNVIndexOutOfBand()
   VLCB::VlcbMessage msg = {4, {OPC_NVRD, 0x01, 0x04, 7}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(2, mockTransport->sent_messages.size());
@@ -207,7 +207,7 @@ void testReadNVAll()
   VLCB::VlcbMessage msg = {4, {OPC_NVRD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1 + configuration->EE_NUM_NVS, mockTransport->sent_messages.size());
@@ -236,7 +236,7 @@ void testSetNVnewIndexOutOfBand()
   VLCB::VlcbMessage msg = {5, {OPC_NVSETRD, 0x01, 0x04, 7, 42}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(2, mockTransport->sent_messages.size());
@@ -259,7 +259,7 @@ void testSetNVShortMessage()
   VLCB::VlcbMessage msg = {4, {OPC_NVSET, 0x01, 0x04, 1}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -279,7 +279,7 @@ void testReadNVShortMessage()
   VLCB::VlcbMessage msg = {3, {OPC_NVRD, 0x01, 0x04}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -299,7 +299,7 @@ void testSetNVnewShortMessage()
   VLCB::VlcbMessage msg = {4, {OPC_NVSETRD, 0x01, 0x04, 1}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());

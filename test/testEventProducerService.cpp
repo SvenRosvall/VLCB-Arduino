@@ -39,7 +39,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(3, mockTransport->sent_messages.size());
@@ -68,7 +68,7 @@ void testServiceDiscoveryEventProdSvc()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -91,6 +91,8 @@ void testSendOn()
 
   eventProducerService->sendEvent(true, 0);
 
+  process(controller);
+
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
   assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
@@ -112,6 +114,8 @@ void testSend1Off()
   controller.getModuleConfig()->writeEvent(0, nnen);
 
   eventProducerService->sendEvent(false, 0, 42);
+
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ACOF1, mockTransport->sent_messages[0].data[0]);
@@ -136,6 +140,8 @@ void testSendShort2On()
 
   eventProducerService->sendEvent(true, 0, 42, 17);
 
+  process(controller);
+  
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ASON2, mockTransport->sent_messages[0].data[0]);
   assertEquals(7, mockTransport->sent_messages[0].len);
@@ -160,6 +166,8 @@ void testSendShort3Off()
 
   eventProducerService->sendEvent(false, 0, 42, 17, 234);
 
+  process(controller);
+  
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ASOF3, mockTransport->sent_messages[0].data[0]);
   assertEquals(8, mockTransport->sent_messages[0].len);
@@ -188,7 +196,7 @@ void testSetProducedDefaultEventsOnNewBoard()
   // Should have no events configured at start
   assertEquals(0, controller.getModuleConfig()->numEvents());
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, controller.getModuleConfig()->numEvents());
 }

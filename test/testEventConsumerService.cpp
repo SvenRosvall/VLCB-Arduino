@@ -39,7 +39,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(3, mockTransport->sent_messages.size());
@@ -67,7 +67,7 @@ void testServiceDiscoveryEventProdSvc()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -105,7 +105,7 @@ void testEventHandlerOff()
   VLCB::VlcbMessage msg = {5, {OPC_ACOF, 0x01, 0x04, 0, 1}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // No responses expected.
   assertEquals(0, mockTransport->sent_messages.size());
@@ -136,7 +136,7 @@ void testEventHandlerShortOn()
   VLCB::VlcbMessage msg = {5, {OPC_ASON, 0x01, 0x04, 0, 2}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // No responses expected.
   assertEquals(0, mockTransport->sent_messages.size());

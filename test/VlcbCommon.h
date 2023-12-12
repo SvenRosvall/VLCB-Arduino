@@ -24,3 +24,6 @@ VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage);
 VLCB::Controller createController(std::initializer_list<VLCB::Service *> services);
 // Use a provided transport.
 VLCB::Controller createController(VLCB::Transport * trp, std::initializer_list<VLCB::Service *> services);
+
+void process(VLCB::Controller &controller);
+

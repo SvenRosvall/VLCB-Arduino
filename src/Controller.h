@@ -69,11 +69,7 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(VlcbMessage *msg)
-  {
-    indicateActivity();
-    return transport->sendMessage(msg);
-  }
+  bool sendMessage(VlcbMessage *msg);
 
   void begin();
   inline bool sendMessageWithNN(int opc);
@@ -94,6 +90,7 @@ public:
   void setLearnMode(byte reqMode);
   
   void putCommand(const Command & cmd) { commandQueue.put(&cmd); }
+  bool pendingCommands();
 
 private:                                          // protected members become private in derived classes
   UserInterface *_ui;

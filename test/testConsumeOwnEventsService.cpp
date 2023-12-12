@@ -48,7 +48,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(5, mockTransport->sent_messages.size());
@@ -76,7 +76,7 @@ void testServiceDiscoveryEventProdSvc()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -110,11 +110,13 @@ void testConsumeOwnEvent()
 
   eventProducerService->sendEvent(true, 0);
 
+  process(controller);
+  
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
   assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, capturedIndex);
   assertEquals(5, capturedMessage.len);

@@ -20,10 +20,19 @@
 namespace VLCB
 {
 
+// TODO: This is a sign something is wrong. Need to be this big to handle 
+// large number of generated messages such as when asking for node parameters.
+// Each entry uses 10 bytes so a size of 30 uses 300 bytes.
+// This will get worse for for example queries for all events.
+// Need a mechanism like TimedResponse to create messages slowly so they can
+// be sent through the transport without requiring this buffering. 
+const int COMMAND_QUEUE_SIZE = 30;
+
 Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_list<Service *> services)
   : _ui(ui)
   , transport(trpt)
   , services(services)
+  , commandQueue(COMMAND_QUEUE_SIZE)
 {
   extern Configuration config;
   module_config = &config;
@@ -45,6 +54,7 @@ Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt
   , module_config(conf)
   , transport(trpt)
   , services(services)
+    , commandQueue(COMMAND_QUEUE_SIZE)
 {
   transport->setController(this);
 
@@ -176,6 +186,8 @@ void Controller::process(byte num_messages)
     {
       case MESSAGE_IN:
       {
+        // TODO: This is an intermediate step until services have been migrated to the new interface.
+
         indicateActivity();
         VlcbMessage &msg = cmd.vlcbMessage;
         unsigned int opc = msg.data[0];
@@ -190,6 +202,13 @@ void Controller::process(byte num_messages)
         // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
       }
       break;
+
+      case MESSAGE_OUT:
+        // TODO: This is an intermediate step until CanTransport has been converted to a Service.
+
+        indicateActivity();
+        transport->sendMessage(&cmd.vlcbMessage);
+        break;
       
       default:
         break;
@@ -206,6 +225,13 @@ void setNN(VlcbMessage *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);
   msg->data[2] = lowByte(nn);
+}
+
+bool Controller::sendMessage(VlcbMessage *msg)
+{
+  Command cmd = { MESSAGE_OUT, *msg};
+  commandQueue.put(&cmd);
+  return true;
 }
 
 bool Controller::sendMessageWithNNandData(int opc, int len, ...)
@@ -259,6 +285,11 @@ void Controller::startCANenumeration()
       canSvc->startCANenumeration();
     }
   }
+}
+
+bool Controller::pendingCommands()
+{
+  return commandQueue.available();
 }
 
 }

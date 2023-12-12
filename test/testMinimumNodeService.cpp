@@ -66,7 +66,7 @@ void testUninitializedRequestNodeNumber()
   // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
@@ -92,7 +92,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   // User requests to enter Normal mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_RQNN, mockTransport->sent_messages[0].data[0]);
@@ -105,7 +105,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   addMillis(31 * 1000);
   mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, mockTransport->sent_messages.size());
   //assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
@@ -124,7 +124,7 @@ void testNormalRequestNodeNumber()
   // User requests to enter Setup mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
@@ -150,7 +150,7 @@ void testNormalRequestNodeNumberMissingSNN()
   // User requests to change mode.
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
@@ -166,7 +166,7 @@ void testNormalRequestNodeNumberMissingSNN()
   addMillis(31 * 1000);
   mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
@@ -186,7 +186,7 @@ void testReleaseNodeNumberByUI()
 
   mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_NNREL, mockTransport->sent_messages[0].data[0]);
@@ -214,7 +214,7 @@ void testRequestNodeNumberElsewhere()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Expect module to not respond, but to change to non-setup mode.
 
@@ -234,7 +234,7 @@ void testSetNodeNumber()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_NNACK, mockTransport->sent_messages[0].data[0]);
@@ -251,7 +251,7 @@ void testSetNodeNumberNormal()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, mockTransport->sent_messages.size());
 }
@@ -266,7 +266,7 @@ void testSetNodeNumberShort()
   VLCB::VlcbMessage msg_rqsd = {2, {OPC_SNN, 0x02}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(6, mockTransport->sent_messages[0].len);
@@ -285,7 +285,7 @@ void testQueryNodeNumber()
   VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
@@ -305,7 +305,7 @@ void testReadNodeParametersNormalMode()
   VLCB::VlcbMessage msg_rqsd = {1, {OPC_RQNP}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, mockTransport->sent_messages.size());
 }
@@ -320,7 +320,7 @@ void testReadNodeParametersSetupMode()
   VLCB::VlcbMessage msg_rqsd = {1, {OPC_RQNP}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_PARAMS, mockTransport->sent_messages[0].data[0]);
@@ -339,7 +339,7 @@ void testReadNodeParameterCount()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(21, mockTransport->sent_messages.size());
@@ -368,7 +368,7 @@ void testReadNodeParameterModuleId()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 3}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -387,7 +387,7 @@ void testReadNodeParameterInvalidIndex()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 33}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(2, mockTransport->sent_messages.size());
@@ -409,7 +409,7 @@ void testReadNodeParameterShortMessage()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNPN, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -429,7 +429,7 @@ void testModuleNameSetup()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_NAME, mockTransport->sent_messages[0].data[0]);
@@ -452,7 +452,7 @@ void testModuleNameLearn()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_NAME, mockTransport->sent_messages[0].data[0]);
@@ -467,7 +467,7 @@ void testModuleNameNormal()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, mockTransport->sent_messages.size());
 }
@@ -481,12 +481,12 @@ void testHeartBeat()
 
   // Not expecting a heartbeat before 5 seconds.
   addMillis(4500);
-  controller.process();
+  process(controller);
   assertEquals(0, mockTransport->sent_messages.size());
 
   // But expecting a heartbeat after 5 seconds.
   addMillis(1000);
-  controller.process();
+  process(controller);
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_HEARTB, mockTransport->sent_messages[0].data[0]);
 }
@@ -500,7 +500,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(5, mockTransport->sent_messages.size());
@@ -538,7 +538,7 @@ void testServiceDiscoveryLongMessageSvc()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 4}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -557,7 +557,7 @@ void testServiceDiscoveryIndexOutOfBand()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 7}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -576,7 +576,7 @@ void testServiceDiscoveryShortMessage()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQSD, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());
@@ -596,7 +596,7 @@ void testModeUninitializedToSetup()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -625,7 +625,7 @@ void testModeSetupToNormal()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -649,7 +649,7 @@ void testModeSetupToUnininitialized()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -671,7 +671,7 @@ void testModeNormalToSetup()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(3, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -703,7 +703,7 @@ void testModeUninitializedToOtherThanSetup()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -723,7 +723,7 @@ void testModeSetupToOtherThanNormal()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -741,7 +741,7 @@ void testModeNormalToNormal()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransport->sent_messages[0].data[0]);
@@ -759,7 +759,7 @@ void testModeShortMessage()
   VLCB::VlcbMessage msg_rqsd = {3, {OPC_MODE, 0x01, 0x04}};
   mockTransport->setNextMessage(msg_rqsd);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
   assertEquals(1, mockTransport->sent_messages.size());

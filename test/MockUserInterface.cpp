@@ -39,7 +39,9 @@ bool MockUserInterface::resetRequested()
 
 VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()
 {
-  return requestedAction;
+  RequestedAction ret = requestedAction;
+  requestedAction = RequestedAction::NONE;
+  return ret;
 }
 
 void MockUserInterface::setRequestedAction(VLCB::UserInterface::RequestedAction action)

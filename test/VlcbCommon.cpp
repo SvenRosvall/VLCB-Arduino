@@ -67,3 +67,13 @@ VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_
   controller.setName(moduleName);
   return controller;
 }
+
+void process(VLCB::Controller &controller)
+{
+  const int MAX_PROCESS_COUNT = 30;
+  controller.process();
+  for (int i = 0 ; controller.pendingCommands() && i < MAX_PROCESS_COUNT ; ++i)
+  {
+    controller.process();
+  }
+}
