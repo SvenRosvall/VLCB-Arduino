@@ -15,7 +15,6 @@ class Configuration;
 
 class EventProducerService : public Service {
 public:
-  EventProducerService(ConsumeOwnEventsService *s = nullptr) : coeService(s) {}
   virtual void setController(Controller *cntrl) override;
   virtual void process(UserInterface::RequestedAction requestedAction) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
@@ -37,7 +36,6 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  ConsumeOwnEventsService *coeService;
   void (*eventhandler)(byte index, VlcbMessage *msg);
 
   void setProducedEvents();

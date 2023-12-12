@@ -17,9 +17,6 @@ class Configuration;
 class ConsumeOwnEventsService : public Service
 {
 public:
-  ConsumeOwnEventsService(byte bufferCapacity = 4)
-    : buffer(bufferCapacity) {}
-
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override {return NOT_PROCESSED;}
 
   virtual byte getServiceID() override
@@ -30,22 +27,6 @@ public:
   {
     return 1;
   }
-
-  bool available() { return buffer.available(); }
-  VlcbMessage *peek() { return buffer.peek(); }
-  VlcbMessage *get() { return buffer.get(); }
-  void put(const VlcbMessage *msg) { buffer.put(msg); }
-  void clear() { buffer.clear(); }
-
-  // Diagnostic metrics access
-  unsigned int getNumberOfPuts() { return buffer.getNumberOfPuts(); }
-  unsigned int getNumberofGets() { return buffer.getNumberOfGets(); }
-  unsigned int getOverflows() { return buffer.getOverflows(); }
-  unsigned int getHighWaterMark() { return buffer.getHighWaterMark(); }
-
-private:
-
-  CircularBuffer<VlcbMessage> buffer;
 };
 
 }  // VLCB

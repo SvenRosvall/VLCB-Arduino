@@ -94,9 +94,9 @@ VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService(&coeService);
+VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService(&coeService);
+VLCB::EventProducerService epService;
 VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515,
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 

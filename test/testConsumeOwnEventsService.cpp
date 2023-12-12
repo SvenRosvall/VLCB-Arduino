@@ -28,9 +28,9 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::ConsumeOwnEventsService> consumeOwnEventsService;
   consumeOwnEventsService.reset(new VLCB::ConsumeOwnEventsService);
 
-  eventConsumerService.reset(new VLCB::EventConsumerService(consumeOwnEventsService.get()));
+  eventConsumerService.reset(new VLCB::EventConsumerService());
 
-  eventProducerService.reset(new VLCB::EventProducerService(consumeOwnEventsService.get()));
+  eventProducerService.reset(new VLCB::EventProducerService());
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get(),
                                                     eventProducerService.get(), eventConsumerService.get()});
@@ -86,6 +86,26 @@ void testServiceDiscoveryEventProdSvc()
   // Not testing service data bytes.
 }
 
+void testCoeFlag()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
+  mockTransport->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(MANU_VLCB, mockTransport->sent_messages[0].data[3]);
+  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[4]);
+  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_COE | PF_SD, mockTransport->sent_messages[0].data[5]);
+}
+
 byte capturedIndex = -1;
 VLCB::VlcbMessage capturedMessage;
 
@@ -129,5 +149,6 @@ void testConsumeOwnEventsService()
 {
   testServiceDiscovery();
   testServiceDiscoveryEventProdSvc();
+  testCoeFlag();
   testConsumeOwnEvent();
 }

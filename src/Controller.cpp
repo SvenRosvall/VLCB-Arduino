@@ -153,6 +153,38 @@ void Controller::indicateActivity()
   }
 }
 
+static bool isEventMessage(VlcbMessage & message)
+{
+  if (message.len == 0)
+  {
+    return false;
+  }
+  switch (message.data[0])
+  {
+    case OPC_ACON:
+    case OPC_ACON1:
+    case OPC_ACON2:
+    case OPC_ACON3:
+    case OPC_ACOF:
+    case OPC_ACOF1:
+    case OPC_ACOF2:
+    case OPC_ACOF3:
+    case OPC_ASON:
+    case OPC_ASON1:
+    case OPC_ASON2:
+    case OPC_ASON3:
+    case OPC_ASOF:
+    case OPC_ASOF1:
+    case OPC_ASOF2:
+    case OPC_ASOF3:
+    case OPC_ARON:
+    case OPC_AROF:
+      return true;
+    default:
+      return false;
+  }
+}
+
 //
 /// main Controller message processing procedure
 //
@@ -184,6 +216,21 @@ void Controller::process(byte num_messages)
     // But for now just call handleMessage()
     switch (cmd.commandType)
     {
+      case MESSAGE_OUT:
+        // TODO: This is an intermediate step until CanTransport has been converted to a Service.
+
+        indicateActivity();
+        transport->sendMessage(&cmd.vlcbMessage);
+
+        if (!(isEventMessage(cmd.vlcbMessage) && (_mparams[PAR_FLAGS] & PF_COE)))
+        {
+          break;
+        }
+        // else Fall through: A message sent out should also be picked up by the consumer service.
+
+        // TODO Note: When this is replaced with process(cmd) the EventConsumerService shall accept
+        // MESSAGE_IN, but also MESSAGE_OUT but only for events. 
+
       case MESSAGE_IN:
       {
         // TODO: This is an intermediate step until services have been migrated to the new interface.
@@ -203,13 +250,6 @@ void Controller::process(byte num_messages)
       }
       break;
 
-      case MESSAGE_OUT:
-        // TODO: This is an intermediate step until CanTransport has been converted to a Service.
-
-        indicateActivity();
-        transport->sendMessage(&cmd.vlcbMessage);
-        break;
-      
       default:
         break;
     }

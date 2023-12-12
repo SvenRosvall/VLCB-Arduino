@@ -44,26 +44,6 @@ void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int 
   }
 }
 
-void EventConsumerService::process(UserInterface::RequestedAction requestedAction)
-{
-  // Are there any events we have just produced?
-  if (coeService && (coeService->available()))
-  {
-    // DEBUG_SERIAL << ">Getting COE Message " << endl;
-    VlcbMessage *msg = coeService->get();
-    byte opc = msg->data[0];
-    bool done = handleMessage(opc, msg);
-    /*if (done)
-    {
-      DEBUG_SERIAL << ">COE Message handled" << endl;
-    }
-    else
-    {
-      DEBUG_SERIAL << ">COE Message not handled" << endl;
-    }*/
-  }
-}
-
 Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
 {
   //DEBUG_SERIAL << ">Handle Message " << endl;

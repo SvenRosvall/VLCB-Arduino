@@ -82,11 +82,6 @@ void EventProducerService::sendEvent(bool state, byte index)
     msg.data[3] = nn_en[2];
     msg.data[4] = nn_en[3];
     controller->sendMessage(&msg);
-      
-    if (coeService)
-    {
-      coeService->put(&msg);
-    }
   }
 }
 
@@ -117,11 +112,6 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
     msg.data[4] = nn_en[3];
     msg.data[5] = data1;
     controller->sendMessage(&msg);
-      
-    if (coeService)
-    {
-      coeService->put(&msg);
-    }
   }
 }
 
@@ -153,11 +143,6 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
     msg.data[5] = data1;
     msg.data[6] = data2;
     controller->sendMessage(&msg);
-      
-    if (coeService)
-    {
-      coeService->put(&msg);
-    }
   }
 }
 
@@ -190,11 +175,6 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
     msg.data[6] = data2;
     msg.data[7] = data3;
     controller->sendMessage(&msg);
-      
-    if (coeService)
-    {
-      coeService->put(&msg);
-    }
   }
 }
 
