@@ -98,7 +98,7 @@ void CanTransport::process()
   }
 
   // The message is a real message.
-  Command cmd = {MESSAGE_IN, { canMsg.len}};
+  Command cmd = {CMD_MESSAGE_IN, { canMsg.len}};
   memcpy(cmd.vlcbMessage.data, canMsg.data, canMsg.len);
 
   controller->putCommand(cmd);

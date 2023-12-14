@@ -34,9 +34,9 @@ struct VlcbMessage
 // Command type
 enum COMMAND
 {
-  MESSAGE_IN,
-  MESSAGE_OUT,
-  START_CAN_ENUMERATION,
+  CMD_MESSAGE_IN,
+  CMD_MESSAGE_OUT,
+  CMD_START_CAN_ENUMERATION,
   // ...
 };
 

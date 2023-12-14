@@ -17,7 +17,7 @@ void MockTransport::process()
 {
   if (!incoming_messages.empty())
   {
-    VLCB::Command cmd = {VLCB::MESSAGE_IN, incoming_messages.front()};
+    VLCB::Command cmd = {VLCB::CMD_MESSAGE_IN, incoming_messages.front()};
     controller->putCommand(cmd);
     incoming_messages.pop_front();
   }

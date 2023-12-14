@@ -216,7 +216,7 @@ void Controller::process(byte num_messages)
     // But for now just call handleMessage()
     switch (cmd.commandType)
     {
-      case MESSAGE_OUT:
+      case CMD_MESSAGE_OUT:
         // TODO: This is an intermediate step until CanTransport has been converted to a Service.
 
         indicateActivity();
@@ -229,9 +229,9 @@ void Controller::process(byte num_messages)
         // else Fall through: A message sent out should also be picked up by the consumer service.
 
         // TODO Note: When this is replaced with process(cmd) the EventConsumerService shall accept
-        // MESSAGE_IN, but also MESSAGE_OUT but only for events. 
+        // CMD_MESSAGE_IN, but also CMD_MESSAGE_OUT but only for events. 
 
-      case MESSAGE_IN:
+      case CMD_MESSAGE_IN:
       {
         // TODO: This is an intermediate step until services have been migrated to the new interface.
 
@@ -269,7 +269,7 @@ void setNN(VlcbMessage *msg, unsigned int nn)
 
 bool Controller::sendMessage(VlcbMessage *msg)
 {
-  Command cmd = { MESSAGE_OUT, *msg};
+  Command cmd = {CMD_MESSAGE_OUT, *msg};
   commandQueue.put(&cmd);
   return true;
 }
