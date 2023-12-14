@@ -50,11 +50,12 @@ VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUser
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
 VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+                            { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
