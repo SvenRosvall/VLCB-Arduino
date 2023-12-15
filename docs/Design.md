@@ -24,16 +24,20 @@ and services.
 ![Class Diagram](VLCB-Arduino-Classes.png)
 
 ### Details
-* There is no queuing in this diagram. Message queuing is expected to happen in the transport layer.
+* There is no message queuing in this diagram. Message queuing is expected to happen in the transport layer.
   Some transport hardware has message queues builtin, for others the transport implementation
   will include queues.
 
 ## Workflow
+The Controller maintains a ```Command``` bus, which is implemented as a circular buffer.
+Each service can put commands on this bus and act on commands placed there by other services.
+
 The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function.
-Each iteration checks the transport object if there are any incoming messages.
-Such incoming messages are offered to each of the service objects in turn.
-The service object responds with a code to say if the message has been taken care of and no other
-services need to look at this.
+During each iteration the controller calls out to each service to do any processing it needs to do. 
+The top element on the command bus (if any) is included in this call.
+
+The ```CanService``` checks for incoming messages on the CAN bus and if the command object passed
+from the controller is an outgoing message it sends it to the CAN bus.
 
 The ```EventConsumerService``` may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
@@ -128,13 +132,12 @@ module parameters.
 
 EventConsumerService
 : Handles incoming events that shall result in actions on the module.
+If the COE parameter is set it will also handle outgoing events.
 
 ConsumeOwnEventsService
-: Passes events produced by the producer service back to the consumer service.
-It is not posible to receive an event whilst transmitting it for self consumption. This service
-provides a buffer that holds a copy of produced events and allows them to be subsequently read
-by the consumer service for action as with any other received event.  It uses no op codes and
-is only a bridge between the producer and consumer services.
+: Enables passing events produced by the producer service back to the consumer service.
+It doesn't do anything else than setting the COE parameter flag which also tells
+the EventConsumerService to also look for outgoing events on the command bus.
 
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.

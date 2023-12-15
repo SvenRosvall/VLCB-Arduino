@@ -54,7 +54,7 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
+VLCB::Controller controller(&combinedUserInterface, &modconfig, 
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
 
 // module objects

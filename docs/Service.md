@@ -104,5 +104,3 @@ Both consumed and produced events can be taught.
 
 ### ConsumeOwnEventsService
 This service facilitates sent events to be received by the same module.
-Simply add a pointer to this service to the constructors of the EventConsumerService
-and the EventProducerService. 

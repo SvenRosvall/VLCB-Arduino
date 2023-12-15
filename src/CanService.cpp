@@ -15,6 +15,7 @@ void CanService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
   this->module_config = cntrl->getModuleConfig();
+  canTransport->setController(cntrl);
 }
 
 void CanService::startCANenumeration(bool fromENUM)
@@ -24,6 +25,8 @@ void CanService::startCANenumeration(bool fromENUM)
 
 void CanService::process(const Command *cmd)
 {
+  canTransport->process();
+
   if (cmd == nullptr)
   {
     return;
@@ -37,7 +40,7 @@ void CanService::process(const Command *cmd)
 
     case CMD_MESSAGE_IN:
       handleCanServiceMessage(&cmd->vlcbMessage);
-      break;
+    break;
   }
 }
 

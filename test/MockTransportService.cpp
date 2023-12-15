@@ -6,8 +6,15 @@
 #include "MockTransportService.h"
 #include "Controller.h"
 
+void MockTransportService::setController(VLCB::Controller *cntrl)
+{
+  canTransport->setController(cntrl);
+}
+
 void MockTransportService::process(const VLCB::Command *cmd)
 {
+  canTransport->process();
+
   if (cmd == nullptr)
   {
     return;

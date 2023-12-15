@@ -53,7 +53,7 @@ VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_
 
   configuration.reset(createConfiguration(mockStorage.get()));
 
-  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), trp, services);
+  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), services);
 
   configuration->setModuleMode(MODE_NORMAL);
   configuration->setNodeNum(0x0104);

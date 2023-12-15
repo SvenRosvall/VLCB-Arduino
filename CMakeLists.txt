@@ -107,6 +107,8 @@ add_executable(testAll
         test/MockTransport.h
         test/MockCanTransport.cpp
         test/MockCanTransport.h
+        test/MockTransportService.cpp
+        test/MockTransportService.h
         test/VlcbCommon.cpp
         test/testEventProducerService.cpp
         test/testEventConsumerService.cpp
@@ -116,6 +118,4 @@ add_executable(testAll
         test/testGridConnect.cpp
         test/testConfiguration.cpp
         test/testCircularBuffer.cpp
-        test/MockTransportService.cpp
-        test/MockTransportService.h
 )

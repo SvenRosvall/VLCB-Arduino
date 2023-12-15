@@ -28,16 +28,13 @@ namespace VLCB
 // be sent through the transport without requiring this buffering. 
 const int COMMAND_QUEUE_SIZE = 30;
 
-Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_list<Service *> services)
+Controller::Controller(UserInterface * ui, std::initializer_list<Service *> services)
   : _ui(ui)
-  , transport(trpt)
   , services(services)
   , commandQueue(COMMAND_QUEUE_SIZE)
 {
   extern Configuration config;
   module_config = &config;
-
-  transport->setController(this);
 
   for (Service * service : services)
   {
@@ -49,15 +46,12 @@ Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_li
 /// construct a Controller object with a Configuration object that the user provides.
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
-Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services)
+Controller::Controller(UserInterface * ui, Configuration *conf, std::initializer_list<Service *> services)
   : _ui(ui)
   , module_config(conf)
-  , transport(trpt)
   , services(services)
     , commandQueue(COMMAND_QUEUE_SIZE)
 {
-  transport->setController(this);
-
   for (Service * service : services)
   {
     service->setController(this);
@@ -207,8 +201,6 @@ void Controller::process(byte num_messages)
     service->process(requestedAction);
   }
   
-  transport->process(); // Let Transport check for incoming messages and put it on the command queue.
-
   Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
 
   for (Service *service: services)

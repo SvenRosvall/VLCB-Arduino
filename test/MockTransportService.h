@@ -9,6 +9,7 @@
 
 namespace VLCB
 {
+class Controller;
 class Transport;
 }
 
@@ -17,6 +18,7 @@ class MockTransportService : public VLCB::Service
 {
 public:
   MockTransportService(VLCB::Transport * trpt) : canTransport(trpt) {}
+  virtual void setController(VLCB::Controller *cntrl) override;
 
   virtual byte getServiceID() override { return 0; }
   virtual byte getServiceVersionID() override { return 1; }

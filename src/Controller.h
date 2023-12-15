@@ -55,8 +55,8 @@ struct Command
 class Controller
 {
 public:
-  Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
-  Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
+  Controller(UserInterface *ui, std::initializer_list<Service *> services);
+  Controller(UserInterface * ui, Configuration *conf, std::initializer_list<Service *> services);
 
   Configuration * getModuleConfig() { return module_config; }
 
@@ -96,7 +96,6 @@ private:                                          // protected members become pr
   UserInterface *_ui;
   Configuration *module_config;
   ArrayHolder<Service *> services;
-  Transport * transport;
 
   unsigned char *_mparams;
   const unsigned char *_mname;

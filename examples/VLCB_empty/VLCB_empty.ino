@@ -47,7 +47,7 @@ VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
+VLCB::Controller controller(&userInterface, &modconfig, 
                             { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.

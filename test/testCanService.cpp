@@ -195,10 +195,6 @@ void testCanidEnumerationOnConflict()
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
-  assertEquals(0, mockCanTransport->sent_messages.size());
-
-  // Collision above only sets a flag. Enumeration happens next.
-  process(controller);
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_messages.size());
