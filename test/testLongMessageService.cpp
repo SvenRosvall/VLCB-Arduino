@@ -30,7 +30,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::LongMessageService> longMessageService;
   longMessageService.reset(new VLCB::LongMessageService);
 
-  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), longMessageService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), longMessageService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;

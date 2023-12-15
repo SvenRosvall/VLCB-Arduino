@@ -30,7 +30,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventTeachingService> eventTeachingService;
   eventTeachingService.reset(new VLCB::EventTeachingService);
 
-  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), eventTeachingService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventTeachingService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;

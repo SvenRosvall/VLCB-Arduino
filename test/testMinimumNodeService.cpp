@@ -52,8 +52,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventProducerService> epService;
   epService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController(mockTransport.get(),
-                                                   {minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get()});
   controller.begin();
   minimumNodeService->setHeartBeat(false);
 

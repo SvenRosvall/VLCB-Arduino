@@ -33,7 +33,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::CanService> canService;
   canService.reset(new VLCB::CanService(mockCanTransport.get()));
 
-  VLCB::Controller controller = ::createController(mockCanTransport.get(), {minimumNodeService.get(), canService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), canService.get()});
   controller.begin();
 
   return controller;

@@ -30,7 +30,7 @@ VLCB::Controller createController()
 
   eventProducerService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;

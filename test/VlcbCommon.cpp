@@ -36,13 +36,6 @@ VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage)
 
 VLCB::Controller createController(const std::initializer_list<VLCB::Service *> services)
 {
-  mockTransport.reset(new MockTransport);
-
-  return createController(mockTransport.get(), services);
-}
-
-VLCB::Controller createController(VLCB::Transport * trp, const std::initializer_list<VLCB::Service *> services)
-{
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
 

@@ -30,7 +30,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::NodeVariableService> nodeVariableService;
   nodeVariableService.reset(new VLCB::NodeVariableService);
 
-  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), nodeVariableService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), nodeVariableService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;
