@@ -19,7 +19,7 @@ class Transport
 public:
   virtual void setController(Controller * ctrl) { }
   virtual void process() = 0;
-  virtual bool sendMessage(VlcbMessage *msg) = 0;
+  virtual bool sendMessage(const VlcbMessage *msg) = 0;
   virtual void reset() = 0;
 
   virtual unsigned int receiveCounter() = 0;

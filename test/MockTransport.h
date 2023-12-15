@@ -17,7 +17,7 @@ class MockTransport : public VLCB::Transport
 public:
   virtual void setController(VLCB::Controller *ctrl) override;
   virtual void process() override;
-  virtual bool sendMessage(VLCB::VlcbMessage *msg) override;
+  virtual bool sendMessage(const VLCB::VlcbMessage *msg) override;
   virtual void reset() override;
   void setNextMessage(VLCB::VlcbMessage msg);
   void clearMessages();

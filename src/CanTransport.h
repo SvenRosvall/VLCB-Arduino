@@ -26,7 +26,7 @@ public:
   virtual bool available() = 0;
   virtual CANMessage getNextCanMessage() = 0;
 
-  virtual bool sendMessage(VlcbMessage *msg) override;
+  virtual bool sendMessage(const VlcbMessage *msg) override;
   bool sendRtrMessage();
   virtual bool sendCanMessage(CANMessage *msg) = 0;
 

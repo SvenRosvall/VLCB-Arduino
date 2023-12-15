@@ -113,7 +113,7 @@ inline uint32_t makeHeader_impl(byte id, byte priority)
   return (priority << 7) + (id & 0x7f);
 }
 
-bool CanTransport::sendMessage(VlcbMessage *msg)
+bool CanTransport::sendMessage(const VlcbMessage *msg)
 {
   // caller must populate the message data
   // this method will create the correct frame header (CAN ID and priority bits)

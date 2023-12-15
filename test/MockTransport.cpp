@@ -23,7 +23,7 @@ void MockTransport::process()
   }
 }
 
-bool MockTransport::sendMessage(VLCB::VlcbMessage *msg)
+bool MockTransport::sendMessage(const VLCB::VlcbMessage *msg)
 {
   sent_messages.push_back(*msg);
   return true;
