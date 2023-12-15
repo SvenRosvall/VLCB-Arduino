@@ -20,7 +20,7 @@ void EventConsumerService::setController(Controller *cntrl)
 //
 /// register the user handler for learned events
 //
-void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage *msg)) 
+void EventConsumerService::setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg)) 
 {
   eventhandler = fptr;
 }
@@ -28,7 +28,7 @@ void EventConsumerService::setEventHandler(void (*fptr)(byte index, VlcbMessage 
 //
 /// for accessory event messages, lookup the event in the event table and call the user's registered event handler function
 //
-void EventConsumerService::processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en) 
+void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en) 
 {
   // try to find a matching stored event -- match on nn, en
   byte index = module_config->findExistingEvent(nn, en);

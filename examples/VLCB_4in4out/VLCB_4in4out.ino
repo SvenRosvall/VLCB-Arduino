@@ -117,7 +117,7 @@ byte switchState[NUM_SWITCHES];
 
 // forward function declarations
 byte checkInputProduced();
-void eventhandler(byte, VLCB::VlcbMessage *);
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
 
@@ -311,7 +311,7 @@ void processSwitches(void)
 //
 /// called from the VLCB library when a learned event is received
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 

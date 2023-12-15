@@ -16,7 +16,7 @@ class Configuration;
 class EventConsumerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
-  void setEventHandler(void (*fptr)(byte index, VlcbMessage *msg));
+  void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override 
@@ -31,9 +31,9 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  void (*eventhandler)(byte index, VlcbMessage *msg) = nullptr;
+  void (*eventhandler)(byte index, const VlcbMessage *msg) = nullptr;
 
-  void processAccessoryEvent(VlcbMessage *msg, unsigned int nn, unsigned int en);
+  void processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB
