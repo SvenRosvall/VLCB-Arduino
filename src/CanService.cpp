@@ -63,7 +63,7 @@ void CanService::handleCanServiceMessage(const VlcbMessage *msg)
 
     case OPC_ENUM:
       // received ENUM -- start CAN bus self-enumeration
-      handleEnumeration(msg, nn);
+      handleEnumeration(nn);
       break;
   }
 }
@@ -90,7 +90,7 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
   }
 }
 
-void CanService::handleEnumeration(const VlcbMessage *msg, unsigned int nn)
+void CanService::handleEnumeration(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
   // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;

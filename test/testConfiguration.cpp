@@ -6,7 +6,6 @@
 // Limited testing of Configuration class.
 // Only created this for refactoring of Configuration::findExistingEvent()
 
-#include <iostream>
 #include "Configuration.h"
 #include "TestTools.hpp"
 #include "VlcbCommon.h"

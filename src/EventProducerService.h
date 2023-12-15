@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "ConsumeOwnEventsService.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB {

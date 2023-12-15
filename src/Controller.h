@@ -84,7 +84,7 @@ public:
 
   void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
-  void process(byte num_messages = 3);
+  void process();
   void indicateMode(byte mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);

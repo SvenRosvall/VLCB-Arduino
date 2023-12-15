@@ -37,7 +37,7 @@ private:
   CanTransport * canTransport;
 
   void handleCanServiceMessage(const VlcbMessage *msg);
-  void handleEnumeration(const VlcbMessage *msg, unsigned int nn);
+  void handleEnumeration(unsigned int nn);
   void handleSetCANID(const VlcbMessage *msg, unsigned int nn);
 };
 

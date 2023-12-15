@@ -439,7 +439,7 @@ void Configuration::reboot()
 #endif
 
 #endif  // which AVR
-#endif  // AVR
+#endif  // __AVR__
 
 // for ESP32
 #if defined ESP32 || defined ESP8266

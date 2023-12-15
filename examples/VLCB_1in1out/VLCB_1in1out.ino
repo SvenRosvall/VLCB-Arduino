@@ -27,6 +27,7 @@
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
+#include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
 #include "CombinedUserInterface.h"

@@ -147,42 +147,10 @@ void Controller::indicateActivity()
   }
 }
 
-static bool isEventMessage(VlcbMessage & message)
-{
-  if (message.len == 0)
-  {
-    return false;
-  }
-  switch (message.data[0])
-  {
-    case OPC_ACON:
-    case OPC_ACON1:
-    case OPC_ACON2:
-    case OPC_ACON3:
-    case OPC_ACOF:
-    case OPC_ACOF1:
-    case OPC_ACOF2:
-    case OPC_ACOF3:
-    case OPC_ASON:
-    case OPC_ASON1:
-    case OPC_ASON2:
-    case OPC_ASON3:
-    case OPC_ASOF:
-    case OPC_ASOF1:
-    case OPC_ASOF2:
-    case OPC_ASOF3:
-    case OPC_ARON:
-    case OPC_AROF:
-      return true;
-    default:
-      return false;
-  }
-}
-
 //
 /// main Controller message processing procedure
 //
-void Controller::process(byte num_messages)
+void Controller::process()
 {
   // process switch operations if the module is configured with one
   UserInterface::RequestedAction requestedAction = UserInterface::NONE;
