@@ -13,11 +13,12 @@ namespace VLCB {
 
 class Configuration;
 
-class EventConsumerService : public Service {
+class EventConsumerService : public Service 
+{
 public:
   virtual void setController(Controller *cntrl) override;
   void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+  virtual void process(const Command * cmd) override;
 
   virtual byte getServiceID() override 
   {
@@ -34,6 +35,7 @@ private:
   void (*eventhandler)(byte index, const VlcbMessage *msg) = nullptr;
 
   void processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
+  void handleConsumedMessage(const VlcbMessage *msg);
 };
 
 }  // VLCB

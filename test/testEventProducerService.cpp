@@ -12,6 +12,7 @@
 #include "EventProducerService.h"
 #include "Parameters.h"
 #include "VlcbCommon.h"
+#include "MockTransportService.h"
 
 namespace
 {
@@ -22,9 +23,15 @@ VLCB::Controller createController()
 {
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
+  mockTransport.reset(new MockTransport);
+
+  static std::unique_ptr<MockTransportService> mockTransportService;
+  mockTransportService.reset(new MockTransportService(mockTransport.get()));
+
   eventProducerService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get()});
+  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
+  controller.begin();
 
   return controller;
 }
@@ -42,10 +49,10 @@ void testServiceDiscovery()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(3, mockTransport->sent_messages.size());
+  assertEquals(4, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(3, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index

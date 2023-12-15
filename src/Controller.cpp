@@ -201,6 +201,7 @@ void Controller::process(byte num_messages)
     //   DEBUG_SERIAL << "Controller::process() UI action=" << requestedAction << " mode=" << module_config->currentMode << endl;
   }
 
+  // TODO: Replace this with commands from the UI. 
   for (Service * service : services)
   {
     service->process(requestedAction);
@@ -208,35 +209,22 @@ void Controller::process(byte num_messages)
   
   transport->process(); // Let Transport check for incoming messages and put it on the command queue.
 
-  if (commandQueue.available())
+  Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+
+  for (Service *service: services)
   {
-    Command cmd = *commandQueue.get();
-    
-    // TODO: Pass this to each Service::process(cmd);
-    // But for now just call handleMessage()
-    switch (cmd.commandType)
+    service->process(cmd);
+  }
+
+  if (cmd != nullptr)
+  {
+    // TODO: This is for services that don't yet implement process(Command)
+    switch (cmd->commandType)
     {
-      case CMD_MESSAGE_OUT:
-        // TODO: This is an intermediate step until CanTransport has been converted to a Service.
-
-        indicateActivity();
-        transport->sendMessage(&cmd.vlcbMessage);
-
-        if (!(isEventMessage(cmd.vlcbMessage) && (_mparams[PAR_FLAGS] & PF_COE)))
-        {
-          break;
-        }
-        // else Fall through: A message sent out should also be picked up by the consumer service.
-
-        // TODO Note: When this is replaced with process(cmd) the EventConsumerService shall accept
-        // CMD_MESSAGE_IN, but also CMD_MESSAGE_OUT but only for events. 
-
       case CMD_MESSAGE_IN:
       {
-        // TODO: This is an intermediate step until services have been migrated to the new interface.
-
         indicateActivity();
-        VlcbMessage &msg = cmd.vlcbMessage;
+        VlcbMessage &msg = cmd->vlcbMessage;
         unsigned int opc = msg.data[0];
         // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
         for (Service *service: services)
@@ -248,17 +236,12 @@ void Controller::process(byte num_messages)
         }
         // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
       }
-      break;
+        break;
 
       default:
         break;
     }
   }
-
-
-  //
-  /// end of Controller message processing
-  //
 }
 
 void setNN(VlcbMessage *msg, unsigned int nn)

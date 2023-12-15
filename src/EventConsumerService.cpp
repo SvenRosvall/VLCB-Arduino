@@ -44,9 +44,32 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
   }
 }
 
-Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg)
+void EventConsumerService::process(const Command *cmd)
+{
+  if (cmd == nullptr)
+  {
+    return;
+  }
+
+  switch (cmd->commandType)
+  {
+    case CMD_MESSAGE_OUT:
+      if (!(controller->getParam(PAR_FLAGS) & PF_COE))
+      {
+        break;
+      }
+      // else Fall through: A message sent out should also be picked up by the consumer service.
+
+    case CMD_MESSAGE_IN:
+      handleConsumedMessage(&cmd->vlcbMessage);
+      break;
+  }
+}
+
+void EventConsumerService::handleConsumedMessage(const VlcbMessage *msg)
 {
   //DEBUG_SERIAL << ">Handle Message " << endl;
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
   // DEBUG_SERIAL << ">ECService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
@@ -71,8 +94,7 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
       {
         processAccessoryEvent(msg, nn, en);
       }
-
-      return PROCESSED;
+      break;
 
     case OPC_ASON:
     case OPC_ASON1:
@@ -89,13 +111,12 @@ Processed EventConsumerService::handleMessage(unsigned int opc, VlcbMessage *msg
       {
         processAccessoryEvent(msg, 0, en);
       }
-
-      return PROCESSED;
+      break;
 
     default:
       // unknown or unhandled OPC
       // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
-      return NOT_PROCESSED;
+      break;
   }
 }
 }

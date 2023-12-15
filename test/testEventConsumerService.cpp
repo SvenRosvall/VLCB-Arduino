@@ -12,6 +12,7 @@
 #include "EventConsumerService.h"
 #include "Parameters.h"
 #include "VlcbCommon.h"
+#include "MockTransportService.h"
 
 namespace
 {
@@ -22,9 +23,14 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
+  mockTransport.reset(new MockTransport);
+
+  static std::unique_ptr<MockTransportService> mockTransportService;
+  mockTransportService.reset(new MockTransportService(mockTransport.get()));
+
   eventConsumerService.reset(new VLCB::EventConsumerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventConsumerService.get()});
+  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), eventConsumerService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;
@@ -42,10 +48,10 @@ void testServiceDiscovery()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(3, mockTransport->sent_messages.size());
+  assertEquals(4, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(3, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
@@ -80,7 +86,7 @@ void testServiceDiscoveryEventProdSvc()
 byte capturedIndex;
 VLCB::VlcbMessage capturedMessage;
 
-void eventHandler(byte index, VLCB::VlcbMessage *msg)
+void eventHandler(byte index, const VLCB::VlcbMessage *msg)
 {
   capturedIndex = index;
   capturedMessage = *msg;

@@ -22,32 +22,50 @@ void CanService::startCANenumeration(bool fromENUM)
   canTransport->startCANenumeration(fromENUM);
 }
 
+void CanService::process(const Command *cmd)
+{
+  if (cmd == nullptr)
+  {
+    return;
+  }
+
+  switch (cmd->commandType)
+  {
+    case CMD_MESSAGE_OUT:
+      canTransport->sendMessage(&cmd->vlcbMessage);
+      break;
+
+    case CMD_MESSAGE_IN:
+      handleCanServiceMessage(&cmd->vlcbMessage);
+      break;
+  }
+}
+
 void CanService::process(UserInterface::RequestedAction requestedAction)
 {
   canTransport->process(requestedAction);
 }
 
-Processed CanService::handleMessage(unsigned int opc, VlcbMessage *msg)
+void CanService::handleCanServiceMessage(const VlcbMessage *msg)
 {
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
   switch (opc)
   {
-
     case OPC_CANID:
       // CAN -- set CANID
-      return handleSetCANID(msg, nn);
+      handleSetCANID(msg, nn);
+      break;
 
     case OPC_ENUM:
       // received ENUM -- start CAN bus self-enumeration
-      return handleEnumeration(msg, nn);
-
-    default:
-      return NOT_PROCESSED;
+      handleEnumeration(msg, nn);
+      break;
   }
 }
 
-Processed CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
+void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
@@ -67,11 +85,9 @@ Processed CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
       controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
     }
   }
-
-  return PROCESSED;
 }
 
-Processed CanService::handleEnumeration(const VlcbMessage *msg, unsigned int nn)
+void CanService::handleEnumeration(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
   // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
@@ -81,7 +97,6 @@ Processed CanService::handleEnumeration(const VlcbMessage *msg, unsigned int nn)
     // DEBUG_SERIAL << F("> initiating enumeration") << endl;
     startCANenumeration(true);
   }
-  return PROCESSED;
 }
 
 }

@@ -12,6 +12,7 @@ namespace VLCB
 {
 
 class Controller;
+struct Command;
 struct VlcbMessage;
 
 enum Processed
@@ -28,8 +29,11 @@ public:
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
+  virtual void process(const Command * cmd) {}
+  
+  // Keep these for services that have not yet implemented the process(Command).
   virtual void process(UserInterface::RequestedAction requestedAction) {}
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) = 0;
+  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) { return NOT_PROCESSED; };
 };
 
 }

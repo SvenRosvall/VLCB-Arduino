@@ -14,6 +14,7 @@
 #include "VlcbCommon.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
+#include "MockTransportService.h"
 
 namespace
 {
@@ -25,15 +26,20 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
+  mockTransport.reset(new MockTransport);
+
+  static std::unique_ptr<MockTransportService> mockTransportService;
+  mockTransportService.reset(new MockTransportService(mockTransport.get()));
+
   static std::unique_ptr<VLCB::ConsumeOwnEventsService> consumeOwnEventsService;
   consumeOwnEventsService.reset(new VLCB::ConsumeOwnEventsService);
 
-  eventConsumerService.reset(new VLCB::EventConsumerService());
+  eventConsumerService.reset(new VLCB::EventConsumerService);
 
-  eventProducerService.reset(new VLCB::EventProducerService());
+  eventProducerService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), consumeOwnEventsService.get(),
-                                                    eventProducerService.get(), eventConsumerService.get()});
+  VLCB::Controller controller = ::createController(mockTransport.get(), {minimumNodeService.get(), consumeOwnEventsService.get(),
+                                                    eventProducerService.get(), eventConsumerService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;
@@ -51,10 +57,10 @@ void testServiceDiscovery()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(5, mockTransport->sent_messages.size());
+  assertEquals(6, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(4, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(5, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
@@ -109,7 +115,7 @@ void testCoeFlag()
 byte capturedIndex = -1;
 VLCB::VlcbMessage capturedMessage;
 
-void eventHandler(byte index, VLCB::VlcbMessage *msg)
+void eventHandler(byte index, const VLCB::VlcbMessage *msg)
 {
   capturedIndex = index;
   capturedMessage = *msg;
