@@ -38,36 +38,64 @@ void EventProducerService::setProducedEvents()
     data[1] = lowByte(module_config->nodeNum);
     data[2] = 0;
     data[3] = i;
- 
-    byte index = i - 1;
+    
+    byte index = module_config->findExistingEventByEv(1, i);
+    if (index >= module_config->EE_MAX_EVENTS)  //event does not exist so creat default
+    {
+      index = module_config->findEventSpace();
+    }
+        
     module_config->writeEvent(index, data);
+    module_config->writeEventEV(index, 1, i);
     module_config->updateEvHashEntry(index);    
   }    
 }
 
+void EventProducerService::recreateDefaultEvent(byte evValue)
+{
+  byte data[4];
+  data[0] = highByte(module_config->nodeNum);
+  data[1] = lowByte(module_config->nodeNum);
+  data[2] = 0;
+  data[3] = evValue;
+  
+  byte index = module_config->findEventSpace();
+  
+  module_config->writeEvent(index, data);
+  module_config->writeEventEV(index, 1, evValue);
+  module_config->updateEvHashEntry(index);
+}
+
+
 void EventProducerService::process(UserInterface::RequestedAction requestedAction)
 {
   // Do this if mode changes from uninitialised to normal
-  if (((uninit) && (module_config->currentMode == MODE_NORMAL)) || module_config->isResetFlagSet())
+  if (((uninit) && (module_config->currentMode == MODE_NORMAL)))
   {
     setProducedEvents();
     uninit = false;
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index)
+void EventProducerService::sendEvent(bool state, byte evValue)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
-    //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn) << endl;
+    //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
       opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
+    }
+    else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
+    {
+      recreateDefaultEvent(evValue);
+      return;
     }
     else
     {
@@ -90,22 +118,29 @@ void EventProducerService::sendEvent(bool state, byte index)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
+    //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON1 : OPC_ASOF1);
+      opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
+    else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
+    {
+      recreateDefaultEvent(evValue);
+      return;
+    }
     else
     {
-      opCode = (state ? OPC_ACON1 : OPC_ACOF1);
+      opCode = (state ? OPC_ACON : OPC_ACOF);
     }
     
     VlcbMessage msg;
@@ -125,22 +160,29 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1)
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
+    //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON2 : OPC_ASOF2);
+      opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
+    else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
+    {
+      recreateDefaultEvent(evValue);
+      return;
+    }
     else
     {
-      opCode = (state ? OPC_ACON2 : OPC_ACOF2);
+      opCode = (state ? OPC_ACON : OPC_ACOF);
     }
     
     VlcbMessage msg;
@@ -161,22 +203,29 @@ void EventProducerService::sendEvent(bool state, byte index, byte data1, byte da
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte index, byte data1, byte data2, byte data3)
+void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
+  byte index = module_config->findExistingEventByEv(1, evValue);
   if (index < module_config->EE_MAX_EVENTS)
   {
     byte opCode;
     byte nn_en[4];
     module_config->readEvent(index, nn_en);
+    //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON3 : OPC_ASOF3);
+      opCode = (state ? OPC_ASON : OPC_ASOF);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
+    else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
+    {
+      recreateDefaultEvent(evValue);
+      return;
+    }
     else
     {
-      opCode = (state ? OPC_ACON3 : OPC_ACOF3);
+      opCode = (state ? OPC_ACON : OPC_ACOF);
     }
     
     VlcbMessage msg;
