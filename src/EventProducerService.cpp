@@ -129,7 +129,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON : OPC_ASOF);
+      opCode = (state ? OPC_ASON1 : OPC_ASOF1);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
@@ -140,7 +140,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     }
     else
     {
-      opCode = (state ? OPC_ACON : OPC_ACOF);
+      opCode = (state ? OPC_ACON1 : OPC_ACOF1);
     }
     
     VlcbMessage msg;
@@ -171,7 +171,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON : OPC_ASOF);
+      opCode = (state ? OPC_ASON2 : OPC_ASOF2);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
@@ -182,7 +182,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     else
     {
-      opCode = (state ? OPC_ACON : OPC_ACOF);
+      opCode = (state ? OPC_ACON2 : OPC_ACOF2);
     }
     
     VlcbMessage msg;
@@ -214,7 +214,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
     if ((nn_en[0] == 0) && (nn_en[1] == 0))
     {
-      opCode = (state ? OPC_ASON : OPC_ASOF);
+      opCode = (state ? OPC_ASON3 : OPC_ASOF3);
       nn_en[0] = highByte(module_config->nodeNum);
       nn_en[1] = lowByte(module_config->nodeNum); 
     }
@@ -225,7 +225,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     else
     {
-      opCode = (state ? OPC_ACON : OPC_ACOF);
+      opCode = (state ? OPC_ACON3 : OPC_ACOF3);
     }
     
     VlcbMessage msg;
