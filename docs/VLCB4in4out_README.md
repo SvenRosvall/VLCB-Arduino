@@ -1,6 +1,6 @@
 # VLCB4IN4OUT
 
-An Arduino program to allocate 4 switches as input pins and 4 outputs to LEDs.
+An Arduino program to allocate 4 switches as inputs and 4 outputs to LEDs.
 
 Key Features:
 - MERG VLCB interface.
@@ -72,6 +72,7 @@ In this case it will be necessary to change the code at or about line 173 approp
 ```
 can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
 ```
+
 ### VLCB Op Codes
 
 The following Op codes are supported:
@@ -83,21 +84,21 @@ OP_CODE | HEX | Function
  OPC_ASON | 0x98 | Short event on
  OPC_ASOF | 0x99 | Short event off
 
-## Set Up
-
-The module is initialised by pressing the VLCB button (formerly CBUS button) for
-6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
-Node Number can then be set via the FCU in the normal manner.
-
 ## Events
+
+### Event Variables
+
+Event Variable 1 (EV1) identifies a consumed only event if its value is zero.
+A non-zero value will identify the source (in this case switch) for a produced
+event.
 
 ### Consumed Events
 
 Event Variables control the action to take when a consumed event is received.
-The number of Event Variables (EV) is equal to the number of LEDs.
+The number of Event Variables (EV) is equal to the number of LEDs plus one.
 
-Event Variable 1 (EV1) controls the first LED pin in the ```LED``` array. 
-EV2 controls the second LED pin, etc.
+Event Variable 2 (EV2) controls the first LED pin in the ```LED``` array. 
+EV3 controls the second LED pin, etc.
 
 The LEDs are controlled by the LEDControl class.  This allows for any LED to be
 switched on, switched off or flashed at a rate determined in the call:
@@ -114,27 +115,36 @@ The following EV values are defined to control the LEDs in this example:
 
 ### Produced Events
 
-The Events Table in an Uninitiailised module is empty. When the module changes to
+The Events Table in an Uninitialised module is empty. When the module changes to
 Normal Mode from Uninitialised, the Events Table is populated with a default
 producer event for each of the four switches (or, in general, each producer item).
+These default events can be removed by using OPC_EVULN whilst the module is in
+learn mode.
 
 A module can also be taught a short event or, indeed, a spoof event. This is
 easily done using any of the normal FCU teach techniques.  For example, a short
 event can be dragged from the Software Node and dropped onto the VLCB4in4out in
-the Node Window.  When the event variable dialogue opens, put the EV Value into the
-relevant EV box for any LEDs that you wish to use for Consume Own Events (see below)
-and press OK.  Now, within 5 seconds, press the switch that you wish to become the
-short or spoof event 
+the Node Window.  When the event variable dialgue opens, put the index number of
+the switch to be associated with the event in EV1 and press OK.  The selected
+switch will now generate that short event (but see FCU Anomolies below).
+
+If a switch default has been unlearnt and that switch not been assigned to an
+event by the FCU, operation of the switch will result in a new default event
+being generated as long as its NV Value is set for a function other than
+"Do Nothing" (See Node Variables below).
 
 ### Consume Own Events
 
 If the Produced Events Service and the Consume Events Service are both applied,
 the Consume Own Events Service can also be enabled.  This service provides a 
 buffer that will pass the produced event back to the Consumed Event Service.
-A consumed Own Event still only has one entry in the Event Table.  If the Event
-Variables are left as 0 or NULL, then the Consume Events Service will do nothing.
-If the Event Variables are populated as shown in the table in the Consumed Events
-Section above, the LEDs will behave accordingly to a Produced Event.
+A Consume Own Event still only has one entry in the Event Table.  If the Event
+Variables 2 onwards are left as 0 or any undefined value, then the
+Consume Events Service will do nothing.  Note that an EV will have a default
+value of 0xFF if not written to. Event Variable 1 will contain the value of
+the producer trigger or switch. If the Event Variables are populated as shown
+in the table in the Consumed Events Section above, the LEDs will respond
+accordingly to a Produced Event.
 
 ## Node Variables
 
@@ -148,12 +158,27 @@ The following NV values define input switch function:
 
 NV Value | Function
 --------|--------
- 0 | On/Off switch
- 1 | On only push button
- 2 | Off only push button
- 3 | On/Off toggle push button
+ 0 | Do nothing
+ 1 | On/Off switch
+ 2 | On only push button
+ 3 | Off only push button
+ 4 | On/Off toggle push button
+ 
+## Set Up
 
+The module is initialised by pressing the VLCB button (formerly CBUS button) for
+6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
+Node Number can then be set via the FCU in the normal manner.
 
+## FCU Anomolies
+
+Whilst the FCU will show newly taught events, if these re-assign a switch, as when
+teaching a short event, it will not, for some reason, remove the now gone original
+event automatically. It is necessary to highlight the redundant event and use
+alt-D to remove it.
+
+It should be noted that the use of alt-D only removes an event from the FCU internal
+table.  It does not remove the event from the Arduino events table.
 
 
  

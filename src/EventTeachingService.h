@@ -18,7 +18,7 @@ class EventTeachingService : public Service
 public:
   virtual void setController(Controller *cntrl) override;
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-  void setcheckInputProduced(byte (*fptr)());
+
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
@@ -28,10 +28,8 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  byte (*checkInputProduced)();
 
   bool bLearn = false;
-  const unsigned long TIME_OUT = 5000; // Time to apply producer input when teaching.
 
   Processed handleLearnMode(const VlcbMessage *msg);
   Processed handleLearn(unsigned int nn);

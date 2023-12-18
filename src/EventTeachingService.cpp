@@ -17,12 +17,6 @@ void EventTeachingService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-// Register the user handler for produced event checking
-void EventTeachingService::setcheckInputProduced(byte (*fptr)())
-{
-  checkInputProduced = fptr;
-}
-
 void EventTeachingService::enableLearn() 
 {
   bLearn = true;
@@ -399,36 +393,37 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return PROCESSED;
   }
+  // Is this a produced event that we know about?
+  // Search the events table by evindex = 1 for a value match with evval.
+  if ((evindex == 1) && (evval > 0))
+  {
+    byte index = module_config->findExistingEventByEv(evindex, evval);
+    if (index < module_config->EE_MAX_EVENTS)
+    {
+      module_config->writeEvent(index, &msg->data[1]);
+      // no need to write eventEV as, by definition, it hasn't changed
+      // recreate event hash table entry
+      module_config->updateEvHashEntry(index);
+      
+      // respond with WRACK
+      controller->sendWRACK();  // Deprecated in favour of GRSP_OK
+      // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
 
-  // Is this an existing event? 
+      // Note that the op-code spec only lists WRACK as successful response.
+      controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+      return PROCESSED;
+    }
+  }     
+      
+  // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
   byte index = module_config->findExistingEvent(nn, en);
 
-  // not found in event table
+  // not found - it's a new event
   if (index >= module_config->EE_MAX_EVENTS)
   {
-    // Are we a producer and is this a produced event to update?
-    if ((controller->getParam(PAR_FLAGS) & PF_PRODUCER) && (evindex == 1) && (checkInputProduced != nullptr))
-    {
-      // Wait TIME_OUT seconds to see if producer button pressed.
-      //DEBUG_SERIAL << F("ets> Update candidate") << endl;
-      unsigned long timeStart = millis();
-      while (TIME_OUT > millis() - timeStart)
-      {
-        index = (byte)(*checkInputProduced)();
-        if (index < module_config->EE_PRODUCED_EVENTS)
-        {
-          // DEBUG_SERIAL << F("ets> Update index ") << index << endl;
-          break;
-        }
-      }
-    }
-          
-    if (index >= module_config->EE_PRODUCED_EVENTS)
-    {
-      //DEBUG_SERIAL << F("ets> Not for update. Create a new event if space available") << endl;
-      index = module_config->findEventSpace();
-    }
+    // DEBUG_SERIAL << F("ets> existing event not found - creating a new one if space available") << endl;
+    index = module_config->findEventSpace();
   }
 
   // if existing or new event space found, write the event data
