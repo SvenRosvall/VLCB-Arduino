@@ -756,7 +756,7 @@ void testUpdateProducedEvent()
   VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   assertEquals(0, mockTransport->sent_messages.size());
 
@@ -765,7 +765,7 @@ void testUpdateProducedEvent()
   msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
@@ -776,7 +776,7 @@ void testUpdateProducedEvent()
   msg = {7, {OPC_EVLRN, 0x01, 0x06, 0x01, 0x08, 1, 42}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   assertEquals(2, mockTransport->sent_messages.size());
   assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
@@ -787,7 +787,7 @@ void testUpdateProducedEvent()
   msg = {4, {OPC_NENRD, 0x01, 0x04, 0}};
   mockTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(OPC_ENRSP, mockTransport->sent_messages[0].data[0]);
