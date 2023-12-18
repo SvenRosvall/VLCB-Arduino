@@ -169,6 +169,11 @@ void loop()
   controller.process();
 
   //
+  /// process console commands
+  //
+  
+  processSerialInput();
+  //
   /// give the switch and LED code some time to run
   //
   moduleSwitch.run();
@@ -291,4 +296,141 @@ void printConfig()
 
   // copyright
   Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
+}
+
+//
+/// command interpreter for serial console input
+//
+void processSerialInput()
+{
+  byte uev = 0;
+  char msgstr[32], dstr[32];
+
+  if (Serial.available())
+  {
+    char c = Serial.read();
+
+    switch (c)
+    {
+    case 'n':
+      // node config
+      printConfig();
+
+      // node identity
+      Serial << F("> VLCB node configuration") << endl;
+      Serial << F("> mode = ") << (modconfig.currentMode == MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig.CANID << F(", node number = ") << modconfig.nodeNum << endl;
+      Serial << endl;
+      break;
+
+    case 'e':
+      // EEPROM learned event data table
+      Serial << F("> stored events ") << endl;
+      Serial << F("  max events = ") << modconfig.EE_MAX_EVENTS << F(" EVs per event = ") << modconfig.EE_NUM_EVS << F(" bytes per event = ") << modconfig.EE_BYTES_PER_EVENT << endl;
+
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
+      {
+        if (modconfig.getEvTableEntry(j) != 0)
+        {
+          ++uev;
+        }
+      }
+
+      Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig.EE_MAX_EVENTS - uev) << endl;
+      Serial << F("  using ") << (uev * modconfig.EE_BYTES_PER_EVENT) << F(" of ") << (modconfig.EE_MAX_EVENTS * modconfig.EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
+
+      Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
+
+      for (byte j = 0; j < (modconfig.EE_NUM_EVS); j++)
+      {
+        sprintf(dstr, "EV%03d | ", j + 1);
+        Serial << dstr;
+      }
+
+      Serial << F("Hash |") << endl;
+      Serial << F(" --------------------------------------------------------------") << endl;
+
+      // for each event data line
+      for (byte j = 0; j < modconfig.EE_MAX_EVENTS; j++)
+      {
+        if (modconfig.getEvTableEntry(j) != 0)
+        {
+          sprintf(dstr, "  %03d  | ", j);
+          Serial << dstr;
+
+          // for each data byte of this event
+          byte evarray[4];
+          modconfig.readEvent(j, evarray);
+          for (byte e = 0; e < 4; e++)
+          {
+            sprintf(dstr, " 0x%02hx | ", evarray[e]);
+            Serial << dstr;
+          }
+          for (byte ev = 1; ev <= modconfig.EE_NUM_EVS; ev++)
+          {
+            sprintf(dstr, " 0x%02hx | ", modconfig.getEventEVval(j, ev));
+            Serial << dstr;
+          }
+
+          sprintf(dstr, "%4d |", modconfig.getEvTableEntry(j));
+          Serial << dstr << endl;
+        }
+      }
+
+      Serial << endl;
+
+      break;
+
+    // NVs
+    case 'v':
+      // note NVs number from 1, not 0
+      Serial << "> Node variables" << endl;
+      Serial << F("   NV   Val") << endl;
+      Serial << F("  --------------------") << endl;
+
+      for (byte j = 1; j <= modconfig.EE_NUM_NVS; j++)
+      {
+        byte v = modconfig.readNV(j);
+        sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
+        Serial << msgstr << endl;
+      }
+
+      Serial << endl << endl;
+
+      break;
+
+    // CAN bus status
+    case 'c':
+      can2515.printStatus();
+      break;
+
+    case 'h':
+      // event hash table
+      modconfig.printEvHashTable(false);
+      break;
+
+    case 'y':
+      // reset CAN bus and VLCB message processing
+      can2515.reset();
+      break;
+
+    case '*':
+      // reboot
+      modconfig.reboot();
+      break;
+
+    case 'm':
+      // free memory
+      Serial << F("> free SRAM = ") << modconfig.freeSRAM() << F(" bytes") << endl;
+      break;
+
+    case '\r':
+    case '\n':
+      Serial << endl;
+      break;
+
+    default:
+      // Serial << F("> unknown command ") << c << endl;
+      break;
+    }
+  }
 }
