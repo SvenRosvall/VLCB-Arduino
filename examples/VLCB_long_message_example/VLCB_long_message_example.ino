@@ -189,10 +189,10 @@ void loop()
 //
 void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
-  // as an example, display the opcode and the first EV of this event
+  // as an example, display the opcode and the first EV of this event, which is ev2 as ev1 defines produced event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
-  Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
+  Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 2) << endl;
 }
 
 //

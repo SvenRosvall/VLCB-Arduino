@@ -158,6 +158,19 @@ byte Configuration::findEventSpace()
   return evidx;
 }
 
+byte Configuration::findExistingEventByEv(byte evindex, byte evval)
+{
+  byte i;
+  for (i = 0; i < EE_MAX_EVENTS; i++)
+  {
+    if (getEventEVval(i, evindex) == evval)
+    {
+      break;
+    }
+  }
+  return i;
+}
+
 //
 /// create a hash from a 4-byte event entry array -- NN + EN
 //

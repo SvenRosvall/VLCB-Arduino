@@ -27,10 +27,10 @@ public:
     return 1;
   }
   void begin() override;
-  void sendEvent(bool state, byte index);
-  void sendEvent(bool state, byte index, byte data1);
-  void sendEvent(bool state, byte index, byte data1, byte data2);
-  void sendEvent(bool state, byte index, byte data1, byte data2, byte data3);
+  void sendEvent(bool state, byte evValue);
+  void sendEvent(bool state, byte evValue, byte data1);
+  void sendEvent(bool state, byte evValue, byte data1, byte data2);
+  void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
 
 private:
   Controller *controller;
@@ -38,6 +38,7 @@ private:
   void (*eventhandler)(byte index, VlcbMessage *msg);
 
   void setProducedEvents();
+  void createDefaultEvent(byte evValue);
   bool uninit = false;
 };
 

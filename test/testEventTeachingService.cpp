@@ -746,6 +746,58 @@ void testIgnoreIfNotInLearnMode()
   mockTransport->clearMessages();
 }
 
+void testUpdateProducedEvent()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(0, mockTransport->sent_messages.size());
+
+  // Teach an event
+  // Data: OP, NN, EN, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Update this event
+  msg = {7, {OPC_EVLRN, 0x01, 0x06, 0x01, 0x08, 1, 42}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(2, mockTransport->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransport->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransport->sent_messages[1].data[0]);
+  mockTransport->clearMessages();
+
+  // Verify event is updated
+  msg = {4, {OPC_NENRD, 0x01, 0x04, 0}};
+  mockTransport->setNextMessage(msg);
+
+  controller.process();
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(OPC_ENRSP, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x06, mockTransport->sent_messages[0].data[4]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[5]);
+  assertEquals(0x08, mockTransport->sent_messages[0].data[6]);
+  mockTransport->clearMessages();
+}
+
 void testEnterLearnModeOldOtherNode()
 {
   test();
@@ -1112,7 +1164,7 @@ void testLearnErrors()
   // Event table full
   for (byte i = 1 ; i <= configuration->EE_MAX_EVENTS ; ++i)
   {
-    msg = {7, {OPC_EVLRN, 0x05, 0x06, 0, i, 1, 42}};
+    msg = {7, {OPC_EVLRN, 0x05, 0x06, 0, i, 1, i}};
     mockTransport->setNextMessage(msg);
 
     process(controller);
@@ -1213,6 +1265,7 @@ void testEventTeachingService()
   testTeachEvent();
   testTeachEventIndexedAndClear();
   testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
+  testUpdateProducedEvent();
 
   // test error conditions.
   testEnterLearnModeOldOtherNode();

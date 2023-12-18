@@ -66,9 +66,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-byte checkInputProduced();
 void eventhandler(byte, const VLCB::VlcbMessage *);
-void processSerialInput();
 void printConfig();
 void processModuleSwitchChange();
 
@@ -129,9 +127,6 @@ void setupVLCB()
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
-
-  // register check produced handler for assigning short and spoof codes
-  etService.setcheckInputProduced(checkInputProduced);
 
   // set Controller LEDs to indicate mode
   controller.indicateMode(modconfig.currentMode);
@@ -207,25 +202,6 @@ void loop()
 }
 
 //
-// Callback used when teaching produced events. 
-// Returns the index of the switch that was pressed which is the taught event shall relate to.
-//
-byte checkInputProduced()
-{
-  moduleSwitch.run();
-  if (moduleSwitch.stateChanged())
-  {
-    // Button was pressed so event is for it. Index 0.
-    return 0;
-  }
-  else
-  {
-    // No button pressed. Event is for consumed event.
-    return 0xFF;
-  }
-}
-
-//
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
 /// then send a long VLCB event with opcode ACON for on and ACOF for off
@@ -251,7 +227,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
 
-  byte evval = modconfig.getEventEVval(index, 1);
+  byte evval = modconfig.getEventEVval(index, 2);  //read ev2 because ev1 defines producer.
   // Event Off op-codes have odd numbers.
   bool ison = (msg->data[0] & 0x01) == 0;
 
