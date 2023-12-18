@@ -33,25 +33,11 @@ void EventProducerService::setProducedEvents()
 { 
   for (byte i = 1; i <= module_config->EE_PRODUCED_EVENTS; i++)
   {
-    byte data[4];
-    data[0] = highByte(module_config->nodeNum);
-    data[1] = lowByte(module_config->nodeNum);
-    data[2] = 0;
-    data[3] = i;
-    
-    byte index = module_config->findExistingEventByEv(1, i);
-    if (index >= module_config->EE_MAX_EVENTS)  //event does not exist so creat default
-    {
-      index = module_config->findEventSpace();
-    }
-        
-    module_config->writeEvent(index, data);
-    module_config->writeEventEV(index, 1, i);
-    module_config->updateEvHashEntry(index);    
+    createDefaultEvent(i);    
   }    
 }
 
-void EventProducerService::recreateDefaultEvent(byte evValue)
+void EventProducerService::createDefaultEvent(byte evValue)
 {
   byte data[4];
   data[0] = highByte(module_config->nodeNum);
@@ -94,7 +80,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
     }
     else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
     {
-      recreateDefaultEvent(evValue);
+      createDefaultEvent(evValue);
       return;
     }
     else
@@ -118,7 +104,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   }
   else
   {
-    recreateDefaultEvent(evValue);
+    createDefaultEvent(evValue);
   }
 }
 
@@ -139,7 +125,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     }
     else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
     {
-      recreateDefaultEvent(evValue);
+      createDefaultEvent(evValue);
       return;
     }
     else
@@ -164,7 +150,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   }
   else
   {
-    recreateDefaultEvent(evValue);
+    createDefaultEvent(evValue);
   }
 }
 
@@ -185,7 +171,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
     {
-      recreateDefaultEvent(evValue);
+      createDefaultEvent(evValue);
       return;
     }
     else
@@ -211,7 +197,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   }
   else
   {
-    recreateDefaultEvent(evValue);
+    createDefaultEvent(evValue);
   }
 }
 
@@ -232,7 +218,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     }
     else if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
     {
-      recreateDefaultEvent(evValue);
+      createDefaultEvent(evValue);
       return;
     }
     else
@@ -259,7 +245,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   }
   else
   {
-    recreateDefaultEvent(evValue);
+    createDefaultEvent(evValue);
   }
 }
 
