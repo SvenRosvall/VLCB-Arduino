@@ -249,7 +249,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
 
-  byte evval = modconfig.getEventEVval(index, 1);
+  byte evval = modconfig.getEventEVval(index, 2);  //read ev2 because ev1 defines producer.
   // Event Off op-codes have odd numbers.
   bool ison = (msg->data[0] & 0x01) == 0;
 

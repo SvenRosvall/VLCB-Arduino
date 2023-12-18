@@ -116,6 +116,10 @@ void EventProducerService::sendEvent(bool state, byte evValue)
       coeService->put(&msg);
     }
   }
+  else
+  {
+    recreateDefaultEvent(evValue);
+  }
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
@@ -157,6 +161,10 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
     {
       coeService->put(&msg);
     }
+  }
+  else
+  {
+    recreateDefaultEvent(evValue);
   }
 }
 
@@ -201,6 +209,10 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
       coeService->put(&msg);
     }
   }
+  else
+  {
+    recreateDefaultEvent(evValue);
+  }
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
@@ -244,6 +256,10 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
     {
       coeService->put(&msg);
     }
+  }
+  else
+  {
+    recreateDefaultEvent(evValue);
   }
 }
 

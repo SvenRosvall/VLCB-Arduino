@@ -404,11 +404,18 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
           // no need to write eventEV as, by definition, it hasn't changed
           // recreate event hash table entry
           module_config->updateEvHashEntry(index);
+          
+          // respond with WRACK
+          controller->sendWRACK();  // Deprecated in favour of GRSP_OK
+          // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
+  
+          // Note that the op-code spec only lists WRACK as successful response.
+          controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
           return PROCESSED;
         }
       }     
       
-      // search for this NN, EN as we may just be adding an EV to an existing learned event 
+  // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
   byte index = module_config->findExistingEvent(nn, en);
 
