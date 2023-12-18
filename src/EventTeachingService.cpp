@@ -393,38 +393,38 @@ Processed EventTeachingService::handleLearnEvent(VlcbMessage *msg, unsigned int 
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return PROCESSED;
   }
-// Is this a produced event that we know about?
-      // Search the events table by evindex = 1 for a value match with evval.
+  // Is this a produced event that we know about?
+  // Search the events table by evindex = 1 for a value match with evval.
   if ((evindex == 1) && (evval > 0))
-      {
-        byte index = module_config->findExistingEventByEv(evindex, evval);
-        if (index < module_config->EE_MAX_EVENTS)
-        {
-          module_config->writeEvent(index, &msg->data[1]);
-          // no need to write eventEV as, by definition, it hasn't changed
-          // recreate event hash table entry
-          module_config->updateEvHashEntry(index);
-          
-          // respond with WRACK
-          controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-          // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
-  
-          // Note that the op-code spec only lists WRACK as successful response.
-          controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
-          return PROCESSED;
-        }
-      }     
+  {
+    byte index = module_config->findExistingEventByEv(evindex, evval);
+    if (index < module_config->EE_MAX_EVENTS)
+    {
+      module_config->writeEvent(index, &msg->data[1]);
+      // no need to write eventEV as, by definition, it hasn't changed
+      // recreate event hash table entry
+      module_config->updateEvHashEntry(index);
+      
+      // respond with WRACK
+      controller->sendWRACK();  // Deprecated in favour of GRSP_OK
+      // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
+
+      // Note that the op-code spec only lists WRACK as successful response.
+      controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+      return PROCESSED;
+    }
+  }     
       
   // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
   byte index = module_config->findExistingEvent(nn, en);
 
-      // not found - it's a new event
-      if (index >= module_config->EE_MAX_EVENTS)
-      {
-        // DEBUG_SERIAL << F("ets> existing event not found - creating a new one if space available") << endl;
-        index = module_config->findEventSpace();
-      }
+  // not found - it's a new event
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    // DEBUG_SERIAL << F("ets> existing event not found - creating a new one if space available") << endl;
+    index = module_config->findEventSpace();
+  }
 
   // if existing or new event space found, write the event data
   if (index >= module_config->EE_MAX_EVENTS)
