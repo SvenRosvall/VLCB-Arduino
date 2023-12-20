@@ -41,7 +41,7 @@ private:
   void (*eventhandler)(byte index, VlcbMessage *msg);
 
   void setProducedEvents();
-  void createDefaultEvent(byte evValue);
+  byte createDefaultEvent(byte evValue);
   bool uninit = false;
 };
 
