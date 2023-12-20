@@ -223,12 +223,10 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
   bool ison = (msg->data[0] & 0x01) == 0;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
+  Serial << F("> EV2 = ") << evval << endl;
 
-  // read the value of the first event variable (EV) associated with this learned event
-  Serial << F("> EV1 = ") << evval << endl;
-
-  // set the LED according to the opcode of the received event, if the first EV equals 0
-  // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
+  // set the LED according to the opcode of the received event, if the second EV equals 1
+  // we turn on the LED and if the first EV equals 2 we use the blink() method of the LED object as an example.
   if (ison)
   {
     switch (evval)
