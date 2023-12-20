@@ -33,6 +33,10 @@ public:
   void sendEvent(bool state, byte evValue, byte data1);
   void sendEvent(bool state, byte evValue, byte data1, byte data2);
   void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
+  void generateMessage();
+  void generateMessage(byte data1);
+  void generateMessage(byte data1, byte data2);
+  void generateMessage(byte data1, byte data2, byte data3);
 
 private:
   Controller *controller;
@@ -40,6 +44,8 @@ private:
   ConsumeOwnEventsService *coeService;
   void (*eventhandler)(byte index, VlcbMessage *msg);
 
+  byte opCode;
+  byte nn_en[4];
   void setProducedEvents();
   void createDefaultEvent(byte evValue);
   bool uninit = false;
