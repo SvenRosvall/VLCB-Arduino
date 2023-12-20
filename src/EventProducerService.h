@@ -33,11 +33,7 @@ public:
   void sendEvent(bool state, byte evValue, byte data1);
   void sendEvent(bool state, byte evValue, byte data1, byte data2);
   void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
-  void generateMessage();
-  void generateMessage(byte data1);
-  void generateMessage(byte data1, byte data2);
-  void generateMessage(byte data1, byte data2, byte data3);
-
+  
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
@@ -49,6 +45,10 @@ private:
   void setProducedEvents();
   void createDefaultEvent(byte evValue);
   bool uninit = false;
+  void generateMessage();
+  void generateMessage(byte data1);
+  void generateMessage(byte data1, byte data2);
+  void generateMessage(byte data1, byte data2, byte data3);
 };
 
 }  // VLCB
