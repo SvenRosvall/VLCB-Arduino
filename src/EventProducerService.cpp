@@ -71,6 +71,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   if (index >= module_config->EE_MAX_EVENTS)
   {
     createDefaultEvent(evValue);
+    opCode = (state ? OPC_ACON : OPC_ACOF);
   }
   else
   {    
