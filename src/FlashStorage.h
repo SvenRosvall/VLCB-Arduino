@@ -45,7 +45,7 @@ public:
   virtual byte read(unsigned int eeaddress) override;
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;
   virtual void write(unsigned int eeaddress, byte data) override;
-  virtual void writeBytes(unsigned int eeaddress, byte src[], byte numbytes) override;
+  virtual void writeBytes(unsigned int eeaddress, const byte src[], byte numbytes) override;
   virtual void reset() override;
 
 };

@@ -27,6 +27,8 @@ extern "C" char* sbrk(int incr);
 namespace VLCB
 {
 
+static const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
+
 //
 /// ctor
 //
@@ -196,7 +198,7 @@ byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 /// return an existing EEPROM event as a 4-byte array -- NN + EN
 //
 
-void Configuration::readEvent(byte idx, byte tarr[])
+void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES])
 {
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
   for (byte i = 0; i < EE_HASH_BYTES; i++)
@@ -236,7 +238,6 @@ void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 void Configuration::makeEvHashTable()
 {
   byte evarray[EE_HASH_BYTES];
-  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
@@ -264,7 +265,6 @@ void Configuration::makeEvHashTable()
 void Configuration::updateEvHashEntry(byte idx)
 {
   byte evarray[EE_HASH_BYTES];
-  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
@@ -382,7 +382,7 @@ void Configuration::writeNV(byte idx, byte val)
 /// write (or clear) an event to EEPROM
 /// just the first four bytes -- NN and EN
 //
-void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
+void Configuration::writeEvent(byte index, const byte data[EE_HASH_BYTES])
 {
   unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
@@ -395,8 +395,6 @@ void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
 //
 void Configuration::cleareventEEPROM(byte index)
 {
-  byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
-
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
   writeEvent(index, unused_entry);
 }

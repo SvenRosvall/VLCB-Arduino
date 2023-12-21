@@ -58,8 +58,8 @@ public:
   byte readNV(byte idx);
   void writeNV(byte idx, byte val);
 
-  void readEvent(byte idx, byte tarr[]);
-  void writeEvent(byte index, byte data[]);
+  void readEvent(byte idx, byte tarr[EE_HASH_BYTES]);
+  void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
   void resetModule(UserInterface * ui);
   void resetModule();
@@ -97,7 +97,7 @@ private:
 
   // Stuff below are not confirmed to be needed to be publically available.
 private:
-  byte makeHash(byte tarr[]);
+  byte makeHash(byte tarr[EE_HASH_BYTES]);
   void getEvArray(byte idx);
   void makeEvHashTable();
 

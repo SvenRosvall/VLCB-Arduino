@@ -116,7 +116,7 @@ void EepromExternalStorage::write(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void EepromExternalStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
+void EepromExternalStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
   // *** TODO *** handle greater than 32 bytes -> the Arduino I2C write buffer size
   // max write = EEPROM pagesize - 64 bytes

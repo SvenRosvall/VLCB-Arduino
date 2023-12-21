@@ -87,7 +87,7 @@ void FlashStorage::write(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void FlashStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
+void FlashStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
