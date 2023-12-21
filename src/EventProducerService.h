@@ -42,6 +42,9 @@ private:
 
   void setProducedEvents();
   byte createDefaultEvent(byte evValue);
+  void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);
+  void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
+
   bool uninit = false;
 };
 

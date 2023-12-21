@@ -65,23 +65,43 @@ void EventProducerService::process(UserInterface::RequestedAction requestedActio
   }
 }
 
-void EventProducerService::sendEvent(bool state, byte evValue)
+void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byte nn_en[4])
 {
-  byte index = module_config->findExistingEventByEv(1, evValue);
+  byte index = module_config->findExistingEventByEv(evIndex, evValue);
   if (index >= module_config->EE_MAX_EVENTS)
   {
     index = createDefaultEvent(evValue);
   }
 
-  byte nn_en[4];
   module_config->readEvent(index, nn_en);
   //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
   if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
   {
-    // This table entry was not initalized correctly.
+    // This table entry was not initalised correctly.
     index = createDefaultEvent(evValue);
     module_config->readEvent(index, nn_en);
   }
+}
+
+void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en)
+{
+  msg.data[0] = opCode;
+  msg.data[1] = nn_en[0];
+  msg.data[2] = nn_en[1];
+  msg.data[3] = nn_en[2];
+  msg.data[4] = nn_en[3];
+  controller->sendMessage(&msg);
+
+  if (coeService)
+  {
+    coeService->put(&msg);
+  }
+}
+
+void EventProducerService::sendEvent(bool state, byte evValue)
+{
+  byte nn_en[4];
+  findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -97,36 +117,13 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   
   VlcbMessage msg;
   msg.len = 5;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
-  controller->sendMessage(&msg);
-    
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }
+  sendMessage(msg, opCode, nn_en);
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
-  byte index = module_config->findExistingEventByEv(1, evValue);
-  if (index >= module_config->EE_MAX_EVENTS)
-  {
-    index = createDefaultEvent(evValue);
-  }
-
   byte nn_en[4];
-  module_config->readEvent(index, nn_en);
-  //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
-  if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
-  {
-    // This table entry was not initalized correctly.
-    index = createDefaultEvent(evValue);
-    module_config->readEvent(index, nn_en);
-  }
+  findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -142,37 +139,15 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   
   VlcbMessage msg;
   msg.len = 6;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
   msg.data[5] = data1;
-  controller->sendMessage(&msg);
-    
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }
+  sendMessage(msg, opCode, nn_en);
+
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
-  byte index = module_config->findExistingEventByEv(1, evValue);
-  if (index >= module_config->EE_MAX_EVENTS)
-  {
-    index = createDefaultEvent(evValue);
-  }
-
   byte nn_en[4];
-  module_config->readEvent(index, nn_en);
-  //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
-  if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
-  {
-    // This table entry was not initalized correctly.
-    index = createDefaultEvent(evValue);
-    module_config->readEvent(index, nn_en);
-  }
+  findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -188,38 +163,15 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   
   VlcbMessage msg;
   msg.len = 7;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
   msg.data[5] = data1;
   msg.data[6] = data2;
-  controller->sendMessage(&msg);
-    
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }
+  sendMessage(msg, opCode, nn_en);
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
-  byte index = module_config->findExistingEventByEv(1, evValue);
-  if (index >= module_config->EE_MAX_EVENTS)
-  {
-    index = createDefaultEvent(evValue);
-  }
-
   byte nn_en[4];
-  module_config->readEvent(index, nn_en);
-  //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
-  if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
-  {
-    // This table entry was not initalized correctly.
-    index = createDefaultEvent(evValue);
-    module_config->readEvent(index, nn_en);
-  }
+  findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -235,20 +187,10 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   
   VlcbMessage msg;
   msg.len = 8;
-  msg.data[0] = opCode;
-  msg.data[1] = nn_en[0];
-  msg.data[2] = nn_en[1];
-  msg.data[3] = nn_en[2];
-  msg.data[4] = nn_en[3];
   msg.data[5] = data1;
   msg.data[6] = data2;
   msg.data[7] = data3;
-  controller->sendMessage(&msg);
-    
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }
+  sendMessage(msg, opCode, nn_en);
 }
 
 Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
