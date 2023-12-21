@@ -197,6 +197,51 @@ void testSetProducedDefaultEventsOnNewBoard()
   assertEquals(1, controller.getModuleConfig()->numEvents());
 }
 
+void testSendEventMissingInTable()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  // No event exists in event table.
+  eventProducerService->sendEvent(true, 1);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
+}
+
+void testSendEventDeletedFromTable()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  // Create a default produced event.
+  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
+  // And delete it.
+  controller.getModuleConfig()->cleareventEEPROM(0);
+
+  // Event with EV1=1 exists but its nn/en has been cleared.
+  eventProducerService->sendEvent(true, 1);
+
+  assertEquals(1, mockTransport->sent_messages.size());
+  assertEquals(5, mockTransport->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
+}
+
 }
 
 void testEventProducerService()
@@ -208,4 +253,6 @@ void testEventProducerService()
   testSendShort2On();
   testSendShort3Off();
   testSetProducedDefaultEventsOnNewBoard();
+  testSendEventMissingInTable();
+  testSendEventDeletedFromTable();
 }
