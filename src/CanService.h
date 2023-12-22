@@ -28,8 +28,6 @@ public:
   virtual void process(const Command * cmd) override;
   virtual void process(UserInterface::RequestedAction requestedAction) override;
 
-  void startCANenumeration(bool fromENUM = false);
-
 private:
 
   Controller *controller;

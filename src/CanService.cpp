@@ -18,11 +18,6 @@ void CanService::setController(Controller *cntrl)
   canTransport->setController(cntrl);
 }
 
-void CanService::startCANenumeration(bool fromENUM)
-{
-  canTransport->startCANenumeration(fromENUM);
-}
-
 void CanService::process(const Command *cmd)
 {
   canTransport->process();
@@ -41,6 +36,10 @@ void CanService::process(const Command *cmd)
     case CMD_MESSAGE_IN:
       handleCanServiceMessage(&cmd->vlcbMessage);
     break;
+    
+    case CMD_START_CAN_ENUMERATION:
+      canTransport->startCANenumeration(cmd->fromENUM);
+      break;
   }
 }
 
@@ -98,7 +97,7 @@ void CanService::handleEnumeration(unsigned int nn)
   if (nn == module_config->nodeNum)
   {
     // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-    startCANenumeration(true);
+    canTransport->startCANenumeration(true);
   }
 }
 

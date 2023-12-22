@@ -32,7 +32,7 @@ struct VlcbMessage
 };
 
 // Command type
-enum COMMAND
+enum COMMAND : byte
 {
   CMD_MESSAGE_IN,
   CMD_MESSAGE_OUT,
@@ -42,10 +42,11 @@ enum COMMAND
 
 struct Command
 {
-  byte commandType;
+  enum COMMAND commandType;
   union
   {
     VlcbMessage vlcbMessage;
+    bool fromENUM;
   };
 };
 
@@ -82,7 +83,6 @@ public:
   bool sendCMDERR(byte cerrno);
   void sendGRSP(byte opCode, byte serviceType, byte errCode);
 
-  void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
   void process();
   void indicateMode(byte mode);

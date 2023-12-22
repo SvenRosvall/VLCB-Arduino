@@ -256,20 +256,6 @@ void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
-void Controller::startCANenumeration()
-{
-  // Delegate this to the CanService.
-  // Find it first.
-  for (Service * svc : services)
-  {
-    if (svc->getServiceID() == SERVICE_ID_CAN)
-    {
-      CanService * canSvc = (CanService *) svc;
-      canSvc->startCANenumeration();
-    }
-  }
-}
-
 bool Controller::pendingCommands()
 {
   return commandQueue.available();

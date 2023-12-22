@@ -40,7 +40,8 @@ void MinimumNodeService::initSetup()
   timeOutTimer = millis();
   
   // enumerate the CAN bus to allocate a free CAN ID
-  controller->startCANenumeration();
+  Command cmd = { CMD_START_CAN_ENUMERATION, false };
+  controller->putCommand(cmd);
 
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
