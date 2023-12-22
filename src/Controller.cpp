@@ -36,6 +36,7 @@ Controller::Controller(UserInterface * ui, std::initializer_list<Service *> serv
   extern Configuration config;
   module_config = &config;
 
+  ui->setController(this);
   for (Service * service : services)
   {
     service->setController(this);
@@ -50,8 +51,9 @@ Controller::Controller(UserInterface * ui, Configuration *conf, std::initializer
   : _ui(ui)
   , module_config(conf)
   , services(services)
-    , commandQueue(COMMAND_QUEUE_SIZE)
+  , commandQueue(COMMAND_QUEUE_SIZE)
 {
+  ui->setController(this);
   for (Service * service : services)
   {
     service->setController(this);
@@ -153,22 +155,11 @@ void Controller::indicateActivity()
 void Controller::process()
 {
   // process switch operations if the module is configured with one
-  UserInterface::RequestedAction requestedAction = UserInterface::NONE;
   if (_ui)
   {
     _ui->run();
-
-    requestedAction = _ui->checkRequestedAction();
-    // if (requestedAction != UserInterface::NONE)
-    //   DEBUG_SERIAL << "Controller::process() UI action=" << requestedAction << " mode=" << module_config->currentMode << endl;
   }
 
-  // TODO: Replace this with commands from the UI. 
-  for (Service * service : services)
-  {
-    service->process(requestedAction);
-  }
-  
   Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
 
   for (Service *service: services)

@@ -69,7 +69,7 @@ void testUninitializedRequestNodeNumber()
   minimumNodeService->setUninitialised();
 
   // User requests to enter Setup mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
 
   process(controller);
 
@@ -95,7 +95,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   minimumNodeService->setUninitialised();
 
   // User requests to enter Normal mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
 
   process(controller);
 
@@ -108,7 +108,6 @@ void testUninitializedRequestNodeNumberMissingSNN()
 
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   process(controller);
 
@@ -127,7 +126,7 @@ void testNormalRequestNodeNumber()
   VLCB::Controller controller = createController();
 
   // User requests to enter Setup mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
 
   process(controller);
 
@@ -153,7 +152,7 @@ void testNormalRequestNodeNumberMissingSNN()
   VLCB::Controller controller = createController();
 
   // User requests to change mode.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
 
   process(controller);
 
@@ -169,7 +168,6 @@ void testNormalRequestNodeNumberMissingSNN()
 
   mockTransport->sent_messages.clear();
   addMillis(31 * 1000);
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   process(controller);
 
@@ -189,7 +187,7 @@ void testReleaseNodeNumberByUI()
 
   VLCB::Controller controller = createController();
 
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
 
   process(controller);
 

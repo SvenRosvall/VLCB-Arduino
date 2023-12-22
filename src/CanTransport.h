@@ -20,8 +20,6 @@ public:
 
   virtual void process() override;
 
-  void process(UserInterface::RequestedAction requestedAction);
-
   // Interface for implementing classes.
   virtual bool available() = 0;
   virtual CANMessage getNextCanMessage() = 0;
@@ -45,6 +43,7 @@ private:
   unsigned long CANenumTime;
   byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
 
+  void checkIncomingMessage();
 };
 
 }

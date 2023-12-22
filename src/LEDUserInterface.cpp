@@ -32,6 +32,8 @@ void LEDUserInterface::run()
     //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
     indicateMode(MODE_SETUP);
   }
+
+  checkRequestedAction();
 }
 
 void LEDUserInterface::indicateResetting()
@@ -87,7 +89,7 @@ void LEDUserInterface::indicateMode(byte mode) {
   }
 }
 
-UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
+void LEDUserInterface::checkRequestedAction()
 {
   //Serial << "UI checkRequestedAction()" << endl;
   if (pushButton.stateChanged())
@@ -105,28 +107,33 @@ UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
       if (press_time > SW_TR_HOLD)
       {
         //Serial << "  long press - change mode" << endl;
-        return CHANGE_MODE;
+        Command cmd = { CMD_CHANGE_MODE };
+        controller->putCommand(cmd);
+        return;
       }
 
       // short 1-2 secs
       if (press_time >= 1000 && press_time < 2000)
       {
         //Serial << "  medium press - renegotiate" << endl;
-        return RENEGOTIATE;
+        Command cmd = { CMD_RENEGOTIATE };
+        controller->putCommand(cmd);
+        return;
       }
 
       // very short < 0.5 sec
       if (press_time < 500)
       {
         //Serial << "  short press - enumeration" << endl;
-        return ENUMERATION;
+        Command cmd = { CMD_START_CAN_ENUMERATION };
+        controller->putCommand(cmd);
+        return;
       }
 
     } else {
       // do any switch release processing here
     }
   }
-  return NONE;
 }
 
 }

@@ -93,13 +93,13 @@ void testCanidEnumerationOnUserAction()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
   minimumNodeService->setSetupMode();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
+  
+  controller.putCommand({VLCB::CMD_START_CAN_ENUMERATION});
 
   process(controller);
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_messages.size());
@@ -123,13 +123,13 @@ void testCanidEnumerationOnSetUp()
 
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
+  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+
   process(controller);
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   // Expect message to make other modules report their CANID's
   assertEquals(2, mockCanTransport->sent_messages.size());
@@ -238,13 +238,13 @@ void testFindFreeCanidOnPopulatedBus()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
   minimumNodeService->setSetupMode();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
+  controller.putCommand({VLCB::CMD_START_CAN_ENUMERATION});
+
   process(controller);
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_messages.size());

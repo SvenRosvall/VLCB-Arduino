@@ -43,7 +43,7 @@ void CanTransport::startCANenumeration(bool fromENUM)
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
-void CanTransport::process()
+void CanTransport::checkIncomingMessage()
 {
   // Check concrete transport for messages and put on controller command queue.
   if (!available())
@@ -203,9 +203,11 @@ byte CanTransport::findFreeCanId()
   return 1;     // default if no responses from other modules
 }
 
-void CanTransport::process(UserInterface::RequestedAction requestedAction)
+void CanTransport::process()
 {
-  if (enumeration_required || requestedAction == UserInterface::ENUMERATION)
+  checkIncomingMessage();
+
+  if (enumeration_required)
   {
     // DEBUG_SERIAL << "> enumeration flag set" << endl;
     enumeration_required = false;

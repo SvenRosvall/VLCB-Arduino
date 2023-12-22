@@ -26,7 +26,6 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(const Command * cmd) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override;
 
 private:
 

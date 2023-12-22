@@ -126,9 +126,9 @@ void MinimumNodeService::heartbeat()
 /// MinimumNode Service processing procedure
 //
 
-void MinimumNodeService::process(UserInterface::RequestedAction requestedAction)
+void MinimumNodeService::process(const Command *cmd)
 {
-  if (requestedAction == UserInterface::CHANGE_MODE)
+  if (cmd != nullptr && cmd->commandType == CMD_CHANGE_MODE)
   {
     switch (module_config->currentMode)
     {

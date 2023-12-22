@@ -22,7 +22,6 @@ public:
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(byte mode) override;
-  virtual RequestedAction checkRequestedAction() override;
 
 private:
   UserInterface * ui1;

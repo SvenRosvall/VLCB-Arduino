@@ -47,14 +47,4 @@ void CombinedUserInterface::indicateMode(byte mode)
   ui2->indicateMode(mode);
 }
 
-UserInterface::RequestedAction CombinedUserInterface::checkRequestedAction()
-{
-  auto ret = ui1->checkRequestedAction();
-  if (ret == UserInterface::NONE)
-  {
-    ret = ui2->checkRequestedAction();
-  }
-  return ret;
-}
-
 }

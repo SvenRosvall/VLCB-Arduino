@@ -19,7 +19,7 @@ class MinimumNodeService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override; 
+  virtual void process(const Command *cmd) override; 
   virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_MNS; }

@@ -23,13 +23,11 @@ public:
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(byte i) override;
-  virtual RequestedAction checkRequestedAction() override;
 
 private:
   Configuration * modconfig;
   Transport * transport;
   bool isResetRequested = false;
-  UserInterface::RequestedAction requestedAction;
 };
 
 }

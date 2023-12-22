@@ -43,11 +43,6 @@ void CanService::process(const Command *cmd)
   }
 }
 
-void CanService::process(UserInterface::RequestedAction requestedAction)
-{
-  canTransport->process(requestedAction);
-}
-
 void CanService::handleCanServiceMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];

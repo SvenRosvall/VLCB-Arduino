@@ -146,7 +146,10 @@ void SerialUserInterface::run()
         break;
         
       case 's': // "s" == "setup"
-        requestedAction = CHANGE_MODE;
+      {
+        Command cmd = {CMD_CHANGE_MODE};
+        controller->putCommand(cmd);
+      }
         break;
 
       case '\r':
@@ -201,13 +204,6 @@ void SerialUserInterface::indicateMode(byte mode)
     default:
       break;
   }
-}
-
-UserInterface::RequestedAction SerialUserInterface::checkRequestedAction()
-{
-  UserInterface::RequestedAction oldRequestedAction = requestedAction;
-  requestedAction = NONE;
-  return oldRequestedAction;
 }
 
 }

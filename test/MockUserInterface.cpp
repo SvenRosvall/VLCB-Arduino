@@ -37,18 +37,6 @@ bool MockUserInterface::resetRequested()
   return false;
 }
 
-VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()
-{
-  RequestedAction ret = requestedAction;
-  requestedAction = RequestedAction::NONE;
-  return ret;
-}
-
-void MockUserInterface::setRequestedAction(VLCB::UserInterface::RequestedAction action)
-{
-  requestedAction = action;
-}
-
 byte MockUserInterface::getIndicatedMode()
 {
   return indicatedMode;
