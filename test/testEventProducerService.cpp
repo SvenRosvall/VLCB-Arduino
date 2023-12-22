@@ -222,6 +222,8 @@ void testSendEventMissingInTable()
   // No event exists in event table.
   eventProducerService->sendEvent(true, 1);
 
+  process(controller);
+
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
   assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
@@ -247,6 +249,8 @@ void testSendEventDeletedFromTable()
 
   // Event with EV1=1 exists but its nn/en has been cleared.
   eventProducerService->sendEvent(true, 1);
+
+  process(controller);
 
   assertEquals(1, mockTransport->sent_messages.size());
   assertEquals(5, mockTransport->sent_messages[0].len);
