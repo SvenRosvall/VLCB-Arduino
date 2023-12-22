@@ -81,7 +81,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 20;
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
-  modconfig.EE_NUM_EVS = 1;
+  modconfig.EE_NUM_EVS = 2; // EV1: Produced event ; EV2: LED1
  
 
   // initialise and load configuration
@@ -118,17 +118,10 @@ void setupVLCB()
 //    modconfig.resetModule(&userInterface);
 //  }
 
-  // opportunity to set default NVs after module reset
-  if (modconfig.isResetFlagSet())
-  {
-    Serial << F("> module has been reset") << endl;
-    modconfig.clearResetFlag();
-  }
-
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
-  // set Controller LEDs to indicate mode
+  // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
 
   // configure and start CAN bus and VLCB message processing
@@ -213,8 +206,8 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte eventIndex = 0;  
-    epService.sendEvent(state, eventIndex);
+    byte inputChannel = 1;  
+    epService.sendEvent(state, inputChannel);
   }
 }
 
@@ -232,29 +225,32 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
   bool ison = (msg->data[0] & 0x01) == 0;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
+  Serial << F("> EV2 = ") << evval << endl;
 
-  // read the value of the first event variable (EV) associated with this learned event
-  Serial << F("> EV1 = ") << evval << endl;
-
-  // set the LED according to the opcode of the received event, if the first EV equals 0
-  // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
+  // set the LED according to the opcode of the received event, if the second EV equals 1
+  // we turn on the LED and if the first EV equals 2 we use the blink() method of the LED object as an example.
   if (ison)
   {
-    if (evval == 0)
+    switch (evval)
     {
-      Serial << F("> switching the LED on") << endl;
-      moduleLED.on();
-    }
-    else if (evval == 1)
-    {
-      Serial << F("> switching the LED to blink") << endl;
-      moduleLED.blink();
+      case 1:
+        Serial << F("> switching the LED on") << endl;
+        moduleLED.on();
+        break;
+
+      case 2:
+        Serial << F("> switching the LED to blink") << endl;
+        moduleLED.blink();
+        break;
     }
   }
   else
   {
-    Serial << F("> switching the LED off") << endl;
-    moduleLED.off();
+    if (evval > 0)
+    {
+      Serial << F("> switching the LED off") << endl;
+      moduleLED.off();
+    }
   }
 }
 

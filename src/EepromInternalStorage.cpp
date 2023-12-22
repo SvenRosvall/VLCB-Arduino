@@ -69,7 +69,7 @@ void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void EepromInternalStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
+void EepromInternalStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
   for (byte i = 0; i < numbytes; i++)
   {

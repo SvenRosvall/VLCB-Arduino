@@ -64,7 +64,7 @@ void DueEepromEmulationStorage::write(unsigned int eeaddress, byte data)
 /// write a number of bytes to EEPROM
 /// external EEPROM must use 16-bit addresses !!
 //
-void DueEepromEmulationStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
+void DueEepromEmulationStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
   for (byte i = 0; i < numbytes; i++) 
   {
