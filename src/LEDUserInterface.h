@@ -21,11 +21,10 @@ public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 
   bool isButtonPressed();
-  virtual void run() override;
+  virtual void process(const Command *cmd) override;
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams i) override;
 
 private:
@@ -33,7 +32,9 @@ private:
   LED yellowLed;
   Switch pushButton;
 
+  void handleCommand(const Command *cmd);
   void checkRequestedAction();
+  void indicateActivity();
 };
 
 }

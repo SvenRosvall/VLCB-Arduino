@@ -40,6 +40,10 @@ enum COMMAND : byte
   CMD_START_CAN_ENUMERATION,
   CMD_CHANGE_MODE,
   CMD_RENEGOTIATE,
+  CMD_INDICATE_ACTIVITY,
+  CMD_INDICATE_RESETTING,
+  CMD_INDICATE_RESET_DONE,
+  CMD_INDICATE_MODE,
   // ...
 };
 
@@ -48,8 +52,9 @@ struct Command
   enum COMMAND commandType;
   union
   {
-    VlcbMessage vlcbMessage;
-    bool fromENUM;
+    VlcbMessage vlcbMessage; // with CMD_MESSAGE_IN & CMD_MESSAGE_OUT
+    bool fromENUM; // with CMD_START_CAN_ENUMERATION
+    VlcbModeParams mode; // with CMD_INDICATE_MODE
   };
 };
 

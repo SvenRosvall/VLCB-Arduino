@@ -144,10 +144,7 @@ void Controller::setParamFlag(unsigned char flag, bool set)
 
 void Controller::indicateActivity()
 {
-  if (_ui)
-  {
-    _ui->indicateActivity();
-  }
+  putCommand({CMD_INDICATE_ACTIVITY});
 }
 
 //
@@ -155,13 +152,12 @@ void Controller::indicateActivity()
 //
 void Controller::process()
 {
-  // process switch operations if the module is configured with one
+  Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+
   if (_ui)
   {
-    _ui->run();
+    _ui->process(cmd);
   }
-
-  Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
 
   for (Service *service: services)
   {

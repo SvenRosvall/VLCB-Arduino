@@ -21,7 +21,7 @@ bool LEDUserInterface::isButtonPressed()
   return pushButton.isPressed();
 }
 
-void LEDUserInterface::run()
+void LEDUserInterface::process(const Command *cmd)
 {
   pushButton.run();
   greenLed.run();
@@ -32,8 +32,41 @@ void LEDUserInterface::run()
     //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
     indicateMode(MODE_SETUP);
   }
+  
+  handleCommand(cmd);
 
   checkRequestedAction();
+}
+
+void LEDUserInterface::handleCommand(const Command *cmd)
+{
+  if (cmd == nullptr)
+  {
+    return;
+  }
+
+  switch (cmd->commandType)
+  {
+    case CMD_INDICATE_ACTIVITY:
+      indicateActivity();
+      break;
+
+      // TODO: Not yet implemented.
+//    case CMD_INDICATE_RESETTING:
+//      indicateResetting();
+//      break;
+//
+//    case CMD_INDICATE_RESET_DONE:
+//      indicateResetDone();
+//      break;
+//
+//    case CMD_INDICATE_MODE:
+//      indicateMode(cmd->mode);
+//      break;
+      
+    default:
+      break;
+  }
 }
 
 void LEDUserInterface::indicateResetting()

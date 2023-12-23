@@ -526,7 +526,7 @@ void Configuration::resetModule(UserInterface * ui)
       return;
     }
 
-    ui->run();
+    ui->process(nullptr);
 
     // wait until switch held for a further 5 secs
     if (ui->resetRequested())

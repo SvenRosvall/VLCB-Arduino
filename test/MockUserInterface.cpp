@@ -7,7 +7,7 @@
 
 #include "MockUserInterface.h"
 
-void MockUserInterface::run()
+void MockUserInterface::process(const VLCB::Command *cmd)
 {
 
 }
@@ -18,11 +18,6 @@ void MockUserInterface::indicateResetting()
 }
 
 void MockUserInterface::indicateResetDone()
-{
-
-}
-
-void MockUserInterface::indicateActivity()
 {
 
 }

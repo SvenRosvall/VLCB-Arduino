@@ -18,7 +18,14 @@ SerialUserInterface::SerialUserInterface(Configuration * modconfig, Transport *t
 {
 }
 
-void SerialUserInterface::run()
+void SerialUserInterface::process(const Command *cmd)
+{
+  handleCommand(cmd);
+  
+  processSerialInput();
+}
+
+void SerialUserInterface::processSerialInput()
 {
   byte uev = 0;
   char msgstr[32], dstr[32];
@@ -164,6 +171,37 @@ void SerialUserInterface::run()
   }
 }
 
+void SerialUserInterface::handleCommand(const Command *cmd)
+{
+  if (cmd == nullptr)
+  {
+    return;
+  }
+
+  switch (cmd->commandType)
+  {
+    case CMD_INDICATE_ACTIVITY:
+      // Don't indicate this. Too noisy.
+      break;
+
+    // TODO: Not yet implemented.
+//    case CMD_INDICATE_RESETTING:
+//      indicateResetting();
+//      break;
+//
+//    case CMD_INDICATE_RESET_DONE:
+//      indicateResetDone();
+//      break;
+//
+//    case CMD_INDICATE_MODE:
+//      indicateMode(cmd->mode);
+//      break;
+
+    default:
+      break;
+  }
+}
+
 void SerialUserInterface::indicateResetting()
 {
   Serial << "Resetting module." << endl;
@@ -173,10 +211,6 @@ void SerialUserInterface::indicateResetDone()
 {
   Serial << "Module reset done" << endl;
 
-}
-
-void SerialUserInterface::indicateActivity()
-{
 }
 
 bool SerialUserInterface::resetRequested()

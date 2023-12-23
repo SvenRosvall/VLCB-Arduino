@@ -7,6 +7,7 @@
 
 #include "UserInterface.h"
 #include "Configuration.h"
+#include "Controller.h"
 
 namespace VLCB
 {
@@ -16,11 +17,10 @@ class CombinedUserInterface : public UserInterface
 public:
   CombinedUserInterface(UserInterface * ui1, UserInterface * ui2);
 
-  virtual void run() override;
+  virtual void process(const Command *cmd) override;
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams mode) override;
 
 private:

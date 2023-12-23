@@ -8,6 +8,7 @@
 #include "UserInterface.h"
 #include "Configuration.h"
 #include "Transport.h"
+#include "Controller.h"
 
 namespace VLCB
 {
@@ -17,17 +18,19 @@ class SerialUserInterface : public UserInterface
 public:
   SerialUserInterface(Configuration * modconfig, Transport * transport);
 
-  virtual void run() override;
+  virtual void process(const Command *cmd) override;
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams i) override;
 
 private:
   Configuration * modconfig;
   Transport * transport;
   bool isResetRequested = false;
+
+  void handleCommand(const Command *cmd);
+  void processSerialInput();
 };
 
 }

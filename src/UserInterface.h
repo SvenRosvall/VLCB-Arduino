@@ -12,15 +12,15 @@ namespace VLCB
 {
 
 class Controller;
+class Command;
 
 class UserInterface
 {
 public:
 
-  virtual void run() = 0;
+  virtual void process(const Command *cmd) = 0;
   virtual void indicateResetting() =0;
   virtual void indicateResetDone() = 0;
-  virtual void indicateActivity() = 0;
   virtual void indicateMode(VlcbModeParams mode) = 0;
   virtual bool resetRequested() = 0;
 

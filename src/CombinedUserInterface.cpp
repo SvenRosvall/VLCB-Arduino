@@ -4,6 +4,7 @@
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
 #include "CombinedUserInterface.h"
+#include "Controller.h"
 
 namespace VLCB
 {
@@ -12,10 +13,10 @@ CombinedUserInterface::CombinedUserInterface(UserInterface *ui1, UserInterface *
   : ui1(ui1), ui2(ui2)
 {}
 
-void CombinedUserInterface::run()
+void CombinedUserInterface::process(const Command *cmd)
 {
-  ui1->run();
-  ui2->run();
+  ui1->process(cmd);
+  ui2->process(cmd);
 }
 
 void CombinedUserInterface::indicateResetting()
@@ -33,12 +34,6 @@ void CombinedUserInterface::indicateResetDone()
 bool CombinedUserInterface::resetRequested()
 {
   return ui1->resetRequested() || ui2->resetRequested();
-}
-
-void CombinedUserInterface::indicateActivity()
-{
-  ui1->indicateActivity();
-  ui2->indicateActivity();
 }
 
 void CombinedUserInterface::indicateMode(VlcbModeParams mode)
