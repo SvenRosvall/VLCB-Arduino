@@ -11,6 +11,7 @@
 #include <Streaming.h>
 
 #include "Configuration.h"
+#include "UserInterface.h"
 
 #ifdef __AVR__
 extern "C" int __heap_start, *__brkval;

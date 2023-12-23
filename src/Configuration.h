@@ -7,12 +7,13 @@
 
 #include <Arduino.h>                // for definition of byte datatype
 
-#include <UserInterface.h>
 #include "Storage.h"
 #include "vlcbdefs.hpp"
 
 namespace VLCB
 {
+
+class UserInterface;
 
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;

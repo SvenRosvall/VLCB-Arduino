@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "UserInterface.h"
 #include "CanTransport.h"
 #include <vlcbdefs.hpp>
 

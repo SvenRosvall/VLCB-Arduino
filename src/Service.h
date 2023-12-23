@@ -6,7 +6,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include "UserInterface.h"
 
 namespace VLCB
 {

@@ -6,8 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "CircularBuffer.h"
-#include <Controller.h>
 #include <vlcbdefs.hpp>
 
 namespace VLCB {
@@ -17,8 +15,6 @@ class Configuration;
 class ConsumeOwnEventsService : public Service
 {
 public:
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override {return NOT_PROCESSED;}
-
   virtual byte getServiceID() override
   {
     return SERVICE_ID_CONSUME_OWN_EVENTS;

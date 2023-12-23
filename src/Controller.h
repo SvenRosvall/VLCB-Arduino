@@ -13,7 +13,6 @@
 
 #include <Configuration.h>
 #include <Transport.h>
-#include "UserInterface.h"
 #include "Service.h"
 #include "initializer_list.h"
 #include "ArrayHolder.h"
@@ -21,6 +20,8 @@
 
 namespace VLCB
 {
+
+class UserInterface;
 
 //
 /// CAN/Controller message type

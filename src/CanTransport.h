@@ -8,7 +8,6 @@
 #include <Arduino.h>
 #include "Transport.h"
 #include "ACAN2515.h"
-#include "UserInterface.h"
 
 namespace VLCB
 {

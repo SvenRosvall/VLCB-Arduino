@@ -26,4 +26,3 @@ VLCB::Controller createController(std::initializer_list<VLCB::Service *> service
 VLCB::Controller createController(VLCB::Transport * trp, std::initializer_list<VLCB::Service *> services);
 
 void process(VLCB::Controller &controller);
-
