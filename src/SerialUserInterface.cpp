@@ -153,10 +153,7 @@ void SerialUserInterface::processSerialInput()
         break;
         
       case 's': // "s" == "setup"
-      {
-        Command cmd = {CMD_CHANGE_MODE};
-        controller->putCommand(cmd);
-      }
+        controller->putCommand(CMD_CHANGE_MODE);
         break;
 
       case '\r':

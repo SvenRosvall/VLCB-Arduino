@@ -244,6 +244,11 @@ void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
+void Controller::putCommand(COMMAND cmd)
+{
+  putCommand(Command{cmd});
+}
+
 bool Controller::pendingCommands()
 {
   return commandQueue.available();

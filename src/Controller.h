@@ -98,6 +98,7 @@ public:
   void setLearnMode(byte reqMode);
   
   void putCommand(const Command & cmd) { commandQueue.put(&cmd); }
+  void putCommand(COMMAND cmd);
   bool pendingCommands();
 
 private:                                          // protected members become private in derived classes

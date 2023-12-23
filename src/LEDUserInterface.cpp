@@ -140,8 +140,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time > SW_TR_HOLD)
       {
         //Serial << "  long press - change mode" << endl;
-        Command cmd = { CMD_CHANGE_MODE };
-        controller->putCommand(cmd);
+        controller->putCommand(CMD_CHANGE_MODE);
         return;
       }
 
@@ -149,8 +148,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time >= 1000 && press_time < 2000)
       {
         //Serial << "  medium press - renegotiate" << endl;
-        Command cmd = { CMD_RENEGOTIATE };
-        controller->putCommand(cmd);
+        controller->putCommand(CMD_RENEGOTIATE);
         return;
       }
 
@@ -158,8 +156,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time < 500)
       {
         //Serial << "  short press - enumeration" << endl;
-        Command cmd = { CMD_START_CAN_ENUMERATION };
-        controller->putCommand(cmd);
+        controller->putCommand(CMD_START_CAN_ENUMERATION);
         return;
       }
 
