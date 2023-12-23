@@ -6,6 +6,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include "vlcbdefs.hpp"
 
 namespace VLCB
 {
@@ -26,7 +27,7 @@ public:
   virtual void indicateResetting() =0;
   virtual void indicateResetDone() = 0;
   virtual void indicateActivity() = 0;
-  virtual void indicateMode(byte mode) = 0;
+  virtual void indicateMode(VlcbModeParams mode) = 0;
   virtual bool resetRequested() = 0;
   virtual RequestedAction checkRequestedAction() = 0;
 };

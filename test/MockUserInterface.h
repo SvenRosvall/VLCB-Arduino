@@ -18,14 +18,14 @@ public:
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual void indicateActivity() override;
-  virtual void indicateMode(byte mode) override;
+  virtual void indicateMode(VlcbModeParams mode) override;
   virtual bool resetRequested() override;
-  virtual RequestedAction checkRequestedAction() override;
+virtual RequestedAction checkRequestedAction() override;
   
   void setRequestedAction(RequestedAction action);
-  byte getIndicatedMode();
+  VlcbModeParams getIndicatedMode();
 
 private:
   RequestedAction requestedAction = NONE;
-  byte indicatedMode = MODE_UNINITIALISED;
+  VlcbModeParams indicatedMode = MODE_UNINITIALISED;
 };

@@ -41,7 +41,7 @@ private:
   bool bModeSetup = false;
   bool requestingNewNN = false;
   unsigned long timeOutTimer;
-  byte instantMode;
+  VlcbModeParams instantMode;
   
   void checkModeChangeTimeout();
   void initSetup();

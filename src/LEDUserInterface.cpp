@@ -61,7 +61,7 @@ bool LEDUserInterface::resetRequested()
   return pushButton.isPressed() && pushButton.getCurrentStateDuration() > SW_TR_HOLD;
 }
 
-void LEDUserInterface::indicateMode(byte mode) {
+void LEDUserInterface::indicateMode(VlcbModeParams mode) {
   switch (mode) {
 
     case MODE_NORMAL:

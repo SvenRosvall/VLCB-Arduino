@@ -181,7 +181,7 @@ bool SerialUserInterface::resetRequested()
   return isResetRequested;
 }
 
-void SerialUserInterface::indicateMode(byte mode) 
+void SerialUserInterface::indicateMode(VlcbModeParams mode) 
 {
   switch (mode) 
   {

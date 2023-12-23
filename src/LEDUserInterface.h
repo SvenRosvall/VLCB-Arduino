@@ -8,6 +8,7 @@
 #include "LED.h"
 #include "Switch.h"
 #include "UserInterface.h"
+#include "vlcbdefs.hpp"
 
 namespace VLCB
 {
@@ -25,7 +26,7 @@ public:
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
-  virtual void indicateMode(byte i) override;
+  virtual void indicateMode(VlcbModeParams i) override;
   virtual RequestedAction checkRequestedAction()override;
 
 private:

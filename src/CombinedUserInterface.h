@@ -21,7 +21,7 @@ public:
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
-  virtual void indicateMode(byte mode) override;
+  virtual void indicateMode(VlcbModeParams mode) override;
   virtual RequestedAction checkRequestedAction() override;
 
 private:
