@@ -22,7 +22,7 @@ public:
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
   virtual void indicateActivity() override;
-  virtual void indicateMode(byte i) override;
+  virtual void indicateMode(VlcbModeParams i) override;
 
 private:
   Configuration * modconfig;

@@ -41,7 +41,7 @@ void CombinedUserInterface::indicateActivity()
   ui2->indicateActivity();
 }
 
-void CombinedUserInterface::indicateMode(byte mode)
+void CombinedUserInterface::indicateMode(VlcbModeParams mode)
 {
   ui1->indicateMode(mode);
   ui2->indicateMode(mode);

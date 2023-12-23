@@ -118,7 +118,7 @@ void Controller::setName(const unsigned char *mname)
 /// set the Controller LEDs to indicate the current mode
 //
 
-void Controller::indicateMode(byte mode)
+void Controller::indicateMode(VlcbModeParams mode)
 {
   // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
   if (_ui) 

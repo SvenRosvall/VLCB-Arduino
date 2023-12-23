@@ -87,7 +87,7 @@ public:
 
   byte getModuleCANID() { return module_config->CANID; }
   void process();
-  void indicateMode(byte mode);
+  void indicateMode(VlcbModeParams mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
   
