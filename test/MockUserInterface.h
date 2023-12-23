@@ -21,7 +21,6 @@ public:
   virtual void indicateMode(VlcbModeParams mode) override;
   virtual bool resetRequested() override;
   
-  void setRequestedAction(RequestedAction action);
   VlcbModeParams getIndicatedMode();
 
 private:
