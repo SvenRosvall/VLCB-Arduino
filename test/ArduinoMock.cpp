@@ -114,6 +114,10 @@ void Serial_T::println(const char *)
 {
 }
 
+void Serial_T::flush()
+{
+}
+
 Serial_T & operator<<(Serial_T & s, int i)
 {
   std::cout << i;
