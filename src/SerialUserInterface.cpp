@@ -153,6 +153,7 @@ void SerialUserInterface::processSerialInput()
         break;
         
       case 's': // "s" == "setup"
+        //Serial << F("SUI> Requesting mode change") << endl; Serial.flush();
         controller->putCommand(CMD_CHANGE_MODE);
         break;
 

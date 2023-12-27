@@ -97,7 +97,7 @@ public:
   void indicateActivity();
   void setLearnMode(byte reqMode);
   
-  void putCommand(const Command & cmd) { commandQueue.put(&cmd); }
+  void putCommand(const Command & cmd);
   void putCommand(COMMAND cmd);
   bool pendingCommands();
 

@@ -152,7 +152,11 @@ void Controller::indicateActivity()
 //
 void Controller::process()
 {
+  //Serial << F("Ctrl::process() start, cmd queue size = ") << commandQueue.size();
   Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+  //Serial << F(" cmd type = ");
+  //if (cmd) Serial << cmd->commandType; else Serial << F("null");
+  //Serial << endl;
 
   if (_ui)
   {
@@ -242,6 +246,12 @@ bool Controller::sendCMDERR(byte cerrno)
 void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
 {
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
+}
+
+void Controller::putCommand(const Command &cmd)
+{
+  // Serial << F("C>put command with type=") << cmd.commandType << endl;
+  commandQueue.put(&cmd);
 }
 
 void Controller::putCommand(COMMAND cmd)
