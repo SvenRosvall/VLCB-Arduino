@@ -34,7 +34,7 @@ void CanService::process(const Command *cmd)
 
     case CMD_MESSAGE_IN:
       handleCanServiceMessage(&cmd->vlcbMessage);
-    break;
+      break;
     
     case CMD_START_CAN_ENUMERATION:
       canTransport->startCANenumeration(cmd->fromENUM);
