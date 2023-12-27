@@ -38,7 +38,6 @@ void CanTransport::startCANenumeration(bool fromENUM)
   startedFromEnumMessage = fromENUM;
 
   sendRtrMessage();
-  controller->indicateActivity();
 
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
@@ -68,10 +67,11 @@ void CanTransport::checkIncomingMessage()
     VlcbMessage message;
     message.len = 0;
     sendMessage(&message);
-    controller->indicateActivity();
 
     return;
   }
+
+  controller->indicateActivity();
 
   byte remoteCANID = getCANID(canMsg.id);
 
@@ -127,6 +127,7 @@ bool CanTransport::sendMessage(const VlcbMessage *msg)
   message.ext = false;
   memcpy(message.data, msg->data, msg->len);
 
+  controller->indicateActivity();
   return sendCanMessage(&message);
 }
 
