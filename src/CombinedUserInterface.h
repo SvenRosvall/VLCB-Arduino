@@ -6,8 +6,6 @@
 #pragma once
 
 #include "UserInterface.h"
-#include "Configuration.h"
-#include "Controller.h"
 
 namespace VLCB
 {
