@@ -24,7 +24,7 @@ public:
   virtual void indicateMode(VlcbModeParams mode) = 0;
   virtual bool resetRequested() = 0;
 
-  void setController(Controller *ctrl)
+  virtual void setController(Controller *ctrl)
   {
     this->controller = ctrl;
   }

@@ -13,6 +13,12 @@ CombinedUserInterface::CombinedUserInterface(UserInterface *ui1, UserInterface *
   : ui1(ui1), ui2(ui2)
 {}
 
+void CombinedUserInterface::setController(Controller *ctrl)
+{
+  ui1->setController(ctrl);
+  ui2->setController(ctrl);
+}
+
 void CombinedUserInterface::process(const Command *cmd)
 {
   ui1->process(cmd);

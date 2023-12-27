@@ -20,6 +20,7 @@ public:
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
   virtual void indicateMode(VlcbModeParams mode) override;
+  virtual void setController(Controller *ctrl) override;
 
 private:
   UserInterface * ui1;
