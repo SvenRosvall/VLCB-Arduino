@@ -6,10 +6,14 @@
 //
 
 #include "MockUserInterface.h"
+#include "Controller.h"
 
 void MockUserInterface::process(const VLCB::Command *cmd)
 {
-
+  if (cmd != nullptr && cmd->commandType == VLCB::CMD_INDICATE_MODE)
+  {
+    indicatedMode = cmd->mode;
+  }
 }
 
 void MockUserInterface::indicateResetting()
@@ -20,11 +24,6 @@ void MockUserInterface::indicateResetting()
 void MockUserInterface::indicateResetDone()
 {
 
-}
-
-void MockUserInterface::indicateMode(VlcbModeParams mode)
-{
-  indicatedMode = mode;
 }
 
 bool MockUserInterface::resetRequested()

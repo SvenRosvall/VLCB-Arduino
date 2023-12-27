@@ -25,7 +25,6 @@ public:
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateMode(VlcbModeParams i) override;
 
 private:
   LED greenLed;
@@ -35,6 +34,7 @@ private:
   void handleCommand(const Command *cmd);
   void checkRequestedAction();
   void indicateActivity();
+  void indicateMode(VlcbModeParams mode);
 };
 
 }

@@ -121,11 +121,10 @@ void Controller::setName(const unsigned char *mname)
 
 void Controller::indicateMode(VlcbModeParams mode)
 {
-  // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
-  if (_ui) 
-  {
-    _ui->indicateMode(mode);
-  }
+  //DEBUG_SERIAL << F("ctrl> indicating mode = ") << mode << endl;
+  Command cmd = {CMD_INDICATE_MODE};
+  cmd.mode = mode;
+  putCommand(cmd);
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
 }

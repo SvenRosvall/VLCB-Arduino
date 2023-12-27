@@ -17,7 +17,6 @@ public:
   virtual void process(const VLCB::Command *cmd) override;
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
-  virtual void indicateMode(VlcbModeParams mode) override;
   virtual bool resetRequested() override;
   
   VlcbModeParams getIndicatedMode();

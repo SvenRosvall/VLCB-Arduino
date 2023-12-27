@@ -190,10 +190,10 @@ void SerialUserInterface::handleCommand(const Command *cmd)
 //    case CMD_INDICATE_RESET_DONE:
 //      indicateResetDone();
 //      break;
-//
-//    case CMD_INDICATE_MODE:
-//      indicateMode(cmd->mode);
-//      break;
+
+    case CMD_INDICATE_MODE:
+      indicateMode(cmd->mode);
+      break;
 
     default:
       break;

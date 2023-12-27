@@ -22,7 +22,6 @@ public:
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateMode(VlcbModeParams i) override;
 
 private:
   Configuration * modconfig;
@@ -31,6 +30,7 @@ private:
 
   void handleCommand(const Command *cmd);
   void processSerialInput();
+  void indicateMode(VlcbModeParams i);
 };
 
 }

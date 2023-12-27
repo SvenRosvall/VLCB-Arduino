@@ -21,7 +21,6 @@ public:
   virtual void process(const Command *cmd) = 0;
   virtual void indicateResetting() =0;
   virtual void indicateResetDone() = 0;
-  virtual void indicateMode(VlcbModeParams mode) = 0;
   virtual bool resetRequested() = 0;
 
   virtual void setController(Controller *ctrl)

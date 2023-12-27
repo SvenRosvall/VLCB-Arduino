@@ -42,10 +42,4 @@ bool CombinedUserInterface::resetRequested()
   return ui1->resetRequested() || ui2->resetRequested();
 }
 
-void CombinedUserInterface::indicateMode(VlcbModeParams mode)
-{
-  ui1->indicateMode(mode);
-  ui2->indicateMode(mode);
-}
-
 }

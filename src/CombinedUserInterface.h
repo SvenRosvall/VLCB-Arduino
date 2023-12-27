@@ -19,7 +19,6 @@ public:
   virtual void indicateResetting() override;
   virtual void indicateResetDone() override;
   virtual bool resetRequested() override;
-  virtual void indicateMode(VlcbModeParams mode) override;
   virtual void setController(Controller *ctrl) override;
 
 private:
