@@ -20,7 +20,6 @@ class LEDUserInterface : public UserInterface
 public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 
-  bool isButtonPressed();
   virtual void process(const Command *cmd) override;
 
   bool isButtonPressedForReset(VlcbModeParams params);

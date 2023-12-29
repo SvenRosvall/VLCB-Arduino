@@ -16,11 +16,6 @@ LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pus
 
 }
 
-bool LEDUserInterface::isButtonPressed()
-{
-  return pushButton.isPressed();
-}
-
 void LEDUserInterface::process(const Command *cmd)
 {
   pushButton.run();
@@ -170,7 +165,7 @@ bool LEDUserInterface::isButtonPressedForReset(VlcbModeParams mode)
   // wait for button press for (5 sec) button press -- as a 'safety' mechanism
   while (true)
   {
-    run();
+    process(nullptr);
 
     if (!pushButton.isPressed())
     {

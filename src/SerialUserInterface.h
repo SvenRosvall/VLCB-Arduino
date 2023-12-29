@@ -18,7 +18,6 @@ public:
   SerialUserInterface(Configuration * modconfig, Transport * transport);
 
   virtual void process(const Command *cmd) override;
-  virtual bool resetRequested() override;
 
 private:
   Configuration * modconfig;

@@ -19,7 +19,6 @@ class UserInterface
 public:
 
   virtual void process(const Command *cmd) = 0;
-  virtual bool resetRequested() = 0;
 
   virtual void setController(Controller *ctrl)
   {
