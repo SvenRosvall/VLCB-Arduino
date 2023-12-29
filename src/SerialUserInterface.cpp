@@ -161,24 +161,8 @@ void SerialUserInterface::run()
   }
 }
 
-void SerialUserInterface::indicateResetting()
-{
-  Serial << "Resetting module." << endl;
-}
-
-void SerialUserInterface::indicateResetDone()
-{
-  Serial << "Module reset done" << endl;
-
-}
-
 void SerialUserInterface::indicateActivity()
 {
-}
-
-bool SerialUserInterface::resetRequested()
-{
-  return isResetRequested;
 }
 
 void SerialUserInterface::indicateMode(VlcbModeParams mode) 

@@ -498,48 +498,8 @@ unsigned int Configuration::freeSRAM()
 }
 
 //
-/// manually reset the module to factory defaults
+/// reset the module to factory defaults
 //
-void Configuration::resetModule(UserInterface * ui)
-{
-  /// standard implementation of resetModule()
-
-  bool bDone;
-  unsigned long waittime;
-
-  // start timeout timer
-  waittime = millis();
-  bDone = false;
-
-  // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
-
-  ui->indicateResetting();
-
-  // wait for a further (5 sec) button press -- as a 'safety' mechanism
-  while (!bDone)
-  {
-    // 30 sec timeout
-    if ((millis() - waittime) > 30000)
-    {
-      // DEBUG_SERIAL << F("> timeout expired, reset not performed") << endl;
-      return;
-    }
-
-    ui->run();
-
-    // wait until switch held for a further 5 secs
-    if (ui->resetRequested())
-    {
-      bDone = true;
-    }
-  }
-
-  // do the reset
-  // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
-  ui->indicateResetDone();
-  resetModule();
-}
-
 void Configuration::resetModule()
 {
   /// implementation of resetModule() without VLCB Switch or LEDs

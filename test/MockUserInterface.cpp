@@ -12,16 +12,6 @@ void MockUserInterface::run()
 
 }
 
-void MockUserInterface::indicateResetting()
-{
-
-}
-
-void MockUserInterface::indicateResetDone()
-{
-
-}
-
 void MockUserInterface::indicateActivity()
 {
 
@@ -30,11 +20,6 @@ void MockUserInterface::indicateActivity()
 void MockUserInterface::indicateMode(VlcbModeParams mode)
 {
   indicatedMode = mode;
-}
-
-bool MockUserInterface::resetRequested()
-{
-  return false;
 }
 
 VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()

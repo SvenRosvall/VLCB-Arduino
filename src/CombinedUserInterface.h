@@ -17,9 +17,6 @@ public:
   CombinedUserInterface(UserInterface * ui1, UserInterface * ui2);
 
   virtual void run() override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
-  virtual bool resetRequested() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams mode) override;
   virtual RequestedAction checkRequestedAction() override;
