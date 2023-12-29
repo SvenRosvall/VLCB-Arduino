@@ -18,23 +18,6 @@ void CombinedUserInterface::run()
   ui2->run();
 }
 
-void CombinedUserInterface::indicateResetting()
-{
-  ui1->indicateResetting();
-  ui2->indicateResetting();
-}
-
-void CombinedUserInterface::indicateResetDone()
-{
-  ui1->indicateResetDone();
-  ui2->indicateResetDone();
-}
-
-bool CombinedUserInterface::resetRequested()
-{
-  return ui1->resetRequested() || ui2->resetRequested();
-}
-
 void CombinedUserInterface::indicateActivity()
 {
   ui1->indicateActivity();

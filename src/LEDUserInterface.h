@@ -22,18 +22,19 @@ public:
 
   bool isButtonPressed();
   virtual void run() override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
-  virtual bool resetRequested() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams i) override;
   virtual RequestedAction checkRequestedAction()override;
+
+  bool isButtonPressedForReset(VlcbModeParams params);
 
 private:
   LED greenLed;
   LED yellowLed;
   Switch pushButton;
 
+  void indicateResetting();
+  bool resetRequested();
 };
 
 }
