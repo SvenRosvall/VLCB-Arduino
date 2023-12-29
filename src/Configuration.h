@@ -62,7 +62,6 @@ public:
   void readEvent(byte idx, byte tarr[EE_HASH_BYTES]);
   void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
-  void resetModule(UserInterface * ui);
   void resetModule();
 
   void setCANID(byte canid);

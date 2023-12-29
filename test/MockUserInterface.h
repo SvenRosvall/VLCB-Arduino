@@ -15,9 +15,6 @@ class MockUserInterface : public VLCB::UserInterface
 {
 public:
   virtual void process(const VLCB::Command *cmd) override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
-  virtual bool resetRequested() override;
   
   VlcbModeParams getIndicatedMode();
 

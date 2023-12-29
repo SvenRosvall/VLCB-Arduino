@@ -16,9 +16,6 @@ public:
   CombinedUserInterface(UserInterface * ui1, UserInterface * ui2);
 
   virtual void process(const Command *cmd) override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
-  virtual bool resetRequested() override;
   virtual void setController(Controller *ctrl) override;
 
 private:

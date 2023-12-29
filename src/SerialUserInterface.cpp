@@ -200,22 +200,6 @@ void SerialUserInterface::handleCommand(const Command *cmd)
   }
 }
 
-void SerialUserInterface::indicateResetting()
-{
-  Serial << "Resetting module." << endl;
-}
-
-void SerialUserInterface::indicateResetDone()
-{
-  Serial << "Module reset done" << endl;
-
-}
-
-bool SerialUserInterface::resetRequested()
-{
-  return isResetRequested;
-}
-
 void SerialUserInterface::indicateMode(VlcbModeParams mode) 
 {
   switch (mode) 

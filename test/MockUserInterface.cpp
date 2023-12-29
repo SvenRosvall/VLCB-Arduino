@@ -16,21 +16,6 @@ void MockUserInterface::process(const VLCB::Command *cmd)
   }
 }
 
-void MockUserInterface::indicateResetting()
-{
-
-}
-
-void MockUserInterface::indicateResetDone()
-{
-
-}
-
-bool MockUserInterface::resetRequested()
-{
-  return false;
-}
-
 VlcbModeParams MockUserInterface::getIndicatedMode()
 {
   return indicatedMode;
