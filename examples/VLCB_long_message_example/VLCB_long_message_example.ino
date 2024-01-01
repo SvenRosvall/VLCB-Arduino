@@ -49,8 +49,8 @@ VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, 
-                            { &mnService, &canService, &nvService, &lmsg, &ecService, &epService, &etService }); // Controller object
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &userInterface, &canService, &nvService, &lmsg, &ecService, &epService, &etService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };

@@ -37,6 +37,8 @@ std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 VLCB::Controller createController()
 {
   minimumNodeService.reset(new VLCB::MinimumNodeService);
+  
+  mockUserInterface.reset(new MockUserInterface);
 
   mockTransport.reset(new MockTransport);
 
@@ -52,7 +54,8 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventProducerService> epService;
   epService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(),
+       ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get(), mockUserInterface.get()});
   controller.begin();
   minimumNodeService->setHeartBeat(false);
 
@@ -506,10 +509,10 @@ void testServiceDiscovery()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(6, mockTransport->sent_messages.size());
+  assertEquals(7, mockTransport->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(5, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(6, mockTransport->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
   assertEquals(1, mockTransport->sent_messages[1].data[3]); // index

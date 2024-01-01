@@ -33,8 +33,6 @@ add_library(hardware_library OBJECT
         src/LEDUserInterface.h
         src/SerialUserInterface.cpp
         src/SerialUserInterface.h
-        src/CombinedUserInterface.h
-        src/CombinedUserInterface.cpp
         src/SerialGC.h
         src/SerialGC.cpp
         )

@@ -29,15 +29,13 @@ namespace VLCB
 // be sent through the transport without requiring this buffering. 
 const int COMMAND_QUEUE_SIZE = 30;
 
-Controller::Controller(UserInterface * ui, std::initializer_list<Service *> services)
-  : _ui(ui)
-  , services(services)
+Controller::Controller(std::initializer_list<Service *> services)
+  : services(services)
   , commandQueue(COMMAND_QUEUE_SIZE)
 {
   extern Configuration config;
   module_config = &config;
 
-  ui->setController(this);
   for (Service * service : services)
   {
     service->setController(this);
@@ -48,13 +46,11 @@ Controller::Controller(UserInterface * ui, std::initializer_list<Service *> serv
 /// construct a Controller object with a Configuration object that the user provides.
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
-Controller::Controller(UserInterface * ui, Configuration *conf, std::initializer_list<Service *> services)
-  : _ui(ui)
-  , module_config(conf)
+Controller::Controller(Configuration *conf, std::initializer_list<Service *> services)
+  : module_config(conf)
   , services(services)
   , commandQueue(COMMAND_QUEUE_SIZE)
 {
-  ui->setController(this);
   for (Service * service : services)
   {
     service->setController(this);
@@ -156,11 +152,6 @@ void Controller::process()
   //Serial << F(" cmd type = ");
   //if (cmd) Serial << cmd->commandType; else Serial << F("null");
   //Serial << endl;
-
-  if (_ui)
-  {
-    _ui->process(cmd);
-  }
 
   for (Service *service: services)
   {

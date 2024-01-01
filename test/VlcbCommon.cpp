@@ -39,14 +39,12 @@ VLCB::Controller createController(const std::initializer_list<VLCB::Service *> s
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
 
-  mockUserInterface.reset(new MockUserInterface);
-
   static std::unique_ptr<MockStorage> mockStorage;
   mockStorage.reset(new MockStorage);
 
   configuration.reset(createConfiguration(mockStorage.get()));
 
-  VLCB::Controller controller(mockUserInterface.get(), configuration.get(), services);
+  VLCB::Controller controller(configuration.get(), services);
 
   configuration->setModuleMode(MODE_NORMAL);
   configuration->setNodeNum(0x0104);

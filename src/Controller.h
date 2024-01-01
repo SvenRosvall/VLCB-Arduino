@@ -21,8 +21,6 @@
 namespace VLCB
 {
 
-class UserInterface;
-
 //
 /// CAN/Controller message type
 //
@@ -64,8 +62,8 @@ struct Command
 class Controller
 {
 public:
-  Controller(UserInterface *ui, std::initializer_list<Service *> services);
-  Controller(UserInterface * ui, Configuration *conf, std::initializer_list<Service *> services);
+  Controller(std::initializer_list<Service *> services);
+  Controller(Configuration *conf, std::initializer_list<Service *> services);
 
   Configuration * getModuleConfig() { return module_config; }
 
@@ -101,8 +99,7 @@ public:
   void putCommand(COMMAND cmd);
   bool pendingCommands();
 
-private:                                          // protected members become private in derived classes
-  UserInterface *_ui;
+private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
 
@@ -114,7 +111,6 @@ private:                                          // protected members become pr
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };
-
 
 bool Controller::sendMessageWithNN(int opc)
 {

@@ -12,10 +12,15 @@ extern void printConfig();
 namespace VLCB
 {
 
-SerialUserInterface::SerialUserInterface(Configuration * modconfig, Transport *transport)
-  : modconfig(modconfig)
-  , transport(transport)
+SerialUserInterface::SerialUserInterface(Transport *transport)
+  : transport(transport)
 {
+}
+
+void SerialUserInterface::setController(Controller *ctrl)
+{
+  this->controller = ctrl;
+  this->modconfig = ctrl->getModuleConfig();
 }
 
 void SerialUserInterface::process(const Command *cmd)

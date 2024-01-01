@@ -1,4 +1,5 @@
 //  Copyright (C) Sven Rosvall (sven@rosvall.ie)
+//  Copyright (C) Sven Rosvall (sven@rosvall.ie)
 //  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
@@ -30,7 +31,6 @@
 #include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
-#include "CombinedUserInterface.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -46,8 +46,7 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
-VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
+VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
@@ -55,8 +54,8 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&combinedUserInterface, &modconfig, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input

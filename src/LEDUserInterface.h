@@ -7,7 +7,7 @@
 
 #include "LED.h"
 #include "Switch.h"
-#include "UserInterface.h"
+#include "Service.h"
 #include "vlcbdefs.hpp"
 
 namespace VLCB
@@ -15,16 +15,20 @@ namespace VLCB
 
 const unsigned int SW_TR_HOLD = 6000U;  // Controller push button hold time for SLiM/FLiM transition in millis = 6 seconds
 
-class LEDUserInterface : public UserInterface
+class LEDUserInterface : public Service
 {
 public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
+  virtual void setController(Controller *ctrl) override { this->controller = ctrl; }
+  virtual byte getServiceID() override { return 99; };
+  virtual byte getServiceVersionID() override { return 1; };
 
   virtual void process(const Command *cmd) override;
 
   bool isButtonPressedForReset(VlcbModeParams params);
 
 private:
+  Controller * controller;
   LED greenLed;
   LED yellowLed;
   Switch pushButton;
