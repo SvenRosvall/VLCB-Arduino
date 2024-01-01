@@ -8,7 +8,6 @@
 
 // Controller library
 #include <Controller.h>
-#include "UserInterface.h"
 #include "MinimumNodeService.h"
 #include "CanService.h"
 #include <stdarg.h>

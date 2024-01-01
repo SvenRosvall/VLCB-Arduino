@@ -50,7 +50,6 @@ add_library(core_library OBJECT
         src/CanTransport.cpp
         src/CanTransport.h
         src/Storage.h
-        src/UserInterface.h
         src/Service.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp

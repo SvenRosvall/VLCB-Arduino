@@ -13,8 +13,6 @@
 namespace VLCB
 {
 
-class UserInterface;
-
 // in-memory hash table
 static const byte EE_HASH_BYTES = 4;
 static const byte HASH_LENGTH = 128;

@@ -29,13 +29,11 @@ public:
 
   void startCANenumeration(bool fromENUM = false);
 
-protected: // TODO: CAN2515 needs access to controller during refactoring.
-  Controller *controller;
-
 private:
   void checkCANenumTimout();
   byte findFreeCanId();
 
+  Controller *controller;
   bool enumeration_required = false;
   bool bCANenum = false;
   bool startedFromEnumMessage = false;
