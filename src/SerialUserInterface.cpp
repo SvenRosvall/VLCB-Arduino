@@ -187,15 +187,6 @@ void SerialUserInterface::handleCommand(const Command *cmd)
       // Don't indicate this. Too noisy.
       break;
 
-    // TODO: Not yet implemented.
-//    case CMD_INDICATE_RESETTING:
-//      indicateResetting();
-//      break;
-//
-//    case CMD_INDICATE_RESET_DONE:
-//      indicateResetDone();
-//      break;
-
     case CMD_INDICATE_MODE:
       indicateMode(cmd->mode);
       break;
