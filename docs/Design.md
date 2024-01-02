@@ -8,16 +8,18 @@ and extended with VLCB specific features.
 This library is still in progress.
 
 ## High Level Architecture
-The code is organized as a central controller object that controls a transport object, 
-a storage object, a user interface object and a set of service objects.
+The code is organized as a central controller object that controls functionality
+via a storage object and a set of service objects.
 
-The library is designed to support a set of different transports such as CAN, Wifi and BLE.
+Services implement various groups of functionalities within VLCB such as events or DCC control.
+The user sketch can select the set of services needed to provide the functionality
+that is necessary for the VLCB module that is created.
+There are also services for user interfaces and communication over different transports such as CAN, Wifi and BLE.
 Currently only a CAN transport using the CAN2515 chip is included in the library.
 
 The library supports a set of storage for node variables and event variables in EEPROM or Flash memory.
-
-The services are split in functionalities so that the user sketch can bring in the functionality
-that is necessary for the VLCB module that is created.
+A Configuration object controls persistence of node specific data such as parameter, node variables
+and events using the chosen storage.
 
 A class diagram is shown below with a selection of concrete implementations of transports, storage, 
 and services.
@@ -43,11 +45,11 @@ The ```EventConsumerService``` may react to consumed events by calling a user re
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
 The user sketch may produce events when are passed on the ```EventProducerService``` object which in turn passes
-this event as a message via the Controller to the transport object.
+this event as a Command via the Controller to the transport object.
 
 ### Dataflow
-Within most of VLCB components a message object ```VlcbMessage``` is used to pass incoming and
-outgoing messages around. 
+Most of VLCB functionality use a message object ```VlcbMessage``` that is used to pass incoming and
+outgoing messages around via the Command bus. 
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
@@ -88,8 +90,8 @@ FlashStorage
 : Stores data in Flash memory. Useful for modules that do not have onboard EEPROM or too
 little EEPROM.
 
-## Transport
-The Transport interface encapsulates the transmission of VLCB message across some
+## CanTransport
+The CanTransport interface encapsulates the transmission of VLCB message across some
 media such as CAN bus.
 
 The class ```CanTransport``` serves as a base class for implementations of CAN based transports. 
@@ -104,14 +106,6 @@ More transports implementations exist but have not yet been imported here.
 
 Read more about the ```Transport``` interface and how to implement new transports in
 [Transport documentation.](Transport.md)
-
-## User Interface
-
-LEDUserInterface
-: Implements a low level UI using a push button, a green LED and a yellow LED. 
-
-It will be possible to implement new user interfaces that make use of an OLED screen or simply
-uses the USB connection for serial communication.
 
 ## Services
 
@@ -142,6 +136,12 @@ the EventConsumerService to also look for outgoing events on the command bus.
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.
 
+LEDUserInterface
+: Implements a low level UI using a push button, a green LED and a yellow LED.
+
+It will be possible to implement new user interfaces that make use of an OLED screen or simply
+uses the USB connection for serial communication.
+
 ## User Sketch
 
 A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
@@ -151,11 +151,12 @@ The setup code may look like:
 ```
 // Global definitions
 VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
-VLCB::CAN2515 canTransport(interruptPin, csPin); 
+VLCB::CAN2515 can2515(interruptPin, csPin); 
+VLCB::CanService canService(&can2515);
 VLCB::EepromInternalStorage eepromStorage;
 VLCB::MnsService mnsService;
 VLCB::EventConsumerService eventConsumerService(myActionCallback);
-VLCB::Controller moduleController(userInterface, canTransport, eepromStorage, {mnsService, eventConsumerService});
+VLCB::Controller moduleController(eepromStorage, {mnsService, userInterface, canService, eventConsumerService});
 
 setup()
 {
@@ -164,3 +165,4 @@ setup()
   canTransport.begin();
 }
 ```
+See also the example sketches how to use the VLCB library.
