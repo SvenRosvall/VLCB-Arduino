@@ -6,9 +6,9 @@
 #include "VlcbCommon.h"
 #include "MockStorage.h"
 #include "Parameters.h"
+#include "Controller.h"
 
 std::unique_ptr<MockUserInterface> mockUserInterface;
-std::unique_ptr<MockTransport> mockTransport;
 std::unique_ptr<VLCB::Configuration> configuration;
 
 // For use by tests of Configuration

@@ -6,25 +6,33 @@
 #pragma once
 
 #include <Service.h>
+#include <deque>
+#include <vector>
+#include <Controller.h>
 
 namespace VLCB
 {
 class Controller;
-class Transport;
 }
 
 // This replaces the CanTransport for tests that don't really need any CAN specifics.
 class MockTransportService : public VLCB::Service
 {
 public:
-  MockTransportService(VLCB::Transport * trpt) : canTransport(trpt) {}
   virtual void setController(VLCB::Controller *cntrl) override;
 
   virtual byte getServiceID() override { return 0; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(const VLCB::Command * cmd) override;
-  
+
+  // Mock support to inject messages to be received and inspect sent messages
+  void setNextMessage(VLCB::VlcbMessage msg);
+  void clearMessages();
+
+  std::deque<VLCB::VlcbMessage> incoming_messages;
+  std::vector<VLCB::VlcbMessage> sent_messages;
+
 private:
-  VLCB::Transport * canTransport;
+  VLCB::Controller * controller;
 };

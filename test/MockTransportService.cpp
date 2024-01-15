@@ -8,12 +8,17 @@
 
 void MockTransportService::setController(VLCB::Controller *cntrl)
 {
-  canTransport->setController(cntrl);
+  this->controller = cntrl;
 }
 
 void MockTransportService::process(const VLCB::Command *cmd)
 {
-  canTransport->process();
+  if (!incoming_messages.empty())
+  {
+    VLCB::Command cmd = {VLCB::CMD_MESSAGE_IN, incoming_messages.front()};
+    controller->putCommand(cmd);
+    incoming_messages.pop_front();
+  }
 
   if (cmd == nullptr)
   {
@@ -23,7 +28,18 @@ void MockTransportService::process(const VLCB::Command *cmd)
   switch (cmd->commandType)
   {
     case VLCB::CMD_MESSAGE_OUT:
-      canTransport->sendMessage(&cmd->vlcbMessage);
+      sent_messages.push_back(cmd->vlcbMessage);
       break;
   }
+}
+
+void MockTransportService::setNextMessage(VLCB::VlcbMessage msg)
+{
+  incoming_messages.push_back(msg);
+}
+
+void MockTransportService::clearMessages()
+{
+  incoming_messages.clear();
+  sent_messages.clear();
 }

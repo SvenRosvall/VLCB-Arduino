@@ -35,6 +35,21 @@ private:
   void handleCanServiceMessage(const VlcbMessage *msg);
   void handleEnumeration(unsigned int nn);
   void handleSetCANID(const VlcbMessage *msg, unsigned int nn);
+
+  bool sendMessage(const VlcbMessage *msg);
+  bool sendRtrMessage();
+  bool sendCanMessage(CANMessage *msg) { return canTransport->sendCanMessage(msg); }
+  void startCANenumeration(bool fromENUM = false);
+
+  void checkIncomingMessage();
+  void checkCANenumTimout();
+  byte findFreeCanId();
+
+  bool enumeration_required = false;
+  bool bCANenum = false;
+  bool startedFromEnumMessage = false;
+  unsigned long CANenumTime;
+  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
 };
 
 }

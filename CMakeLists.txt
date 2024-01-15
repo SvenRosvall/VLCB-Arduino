@@ -47,7 +47,6 @@ add_library(core_library OBJECT
         src/Parameters.cpp
         src/Parameters.h
         src/Transport.h
-        src/CanTransport.cpp
         src/CanTransport.h
         src/Storage.h
         src/Service.h
@@ -99,9 +98,7 @@ add_executable(testAll
         test/testNodeVariableService.cpp
         test/testCanService.cpp
         test/MockUserInterface.cpp
-        test/MockTransport.cpp
         test/MockStorage.cpp
-        test/MockTransport.h
         test/MockCanTransport.cpp
         test/MockCanTransport.h
         test/MockTransportService.cpp

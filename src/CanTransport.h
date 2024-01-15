@@ -12,35 +12,13 @@
 namespace VLCB
 {
 
+// Interface for CAN transports 
 class CanTransport : public Transport
 {
 public:
-  void setController(Controller *ctrl) override { this->controller = ctrl; }
-
-  virtual void process() override;
-
-  // Interface for implementing classes.
   virtual bool available() = 0;
   virtual CANMessage getNextCanMessage() = 0;
-
-  virtual bool sendMessage(const VlcbMessage *msg) override;
-  bool sendRtrMessage();
   virtual bool sendCanMessage(CANMessage *msg) = 0;
-
-  void startCANenumeration(bool fromENUM = false);
-
-private:
-  void checkCANenumTimout();
-  byte findFreeCanId();
-
-  Controller *controller;
-  bool enumeration_required = false;
-  bool bCANenum = false;
-  bool startedFromEnumMessage = false;
-  unsigned long CANenumTime;
-  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
-
-  void checkIncomingMessage();
 };
 
 }

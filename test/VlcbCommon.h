@@ -6,15 +6,19 @@
 #pragma once
 
 #include <memory>
+#include "initializer_list.h"
 #include "MockUserInterface.h"
-#include "MockTransport.h"
 #include "Service.h"
+
+namespace VLCB
+{
+class Transport;
+}
 
 const int MODULE_ID = 253;
 const unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
 
 extern std::unique_ptr<MockUserInterface> mockUserInterface;
-extern std::unique_ptr<MockTransport> mockTransport;
 extern std::unique_ptr<VLCB::Configuration> configuration;
 
 // Create a Configuration object.

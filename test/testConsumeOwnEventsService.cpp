@@ -20,16 +20,14 @@ namespace
 {
 std::unique_ptr<VLCB::EventProducerService> eventProducerService;
 std::unique_ptr<VLCB::EventConsumerService> eventConsumerService;
+static std::unique_ptr<MockTransportService> mockTransportService;
 
 VLCB::Controller createController()
 {
   static std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
-  mockTransport.reset(new MockTransport);
-
-  static std::unique_ptr<MockTransportService> mockTransportService;
-  mockTransportService.reset(new MockTransportService(mockTransport.get()));
+  mockTransportService.reset(new MockTransportService);
 
   static std::unique_ptr<VLCB::ConsumeOwnEventsService> consumeOwnEventsService;
   consumeOwnEventsService.reset(new VLCB::ConsumeOwnEventsService);
@@ -52,25 +50,25 @@ void testServiceDiscovery()
   VLCB::Controller controller = createController();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
-  mockTransport->setNextMessage(msg);
+  mockTransportService->setNextMessage(msg);
 
   process(controller);
 
   // Verify sent messages.
-  assertEquals(6, mockTransport->sent_messages.size());
+  assertEquals(6, mockTransportService->sent_messages.size());
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(5, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(OPC_SD, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(5, mockTransportService->sent_messages[0].data[5]); // Number of services
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
-  assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
-  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[1].data[4]); // service ID
-  assertEquals(1, mockTransport->sent_messages[1].data[5]); // version
+  assertEquals(OPC_SD, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(1, mockTransportService->sent_messages[1].data[3]); // index
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[1].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages[1].data[5]); // version
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[2].data[0]);
-  assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
-  assertEquals(SERVICE_ID_CONSUME_OWN_EVENTS, mockTransport->sent_messages[2].data[4]); // service ID
-  assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
+  assertEquals(OPC_SD, mockTransportService->sent_messages[2].data[0]);
+  assertEquals(2, mockTransportService->sent_messages[2].data[3]); // index
+  assertEquals(SERVICE_ID_CONSUME_OWN_EVENTS, mockTransportService->sent_messages[2].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages[2].data[5]); // version
 }
 
 void testServiceDiscoveryEventProdSvc()
@@ -80,15 +78,15 @@ void testServiceDiscoveryEventProdSvc()
   VLCB::Controller controller = createController();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
-  mockTransport->setNextMessage(msg);
+  mockTransportService->setNextMessage(msg);
 
   process(controller);
 
   // Verify sent messages.
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[3]); // index
-  assertEquals(SERVICE_ID_CONSUME_OWN_EVENTS, mockTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ESD, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[3]); // index
+  assertEquals(SERVICE_ID_CONSUME_OWN_EVENTS, mockTransportService->sent_messages[0].data[4]); // service ID
   // Not testing service data bytes.
 }
 
@@ -99,17 +97,17 @@ void testCoeFlag()
   VLCB::Controller controller = createController();
 
   VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
-  mockTransport->setNextMessage(msg_rqsd);
+  mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_PNN, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  assertEquals(MANU_VLCB, mockTransport->sent_messages[0].data[3]);
-  assertEquals(MODULE_ID, mockTransport->sent_messages[0].data[4]);
-  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_COE | PF_SD, mockTransport->sent_messages[0].data[5]);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(MANU_VLCB, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(MODULE_ID, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_COE | PF_SD, mockTransportService->sent_messages[0].data[5]);
 }
 
 byte capturedIndex = -1;
@@ -139,9 +137,9 @@ void testConsumeOwnEvent()
 
   process(controller);
   
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(5, mockTransport->sent_messages[0].len);
-  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransportService->sent_messages[0].data[0]);
 
   process(controller);
 

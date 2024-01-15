@@ -10,16 +10,10 @@ namespace VLCB
 
 const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
-class Controller;
-struct VlcbMessage;
-
-// Interface for sending and receiving Controller messages.
+// Interface for statistics on the transport layer.
 class Transport
 {
 public:
-  virtual void setController(Controller * ctrl) { }
-  virtual void process() = 0;
-  virtual bool sendMessage(const VlcbMessage *msg) = 0;
   virtual void reset() = 0;
 
   virtual unsigned int receiveCounter() = 0;
