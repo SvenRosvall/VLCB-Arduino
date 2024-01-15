@@ -8,8 +8,6 @@
 namespace VLCB
 {
 
-const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
-
 // Interface for statistics on the transport layer.
 class Transport
 {

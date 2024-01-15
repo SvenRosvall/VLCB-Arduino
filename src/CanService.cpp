@@ -11,6 +11,8 @@
 namespace VLCB
 {
 
+const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
+
 void CanService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
