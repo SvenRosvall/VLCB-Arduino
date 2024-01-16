@@ -165,11 +165,10 @@ void Controller::process()
       case CMD_MESSAGE_IN:
       {
         VlcbMessage &msg = cmd->vlcbMessage;
-        unsigned int opc = msg.data[0];
         // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
         for (Service *service: services)
         {
-          if (service->handleMessage(opc, &msg) == PROCESSED)
+          if (service->handleMessage(&msg) == PROCESSED)
           {
             break;
           }

@@ -33,8 +33,9 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
-Processed LongMessageService::handleMessage(unsigned int opc, VlcbMessage *msg)
+Processed LongMessageService::handleMessage(VlcbMessage *msg)
 {
+  unsigned int opc = msg->data[0];
   switch (opc)
   {
     case OPC_DTXC:

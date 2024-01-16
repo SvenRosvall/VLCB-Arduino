@@ -22,7 +22,7 @@ public:
   virtual byte getServiceID() override { return SERVICE_ID_NV; }
   virtual byte getServiceVersionID() override { return 1; }
 
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+  virtual Processed handleMessage(VlcbMessage *msg) override;
 
 private:
 

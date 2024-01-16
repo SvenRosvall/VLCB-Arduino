@@ -17,8 +17,9 @@ void NodeVariableService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-Processed NodeVariableService::handleMessage(unsigned int opc, VlcbMessage *msg)
+Processed NodeVariableService::handleMessage(VlcbMessage *msg)
 {
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
   switch (opc)

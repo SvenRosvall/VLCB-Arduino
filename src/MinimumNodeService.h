@@ -20,7 +20,7 @@ public:
 
   virtual void setController(Controller *cntrl) override;
   virtual void process(const Command *cmd) override; 
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+  virtual Processed handleMessage(VlcbMessage *msg) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }

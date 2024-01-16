@@ -31,8 +31,9 @@ void EventTeachingService::inhibitLearn()
   controller->setParamFlag(PF_LRN, false);
 }
 
-Processed EventTeachingService::handleMessage(unsigned int opc, VlcbMessage *msg) 
+Processed EventTeachingService::handleMessage(VlcbMessage *msg) 
 {
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
   unsigned int en = (msg->data[3] << 8) + msg->data[4];
   //DEBUG_SERIAL << "ets>VlcbSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;

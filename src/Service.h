@@ -31,7 +31,7 @@ public:
   virtual void process(const Command * cmd) {}
   
   // Keep these for services that have not yet implemented the process(Command).
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) { return NOT_PROCESSED; };
+  virtual Processed handleMessage(VlcbMessage *msg) { return NOT_PROCESSED; };
 };
 
 }

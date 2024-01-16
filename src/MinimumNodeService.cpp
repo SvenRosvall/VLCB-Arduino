@@ -153,8 +153,9 @@ void MinimumNodeService::process(const Command *cmd)
 // MNS shall implement these opcodes in incoming requests
 // * RDGN - Request Diagnostic Data (0x87)
 
-Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
+Processed MinimumNodeService::handleMessage(VlcbMessage *msg)
 {
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
 
   switch (opc)
