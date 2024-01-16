@@ -147,7 +147,7 @@ void Controller::indicateActivity()
 void Controller::process()
 {
   //Serial << F("Ctrl::process() start, cmd queue size = ") << commandQueue.size();
-  Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+  const Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
   //Serial << F(" cmd type = ");
   //if (cmd) Serial << cmd->commandType; else Serial << F("null");
   //Serial << endl;
@@ -164,7 +164,7 @@ void setNN(VlcbMessage *msg, unsigned int nn)
   msg->data[2] = lowByte(nn);
 }
 
-bool Controller::sendMessage(VlcbMessage *msg)
+bool Controller::sendMessage(const VlcbMessage *msg)
 {
   Command cmd = {CMD_MESSAGE_OUT, *msg};
   commandQueue.put(&cmd);

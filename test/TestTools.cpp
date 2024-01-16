@@ -31,7 +31,7 @@ void doAssertEquals(const char * file, int line,
 }
 
 void doAssertEquals(const char * file, int line,
-                    void * expected, void * actual, const char * expression)
+                    const void * expected, const void * actual, const char * expression)
 {
   if (expected != actual)
   {

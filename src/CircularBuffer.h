@@ -19,7 +19,7 @@ public:
 
   bool available();
   E *peek();
-  E *get();
+  const E * get();
   void put(const E *entry);
   void clear();
 
@@ -95,7 +95,7 @@ void CircularBuffer<E>::put(const E * msg)
 
 /// retrieve the next item from the buffer
 template <typename E>
-E *CircularBuffer<E>::get()
+const E * CircularBuffer<E>::get()
 {
   E *p = nullptr;
 

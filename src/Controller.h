@@ -74,7 +74,7 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(VlcbMessage *msg);
+  bool sendMessage(const VlcbMessage *msg);
 
   void begin();
   inline bool sendMessageWithNN(int opc);
