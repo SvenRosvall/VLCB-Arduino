@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "Transport.h"  // for DEFAULT_PRIORITY
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -30,6 +29,8 @@ enum {
   LONG_MESSAGE_TRUNCATED
 };
 
+struct VlcbMessage;
+
 //
 /// a basic class to send and receive Controller long messages per MERG RFC 0005
 /// See https://www.merg.org.uk/merg_wiki/doku.php?id=rfc:longmessageprotocol
@@ -42,7 +43,7 @@ class LongMessageService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
-  virtual Processed handleMessage(VlcbMessage *msg) override;
+  virtual void process(const Command * cmd) override;
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process();
@@ -56,6 +57,7 @@ public:
 
 protected:
 
+  void handleMessage(const VlcbMessage *msg);
   bool sendMessageFragment(VlcbMessage *frame);
 
   bool _is_receiving = false;

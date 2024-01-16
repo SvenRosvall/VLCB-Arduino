@@ -33,17 +33,22 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
-Processed LongMessageService::handleMessage(VlcbMessage *msg)
+void LongMessageService::process(const Command *cmd)
+{
+  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  {
+    handleMessage(&cmd->vlcbMessage);
+  }
+}
+
+void LongMessageService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
   switch (opc)
   {
     case OPC_DTXC:
       processReceivedMessageFragment(msg);
-      return PROCESSED;
-
-    default:
-      return NOT_PROCESSED;
+      break;
   }
 }
 

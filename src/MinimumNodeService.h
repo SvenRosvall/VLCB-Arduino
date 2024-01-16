@@ -12,6 +12,7 @@ namespace VLCB
 {
 
 class Configuration;
+struct VlcbMessage;
 
 class MinimumNodeService : public Service
 {
@@ -20,7 +21,6 @@ public:
 
   virtual void setController(Controller *cntrl) override;
   virtual void process(const Command *cmd) override; 
-  virtual Processed handleMessage(VlcbMessage *msg) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }
@@ -54,12 +54,13 @@ private:
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
 
-  Processed handleRequestNodeParameters(VlcbMessage *msg);
-  Processed handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
-  Processed handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
-  Processed handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
-  Processed handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn);
-  Processed handleModeMessage(const VlcbMessage *msg, unsigned int nn);
+  void handleMessage(const VlcbMessage *msg);
+  void handleRequestNodeParameters();
+  void handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
+  void handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
+  void handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
+  void handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn);
+  void handleModeMessage(const VlcbMessage *msg, unsigned int nn);
 };
 
 }

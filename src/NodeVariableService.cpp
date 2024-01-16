@@ -17,7 +17,15 @@ void NodeVariableService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-Processed NodeVariableService::handleMessage(VlcbMessage *msg)
+void NodeVariableService::process(const Command *cmd)
+{
+  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  {
+    handleMessage(&cmd->vlcbMessage);
+  }
+}
+
+void NodeVariableService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
@@ -26,29 +34,29 @@ Processed NodeVariableService::handleMessage(VlcbMessage *msg)
   {
     case OPC_NVRD:
       // received NVRD -- read NV by index
-      return handleReadNV(msg, nn);
+      handleReadNV(msg, nn);
+      break;
 
     case OPC_NVSET:
       // received NVSET -- set NV by index
-      return handleSetNV(msg, nn);
+      handleSetNV(msg, nn);
+      break;
 
     case OPC_NVSETRD:
       // received NVSETRD -- set NV by index and read
-      return handleSetAndReadNV(msg, nn);
-
-    default:
-      return NOT_PROCESSED;
+      handleSetAndReadNV(msg, nn);
+      break;
   }
 }
 
-Processed NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
+void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
   {
     if (msg->len < 4)
     {
       controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_CMD);
-      return PROCESSED;
+      return;
     }
 
     byte nvindex = msg->data[3];
@@ -72,11 +80,9 @@ Processed NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int
       controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
     }
   }
-
-  return PROCESSED;
 }
 
-Processed NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
+void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
@@ -85,7 +91,7 @@ Processed NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int 
     if (msg->len < 5)
     {
       controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_CMD);
-      return PROCESSED;
+      return;
     }
 
     if (msg->data[3] > module_config->EE_NUM_NVS)
@@ -102,11 +108,9 @@ Processed NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int 
       // DEBUG_SERIAL << F("> set NV ok") << endl;
     }
   }
-
-  return PROCESSED;
 }
 
-Processed NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned int nn)
+void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
 
@@ -115,7 +119,7 @@ Processed NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsign
     if (msg->len < 5)
     {
       controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_CMD);
-      return PROCESSED;
+      return;
     }
 
     byte nvindex = msg->data[3];
@@ -134,8 +138,6 @@ Processed NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsign
       // DEBUG_SERIAL << F("> set NV ok") << endl;
     }
   }
-
-  return PROCESSED;
 }
 
 }

@@ -156,31 +156,6 @@ void Controller::process()
   {
     service->process(cmd);
   }
-
-  if (cmd != nullptr)
-  {
-    // TODO: This is for services that don't yet implement process(Command)
-    switch (cmd->commandType)
-    {
-      case CMD_MESSAGE_IN:
-      {
-        VlcbMessage &msg = cmd->vlcbMessage;
-        // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
-        for (Service *service: services)
-        {
-          if (service->handleMessage(&msg) == PROCESSED)
-          {
-            break;
-          }
-        }
-        // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
-      }
-        break;
-
-      default:
-        break;
-    }
-  }
 }
 
 void setNN(VlcbMessage *msg, unsigned int nn)

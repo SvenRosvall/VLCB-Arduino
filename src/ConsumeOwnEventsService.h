@@ -19,10 +19,14 @@ public:
   {
     return SERVICE_ID_CONSUME_OWN_EVENTS;
   }
+  
   virtual byte getServiceVersionID() override
   {
     return 1;
   }
+
+  virtual void process(const Command * cmd) override
+  {}
 };
 
 }  // VLCB
