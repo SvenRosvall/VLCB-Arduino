@@ -138,7 +138,7 @@ void Controller::setParamFlag(unsigned char flag, bool set)
 
 void Controller::indicateActivity()
 {
-  putCommand({CMD_INDICATE_ACTIVITY});
+  putCommand(CMD_INDICATE_ACTIVITY);
 }
 
 //
@@ -164,7 +164,6 @@ void Controller::process()
     {
       case CMD_MESSAGE_IN:
       {
-        indicateActivity();
         VlcbMessage &msg = cmd->vlcbMessage;
         unsigned int opc = msg.data[0];
         // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
