@@ -37,8 +37,7 @@ private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
-  
-  bool bModeSetup = false;
+
   bool requestingNewNN = false;
   unsigned long timeOutTimer;
   VlcbModeParams instantMode;
