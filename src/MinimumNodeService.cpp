@@ -36,7 +36,6 @@ void MinimumNodeService::initSetup()
   instantMode = MODE_SETUP;
   controller->indicateMode(MODE_SETUP);
 
-  bModeSetup = true;
   timeOutTimer = millis();
   
   // enumerate the CAN bus to allocate a free CAN ID
@@ -51,7 +50,6 @@ void MinimumNodeService::initSetup()
 void MinimumNodeService::setNormal()
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
-  bModeSetup = false;
   requestingNewNN = false;
   instantMode = MODE_NORMAL;
   module_config->setModuleMode(MODE_NORMAL);
@@ -64,7 +62,6 @@ void MinimumNodeService::setNormal()
 void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
-  bModeSetup = false;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
   module_config->setNodeNum(0);
@@ -90,11 +87,10 @@ void MinimumNodeService::initSetupFromNormal()
 //
 void MinimumNodeService::checkModeChangeTimeout()
 {
-  if (bModeSetup && ((millis() - timeOutTimer) >= 30000)) 
+  if (instantMode == MODE_SETUP && ((millis() - timeOutTimer) >= 30000)) 
   {
     // Revert to previous mode.
     // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << currentMode << F(", mode change = ") << bModeSetup << endl;
-    bModeSetup = false;
     instantMode = module_config->currentMode;
     controller->indicateMode(instantMode);
 
@@ -109,7 +105,7 @@ void MinimumNodeService::checkModeChangeTimeout()
 
 void MinimumNodeService::heartbeat()
 {
-  if ((module_config->currentMode == MODE_NORMAL) && !noHeartbeat && !bModeSetup)
+  if ((module_config->currentMode == MODE_NORMAL) && !noHeartbeat && instantMode != MODE_SETUP)
   {
     if ((millis() - lastHeartbeat) > heartRate)
     {
@@ -177,9 +173,8 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
       // 50 - Another module has entered setup.
       // If we are in setup, abort (MNS Spec 3.2.1)
 
-      if (bModeSetup)
+      if (instantMode == MODE_SETUP)
       {
-        bModeSetup = false;
         instantMode = module_config->currentMode;
         controller->indicateMode(module_config->currentMode);
       }
@@ -204,7 +199,7 @@ Processed MinimumNodeService::handleMessage(unsigned int opc, VlcbMessage *msg)
 
       // only respond if in transition to Normal, i.e. Setup mode, or in learn mode.
 
-      if (bModeSetup || (controller->getParam(PAR_FLAGS) & PF_LRN))
+      if (instantMode == MODE_SETUP || (controller->getParam(PAR_FLAGS) & PF_LRN))
       {
         // respond with NAME
         msg->len = 8;
@@ -253,7 +248,7 @@ Processed MinimumNodeService::handleRequestNodeParameters(VlcbMessage *msg)
   // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
   // only respond if we are in transition to Normal mode
-  if (bModeSetup)
+  if (instantMode == MODE_SETUP)
   {
     // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
@@ -314,7 +309,7 @@ Processed MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg,
 Processed MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
 {      // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
-  if (bModeSetup)
+  if (instantMode == MODE_SETUP)
   {
     if (msg->len < 3)
     {
@@ -500,7 +495,6 @@ Processed MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned
 
 void MinimumNodeService::setSetupMode()
 {
-  bModeSetup = true;
   instantMode = MODE_SETUP;
   timeOutTimer = 0;
 }
