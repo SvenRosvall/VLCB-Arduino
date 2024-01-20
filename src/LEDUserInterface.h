@@ -25,15 +25,12 @@ public:
 
   virtual void process(const Command *cmd) override;
 
-  bool isButtonPressedForReset(VlcbModeParams params);
-
 private:
   Controller * controller;
   LED greenLed;
   LED yellowLed;
   Switch pushButton;
 
-  void indicateResetting();
   bool resetRequested();
   void handleCommand(const Command *cmd);
   void checkRequestedAction();

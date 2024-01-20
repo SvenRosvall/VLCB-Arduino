@@ -16,6 +16,11 @@ LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pus
 
 }
 
+bool LEDUserInterface::isButtonPressed()
+{
+  return pushButton.isPressed();
+}
+
 void LEDUserInterface::process(const Command *cmd)
 {
   pushButton.run();
@@ -53,13 +58,6 @@ void LEDUserInterface::handleCommand(const Command *cmd)
     default:
       break;
   }
-}
-
-void LEDUserInterface::indicateResetting()
-{
-  pushButton.reset();
-  greenLed.blink();
-  yellowLed.blink();
 }
 
 void LEDUserInterface::indicateActivity()
@@ -142,39 +140,6 @@ void LEDUserInterface::checkRequestedAction()
       // do any switch release processing here
     }
   }
-}
-
-bool LEDUserInterface::isButtonPressedForReset(VlcbModeParams mode)
-{
-  // start timeout timer
-  unsigned long waittime = millis();
-
-  // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
-
-  indicateResetting();
-
-  // wait for button press for (5 sec) button press -- as a 'safety' mechanism
-  while (true)
-  {
-    process(nullptr);
-
-    if (!pushButton.isPressed())
-    {
-      // Button release early
-      break;
-    }
-      
-    if (pushButton.getCurrentStateDuration() > SW_TR_HOLD)
-    {
-      // Button held down long enough
-      // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
-      return true;
-    }
-  }
-
-  // DEBUG_SERIAL << F("> button released early, reset not performed") << endl;
-  indicateMode(mode);
-  return false;
 }
 
 }

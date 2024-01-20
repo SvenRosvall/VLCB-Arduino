@@ -70,7 +70,6 @@ void setupVLCB()
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  
 
   // initialise and load configuration
   controller.begin();
@@ -91,7 +90,7 @@ void setupVLCB()
   controller.setName(mname);
 
   // module reset - if switch is depressed at startup and module is in Uninitialised mode
-  if (modconfig.currentMode == MODE_UNINITIALISED && userInterface.isButtonPressedForReset(modconfig.currentMode))
+  if (userInterface.isButtonPressed())
   {
     Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
     modconfig.resetModule();
