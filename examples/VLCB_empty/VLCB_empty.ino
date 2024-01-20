@@ -89,10 +89,10 @@ void setupVLCB()
   controller.setParams(params.getParams());
   controller.setName(mname);
 
-  // module reset - if switch is depressed at startup and module is in Uninitialised mode
+  // module reset - if switch is depressed at startup
   if (userInterface.isButtonPressed())
   {
-    Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
+    Serial << F("> switch was pressed at startup") << endl;
     modconfig.resetModule();
   }
 
