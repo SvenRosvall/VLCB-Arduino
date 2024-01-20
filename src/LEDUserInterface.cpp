@@ -122,11 +122,6 @@ UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
 
 bool LEDUserInterface::isButtonPressedForReset(VlcbModeParams mode)
 {
-  // start timeout timer
-  unsigned long waittime = millis();
-
-  // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
-
   indicateResetting();
 
   // wait for button press for (5 sec) button press -- as a 'safety' mechanism
