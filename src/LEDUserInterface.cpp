@@ -34,22 +34,6 @@ void LEDUserInterface::run()
   }
 }
 
-void LEDUserInterface::indicateResetting()
-{
-  pushButton.reset();
-  greenLed.blink();
-  yellowLed.blink();
-}
-
-void LEDUserInterface::indicateResetDone()
-{
-  Serial << "UI indicateResetDone()" << endl;
-  greenLed.off();
-  yellowLed.off();
-  greenLed.run();
-  yellowLed.run();
-}
-
 void LEDUserInterface::indicateActivity()
 {
   greenLed.pulse();

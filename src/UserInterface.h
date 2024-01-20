@@ -24,11 +24,8 @@ public:
   };
 
   virtual void run() = 0;
-  virtual void indicateResetting() =0;
-  virtual void indicateResetDone() = 0;
   virtual void indicateActivity() = 0;
   virtual void indicateMode(VlcbModeParams mode) = 0;
-  virtual bool resetRequested() = 0;
   virtual RequestedAction checkRequestedAction() = 0;
 };
 

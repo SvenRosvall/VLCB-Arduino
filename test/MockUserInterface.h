@@ -15,12 +15,9 @@ class MockUserInterface : public VLCB::UserInterface
 {
 public:
   virtual void run() override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
   virtual void indicateActivity() override;
   virtual void indicateMode(VlcbModeParams mode) override;
-  virtual bool resetRequested() override;
-virtual RequestedAction checkRequestedAction() override;
+  virtual RequestedAction checkRequestedAction() override;
   
   void setRequestedAction(RequestedAction action);
   VlcbModeParams getIndicatedMode();
