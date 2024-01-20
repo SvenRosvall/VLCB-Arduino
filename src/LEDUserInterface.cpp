@@ -34,13 +34,6 @@ void LEDUserInterface::run()
   }
 }
 
-void LEDUserInterface::indicateResetting()
-{
-  pushButton.reset();
-  greenLed.blink();
-  yellowLed.blink();
-}
-
 void LEDUserInterface::indicateActivity()
 {
   greenLed.pulse();
@@ -118,34 +111,6 @@ UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
     }
   }
   return NONE;
-}
-
-bool LEDUserInterface::isButtonPressedForReset(VlcbModeParams mode)
-{
-  indicateResetting();
-
-  // wait for button press for (5 sec) button press -- as a 'safety' mechanism
-  while (true)
-  {
-    run();
-
-    if (!pushButton.isPressed())
-    {
-      // Button release early
-      break;
-    }
-      
-    if (pushButton.getCurrentStateDuration() > SW_TR_HOLD)
-    {
-      // Button held down long enough
-      // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
-      return true;
-    }
-  }
-
-  // DEBUG_SERIAL << F("> button released early, reset not performed") << endl;
-  indicateMode(mode);
-  return false;
 }
 
 }
