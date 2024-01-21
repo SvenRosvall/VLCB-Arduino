@@ -23,6 +23,7 @@ public:
   virtual byte getServiceID() override { return 99; };
   virtual byte getServiceVersionID() override { return 1; };
 
+  bool isButtonPressed();
   virtual void process(const Command *cmd) override;
 
 private:
