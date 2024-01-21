@@ -149,6 +149,13 @@ void setupVLCB()
   controller.setParams(params.getParams());
   controller.setName(mname);
 
+  // module reset - if switch is depressed at startup
+  if (ledUserInterface.isButtonPressed())
+  {
+    Serial << F("> switch was pressed at startup") << endl;
+    modconfig.resetModule();
+  }
+  
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
