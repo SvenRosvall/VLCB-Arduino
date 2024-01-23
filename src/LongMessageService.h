@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "Transport.h"  // for DEFAULT_PRIORITY
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -30,6 +29,8 @@ enum {
   LONG_MESSAGE_TRUNCATED
 };
 
+struct VlcbMessage;
+
 //
 /// a basic class to send and receive Controller long messages per MERG RFC 0005
 /// See https://www.merg.org.uk/merg_wiki/doku.php?id=rfc:longmessageprotocol
@@ -42,8 +43,8 @@ class LongMessageService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
+  virtual void process(const Command * cmd) override;
+  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process();
   virtual void processReceivedMessageFragment(const VlcbMessage *frame);
@@ -56,12 +57,13 @@ public:
 
 protected:
 
-  bool sendMessageFragment(VlcbMessage *frame, const byte priority);
+  void handleMessage(const VlcbMessage *msg);
+  bool sendMessageFragment(VlcbMessage *frame);
 
   bool _is_receiving = false;
   byte *_send_buffer, *_receive_buffer;
   byte _send_stream_id = 0, _receive_stream_id = 0, *_stream_ids = NULL, _num_stream_ids = 0;
-  byte _send_priority = DEFAULT_PRIORITY, _msg_delay = LONG_MESSAGE_DEFAULT_DELAY;
+  byte _msg_delay = LONG_MESSAGE_DEFAULT_DELAY;
   unsigned int _send_buffer_len = 0, _incoming_message_length = 0, _receive_buffer_len = 0, _receive_buffer_index = 0;
   unsigned int _send_buffer_index = 0, _incoming_message_crc = 0, _incoming_bytes_received = 0;
   unsigned int _receive_timeout = LONG_MESSAGE_RECEIVE_TIMEOUT, _send_sequence_num = 0, _expected_next_receive_sequence_num = 0;
@@ -86,7 +88,7 @@ struct receive_context_t {
 
 struct send_context_t {
   bool in_use;
-  byte send_stream_id, send_priority, msg_delay;
+  byte send_stream_id, msg_delay;
   byte *buffer;
   unsigned int send_buffer_len, send_buffer_index, send_sequence_num;
   unsigned long last_fragment_sent;
@@ -100,7 +102,7 @@ class LongMessageServiceEx : public LongMessageService
 public:
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
-  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id, const byte priority = DEFAULT_PRIORITY);
+  bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   bool process();
   void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
   virtual void processReceivedMessageFragment(const VlcbMessage *frame);

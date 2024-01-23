@@ -5,28 +5,32 @@
 
 #pragma once
 
-#include "UserInterface.h"
+#include "Service.h"
 #include "Configuration.h"
 #include "Transport.h"
 
 namespace VLCB
 {
 
-class SerialUserInterface : public UserInterface
+class SerialUserInterface : public Service
 {
 public:
-  SerialUserInterface(Configuration * modconfig, Transport * transport);
+  SerialUserInterface(Transport *transport);
+  virtual void setController(Controller *ctrl) override;
+  virtual byte getServiceID() override { return 98; };
+  virtual byte getServiceVersionID() override { return 1; };
 
-  virtual void run() override;
-  virtual void indicateActivity() override;
-  virtual void indicateMode(VlcbModeParams i) override;
-  virtual RequestedAction checkRequestedAction() override;
+  virtual void process(const Command *cmd) override;
 
 private:
+  Controller * controller;
   Configuration * modconfig;
   Transport * transport;
   bool isResetRequested = false;
-  UserInterface::RequestedAction requestedAction;
+
+  void handleCommand(const Command *cmd);
+  void processSerialInput();
+  void indicateMode(VlcbModeParams i);
 };
 
 }

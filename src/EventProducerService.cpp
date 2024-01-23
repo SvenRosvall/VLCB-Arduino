@@ -55,13 +55,18 @@ byte EventProducerService::createDefaultEvent(byte evValue)
 }
 
 
-void EventProducerService::process(UserInterface::RequestedAction requestedAction)
+void EventProducerService::process(const Command * cmd)
 {
   // Do this if mode changes from uninitialised to normal
   if (((uninit) && (module_config->currentMode == MODE_NORMAL)))
   {
     setProducedEvents();
     uninit = false;
+  }
+  
+  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  {
+    handleProdSvcMessage(&cmd->vlcbMessage);
   }
 }
 
@@ -91,11 +96,6 @@ void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte
   msg.data[3] = nn_en[2];
   msg.data[4] = nn_en[3];
   controller->sendMessage(&msg);
-
-  if (coeService)
-  {
-    coeService->put(&msg);
-  }
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue)
@@ -110,7 +110,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
     nn_en[0] = highByte(module_config->nodeNum);
     nn_en[1] = lowByte(module_config->nodeNum); 
   }
-  else 
+  else
   {
     opCode = (state ? OPC_ACON : OPC_ACOF);
   }
@@ -193,11 +193,11 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   sendMessage(msg, opCode, nn_en);
 }
 
-Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg) 
+void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg) 
 {
+  unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
-  //unsigned int en = (msg->data[3] << 8) + msg->data[4];
-  // DEBUG_SERIAL << ">VLCBSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
+  // DEBUG_SERIAL << ">VLCBProdSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 
   {    
@@ -209,19 +209,14 @@ Processed EventProducerService::handleMessage(unsigned int opc, VlcbMessage *msg
       {
         (void)(*eventhandler)(0, msg);
       }
-
-      return PROCESSED;
+      break;
 
     case OPC_ASRQ:
 
 
 
-      return PROCESSED;
+      break;
 
-    default:
-      // unknown or unhandled OPC
-      // DEBUG_SERIAL << F("> opcode 0x") << _HEX(opc) << F(" is not currently implemented")  << endl;
-      return NOT_PROCESSED;
   }
 }
 }

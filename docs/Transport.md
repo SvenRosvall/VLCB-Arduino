@@ -8,8 +8,7 @@ class Transport
 {
 public:
   virtual void setController(Controller * ctrl) { }
-  virtual bool available() = 0;
-  virtual VlcbMessage getNextMessage() = 0;
+  virtual bool process() = 0;
   virtual bool sendMessage(VlcbMessage *msg) = 0;
   virtual void reset() = 0;
 };
@@ -22,11 +21,9 @@ setController
 There is a default implementation here so the implementing class does not need to implement
 it if it doesn't need a pointer to the controller.
 
-available
-: returns true if there is a message available.
-
-getNextMessage
-: retrieves the next message that is available.
+process
+: Checks for incoming messages and if there is one put it on
+the command queue.
 
 sendMessage
 : send a message to the transport mechanism being implemented.
@@ -38,7 +35,7 @@ reset
 The class ```CanTransport``` serves as a base class for implementations of CAN based transports.
 It handles CANID enumeration and conflict detection that would be the same for all CAN based transports. 
 
-```CanTransport``` implements the methods ```getNextMessage``` and ```sendMessage``` above. 
+```CanTransport``` implements the methods ```process``` and ```sendMessage``` above. 
 However, it requires that any concrete implementing classes implement the following methods:
 
 getNextCanMessage

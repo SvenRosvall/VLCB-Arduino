@@ -55,50 +55,6 @@ new virtual methods that the CAN driver must implement.
 Making the CAN Driver a separate object clarifies the responsibilities of ```CanTransport```
 and CAN driver implementations.
 
-## Introduce a Command Queue for communication between services
-Today we have a few pieces of code where services communicate between each other.
-Each of these solve the relationship between services in different ways.
-1. MinimumNodeService needs to tell CanService to start CANID enumeration when changing mode.
-   This is done by making a call to controller which looks up the CanService and forwards the call.
-2. EventProducerService passes a produced event to CoEService which then makes it available to
-   the EventConsumerService.
-   This is done by including a pointer to the CoEService in the EPService and the ECService.
-3. Pending pull request:Clear Events message (NNCLR) is handled by the EventTeachingService. 
-   It needs to tell the EventProducerService to re-create the default events.
-   The EventTeachingService raises a flag that the EventProducerService checks and if set it
-   re-creates the default events.
-
-Three different solutions to a problem with inter-service communication. We need something better.
-
-Introduce a queue of commands.
-Each command is a structure with a command (enum) and a payload that is different for each command.
-The service that needs to instruct another service puts a command on the queue. 
-The Controller manages the queue and passes the command on top the queue to the services in their process() call.
-This command can be null if there is no command in the queue.
-
-The impact on program memory shouldn't be too severe as a queue implementation is already kept in
-the CoEService.
-The existing specific code pieces for handling intra-service communication will go away.
-The CoEService will go away.
-
-### Additional Improvements
-If this command queue is successful we could even use it for passing incoming messages from the Transport
-to services. 
-And vice versa use this queue for sending response messages and produced event messages as commands to the
-Transport.
-
-This idea can even go further and make the Transport a service (as originally envisaged).
-Having the Transport as a service also allows for multiple transport connections and implement bridges
-between different types of transport media such as CAN and Ethernet.
-
-The UserInterface also generates actions that could be passed on as a Command on this queue instead of
-being passed as a parameter to the Service process(). 
-Thus, the UserInterface could also be converted to a service and will receive commands such as indicate
-activity from other services.
-
-The ```CombinedUserInterface``` won't be needed anymore as the ```LedUserInterface``` and
-```SerialUserInterface``` can now be added to the list of services side by side.
-
 ## Documentation
 
 ### Split documentation based on audience

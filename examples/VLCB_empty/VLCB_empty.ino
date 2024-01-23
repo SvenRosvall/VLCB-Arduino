@@ -47,14 +47,14 @@ VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &userInterface, &canService, &nvService, &ecService, &epService, &etService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::VlcbMessage *);
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 
@@ -171,7 +171,7 @@ void loop()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   // as an example, display the opcode and the first EV of this event, which will be ev2 as ev1 defines produced event
 

@@ -20,15 +20,20 @@
 namespace VLCB
 {
 
-Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_list<Service *> services)
-  : _ui(ui)
-  , transport(trpt)
-  , services(services)
+// TODO: This is a sign something is wrong. Need to be this big to handle 
+// large number of generated messages such as when asking for node parameters.
+// Each entry uses 10 bytes so a size of 30 uses 300 bytes.
+// This will get worse for for example queries for all events.
+// Need a mechanism like TimedResponse to create messages slowly so they can
+// be sent through the transport without requiring this buffering. 
+const int COMMAND_QUEUE_SIZE = 30;
+
+Controller::Controller(std::initializer_list<Service *> services)
+  : services(services)
+  , commandQueue(COMMAND_QUEUE_SIZE)
 {
   extern Configuration config;
   module_config = &config;
-
-  transport->setController(this);
 
   for (Service * service : services)
   {
@@ -40,14 +45,11 @@ Controller::Controller(UserInterface * ui, Transport * trpt, std::initializer_li
 /// construct a Controller object with a Configuration object that the user provides.
 /// note that this Configuration object must have a lifetime longer than the Controller object.
 //
-Controller::Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services)
-  : _ui(ui)
-  , module_config(conf)
-  , transport(trpt)
+Controller::Controller(Configuration *conf, std::initializer_list<Service *> services)
+  : module_config(conf)
   , services(services)
+  , commandQueue(COMMAND_QUEUE_SIZE)
 {
-  transport->setController(this);
-
   for (Service * service : services)
   {
     service->setController(this);
@@ -114,11 +116,10 @@ void Controller::setName(const unsigned char *mname)
 
 void Controller::indicateMode(VlcbModeParams mode)
 {
-  // DEBUG_SERIAL << F("> indicating mode = ") << mode << endl;
-  if (_ui) 
-  {
-    _ui->indicateMode(mode);
-  }
+  //DEBUG_SERIAL << F("ctrl> indicating mode = ") << mode << endl;
+  Command cmd = {CMD_INDICATE_MODE};
+  cmd.mode = mode;
+  putCommand(cmd);
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
 }
@@ -137,83 +138,37 @@ void Controller::setParamFlag(unsigned char flag, bool set)
 
 void Controller::indicateActivity()
 {
-  if (_ui)
-  {
-    _ui->indicateActivity();
-  }
+  putCommand(CMD_INDICATE_ACTIVITY);
 }
 
 //
 /// main Controller message processing procedure
 //
-void Controller::process(byte num_messages)
+void Controller::process()
 {
-  // process switch operations if the module is configured with one
-  UserInterface::RequestedAction requestedAction = UserInterface::NONE;
-  if (_ui)
-  {
-    _ui->run();
+  //Serial << F("Ctrl::process() start, cmd queue size = ") << commandQueue.size();
+  const Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+  //Serial << F(" cmd type = ");
+  //if (cmd) Serial << cmd->commandType; else Serial << F("null");
+  //Serial << endl;
 
-    requestedAction = _ui->checkRequestedAction();
-    // if (requestedAction != UserInterface::NONE)
-    //   DEBUG_SERIAL << "Controller::process() UI action=" << requestedAction << " mode=" << module_config->currentMode << endl;
+  for (Service *service: services)
+  {
+    service->process(cmd);
   }
-
-  for (Service * service : services)
-  {
-    service->process(requestedAction);
-  }
-
-  // get received CAN frames from buffer
-  // process by default 3 messages per run so the user's application code doesn't appear unresponsive under load
-  for (byte mcount = 0 ; transport->available() && mcount < num_messages ; ++mcount)
-  {
-    // at least one CAN frame is available in the reception buffer
-    // retrieve the next one
-
-    VlcbMessage msg = transport->getNextMessage();
-    // DEBUG_SERIAL << "> Received a message" << endl;
-
-    if (msg.len == 0xFF)
-    {
-      // received msg was something CAN specific, ignore it.
-      continue;
-    }
-
-    indicateActivity();
-
-    //
-    /// process the message opcode
-    /// if we got this far, it's a standard CAN frame (not extended, not RTR) with a data payload length > 0
-    //
-
-    if (msg.len > 0) 
-    {
-      unsigned int opc = msg.data[0];
-      // DEBUG_SERIAL << "> Passing on message with op=" << _HEX(opc) << endl;
-      for (Service * service : services)
-      {
-        if (service->handleMessage(opc, &msg) == PROCESSED)
-        {
-          break;
-        }
-      }
-    } else {
-      // DEBUG_SERIAL << F("> oops ... zero - length frame ?? ") << endl;
-    }
-  }  // while messages available
-
-  // DEBUG_SERIAL << F("> end of opcode processing, time = ") << (micros() - mtime) << "us" << endl;
-
-  //
-  /// end of Controller message processing
-  //
 }
 
 void setNN(VlcbMessage *msg, unsigned int nn)
 {
   msg->data[1] = highByte(nn);
   msg->data[2] = lowByte(nn);
+}
+
+bool Controller::sendMessage(const VlcbMessage *msg)
+{
+  Command cmd = {CMD_MESSAGE_OUT, *msg};
+  commandQueue.put(&cmd);
+  return true;
 }
 
 bool Controller::sendMessageWithNNandData(int opc, int len, ...)
@@ -255,18 +210,20 @@ void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
-void Controller::startCANenumeration()
+void Controller::putCommand(const Command &cmd)
 {
-  // Delegate this to the CanService.
-  // Find it first.
-  for (Service * svc : services)
-  {
-    if (svc->getServiceID() == SERVICE_ID_CAN)
-    {
-      CanService * canSvc = (CanService *) svc;
-      canSvc->startCANenumeration();
-    }
-  }
+  // Serial << F("C>put command with type=") << cmd.commandType << endl;
+  commandQueue.put(&cmd);
+}
+
+void Controller::putCommand(COMMAND cmd)
+{
+  putCommand(Command{cmd});
+}
+
+bool Controller::pendingCommands()
+{
+  return commandQueue.available();
 }
 
 }

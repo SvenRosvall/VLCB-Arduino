@@ -6,19 +6,17 @@
 #pragma once
 
 #include "Service.h"
-#include "ConsumeOwnEventsService.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB {
 
 class Configuration;
+struct VlcbMessage;
 
 class EventProducerService : public Service {
 public:
-  EventProducerService(ConsumeOwnEventsService *s = nullptr) : coeService(s) {}
   virtual void setController(Controller *cntrl) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+  virtual void process(const Command * cmd) override;
 
   virtual byte getServiceID() override
   {
@@ -37,9 +35,9 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  ConsumeOwnEventsService *coeService;
-  void (*eventhandler)(byte index, VlcbMessage *msg);
+  void (*eventhandler)(byte index, const VlcbMessage *msg);
 
+  void handleProdSvcMessage(const VlcbMessage *msg);
   void setProducedEvents();
   byte createDefaultEvent(byte evValue);
   void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);

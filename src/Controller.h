@@ -13,10 +13,10 @@
 
 #include <Configuration.h>
 #include <Transport.h>
-#include "UserInterface.h"
 #include "Service.h"
 #include "initializer_list.h"
 #include "ArrayHolder.h"
+#include "CircularBuffer.h"
 
 namespace VLCB
 {
@@ -30,14 +30,38 @@ struct VlcbMessage
   uint8_t data[8];
 };
 
+// Command type
+enum COMMAND : byte
+{
+  CMD_MESSAGE_IN,
+  CMD_MESSAGE_OUT,
+  CMD_START_CAN_ENUMERATION,
+  CMD_CHANGE_MODE,
+  CMD_RENEGOTIATE,
+  CMD_INDICATE_ACTIVITY,
+  CMD_INDICATE_MODE,
+  // ...
+};
+
+struct Command
+{
+  enum COMMAND commandType;
+  union
+  {
+    VlcbMessage vlcbMessage; // with CMD_MESSAGE_IN & CMD_MESSAGE_OUT
+    bool fromENUM; // with CMD_START_CAN_ENUMERATION
+    VlcbModeParams mode; // with CMD_INDICATE_MODE
+  };
+};
+
 //
 /// Main object in VLCB. Coordinates transport, ui, configuration and services.
 //
 class Controller
 {
 public:
-  Controller(UserInterface *ui, Transport *trpt, std::initializer_list<Service *> services);
-  Controller(UserInterface * ui, Configuration *conf, Transport * trpt, std::initializer_list<Service *> services);
+  Controller(std::initializer_list<Service *> services);
+  Controller(Configuration *conf, std::initializer_list<Service *> services);
 
   Configuration * getModuleConfig() { return module_config; }
 
@@ -50,11 +74,7 @@ public:
   void setParamFlag(unsigned char flag, bool b);
   unsigned char getParam(unsigned int param) { return _mparams[param]; }
 
-  bool sendMessage(VlcbMessage *msg)
-  {
-    indicateActivity();
-    return transport->sendMessage(msg);
-  }
+  bool sendMessage(const VlcbMessage *msg);
 
   void begin();
   inline bool sendMessageWithNN(int opc);
@@ -67,26 +87,28 @@ public:
   bool sendCMDERR(byte cerrno);
   void sendGRSP(byte opCode, byte serviceType, byte errCode);
 
-  void startCANenumeration();
   byte getModuleCANID() { return module_config->CANID; }
-  void process(byte num_messages = 3);
+  void process();
   void indicateMode(VlcbModeParams mode);
   void indicateActivity();
   void setLearnMode(byte reqMode);
+  
+  void putCommand(const Command & cmd);
+  void putCommand(COMMAND cmd);
+  bool pendingCommands();
 
-private:                                          // protected members become private in derived classes
-  UserInterface *_ui;
+private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
-  Transport * transport;
 
   unsigned char *_mparams;
   const unsigned char *_mname;
+  
+  CircularBuffer<Command> commandQueue;
 
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);
 };
-
 
 bool Controller::sendMessageWithNN(int opc)
 {

@@ -70,7 +70,6 @@
 #include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
-#include "CombinedUserInterface.h"
 
 #include "LEDControl.h"
 
@@ -88,17 +87,16 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
-VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
+VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService(&coeService);
+VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService(&coeService);
-VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515,
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
+VLCB::EventProducerService epService;
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
@@ -116,7 +114,7 @@ LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
 // forward function declarations
-void eventhandler(byte, VLCB::VlcbMessage *);
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
 
@@ -296,7 +294,7 @@ void processSwitches(void)
 //
 /// called from the VLCB library when a learned event is received
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 

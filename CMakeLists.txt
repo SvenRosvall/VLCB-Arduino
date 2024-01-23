@@ -33,8 +33,6 @@ add_library(hardware_library OBJECT
         src/LEDUserInterface.h
         src/SerialUserInterface.cpp
         src/SerialUserInterface.h
-        src/CombinedUserInterface.h
-        src/CombinedUserInterface.cpp
         src/SerialGC.h
         src/SerialGC.cpp
         )
@@ -49,10 +47,8 @@ add_library(core_library OBJECT
         src/Parameters.cpp
         src/Parameters.h
         src/Transport.h
-        src/CanTransport.cpp
         src/CanTransport.h
         src/Storage.h
-        src/UserInterface.h
         src/Service.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp
@@ -72,6 +68,7 @@ add_library(core_library OBJECT
         src/ConsumeOwnEventsService.cpp
         src/GridConnect.cpp
         src/GridConnect.h
+        src/CircularBuffer.h
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -101,11 +98,11 @@ add_executable(testAll
         test/testNodeVariableService.cpp
         test/testCanService.cpp
         test/MockUserInterface.cpp
-        test/MockTransport.cpp
         test/MockStorage.cpp
-        test/MockTransport.h
         test/MockCanTransport.cpp
         test/MockCanTransport.h
+        test/MockTransportService.cpp
+        test/MockTransportService.h
         test/VlcbCommon.cpp
         test/testEventProducerService.cpp
         test/testEventConsumerService.cpp
@@ -114,4 +111,5 @@ add_executable(testAll
         test/testLongMessageService.cpp
         test/testGridConnect.cpp
         test/testConfiguration.cpp
+        test/testCircularBuffer.cpp
 )

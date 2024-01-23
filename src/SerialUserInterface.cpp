@@ -12,13 +12,25 @@ extern void printConfig();
 namespace VLCB
 {
 
-SerialUserInterface::SerialUserInterface(Configuration * modconfig, Transport *transport)
-  : modconfig(modconfig)
-  , transport(transport)
+SerialUserInterface::SerialUserInterface(Transport *transport)
+  : transport(transport)
 {
 }
 
-void SerialUserInterface::run()
+void SerialUserInterface::setController(Controller *ctrl)
+{
+  this->controller = ctrl;
+  this->modconfig = ctrl->getModuleConfig();
+}
+
+void SerialUserInterface::process(const Command *cmd)
+{
+  handleCommand(cmd);
+  
+  processSerialInput();
+}
+
+void SerialUserInterface::processSerialInput()
 {
   byte uev = 0;
   char msgstr[32], dstr[32];
@@ -146,7 +158,8 @@ void SerialUserInterface::run()
         break;
         
       case 's': // "s" == "setup"
-        requestedAction = CHANGE_MODE;
+        //Serial << F("SUI> Requesting mode change") << endl; Serial.flush();
+        controller->putCommand(CMD_CHANGE_MODE);
         break;
 
       case '\r':
@@ -161,8 +174,26 @@ void SerialUserInterface::run()
   }
 }
 
-void SerialUserInterface::indicateActivity()
+void SerialUserInterface::handleCommand(const Command *cmd)
 {
+  if (cmd == nullptr)
+  {
+    return;
+  }
+
+  switch (cmd->commandType)
+  {
+    case CMD_INDICATE_ACTIVITY:
+      // Don't indicate this. Too noisy.
+      break;
+
+    case CMD_INDICATE_MODE:
+      indicateMode(cmd->mode);
+      break;
+
+    default:
+      break;
+  }
 }
 
 void SerialUserInterface::indicateMode(VlcbModeParams mode) 
@@ -185,13 +216,6 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
     default:
       break;
   }
-}
-
-UserInterface::RequestedAction SerialUserInterface::checkRequestedAction()
-{
-  UserInterface::RequestedAction oldRequestedAction = requestedAction;
-  requestedAction = NONE;
-  return oldRequestedAction;
 }
 
 }

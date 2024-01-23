@@ -6,7 +6,6 @@
 #pragma once
 
 #include "Service.h"
-#include "UserInterface.h"
 #include "CanTransport.h"
 #include <vlcbdefs.hpp>
 
@@ -14,6 +13,7 @@ namespace VLCB
 {
 
 class Configuration;
+struct VlcbMessage;
 
 class CanService : public Service
 {
@@ -25,10 +25,7 @@ public:
   virtual byte getServiceID() override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() override { return 1; }
 
-  virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-
-  void startCANenumeration(bool fromENUM = false);
+  virtual void process(const Command * cmd) override;
 
 private:
 
@@ -36,8 +33,24 @@ private:
   Configuration * module_config;  // Shortcut to reduce indirection code.
   CanTransport * canTransport;
 
-  Processed handleEnumeration(const VlcbMessage *msg, unsigned int nn);
-  Processed handleSetCANID(const VlcbMessage *msg, unsigned int nn);
+  void handleCanServiceMessage(const VlcbMessage *msg);
+  void handleEnumeration(unsigned int nn);
+  void handleSetCANID(const VlcbMessage *msg, unsigned int nn);
+
+  bool sendMessage(const VlcbMessage *msg);
+  bool sendRtrMessage();
+  bool sendCanMessage(CANMessage *msg) { return canTransport->sendCanMessage(msg); }
+  void startCANenumeration(bool fromENUM = false);
+
+  void checkIncomingMessage();
+  void checkCANenumTimout();
+  byte findFreeCanId();
+
+  bool enumeration_required = false;
+  bool bCANenum = false;
+  bool startedFromEnumMessage = false;
+  unsigned long CANenumTime;
+  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
 };
 
 }

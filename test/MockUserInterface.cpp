@@ -6,30 +6,14 @@
 //
 
 #include "MockUserInterface.h"
+#include "Controller.h"
 
-void MockUserInterface::run()
+void MockUserInterface::process(const VLCB::Command *cmd)
 {
-
-}
-
-void MockUserInterface::indicateActivity()
-{
-
-}
-
-void MockUserInterface::indicateMode(VlcbModeParams mode)
-{
-  indicatedMode = mode;
-}
-
-VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()
-{
-  return requestedAction;
-}
-
-void MockUserInterface::setRequestedAction(VLCB::UserInterface::RequestedAction action)
-{
-  requestedAction = action;
+  if (cmd != nullptr && cmd->commandType == VLCB::CMD_INDICATE_MODE)
+  {
+    indicatedMode = cmd->mode;
+  }
 }
 
 VlcbModeParams MockUserInterface::getIndicatedMode()
