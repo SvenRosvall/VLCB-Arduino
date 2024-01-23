@@ -58,6 +58,8 @@
 // VLCB library header files
 #include <Controller.h>                   // Controller class
 #include <CAN2515.h>               // CAN controller
+#include <Switch.h>
+#include <LED.h>
 #include <Configuration.h>             // module configuration
 #include <Parameters.h>             // VLCB parameters
 #include <vlcbdefs.hpp>               // VLCB constants
