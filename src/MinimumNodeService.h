@@ -31,7 +31,7 @@ public:
   void setHeartBeat(bool f) { noHeartbeat = !f; }
   void setSetupMode();
   void setUninitialised();
-  void setNormal();
+  void setNormal(unsigned int nn);
 
 private:
 

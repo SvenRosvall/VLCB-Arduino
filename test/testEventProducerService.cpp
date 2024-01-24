@@ -200,7 +200,7 @@ void testSetProducedDefaultEventsOnNewBoard()
 
   controller.begin();
 
-  minimumNodeService->setNormal();
+  minimumNodeService->setNormal(0x0104);
 
   // Should have no events configured at start
   assertEquals(0, controller.getModuleConfig()->numEvents());
@@ -208,6 +208,13 @@ void testSetProducedDefaultEventsOnNewBoard()
   process(controller);
 
   assertEquals(1, controller.getModuleConfig()->numEvents());
+  byte eventArray[VLCB::EE_HASH_BYTES];
+  controller.getModuleConfig()->readEvent(0, eventArray);
+  assertEquals(0x01, eventArray[0]);
+  assertEquals(0x04, eventArray[1]);
+  assertEquals(0x00, eventArray[2]);
+  assertEquals(0x01, eventArray[3]);
+  assertEquals(1, controller.getModuleConfig()->getEventEVval(0, 1));
 }
 
 void testSendEventMissingInTable()
