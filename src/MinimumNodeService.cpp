@@ -52,9 +52,8 @@ void MinimumNodeService::setNormal(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
   requestingNewNN = false;
-  module_config->setNodeNum(nn);
   instantMode = MODE_NORMAL;
-  module_config->setModuleMode(MODE_NORMAL);
+  module_config->setModuleNormalMode(nn);
   controller->indicateMode(MODE_NORMAL);
 }
 
@@ -66,8 +65,7 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
-  module_config->setNodeNum(0);
-  module_config->setModuleMode(MODE_UNINITIALISED);
+  module_config->setModuleUninitializedMode();
   module_config->setCANID(0);
 
   controller->indicateMode(MODE_UNINITIALISED);
