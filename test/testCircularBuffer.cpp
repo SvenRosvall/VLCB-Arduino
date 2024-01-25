@@ -20,9 +20,6 @@ void testEmpty()
   assertEquals(0, buffer.getOverflows());
   assertEquals(0, buffer.getNumberOfGets());
   assertEquals(0, buffer.getNumberOfPuts());
-
-  assertEquals(nullptr, buffer.get());
-  assertEquals(0, buffer.getNumberOfGets());
 }
 
 void testHasOne()
@@ -31,7 +28,7 @@ void testHasOne()
   
   VLCB::CircularBuffer<int> buffer(4);
   int entry = 17;
-  buffer.put(&entry);
+  buffer.put(entry);
 
   assertEquals(true, buffer.available());
   assertEquals(1, buffer.getHighWaterMark());
@@ -39,7 +36,7 @@ void testHasOne()
   assertEquals(0, buffer.getNumberOfGets());
   assertEquals(1, buffer.getNumberOfPuts());
 
-  assertEquals(entry, *buffer.get());
+  assertEquals(entry, buffer.pop());
   assertEquals(1, buffer.getNumberOfGets());
   assertEquals(false, buffer.available());
 }
@@ -50,10 +47,10 @@ void testFull()
   
   VLCB::CircularBuffer<int> buffer(4);
   int entry = 1;
-  buffer.put(&entry);
-  buffer.put(&entry);
-  buffer.put(&entry);
-  buffer.put(&entry);
+  buffer.put(entry);
+  buffer.put(entry);
+  buffer.put(entry);
+  buffer.put(entry);
 
   assertEquals(true, buffer.available());
   assertEquals(4, buffer.getHighWaterMark());
@@ -68,15 +65,15 @@ void testOverflow()
   
   VLCB::CircularBuffer<int> buffer(4);
   int entry = 1;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 2;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 3;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 4;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 5;
-  buffer.put(&entry);
+  buffer.put(entry);
 
   assertEquals(true, buffer.available());
   assertEquals(4, buffer.getHighWaterMark());
@@ -85,7 +82,7 @@ void testOverflow()
   assertEquals(5, buffer.getNumberOfPuts());
   
   // First entry has been overwritten.
-  assertEquals(2, *buffer.get());
+  assertEquals(2, buffer.pop());
 }
 
 void testHeadWrapAround()
@@ -94,23 +91,23 @@ void testHeadWrapAround()
   
   VLCB::CircularBuffer<int> buffer(4);
   int entry = 1;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 2;
-  buffer.put(&entry);
+  buffer.put(entry);
 
-  assertEquals(1, *buffer.get());
-  assertEquals(2, *buffer.get());
+  assertEquals(1, buffer.pop());
+  assertEquals(2, buffer.pop());
 
   entry = 3;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 4;
-  buffer.put(&entry);
+  buffer.put(entry);
   entry = 5;
-  buffer.put(&entry);
+  buffer.put(entry);
 
-  assertEquals(3, *buffer.get());
-  assertEquals(4, *buffer.get());
-  assertEquals(5, *buffer.get());
+  assertEquals(3, buffer.pop());
+  assertEquals(4, buffer.pop());
+  assertEquals(5, buffer.pop());
 
   assertEquals(false, buffer.available());
   assertEquals(3, buffer.getHighWaterMark());
