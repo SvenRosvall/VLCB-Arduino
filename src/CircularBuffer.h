@@ -19,8 +19,8 @@ public:
 
   bool available();
   E *peek();
-  const E * get();
-  void put(const E *entry);
+  const E & pop();
+  void put(const E &entry);
   void clear();
 
   // Diagnostic metrics access
@@ -69,10 +69,10 @@ bool CircularBuffer<E>::available()
 /// store an item to the buffer - overwrite oldest item if buffer is full
 /// never called from an interrupt context so we don't need to worry about interrupts
 template <typename E>
-void CircularBuffer<E>::put(const E * msg)
+void CircularBuffer<E>::put(const E &msg)
 {
 //  E msg;
-  buffer[head] = *msg;
+  buffer[head] = msg;
 
   if (full)
   {
@@ -93,22 +93,16 @@ void CircularBuffer<E>::put(const E * msg)
   // DEBUG_SERIAL << ">COE Puts = " << numPuts << " Size = " << size <<endl;
 }
 
-/// retrieve the next item from the buffer
+/// retrieve the next item from the buffer, requires that available() is checked first.
 template <typename E>
-const E * CircularBuffer<E>::get()
+const E & CircularBuffer<E>::pop()
 {
-  E *p = nullptr;
-
-  if (available())
-  {
-    p = &buffer[tail];
-    full = false;
-    tail = (tail + 1) % capacity;
-    ++numGets;        // Counts how many events got from buffer.
-    // DEBUG_SERIAL << ">COE Gets = " << numGets << endl;
-  }
-
-  return p;
+  uint8_t oldTail = tail;
+  full = false;
+  tail = (tail + 1) % capacity;
+  ++numGets;        // Counts how many events got from buffer.
+  // DEBUG_SERIAL << ">COE Gets = " << numGets << endl;
+  return buffer[oldTail];
 }
 
 /// peek at the next item in the buffer without removing it

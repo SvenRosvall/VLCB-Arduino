@@ -9,7 +9,6 @@
 // Controller library
 #include <Controller.h>
 #include "MinimumNodeService.h"
-#include "CanService.h"
 #include <stdarg.h>
 
 //
@@ -147,7 +146,13 @@ void Controller::indicateActivity()
 void Controller::process()
 {
   //Serial << F("Ctrl::process() start, cmd queue size = ") << commandQueue.size();
-  const Command * cmd = commandQueue.available() ? commandQueue.get() : nullptr;
+  const Command * cmd = nullptr;
+  Command command;
+  if (commandQueue.available())
+  {
+    command = commandQueue.pop();
+    cmd = &command;
+  }
   //Serial << F(" cmd type = ");
   //if (cmd) Serial << cmd->commandType; else Serial << F("null");
   //Serial << endl;
@@ -167,7 +172,7 @@ void setNN(VlcbMessage *msg, unsigned int nn)
 bool Controller::sendMessage(const VlcbMessage *msg)
 {
   Command cmd = {CMD_MESSAGE_OUT, *msg};
-  commandQueue.put(&cmd);
+  commandQueue.put(cmd);
   return true;
 }
 
@@ -213,7 +218,7 @@ void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
 void Controller::putCommand(const Command &cmd)
 {
   // Serial << F("C>put command with type=") << cmd.commandType << endl;
-  commandQueue.put(&cmd);
+  commandQueue.put(cmd);
 }
 
 void Controller::putCommand(COMMAND cmd)
