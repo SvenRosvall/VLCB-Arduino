@@ -9,7 +9,6 @@
 // Controller library
 #include <Controller.h>
 #include "MinimumNodeService.h"
-#include "CanService.h"
 #include <stdarg.h>
 
 //
