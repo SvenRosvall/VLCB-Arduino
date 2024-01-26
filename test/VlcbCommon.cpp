@@ -62,7 +62,7 @@ void process(VLCB::Controller &controller)
 {
   const int MAX_PROCESS_COUNT = 30;
   controller.process();
-  for (int i = 0 ; controller.pendingCommands() && i < MAX_PROCESS_COUNT ; ++i)
+  for (int i = 0 ; controller.pendingAction() && i < MAX_PROCESS_COUNT ; ++i)
   {
     controller.process();
   }

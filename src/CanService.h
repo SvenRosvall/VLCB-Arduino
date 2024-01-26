@@ -25,7 +25,7 @@ public:
   virtual byte getServiceID() override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() override { return 1; }
 
-  virtual void process(const Command * cmd) override;
+  virtual void process(const Action * action) override;
 
 private:
 

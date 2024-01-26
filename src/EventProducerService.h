@@ -16,7 +16,7 @@ struct VlcbMessage;
 class EventProducerService : public Service {
 public:
   virtual void setController(Controller *cntrl) override;
-  virtual void process(const Command * cmd) override;
+  virtual void process(const Action * action) override;
 
   virtual byte getServiceID() override
   {

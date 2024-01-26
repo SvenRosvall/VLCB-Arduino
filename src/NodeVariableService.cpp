@@ -17,11 +17,11 @@ void NodeVariableService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-void NodeVariableService::process(const Command *cmd)
+void NodeVariableService::process(const Action *action)
 {
-  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
   {
-    handleMessage(&cmd->vlcbMessage);
+    handleMessage(&action->vlcbMessage);
   }
 }
 

@@ -30,27 +30,27 @@ struct VlcbMessage
   uint8_t data[8];
 };
 
-// Command type
-enum COMMAND : byte
+// Action type
+enum ACTION : byte
 {
-  CMD_MESSAGE_IN,
-  CMD_MESSAGE_OUT,
-  CMD_START_CAN_ENUMERATION,
-  CMD_CHANGE_MODE,
-  CMD_RENEGOTIATE,
-  CMD_INDICATE_ACTIVITY,
-  CMD_INDICATE_MODE,
+  ACT_MESSAGE_IN,
+  ACT_MESSAGE_OUT,
+  ACT_START_CAN_ENUMERATION,
+  ACT_CHANGE_MODE,
+  ACT_RENEGOTIATE,
+  ACT_INDICATE_ACTIVITY,
+  ACT_INDICATE_MODE,
   // ...
 };
 
-struct Command
+struct Action
 {
-  enum COMMAND commandType;
+  enum ACTION actionType;
   union
   {
-    VlcbMessage vlcbMessage; // with CMD_MESSAGE_IN & CMD_MESSAGE_OUT
-    bool fromENUM; // with CMD_START_CAN_ENUMERATION
-    VlcbModeParams mode; // with CMD_INDICATE_MODE
+    VlcbMessage vlcbMessage; // with ACT_MESSAGE_IN & ACT_MESSAGE_OUT
+    bool fromENUM; // with ACT_START_CAN_ENUMERATION
+    VlcbModeParams mode; // with ACT_INDICATE_MODE
   };
 };
 
@@ -93,9 +93,9 @@ public:
   void indicateActivity();
   void setLearnMode(byte reqMode);
   
-  void putCommand(const Command & cmd);
-  void putCommand(COMMAND cmd);
-  bool pendingCommands();
+  void putAction(const Action & action);
+  void putAction(ACTION action);
+  bool pendingAction();
 
 private:
   Configuration *module_config;
@@ -104,7 +104,7 @@ private:
   unsigned char *_mparams;
   const unsigned char *_mname;
   
-  CircularBuffer<Command> commandQueue;
+  CircularBuffer<Action> actionQueue;
 
   bool sendMessageWithNNandData(int opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(int opc, int len, ...);

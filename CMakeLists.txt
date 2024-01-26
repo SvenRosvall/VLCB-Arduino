@@ -112,4 +112,5 @@ add_executable(testAll
         test/testGridConnect.cpp
         test/testConfiguration.cpp
         test/testCircularBuffer.cpp
+        test/MockUserInterface.h
 )

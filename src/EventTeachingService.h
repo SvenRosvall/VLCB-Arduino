@@ -18,7 +18,7 @@ class EventTeachingService : public Service
 {
 public:
   virtual void setController(Controller *cntrl) override;
-  virtual void process(const Command * cmd) override;
+  virtual void process(const Action * action) override;
 
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }

@@ -25,11 +25,11 @@ namespace VLCB
 // This will get worse for for example queries for all events.
 // Need a mechanism like TimedResponse to create messages slowly so they can
 // be sent through the transport without requiring this buffering. 
-const int COMMAND_QUEUE_SIZE = 30;
+const int ACTION_QUEUE_SIZE = 30;
 
 Controller::Controller(std::initializer_list<Service *> services)
   : services(services)
-  , commandQueue(COMMAND_QUEUE_SIZE)
+  , actionQueue(ACTION_QUEUE_SIZE)
 {
   extern Configuration config;
   module_config = &config;
@@ -47,7 +47,7 @@ Controller::Controller(std::initializer_list<Service *> services)
 Controller::Controller(Configuration *conf, std::initializer_list<Service *> services)
   : module_config(conf)
   , services(services)
-  , commandQueue(COMMAND_QUEUE_SIZE)
+  , actionQueue(ACTION_QUEUE_SIZE)
 {
   for (Service * service : services)
   {
@@ -116,9 +116,9 @@ void Controller::setName(const unsigned char *mname)
 void Controller::indicateMode(VlcbModeParams mode)
 {
   //DEBUG_SERIAL << F("ctrl> indicating mode = ") << mode << endl;
-  Command cmd = {CMD_INDICATE_MODE};
-  cmd.mode = mode;
-  putCommand(cmd);
+  Action action = {ACT_INDICATE_MODE};
+  action.mode = mode;
+  putAction(action);
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
 }
@@ -137,7 +137,7 @@ void Controller::setParamFlag(unsigned char flag, bool set)
 
 void Controller::indicateActivity()
 {
-  putCommand(CMD_INDICATE_ACTIVITY);
+  putAction(ACT_INDICATE_ACTIVITY);
 }
 
 //
@@ -145,21 +145,21 @@ void Controller::indicateActivity()
 //
 void Controller::process()
 {
-  //Serial << F("Ctrl::process() start, cmd queue size = ") << commandQueue.size();
-  const Command * cmd = nullptr;
-  Command command;
-  if (commandQueue.available())
+  //Serial << F("Ctrl::process() start, pAction queue size = ") << actionQueue.size();
+  const Action * pAction = nullptr;
+  Action action;
+  if (actionQueue.available())
   {
-    command = commandQueue.pop();
-    cmd = &command;
+    action = actionQueue.pop();
+    pAction = &action;
   }
-  //Serial << F(" cmd type = ");
-  //if (cmd) Serial << cmd->commandType; else Serial << F("null");
+  //Serial << F(" pAction type = ");
+  //if (pAction) Serial << pAction->actionType; else Serial << F("null");
   //Serial << endl;
 
   for (Service *service: services)
   {
-    service->process(cmd);
+    service->process(pAction);
   }
 }
 
@@ -171,8 +171,8 @@ void setNN(VlcbMessage *msg, unsigned int nn)
 
 bool Controller::sendMessage(const VlcbMessage *msg)
 {
-  Command cmd = {CMD_MESSAGE_OUT, *msg};
-  commandQueue.put(cmd);
+  Action action = {ACT_MESSAGE_OUT, *msg};
+  actionQueue.put(action);
   return true;
 }
 
@@ -215,20 +215,20 @@ void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
-void Controller::putCommand(const Command &cmd)
+void Controller::putAction(const Action &action)
 {
-  // Serial << F("C>put command with type=") << cmd.commandType << endl;
-  commandQueue.put(cmd);
+  // Serial << F("C>put action with type=") << action.actionType << endl;
+  actionQueue.put(action);
 }
 
-void Controller::putCommand(COMMAND cmd)
+void Controller::putAction(ACTION action)
 {
-  putCommand(Command{cmd});
+  putAction(Action{action});
 }
 
-bool Controller::pendingCommands()
+bool Controller::pendingAction()
 {
-  return commandQueue.available();
+  return actionQueue.available();
 }
 
 }

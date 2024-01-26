@@ -23,9 +23,9 @@ void SerialUserInterface::setController(Controller *ctrl)
   this->modconfig = ctrl->getModuleConfig();
 }
 
-void SerialUserInterface::process(const Command *cmd)
+void SerialUserInterface::process(const Action *action)
 {
-  handleCommand(cmd);
+  handleAction(action);
   
   processSerialInput();
 }
@@ -159,7 +159,7 @@ void SerialUserInterface::processSerialInput()
         
       case 's': // "s" == "setup"
         //Serial << F("SUI> Requesting mode change") << endl; Serial.flush();
-        controller->putCommand(CMD_CHANGE_MODE);
+        controller->putAction(ACT_CHANGE_MODE);
         break;
 
       case '\r':
@@ -174,21 +174,21 @@ void SerialUserInterface::processSerialInput()
   }
 }
 
-void SerialUserInterface::handleCommand(const Command *cmd)
+void SerialUserInterface::handleAction(const Action *action)
 {
-  if (cmd == nullptr)
+  if (action == nullptr)
   {
     return;
   }
 
-  switch (cmd->commandType)
+  switch (action->actionType)
   {
-    case CMD_INDICATE_ACTIVITY:
+    case ACT_INDICATE_ACTIVITY:
       // Don't indicate this. Too noisy.
       break;
 
-    case CMD_INDICATE_MODE:
-      indicateMode(cmd->mode);
+    case ACT_INDICATE_MODE:
+      indicateMode(action->mode);
       break;
 
     default:

@@ -21,7 +21,7 @@ bool LEDUserInterface::isButtonPressed()
   return pushButton.isPressed();
 }
 
-void LEDUserInterface::process(const Command *cmd)
+void LEDUserInterface::process(const Action *action)
 {
   pushButton.run();
   greenLed.run();
@@ -33,26 +33,26 @@ void LEDUserInterface::process(const Command *cmd)
     indicateMode(MODE_SETUP);
   }
   
-  handleCommand(cmd);
+  handleAction(action);
 
   checkRequestedAction();
 }
 
-void LEDUserInterface::handleCommand(const Command *cmd)
+void LEDUserInterface::handleAction(const Action *action)
 {
-  if (cmd == nullptr)
+  if (action == nullptr)
   {
     return;
   }
 
-  switch (cmd->commandType)
+  switch (action->actionType)
   {
-    case CMD_INDICATE_ACTIVITY:
+    case ACT_INDICATE_ACTIVITY:
       indicateActivity();
       break;
 
-    case CMD_INDICATE_MODE:
-      indicateMode(cmd->mode);
+    case ACT_INDICATE_MODE:
+      indicateMode(action->mode);
       break;
       
     default:
@@ -116,7 +116,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time > SW_TR_HOLD)
       {
         //Serial << F("  long press - change mode") << endl;
-        controller->putCommand(CMD_CHANGE_MODE);
+        controller->putAction(ACT_CHANGE_MODE);
         return;
       }
 
@@ -124,7 +124,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time >= 1000 && press_time < 2000)
       {
         //Serial << F("  medium press - renegotiate") << endl;
-        controller->putCommand(CMD_RENEGOTIATE);
+        controller->putAction(ACT_RENEGOTIATE);
         return;
       }
 
@@ -132,7 +132,7 @@ void LEDUserInterface::checkRequestedAction()
       if (press_time < 500)
       {
         //Serial << F("  short press - enumeration") << endl;
-        controller->putCommand(CMD_START_CAN_ENUMERATION);
+        controller->putAction(ACT_START_CAN_ENUMERATION);
         return;
       }
 

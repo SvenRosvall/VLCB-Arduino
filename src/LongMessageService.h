@@ -43,7 +43,7 @@ class LongMessageService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override { this->controller = cntrl; }
-  virtual void process(const Command * cmd) override;
+  virtual void process(const Action * action) override;
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   bool process();

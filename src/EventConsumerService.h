@@ -18,7 +18,7 @@ class EventConsumerService : public Service
 public:
   virtual void setController(Controller *cntrl) override;
   void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
-  virtual void process(const Command * cmd) override;
+  virtual void process(const Action * action) override;
 
   virtual byte getServiceID() override 
   {

@@ -96,8 +96,8 @@ void testCanidEnumerationOnUserAction()
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
-  
-  controller.putCommand({VLCB::CMD_START_CAN_ENUMERATION});
+
+  controller.putAction({VLCB::ACT_START_CAN_ENUMERATION});
 
   process(controller);
 
@@ -127,7 +127,7 @@ void testCanidEnumerationOnSetUp()
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 
@@ -242,7 +242,7 @@ void testFindFreeCanidOnPopulatedBus()
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
-  controller.putCommand({VLCB::CMD_START_CAN_ENUMERATION});
+  controller.putAction({VLCB::ACT_START_CAN_ENUMERATION});
 
   process(controller);
 

@@ -24,7 +24,7 @@ public:
   virtual byte getServiceVersionID() override { return 1; };
 
   bool isButtonPressed();
-  virtual void process(const Command *cmd) override;
+  virtual void process(const Action *action) override;
 
 private:
   Controller * controller;
@@ -33,7 +33,7 @@ private:
   Switch pushButton;
 
   bool resetRequested();
-  void handleCommand(const Command *cmd);
+  void handleAction(const Action *action);
   void checkRequestedAction();
   void indicateActivity();
   void indicateMode(VlcbModeParams mode);

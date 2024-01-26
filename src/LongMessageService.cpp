@@ -33,11 +33,11 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
-void LongMessageService::process(const Command *cmd)
+void LongMessageService::process(const Action *action)
 {
-  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
   {
-    handleMessage(&cmd->vlcbMessage);
+    handleMessage(&action->vlcbMessage);
   }
 }
 

@@ -20,7 +20,7 @@ public:
   virtual byte getServiceID() override { return 98; };
   virtual byte getServiceVersionID() override { return 1; };
 
-  virtual void process(const Command *cmd) override;
+  virtual void process(const Action *action) override;
 
 private:
   Controller * controller;
@@ -28,7 +28,7 @@ private:
   Transport * transport;
   bool isResetRequested = false;
 
-  void handleCommand(const Command *cmd);
+  void handleAction(const Action *action);
   void processSerialInput();
   void indicateMode(VlcbModeParams i);
 };

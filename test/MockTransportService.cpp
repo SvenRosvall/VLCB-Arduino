@@ -11,24 +11,24 @@ void MockTransportService::setController(VLCB::Controller *cntrl)
   this->controller = cntrl;
 }
 
-void MockTransportService::process(const VLCB::Command *cmd)
+void MockTransportService::process(const VLCB::Action *action)
 {
   if (!incoming_messages.empty())
   {
-    VLCB::Command cmd = {VLCB::CMD_MESSAGE_IN, incoming_messages.front()};
-    controller->putCommand(cmd);
+    VLCB::Action incomingAction = {VLCB::ACT_MESSAGE_IN, incoming_messages.front()};
+    controller->putAction(incomingAction);
     incoming_messages.pop_front();
   }
 
-  if (cmd == nullptr)
+  if (action == nullptr)
   {
     return;
   }
 
-  switch (cmd->commandType)
+  switch (action->actionType)
   {
-    case VLCB::CMD_MESSAGE_OUT:
-      sent_messages.push_back(cmd->vlcbMessage);
+    case VLCB::ACT_MESSAGE_OUT:
+      sent_messages.push_back(action->vlcbMessage);
       break;
   }
 }
