@@ -5,19 +5,19 @@ This document describes the main components within the VLCB library and how they
 This VLCB library is based on Duncan Greenwood's [CBUS library](https://github.com/MERG-DEV/CBUS)
 and extended with VLCB specific features.
 
-This library is still in progress.
+This library is still work in progress.
 
 ## High Level Architecture
-The code is organized as a central controller object that controls functionality
+The code is organised as a central controller object that controls functionality
 via a storage object and a set of service objects.
 
-Services implement various groups of functionalities within VLCB such as events or DCC control.
-The user sketch can select the set of services needed to provide the functionality
-that is necessary for the VLCB module that is created.
+Services implement various groups of functionality within VLCB such as events or DCC control.
+The user sketch can select the set of services needed to provide the necessary functionality
+for the VLCB module that is created.
 There are also services for user interfaces and communication over different transports such as CAN, Wifi and BLE.
 Currently only a CAN transport using the CAN2515 chip is included in the library.
 
-The library supports a set of storage for node variables and event variables in EEPROM or Flash memory.
+The library supports storage for node variables and event variables in EEPROM or Flash memory.
 A Configuration object controls persistence of node specific data such as parameter, node variables
 and events using the chosen storage.
 
@@ -44,29 +44,31 @@ from the controller is an outgoing message it sends it to the CAN bus.
 The ```EventConsumerService``` may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
-The user sketch may produce events when are passed on the ```EventProducerService``` object which in turn passes
-this event as a Command via the Controller to the transport object.
+The user sketch may produce events that are managed by the ```EventProducerService``` object which then passes
+the event as a Command via the Controller to the transport object.
 
 ### Dataflow
-Most of VLCB functionality use a message object ```VlcbMessage``` that is used to pass incoming and
+Most of the VLCB functionality uses a message object ```VlcbMessage``` that passes incoming and
 outgoing messages around via the Command bus. 
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
-The ```CanTransport``` object translates the VlcbMessage object to from an object that represents
-a CAN frame which contains an id, 8 bytes of data (same as the VlcbMessage) and the flags
+The ```CanTransport``` object translates the VlcbMessage object to form an object that represents
+a CAN frame containing an id, 8 bytes of data (same as the VlcbMessage) and the flags
 ```rtr``` and ```ext```.
-This CAN frame is then passed to/from the CAN driver such as CAN2515. 
+This CAN frame is then passed to the CAN driver, such as CAN2515. 
 CAN drivers may need to convert this CAN frame to a data structure used by any library
 that is used by that driver.
 
 Currently, this CAN frame is stored in a ```CANMessage``` object defined in the ACAN2515 library.
-This should be replaced with another class that doesn't depend on an external library
+This should be replaced with another class that doesn't depend on an external library.
+
+The ```CanTransport``` also translates a received CAN frame to a ```VlcbMessage```.
 
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
 that is required. It makes use of a storage object that has different implementations for different
-storage types. Not all Arduino modules have EEPROM or enough EEPROM. Instead, external EEPROM or
+storage types. Not all Arduino modules have EEPROM or enough EEPROM, in which case external EEPROM or
 Flash memory can be used.
 See furter details in [Persistent Storage](PersistentStorage.md) documentation.
 
@@ -91,7 +93,7 @@ FlashStorage
 little EEPROM.
 
 ## CanTransport
-The CanTransport interface encapsulates the transmission of VLCB message across some
+The CanTransport interface encapsulates the transmission of a VLCB message across some
 media such as CAN bus.
 
 The class ```CanTransport``` serves as a base class for implementations of CAN based transports. 
@@ -121,7 +123,7 @@ Examples of some services:
 
 MinimumNodeService
 : Handles all the mandatory op-codes that all VLCB modules must implement. 
-These op-codes involves running modes and basic node configuration such as node number and
+These op-codes involve running modes and basic node configuration such as node number and
 module parameters.
 
 EventConsumerService
@@ -139,8 +141,8 @@ LongMessageService
 LEDUserInterface
 : Implements a low level UI using a push button, a green LED and a yellow LED.
 
-It will be possible to implement new user interfaces that make use of an OLED screen or simply
-uses the USB connection for serial communication.
+It will be possible to implement new user interfaces that make use of, for example, an OLED screen or simply
+use the USB connection for serial communication.
 
 ## User Sketch
 
