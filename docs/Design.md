@@ -53,17 +53,15 @@ outgoing messages around via the Command bus.
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
-The ```CanTransport``` object translates the VlcbMessage object to form an object that represents
+The ```CanTransport``` object translates the VlcbMessage object to and from an object that represents
 a CAN frame containing an id, 8 bytes of data (same as the VlcbMessage) and the flags
 ```rtr``` and ```ext```.
-This CAN frame is then passed to the CAN driver, such as CAN2515. 
+This CAN frame is then passed to or from a CAN driver, such as CAN2515. 
 CAN drivers may need to convert this CAN frame to a data structure used by any library
 that is used by that driver.
 
 Currently, this CAN frame is stored in a ```CANMessage``` object defined in the ACAN2515 library.
 This should be replaced with another class that doesn't depend on an external library.
-
-The ```CanTransport``` also translates a received CAN frame to a ```VlcbMessage```.
 
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
