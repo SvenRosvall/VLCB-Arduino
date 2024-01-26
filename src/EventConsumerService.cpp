@@ -44,24 +44,24 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
   }
 }
 
-void EventConsumerService::process(const Command *cmd)
+void EventConsumerService::process(const Action *action)
 {
-  if (cmd == nullptr)
+  if (action == nullptr)
   {
     return;
   }
 
-  switch (cmd->commandType)
+  switch (action->actionType)
   {
-    case CMD_MESSAGE_OUT:
+    case ACT_MESSAGE_OUT:
       if (!(controller->getParam(PAR_FLAGS) & PF_COE))
       {
         break;
       }
       // else Fall through: A message sent out should also be picked up by the consumer service.
 
-    case CMD_MESSAGE_IN:
-      handleConsumedMessage(&cmd->vlcbMessage);
+    case ACT_MESSAGE_IN:
+      handleConsumedMessage(&action->vlcbMessage);
       break;
   }
 }

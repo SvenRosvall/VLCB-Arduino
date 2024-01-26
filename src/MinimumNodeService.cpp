@@ -39,8 +39,8 @@ void MinimumNodeService::initSetup()
   timeOutTimer = millis();
   
   // enumerate the CAN bus to allocate a free CAN ID
-  Command cmd = { CMD_START_CAN_ENUMERATION, false };
-  controller->putCommand(cmd);
+  Action action = {ACT_START_CAN_ENUMERATION, false };
+  controller->putAction(action);
 
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
@@ -121,13 +121,13 @@ void MinimumNodeService::heartbeat()
 /// MinimumNode Service processing procedure
 //
 
-void MinimumNodeService::process(const Command *cmd)
+void MinimumNodeService::process(const Action *action)
 {
-  if (cmd != nullptr)
+  if (action != nullptr)
   {
-    switch (cmd->commandType)
+    switch (action->actionType)
     {
-      case CMD_CHANGE_MODE:
+      case ACT_CHANGE_MODE:
       {
         switch (module_config->currentMode)
         {
@@ -145,8 +145,8 @@ void MinimumNodeService::process(const Command *cmd)
         break;
       }
       
-      case CMD_MESSAGE_IN:
-        handleMessage(&cmd->vlcbMessage);
+      case ACT_MESSAGE_IN:
+        handleMessage(&action->vlcbMessage);
 
     }
   }

@@ -19,7 +19,7 @@ public:
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
-  virtual void process(Command * command) = 0;
+  virtual void process(Action * action) = 0;
 };
 ```
 
@@ -46,8 +46,8 @@ There is no need to bump up the version number for minor changes and bug fixes.
 
 process
 : This method that be called regularly. 
-It has a pointer to a Command that needs to be processed or a null pointer if there is
-no Command to be processed.
+It has a pointer to a Action that needs to be processed or a null pointer if there is
+no Action to be processed.
 Use this for any processing that needs to be performed now and then such as polling for
 changes of input pins.
 
@@ -101,10 +101,10 @@ This service facilitates sent events to be received by the same module.
 ### LedUserInterface
 Manages the green and yellow LEDs and also the push button on the VLCB module.
 Updates the LEDs based on activities on the module. 
-When the push button is pressed sends a Command to tell the other services that the
+When the push button is pressed sends an Action to tell the other services that the
 user has requested some action.
 
 ### SerialUserInterface
 Provides a user interface on the serial port on the Arduino.
-Prints status messages and also handles commands the user enters on the serial port.
+Prints status messages and also handles actions the user enters on the serial port.
 See more details in [SerialUserInterface](SerialUserInterface.md) documentation.

@@ -19,7 +19,7 @@ void CanService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
-void CanService::process(const Command *cmd)
+void CanService::process(const Action *action)
 {
   checkIncomingMessage();
 
@@ -32,23 +32,23 @@ void CanService::process(const Command *cmd)
 
   checkCANenumTimout();
 
-  if (cmd == nullptr)
+  if (action == nullptr)
   {
     return;
   }
 
-  switch (cmd->commandType)
+  switch (action->actionType)
   {
-    case CMD_MESSAGE_OUT:
-      sendMessage(&cmd->vlcbMessage);
+    case ACT_MESSAGE_OUT:
+      sendMessage(&action->vlcbMessage);
       break;
 
-    case CMD_MESSAGE_IN:
-      handleCanServiceMessage(&cmd->vlcbMessage);
+    case ACT_MESSAGE_IN:
+      handleCanServiceMessage(&action->vlcbMessage);
       break;
     
-    case CMD_START_CAN_ENUMERATION:
-      startCANenumeration(cmd->fromENUM);
+    case ACT_START_CAN_ENUMERATION:
+      startCANenumeration(action->fromENUM);
       break;
   }
 }
@@ -141,7 +141,7 @@ void CanService::startCANenumeration(bool fromENUM)
 
 void CanService::checkIncomingMessage()
 {
-  // Check concrete transport for messages and put on controller command queue.
+  // Check concrete transport for messages and put on controller action queue.
   if (!canTransport->available())
   {
     return;
@@ -194,11 +194,11 @@ void CanService::checkIncomingMessage()
     return;
   }
 
-  // The message is a real message.
-  Command cmd = {CMD_MESSAGE_IN, { canMsg.len}};
-  memcpy(cmd.vlcbMessage.data, canMsg.data, canMsg.len);
+  // The message is a VLCB message.
+  Action action = {ACT_MESSAGE_IN, {canMsg.len}};
+  memcpy(action.vlcbMessage.data, canMsg.data, canMsg.len);
 
-  controller->putCommand(cmd);
+  controller->putAction(action);
 }
 
 /// actual implementation of the makeHeader method

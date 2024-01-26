@@ -31,25 +31,27 @@ and services.
   will include queues.
 
 ## Workflow
-The Controller maintains a ```Command``` bus, which is implemented as a circular buffer.
-Each service can put commands on this bus and act on commands placed there by other services.
+The Controller maintains a ```Action``` bus, which is implemented as a circular buffer.
+Each service can put actions on this bus and act on actions placed there by other services.
+An action represents tasks or information to be shared with other services. 
+The Action bus decouples services from each other and makes it easier to add new services.
 
 The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function.
 During each iteration the controller calls out to each service to do any processing it needs to do. 
-The top element on the command bus (if any) is included in this call.
+The top element on the action bus (if any) is included in this call.
 
-The ```CanService``` checks for incoming messages on the CAN bus and if the command object passed
+The ```CanService``` checks for incoming messages on the CAN bus and if the action object passed
 from the controller is an outgoing message it sends it to the CAN bus.
 
 The ```EventConsumerService``` may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
 The user sketch may produce events that are managed by the ```EventProducerService``` object which then passes
-the event as a Command via the Controller to the transport object.
+the event as a Action via the Controller to the transport object.
 
 ### Dataflow
 Most of the VLCB functionality uses a message object ```VlcbMessage``` that passes incoming and
-outgoing messages around via the Command bus. 
+outgoing messages around via the Action bus. 
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
@@ -131,7 +133,7 @@ If the COE parameter is set it will also handle outgoing events.
 ConsumeOwnEventsService
 : Enables passing events produced by the producer service back to the consumer service.
 It doesn't do anything else than setting the COE parameter flag which also tells
-the EventConsumerService to also look for outgoing events on the command bus.
+the EventConsumerService to also look for outgoing events on the action bus.
 
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.

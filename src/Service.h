@@ -11,7 +11,7 @@ namespace VLCB
 {
 
 class Controller;
-struct Command;
+struct Action;
 
 class Service
 {
@@ -21,7 +21,7 @@ public:
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
-  virtual void process(const Command * cmd) = 0;
+  virtual void process(const Action * action) = 0;
 };
 
 }

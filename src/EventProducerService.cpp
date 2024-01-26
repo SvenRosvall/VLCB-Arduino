@@ -55,7 +55,7 @@ byte EventProducerService::createDefaultEvent(byte evValue)
 }
 
 
-void EventProducerService::process(const Command * cmd)
+void EventProducerService::process(const Action * action)
 {
   // Do this if mode changes from uninitialised to normal
   if (((uninit) && (module_config->currentMode == MODE_NORMAL)))
@@ -64,9 +64,9 @@ void EventProducerService::process(const Command * cmd)
     uninit = false;
   }
   
-  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
   {
-    handleProdSvcMessage(&cmd->vlcbMessage);
+    handleProdSvcMessage(&action->vlcbMessage);
   }
 }
 

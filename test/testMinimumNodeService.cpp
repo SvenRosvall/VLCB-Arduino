@@ -70,7 +70,7 @@ void testUninitializedRequestNodeNumber()
   minimumNodeService->setUninitialised();
 
   // User requests to enter Setup mode.
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 
@@ -96,7 +96,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   minimumNodeService->setUninitialised();
 
   // User requests to enter Normal mode.
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 
@@ -127,7 +127,7 @@ void testNormalRequestNodeNumber()
   VLCB::Controller controller = createController();
 
   // User requests to enter Setup mode.
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 
@@ -153,7 +153,7 @@ void testNormalRequestNodeNumberMissingSNN()
   VLCB::Controller controller = createController();
 
   // User requests to change mode.
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 
@@ -188,7 +188,7 @@ void testReleaseNodeNumberByUI()
 
   VLCB::Controller controller = createController();
 
-  controller.putCommand({VLCB::CMD_CHANGE_MODE});
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
 
   process(controller);
 

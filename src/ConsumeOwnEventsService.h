@@ -25,7 +25,7 @@ public:
     return 1;
   }
 
-  virtual void process(const Command * cmd) override
+  virtual void process(const Action * action) override
   {}
 };
 

@@ -31,11 +31,11 @@ void EventTeachingService::inhibitLearn()
   controller->setParamFlag(PF_LRN, false);
 }
 
-void EventTeachingService::process(const Command *cmd)
+void EventTeachingService::process(const Action *action)
 {
-  if (cmd != nullptr && cmd->commandType == CMD_MESSAGE_IN)
+  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
   {
-    handleMessage(&cmd->vlcbMessage);
+    handleMessage(&action->vlcbMessage);
   }
 }
 
