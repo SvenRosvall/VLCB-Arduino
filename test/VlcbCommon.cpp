@@ -46,8 +46,7 @@ VLCB::Controller createController(const std::initializer_list<VLCB::Service *> s
 
   VLCB::Controller controller(configuration.get(), services);
 
-  configuration->setModuleMode(MODE_NORMAL);
-  configuration->setNodeNum(0x0104);
+  configuration->setModuleNormalMode(0x0104);
   static std::unique_ptr<VLCB::Parameters> params;
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');

@@ -64,6 +64,18 @@ void Configuration::begin()
   makeEvHashTable();
 }
 
+void Configuration::setModuleUninitializedMode()
+{
+  setModuleMode(MODE_UNINITIALISED);
+  setNodeNum(0);
+}
+
+void Configuration::setModuleNormalMode(unsigned int nodeNumber)
+{
+  setModuleMode(MODE_NORMAL);
+  setNodeNum(nodeNumber);
+}
+
 void Configuration::setModuleMode(VlcbModeParams f)
 {
   currentMode = f;

@@ -48,12 +48,12 @@ void MinimumNodeService::initSetup()
   // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << module_config->nodeNum << endl;
 }
 
-void MinimumNodeService::setNormal()
+void MinimumNodeService::setNormal(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
   requestingNewNN = false;
   instantMode = MODE_NORMAL;
-  module_config->setModuleMode(MODE_NORMAL);
+  module_config->setModuleNormalMode(nn);
   controller->indicateMode(MODE_NORMAL);
 }
 
@@ -65,8 +65,7 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
-  module_config->setNodeNum(0);
-  module_config->setModuleMode(MODE_UNINITIALISED);
+  module_config->setModuleUninitializedMode();
   module_config->setCANID(0);
 
   controller->indicateMode(MODE_UNINITIALISED);
@@ -332,18 +331,13 @@ void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned in
     {
       // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
 
-      // save the NN
-      module_config->setNodeNum(nn);
+      // we are now in Normal mode - update the configuration
+      setNormal(nn);
+      // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
 
       // respond with NNACK
       controller->sendMessageWithNN(OPC_NNACK);
-
       // DEBUG_SERIAL << F("> sent NNACK for NN = ") << module_config->nodeNum << endl;
-
-      // we are now in Normal mode - update the configuration
-      setNormal();
-
-      // DEBUG_SERIAL << F("> current mode = ") << module_config->currentMode << F(", node number = ") << module_config->nodeNum << F(", CANID = ") << module_config->CANID << endl;
     }
   }
 }

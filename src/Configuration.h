@@ -63,7 +63,8 @@ public:
   void resetModule();
 
   void setCANID(byte canid);
-  void setModuleMode(VlcbModeParams m);
+  void setModuleUninitializedMode();
+  void setModuleNormalMode(unsigned int nodeNumber);
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
   void setEventAck(bool ea);
@@ -93,8 +94,7 @@ public:
 private:
   Storage * storage;
 
-  // Stuff below are not confirmed to be needed to be publically available.
-private:
+  void setModuleMode(VlcbModeParams m);
   byte makeHash(byte tarr[EE_HASH_BYTES]);
   void getEvArray(byte idx);
   void makeEvHashTable();
