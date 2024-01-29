@@ -1,5 +1,9 @@
 # TODO List
 
+## UI Service ID shall be ignored
+UI classes are implemented as services. However they are not services in VLCB sense.
+Therefore the UI services shall not be included in the response to RQSD.
+
 ## Keep Node data in Controller
 NodeNumber etc are split across ```Controller``` and ```Configuration```. 
 Keep all access to these in ```Controller```. 
@@ -16,10 +20,6 @@ Configuration today has
 Need to change the notion of SLiM/FLiM to VLCB modes.
 Should be part of the MNS service.
 
-## Update LedUserInterface class
-The Minimum Node Specification describes a few more states that the LED's need to indicate. 
-Review this spec again and update the user interface. 
-Also need to update the interface class and add support for these states in the Controller class.
 
 ## Updates to the Storage interface
 The begin method should take a size parameter. 
@@ -38,7 +38,8 @@ This adds code bloat.
 Split this class in two: 
   1. do the same things as the push-button does, i.e. initiate CAN enumeration, 
      initiate setup mode.
-  1. all the other stuff a developer would want.
+  1. all the other stuff a developer would want, such as transport statistics and
+     resetting the module.
 
 ## Introduce a class/struct for CAN Frames
 Currently, we are using ```CANMessage``` from the ACAN2515 library. 
@@ -47,13 +48,6 @@ dependency.
 Instead, we should introduce a CAN Frame struct that holds CAN information.
 This will be used to with the CAN driver who in turn converts this to/from a data structure
 type used here.
-
-## Make CAN drivers objects instead of child of CanTransport
-The relationship between CanTransport and CAN driver can be confusing as ```CanTransport```
-implements some methods in the ```Transport``` interface and also introduces a some
-new virtual methods that the CAN driver must implement.
-Making the CAN Driver a separate object clarifies the responsibilities of ```CanTransport```
-and CAN driver implementations.
 
 ## Documentation
 
