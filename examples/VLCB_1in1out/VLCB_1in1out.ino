@@ -104,8 +104,9 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANU_DEV);
   params.setModuleId(MODULE_ID);
- 
+
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
