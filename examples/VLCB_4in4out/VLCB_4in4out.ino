@@ -143,6 +143,7 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANU_DEV);
   params.setModuleId(MODULE_ID);
 
   // assign to Controller
@@ -155,7 +156,7 @@ void setupVLCB()
     Serial << F("> switch was pressed at startup") << endl;
     modconfig.resetModule();
   }
-  
+
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 

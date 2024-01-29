@@ -77,7 +77,7 @@ void setupVLCB()
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  
+
   // initialise and load configuration
   controller.begin();
 
@@ -90,6 +90,7 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANU_DEV);
   params.setModuleId(MODULE_ID);
 
   // assign to Controller
