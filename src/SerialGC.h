@@ -31,8 +31,8 @@ namespace VLCB
     bool begin();
 
     bool available() override;
-    CANMessage getNextCanMessage() override;
-    bool sendCanMessage(CANMessage *msg) override;
+    CANFrame getNextCanFrame() override;
+    bool sendCanFrame(CANFrame *frame) override;
     void reset() override;
 
     unsigned int receiveCounter() override { return receivedCount; }
@@ -46,14 +46,14 @@ namespace VLCB
 
     char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
     char txBuffer[RXBUFFERSIZE]; // Define a byte array to store the outgoing data
-    CANMessage rxCANMessage;
+    CANFrame rxCANFrame;
 
     unsigned int receivedCount = 0;
     unsigned int transmitCount = 0;
     unsigned int receiveErrorCount = 0;
     unsigned int transmitErrorCount = 0;
 
-    void debugCANMessage(CANMessage message);
+    void debugCANMessage(CANFrame frame);
 
   };
 

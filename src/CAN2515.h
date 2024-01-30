@@ -42,8 +42,8 @@ public:
   bool begin(bool poll = false, SPIClass spi = SPI);
 #endif
   bool available() override;
-  CANMessage getNextCanMessage() override;
-  bool sendCanMessage(CANMessage *msg) override;
+  CANFrame getNextCanFrame() override;
+  bool sendCanFrame(CANFrame *frame) override;
   void reset() override;
 
   // these methods are specific to this implementation

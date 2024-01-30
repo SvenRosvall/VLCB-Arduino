@@ -38,11 +38,11 @@ private:
   void handleSetCANID(const VlcbMessage *msg, unsigned int nn);
 
   bool sendMessage(const VlcbMessage *msg);
-  bool sendRtrMessage();
-  bool sendCanMessage(CANMessage *msg) { return canTransport->sendCanMessage(msg); }
+  bool sendRtrFrame();
+  bool sendCanFrame(CANFrame *msg) { return canTransport->sendCanFrame(msg); }
   void startCANenumeration(bool fromENUM = false);
 
-  void checkIncomingMessage();
+  void checkIncomingCanFrame();
   void checkCANenumTimout();
   byte findFreeCanId();
 

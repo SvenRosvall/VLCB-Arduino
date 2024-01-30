@@ -12,15 +12,14 @@
 #include "Transport.h"
 #include "Controller.h"
 #include "CanTransport.h"
-#include "ACAN2515.h"
 
 // This is to replace the hardware layer. It uses the CanTransport class for CAN processing.
 class MockCanTransport : public VLCB::CanTransport
 {
 public:
   virtual bool available() override;
-  virtual CANMessage getNextCanMessage() override;
-  virtual bool sendCanMessage(CANMessage *msg) override;
+  virtual VLCB::CANFrame getNextCanFrame() override;
+  virtual bool sendCanFrame(VLCB::CANFrame *frame) override;
   
   virtual void reset() override;
 
@@ -30,9 +29,9 @@ public:
   virtual unsigned int transmitErrorCounter() override { return 0; }
   virtual unsigned int errorStatus() override { return 0; }
 
-  void setNextMessage(CANMessage msg);
+  void setNextMessage(VLCB::CANFrame frame);
   void clearMessages();
 
-  std::deque<CANMessage> incoming_messages;
-  std::vector<CANMessage> sent_messages;
+  std::deque<VLCB::CANFrame> incoming_frames;
+  std::vector<VLCB::CANFrame> sent_frames;
 };

@@ -7,18 +7,26 @@
 
 #include <Arduino.h>
 #include "Transport.h"
-#include "ACAN2515.h"
 
 namespace VLCB
 {
+
+struct CANFrame
+{
+  uint32_t id;
+  bool ext;
+  bool rtr;
+  uint8_t len;
+  uint8_t data[8];
+};
 
 // Interface for CAN transports 
 class CanTransport : public Transport
 {
 public:
   virtual bool available() = 0;
-  virtual CANMessage getNextCanMessage() = 0;
-  virtual bool sendCanMessage(CANMessage *msg) = 0;
+  virtual CANFrame getNextCanFrame() = 0;
+  virtual bool sendCanFrame(CANFrame *msg) = 0;
 };
 
 }
