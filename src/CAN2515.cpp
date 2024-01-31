@@ -34,11 +34,10 @@ CAN2515::CAN2515()
 #ifdef ARDUINO_ARCH_RP2040
 bool CAN2515::begin(bool poll, SPIClassRP2040 spi)
 #else
-bool CAN2515::begin(bool poll, SPIClass spi)
+bool CAN2515::begin(bool poll, SPIClass &spi)
 #endif
 {
   uint16_t ret;
-  bool retval = false;
 
   _numMsgsSent = 0;
   _numMsgsRcvd = 0;
@@ -86,14 +85,13 @@ bool CAN2515::begin(bool poll, SPIClass spi)
   if (ret == 0)
   {
     // DEBUG_SERIAL << F("> CAN controller initialised ok") << endl;
-    retval = true;
+    return true;
   }
   else
   {
     // DEBUG_SERIAL << F("> error initialising CAN controller, error code = ") << ret << endl;
+    return false;
   }
-
-  return retval;
 }
 
 //
