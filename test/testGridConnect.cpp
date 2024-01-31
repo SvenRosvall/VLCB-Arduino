@@ -4,18 +4,18 @@
 
 #include "GridConnect.h"
 
-void debugCANMessage(CANMessage message)
+void debugCANMessage(VLCB::CANFrame frame)
+{
+  std::cout << std::endl << "VLCB::CANFrame:";
+  std::cout << " id " << frame.id << " length " << frame.len;
+  std::cout << " data ";
+  for (int i=0; i < frame.len; i++)
   {
-    std::cout << std::endl << "CANMessage:";
-    std::cout << " id " << message.id << " length " << message.len;
-    std::cout << " data ";
-    for (int i=0; i <message.len; i++)
-    {
-      if( i>0 ) std::cout << ",";
-      std::cout << message.data[i];
-    }
-    std::cout << std::endl;
+    if( i>0 ) std::cout << ",";
+    std::cout << frame.data[i];
   }
+  std::cout << std::endl;
+}
 
 
 
@@ -23,15 +23,15 @@ void testGridConnectEncode_StandardID(int ID, const char * expectedMessage, bool
 {
   test();
   char msgBuffer[28]; 
-  CANMessage msg;
-  msg.ext = false;
-  msg.len = 2;
-  msg.rtr = false;
-  msg.id = ID;
-  msg.data[0] = 1;
-  msg.data[1] = 2;
+  VLCB::CANFrame frame;
+  frame.ext = false;
+  frame.len = 2;
+  frame.rtr = false;
+  frame.id = ID;
+  frame.data[0] = 1;
+  frame.data[1] = 2;
 
-  bool result = VLCB::encodeGridConnect(msgBuffer, &msg);
+  bool result = VLCB::encodeGridConnect(msgBuffer, &frame);
 
   assertEquals(expectedMessage, msgBuffer);
   assertEquals(expectedResult, result);
@@ -44,15 +44,15 @@ void testGridConnectEncode_ExtendedID(int ID, const char * expectedMessage, bool
 {
   test();
   char msgBuffer[28]; 
-  CANMessage msg;
-  msg.ext = true;
-  msg.len = 2;
-  msg.rtr = false;
-  msg.id = ID;
-  msg.data[0] = 1;
-  msg.data[1] = 2;
+  VLCB::CANFrame frame;
+  frame.ext = true;
+  frame.len = 2;
+  frame.rtr = false;
+  frame.id = ID;
+  frame.data[0] = 1;
+  frame.data[1] = 2;
 
-  bool result = VLCB::encodeGridConnect(msgBuffer, &msg);
+  bool result = VLCB::encodeGridConnect(msgBuffer, &frame);
 
   assertEquals(expectedMessage, msgBuffer);
   assertEquals(expectedResult, result);
@@ -65,15 +65,15 @@ void testGridConnectEncode_RTR(bool rtr, const char * expectedMessage, bool expe
 {
   test();
   char msgBuffer[28]; 
-  CANMessage msg;
-  msg.ext = false;
-  msg.len = 2;
-  msg.rtr = rtr;
-  msg.id = 0x7FF;
-  msg.data[0] = 1;
-  msg.data[1] = 2;
+  VLCB::CANFrame frame;
+  frame.ext = false;
+  frame.len = 2;
+  frame.rtr = rtr;
+  frame.id = 0x7FF;
+  frame.data[0] = 1;
+  frame.data[1] = 2;
 
-  bool result = VLCB::encodeGridConnect(msgBuffer, &msg);
+  bool result = VLCB::encodeGridConnect(msgBuffer, &frame);
 
   assertEquals(expectedMessage, msgBuffer);
   assertEquals(expectedResult, result);
@@ -85,17 +85,17 @@ void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expe
 {
   test();
   char msgBuffer[30]; 
-  CANMessage msg;
-  msg.ext = false;
-  msg.len = len;
-  msg.rtr = false;
-  msg.id = 0x7FF;
+  VLCB::CANFrame frame;
+  frame.ext = false;
+  frame.len = len;
+  frame.rtr = false;
+  frame.id = 0x7FF;
   for (int i = 0; i<8; i++)
   {
-    msg.data[i] = i+1;
+    frame.data[i] = i + 1;
   }
 
-  bool result = VLCB::encodeGridConnect(msgBuffer, &msg);
+  bool result = VLCB::encodeGridConnect(msgBuffer, &frame);
 
   assertEquals(expectedMessage, msgBuffer);
   assertEquals(expectedResult, result);
@@ -107,41 +107,41 @@ void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expe
 void testGridConnectDecode_ID(const char * inputMessage, bool expectedEXT, int expectedID, bool expectedResult)
 {
   test();
-  CANMessage msg;
-  bool result = VLCB::decodeGridConnect(inputMessage, &msg);
+  VLCB::CANFrame frame;
+  bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
   if (result)
   { // only check ID if result is true (i.e. decode worked)
-    assertEquals(expectedEXT, msg.ext);
-    assertEquals(expectedID, msg.id);
-    //std::cout << "decoded ID " << msg.id << std::endl << std::endl;  
+    assertEquals(expectedEXT, frame.ext);
+    assertEquals(expectedID, frame.id);
+    //std::cout << "decoded ID " << frame.id << std::endl << std::endl;  
   }
 }
 
 void testGridConnectDecode_RTR(const char * inputMessage, bool expectedRTR, bool expectedResult)
 {
   test();
-  CANMessage msg;
-  bool result = VLCB::decodeGridConnect(inputMessage, &msg);
+  VLCB::CANFrame frame;
+  bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
   if (result)
   { // only check ID if result is true (i.e. decode worked)
-    assertEquals(expectedRTR, msg.rtr);
+    assertEquals(expectedRTR, frame.rtr);
   }
 }
 
 void testGridConnectDecode_DATA(const char * inputMessage, int expectedLEN, bool expectedResult)
 {
   test();
-  CANMessage msg;
-  bool result = VLCB::decodeGridConnect(inputMessage, &msg);
+  VLCB::CANFrame frame;
+  bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
   if (result)
   { // only check ID if result is true (i.e. decode worked)
-    assertEquals(expectedLEN, msg.len);
+    assertEquals(expectedLEN, frame.len);
   }
 }
 
@@ -233,6 +233,4 @@ void testGridConnect()
   testGridConnectDecode_DATA(":X00000000N000102030405FEFF09;", 9, false);   // extended msg, too many data bytes
   testGridConnectDecode_DATA(":X00000000NQ00102030405FEFF;", 8, false);     // extended msg, invalid char in data
   testGridConnectDecode_DATA(":X00000000N000102030405FEFQ;", 8, false);     // extended msg, invalid char in data
-
-
 }

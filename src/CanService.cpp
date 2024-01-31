@@ -21,7 +21,7 @@ void CanService::setController(Controller *cntrl)
 
 void CanService::process(const Action *action)
 {
-  checkIncomingMessage();
+  checkIncomingCanFrame();
 
   if (enumeration_required)
   {
@@ -134,31 +134,31 @@ void CanService::startCANenumeration(bool fromENUM)
   memset(enum_responses, 0, sizeof(enum_responses));
   startedFromEnumMessage = fromENUM;
 
-  sendRtrMessage();
+  sendRtrFrame();
 
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
-void CanService::checkIncomingMessage()
+void CanService::checkIncomingCanFrame()
 {
   // Check concrete transport for messages and put on controller action queue.
   if (!canTransport->available())
   {
     return;
   }
-  CANMessage canMsg = canTransport->getNextCanMessage();
+  CANFrame canFrame = canTransport->getNextCanFrame();
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-  if (canMsg.ext)
+  if (canFrame.ext)
   {
     return;
   }
 
   // is this a CANID enumeration request from another node (RTR set) ?
-  if (canMsg.rtr)
+  if (canFrame.rtr)
   {
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
-    // send an empty canMsg to show our CANID
+    // send an empty canFrame to show our CANID
 
     // TODO: introduce a sendMessage() with zero length. Doesn't need a VlcbMessage.
     VlcbMessage message;
@@ -170,18 +170,18 @@ void CanService::checkIncomingMessage()
 
   controller->indicateActivity();
 
-  byte remoteCANID = getCANID(canMsg.id);
+  byte remoteCANID = getCANID(canFrame.id);
 
   /// set flag if we find a CANID conflict with the frame's producer
   /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
-  if (remoteCANID == controller->getModuleCANID() && canMsg.len > 0)
+  if (remoteCANID == controller->getModuleCANID() && canFrame.len > 0)
   {
     // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
     enumeration_required = true;
   }
 
   // are we enumerating CANIDs ?
-  if (bCANenum && canMsg.len == 0)
+  if (bCANenum && canFrame.len == 0)
   {
     // store this response in the responses array
     if (remoteCANID > 0)
@@ -194,9 +194,9 @@ void CanService::checkIncomingMessage()
     return;
   }
 
-  // The message is a VLCB message.
-  Action action = {ACT_MESSAGE_IN, {canMsg.len}};
-  memcpy(action.vlcbMessage.data, canMsg.data, canMsg.len);
+  // The incoming CAN frame is a VLCB message.
+  Action action = {ACT_MESSAGE_IN, {canFrame.len}};
+  memcpy(action.vlcbMessage.data, canFrame.data, canFrame.len);
 
   controller->putAction(action);
 }
@@ -212,31 +212,31 @@ inline uint32_t makeHeader_impl(byte id, byte priority)
 
 bool CanService::sendMessage(const VlcbMessage *msg)
 {
-  // caller must populate the message data
+  // caller must populate the frame data
   // this method will create the correct frame header (CAN ID and priority bits)
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
   // priority defaults to 1011 low/medium
 
-  CANMessage message;       // ACAN2515 frame class
-  message.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  message.len = msg->len;
-  message.rtr = false;
-  message.ext = false;
-  memcpy(message.data, msg->data, msg->len);
+  CANFrame frame;
+  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
+  frame.len = msg->len;
+  frame.rtr = false;
+  frame.ext = false;
+  memcpy(frame.data, msg->data, msg->len);
 
   controller->indicateActivity();
-  return sendCanMessage(&message);
+  return sendCanFrame(&frame);
 }
 
-bool CanService::sendRtrMessage()
+bool CanService::sendRtrFrame()
 {
-  CANMessage message;       // ACAN2515 frame class
-  message.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  message.rtr = true;
-  message.ext = false;
-  message.len = 0;
+  CANFrame frame;
+  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
+  frame.rtr = true;
+  frame.ext = false;
+  frame.len = 0;
 
-  return sendCanMessage(&message);
+  return sendCanFrame(&frame);
 }
 
 void CanService::checkCANenumTimout()

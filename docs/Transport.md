@@ -38,10 +38,10 @@ It handles CANID enumeration and conflict detection that would be the same for a
 ```CanTransport``` implements the methods ```process``` and ```sendMessage``` above. 
 However, it requires that any concrete implementing classes implement the following methods:
 
-getNextCanMessage
+getNextCanFrame
 : get the next CAN message that is available.
 
-sendCanMessage
+sendCanFrame
 : send a CAN message to the CAN bus.
 
 Note that these two methods work with a CAN message (```CANMessage```) rather than a 

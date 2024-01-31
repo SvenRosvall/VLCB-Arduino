@@ -113,7 +113,7 @@ void testUninitializedRequestNodeNumberMissingSNN()
   process(controller);
 
   assertEquals(0, mockTransportService->sent_messages.size());
-  //assertEquals(OPC_NNACK, mockTransportService->sent_messages[0].data[0]);
+  //assertEquals(OPC_NNACK, mockTransportService->sent_frames[0].data[0]);
 
   assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_UNINITIALISED, configuration->currentMode);

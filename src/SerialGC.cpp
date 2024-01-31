@@ -70,7 +70,7 @@ namespace VLCB
     {
       // We have received a message between a ':' and a ';', so increment count
       receivedCount++;
-      result = decodeGridConnect(rxBuffer, &rxCANMessage);
+      result = decodeGridConnect(rxBuffer, &rxCANFrame);
       if (!result)
       {
         // must have been an error in the message, so increment error counter
@@ -85,9 +85,9 @@ namespace VLCB
   /// get the available CANMessage
   /// must call available first to ensure there is something to get
   //
-  CANMessage SerialGC::getNextCanMessage()
+  CANFrame SerialGC::getNextCanFrame()
   {
-    return rxCANMessage;
+    return rxCANFrame;
   }
 
 
@@ -95,10 +95,10 @@ namespace VLCB
   /// send a CANMessage message in GridConnect format
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool SerialGC::sendCanMessage(CANMessage *msg)
+  bool SerialGC::sendCanFrame(CANFrame *frame)
   {
     transmitCount++;
-    bool result = encodeGridConnect(txBuffer, msg);
+    bool result = encodeGridConnect(txBuffer, frame);
     if (result)
     {
       // output the message
@@ -111,13 +111,10 @@ namespace VLCB
    return result;
   }
 
-
   //
   /// reset
   //
   void SerialGC::reset()
   {
   }
-
-
 }

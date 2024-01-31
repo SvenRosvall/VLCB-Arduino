@@ -112,34 +112,48 @@ bool CAN2515::available()
 /// get next unprocessed message from the buffer
 /// must call available first to ensure there is something to get
 //
-CANMessage CAN2515::getNextCanMessage()
+CANFrame CAN2515::getNextCanFrame()
 {
   // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
   CANMessage message;       // ACAN2515 frame class
 
   canp->receive(message);
 
-//  DEBUG_SERIAL << F("CAN2515 getNextCanMessage id=") << (msg.id & 0x7F) << " len=" << msg.len << " rtr=" << msg.rtr;
+//  DEBUG_SERIAL << F("CAN2515 getNextCanFrame id=") << (msg.id & 0x7F) << " len=" << msg.len << " rtr=" << msg.rtr;
 //  if (msg.len > 0)
 //    DEBUG_SERIAL << " op=" << _HEX(msg.data[0]);
 //  DEBUG_SERIAL << endl;
 
   ++_numMsgsRcvd;
   
-  return message;
+  CANFrame frame;
+  frame.id = message.id;
+  frame.ext = message.ext;
+  frame.rtr = message.rtr;
+  frame.len = message.len;
+  memcpy(frame.data, message.data, message.len);
+
+  return frame;
 }
 
 //
 /// send a VLCB message
 //
-bool CAN2515::sendCanMessage(CANMessage *msg)
+bool CAN2515::sendCanFrame(CANFrame *frame)
 {
-//  DEBUG_SERIAL << F("CAN2515 sendCanMessage id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
+  CANMessage msg;
+  msg.id = frame->id;
+  msg.ext = frame->ext;
+  msg.rtr = frame->rtr;
+  msg.len = frame->len;
+  memcpy(msg.data, frame->data, frame->len);
+
+//  DEBUG_SERIAL << F("CAN2515 sendCanFrame id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
 //  if (msg->len > 0)
 //    DEBUG_SERIAL << " op=" << _HEX(msg->data[0]);
 //  DEBUG_SERIAL << endl;
 
-  bool ret = canp->tryToSend(*msg);
+  bool ret = canp->tryToSend(msg);
   _numMsgsSent += ret;
 
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.
