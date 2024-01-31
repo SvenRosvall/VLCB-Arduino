@@ -91,6 +91,9 @@ public:
   unsigned int freeSRAM();
   void reboot();
 
+  static void setTwoBytes(byte *target, unsigned int value);
+  static unsigned int getTwoBytes(const byte *bytes);
+
 private:
   Storage * storage;
 

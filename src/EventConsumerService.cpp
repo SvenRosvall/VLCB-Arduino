@@ -70,8 +70,8 @@ void EventConsumerService::handleConsumedMessage(const VlcbMessage *msg)
 {
   //DEBUG_SERIAL << ">Handle Message " << endl;
   unsigned int opc = msg->data[0];
-  unsigned int nn = (msg->data[1] << 8) + msg->data[2];
-  unsigned int en = (msg->data[3] << 8) + msg->data[4];
+  unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
+  unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
   // DEBUG_SERIAL << ">ECService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 

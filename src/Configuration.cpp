@@ -126,10 +126,8 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
 
   // DEBUG_SERIAL << F("> looking for match with ") << nn << ", " << en << endl;
 
-  tarray[0] = highByte(nn);
-  tarray[1] = lowByte(nn);
-  tarray[2] = highByte(en);
-  tarray[3] = lowByte(en);
+  setTwoBytes(&tarray[0], nn);
+  setTwoBytes(&tarray[2], en);
 
   // calc the hash of the incoming event to match
   byte tmphash = makeHash(tarray);
@@ -141,7 +139,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
     {
       // check the EEPROM for a match with the incoming NN and EN
       readEvent(i, tarray);
-      if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)
+      if (getTwoBytes(&tarray[0]) == nn && getTwoBytes(&tarray[2]) == en)
       {
         return i;
       }
@@ -191,8 +189,8 @@ byte Configuration::findExistingEventByEv(byte evindex, byte evval)
 byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 {
   // make a hash from a 4-byte NN + EN event
-  unsigned int nn = (tarr[0] << 8) + tarr[1];
-  unsigned int en = (tarr[2] << 8) + tarr[3];
+  unsigned int nn = getTwoBytes(&tarr[0]);
+  unsigned int en = getTwoBytes(&tarr[2]);
 
   // need to hash the NN and EN to a uniform distribution across HASH_LENGTH
   byte hash = nn ^ (nn >> 8);
@@ -218,7 +216,7 @@ void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES])
     tarr[i] = storage->read(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
   }
 
-  // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
+  // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << getTwoBytes(&tarr[0]) << F(", en = ") << getTwoBytes(&tarr[2]) << endl;
 }
 
 // return the address an event variable is stored in the eeprom.
@@ -577,6 +575,17 @@ void Configuration::clearResetFlag()
 bool Configuration::isResetFlagSet()
 {
   return (storage->read(LOCATION_RESET_FLAG) == 99);
+}
+
+void Configuration::setTwoBytes(byte *target, unsigned int value)
+{
+  target[0] = highByte(value);
+  target[1] = lowByte(value);
+}
+
+unsigned int Configuration::getTwoBytes(const byte *bytes)
+{
+  return (bytes[0] << 8) + bytes[1];
 }
 
 }

@@ -40,8 +40,7 @@ void EventProducerService::setProducedEvents()
 byte EventProducerService::createDefaultEvent(byte evValue)
 {
   byte data[4];
-  data[0] = highByte(module_config->nodeNum);
-  data[1] = lowByte(module_config->nodeNum);
+  Configuration::setTwoBytes(&data[0], module_config->nodeNum);
   data[2] = 0;
   data[3] = evValue;
   
@@ -107,8 +106,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON : OPC_ASOF);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
   }
   else
   {
@@ -129,8 +127,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON1 : OPC_ASOF1);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
   }
   else
   {
@@ -153,8 +150,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON2 : OPC_ASOF2);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
   }
   else
   {
@@ -177,8 +173,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
   {
     opCode = (state ? OPC_ASON3 : OPC_ASOF3);
-    nn_en[0] = highByte(module_config->nodeNum);
-    nn_en[1] = lowByte(module_config->nodeNum); 
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
   }
   else
   {
@@ -196,7 +191,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
 void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg) 
 {
   unsigned int opc = msg->data[0];
-  unsigned int nn = (msg->data[1] << 8) + msg->data[2];
+  unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
   // DEBUG_SERIAL << ">VLCBProdSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
 
   switch (opc) 

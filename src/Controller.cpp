@@ -163,12 +163,6 @@ void Controller::process()
   }
 }
 
-void setNN(VlcbMessage *msg, unsigned int nn)
-{
-  msg->data[1] = highByte(nn);
-  msg->data[2] = lowByte(nn);
-}
-
 bool Controller::sendMessage(const VlcbMessage *msg)
 {
   Action action = {ACT_MESSAGE_OUT, *msg};
@@ -183,7 +177,7 @@ bool Controller::sendMessageWithNNandData(int opc, int len, ...)
   VlcbMessage msg;
   msg.len = len + 3;
   msg.data[0] = opc;
-  setNN(&msg, module_config->nodeNum);
+  Configuration::setTwoBytes(&msg.data[1], module_config->nodeNum);
   for (int i = 0 ; i < len ; ++i)
   {
     msg.data[3 + i] = va_arg(args, int);
