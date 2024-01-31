@@ -39,6 +39,7 @@ private:
 
   bool sendMessage(const VlcbMessage *msg);
   bool sendRtrFrame();
+  bool sendEmptyFrame(bool rtr = false);
   bool sendCanFrame(CANFrame *msg) { return canTransport->sendCanFrame(msg); }
   void startCANenumeration(bool fromENUM = false);
 
