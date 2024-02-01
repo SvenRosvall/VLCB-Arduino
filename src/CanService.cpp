@@ -160,10 +160,7 @@ void CanService::checkIncomingCanFrame()
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
     // send an empty canFrame to show our CANID
 
-    // TODO: introduce a sendMessage() with zero length. Doesn't need a VlcbMessage.
-    VlcbMessage message;
-    message.len = 0;
-    sendMessage(&message);
+    sendEmptyFrame();
 
     return;
   }
@@ -230,9 +227,14 @@ bool CanService::sendMessage(const VlcbMessage *msg)
 
 bool CanService::sendRtrFrame()
 {
+  return sendEmptyFrame(true);
+}
+
+bool CanService::sendEmptyFrame(bool rtr)
+{
   CANFrame frame;
   frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  frame.rtr = true;
+  frame.rtr = rtr;
   frame.ext = false;
   frame.len = 0;
 
