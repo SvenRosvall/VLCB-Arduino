@@ -39,7 +39,7 @@ public:
 #ifdef ARDUINO_ARCH_RP2040
   bool begin(bool poll = false, SPIClassRP2040 spi = SPI);    // note default args
 #else
-  bool begin(bool poll = false, SPIClass spi = SPI);
+  bool begin(bool poll = false, SPIClass &spi = SPI);
 #endif
   bool available() override;
   CANFrame getNextCanFrame() override;
