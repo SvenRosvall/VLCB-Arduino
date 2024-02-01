@@ -162,7 +162,7 @@ void MinimumNodeService::process(const Action *action)
 void MinimumNodeService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
-  unsigned int nn = (msg->data[1] << 8) + msg->data[2];
+  unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
 
   switch (opc)
   {
