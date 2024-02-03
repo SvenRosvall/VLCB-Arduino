@@ -46,6 +46,8 @@ byte DueEepromEmulationStorage::getChipEEPROMVal(unsigned int eeaddress)
 {
 #ifdef __SAM3X8E__
   return dueFlashStorage.read(eeaddress);
+#else
+  return 0;
 #endif
 }
 
