@@ -41,13 +41,21 @@ Split this class in two:
   1. all the other stuff a developer would want, such as transport statistics and
      resetting the module.
 
-## Introduce a class/struct for CAN Frames
-Currently, we are using ```CANMessage``` from the ACAN2515 library. 
-This is convenient for the CAN2515 driver but for other CAN drivers it is an unnecessary
-dependency.
-Instead, we should introduce a CAN Frame struct that holds CAN information.
-This will be used to with the CAN driver who in turn converts this to/from a data structure
-type used here.
+## Move CAN2515 to its own package/repo
+Now that we are getting more CAN transport implementations it is time to move CAN2515 
+away into its own library. 
+This breaks the dependency on ACAN2515 which should not be required for other CAN transports.
+
+## Ideas for reducing memory usage
+### Make CanFrame polymorphic
+Use virtual functions to get each field.
+Each CAN transport implementation must implement CAN Frame functions.
+
+This should reduce the amount of copying between CanFrame and the datastructure used 
+within the CAN transport implementation.
+
+However, the added coding and memory used for virtual functions may negate the benefits 
+of a polymorphic CanFrame class.
 
 ## Documentation
 
