@@ -55,15 +55,15 @@ outgoing messages around via the Action bus.
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
-The ```CanTransport``` object translates the VlcbMessage object to and from an object that represents
+The ```CanService``` translates the ```VlcbMessage``` to/from a ```CANFrame``` class that contains 
+CAN specific fields and a ```VlcbMessage``` in its data portion.
+
+The ```CanTransport``` object translates the ```CANFrame``` object to and from an object that represents
 a CAN frame containing an id, 8 bytes of data (same as the VlcbMessage) and the flags
 ```rtr``` and ```ext```.
 This CAN frame is then passed to or from a CAN driver, such as CAN2515. 
 CAN drivers may need to convert this CAN frame to a data structure used by any library
 that is used by that driver.
-
-Currently, this CAN frame is stored in a ```CANMessage``` object defined in the ACAN2515 library.
-This should be replaced with another class that doesn't depend on an external library.
 
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
@@ -91,23 +91,6 @@ DueEepromEmulationStorage
 FlashStorage
 : Stores data in Flash memory. Useful for modules that do not have onboard EEPROM or too
 little EEPROM.
-
-## CanTransport
-The CanTransport interface encapsulates the transmission of a VLCB message across some
-media such as CAN bus.
-
-The class ```CanTransport``` serves as a base class for implementations of CAN based transports. 
-It handles CANID enumeration and conflict detection that would be the same for all CAN based transports. 
-
-Current implementing transport classes:
-
-CAN2515
-: Transport over CAN bus using the MCP2515 chip.
-
-More transports implementations exist but have not yet been imported here.
-
-Read more about the ```Transport``` interface and how to implement new transports in
-[Transport documentation.](Transport.md)
 
 ## Services
 

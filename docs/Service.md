@@ -63,7 +63,7 @@ This is a service that is specifically for modules on a CAN bus and is required 
 Handles OP-codes CANID and ENUM for re-assigning CANID for the module.
 
 The ```CanService``` works in tandem with a CAN transport object, derived from the 
-```CanTransport``` class, which must be provided as an argument to its constructor.
+[```CanTransport```](CanTransport.md) interface, which must be provided as an argument to its constructor.
 
 ### NodeVariableService
 Handles configuration of node variables for the module.
@@ -72,16 +72,13 @@ Handles configuration of node variables for the module.
 Handles incoming events.
 To use this the module application needs to register an event handler function with
 ```setEventHandler()```.
-The signature of the handler function shall be one of
+The signature of the handler function shall be
 ```C++
-void handler(byte index, VlcbMessage *msg);
-void handler(byte index, VlcbMessage *msg, bool ison, byte evval);
+void handler(byte index, const VlcbMessage *msg);
 ```
 The arguments provided to the handler function are:
 * ```index``` : The index number of the incoming event in the event table.
 * ```msg``` : The message structure that contains the event.
-* ```ison``` : A flag to indicate if the event is an on or off event.
-* ```evval``` : The value of event variable 1 for the incoming event.
 
 ### EventProducerService
 Facilitates sending events. 
