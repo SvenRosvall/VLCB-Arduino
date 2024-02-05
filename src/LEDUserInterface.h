@@ -20,7 +20,7 @@ class LEDUserInterface : public Service
 public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
   virtual void setController(Controller *ctrl) override { this->controller = ctrl; }
-  virtual byte getServiceID() override { return 99; };
+  virtual byte getServiceID() override { return 0; };
   virtual byte getServiceVersionID() override { return 1; };
 
   bool isButtonPressed();

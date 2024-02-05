@@ -362,15 +362,26 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
       byte svcIndex = 0;
       for (auto svc: controller->getServices())
       {
-        // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
-        controller->sendMessageWithNN(OPC_SD, ++svcIndex, svc->getServiceID(), svc->getServiceVersionID());
+        ++svcIndex;
+        if (svc->getServiceID() > 0)
+        {
+          // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
+          controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
+        }
       }
     }
     else if (serviceIndex <= controller->getServices().size())
     {
       // Request for details of a single service.
       Service *theService = controller->getServices()[serviceIndex - 1];
-      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+      if (theService->getServiceID() == 0)
+      {
+        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
+      }
+      else
+      {
+        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+      }
     }
     else
     {

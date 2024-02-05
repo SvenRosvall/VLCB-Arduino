@@ -52,8 +52,8 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::EventProducerService> epService;
   epService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(),
-       ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get(), mockUserInterface.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), mockUserInterface.get(),
+       ecService.get(), epService.get(), longMessageService.get(), mockTransportService.get()});
   controller.begin();
   minimumNodeService->setHeartBeat(false);
 
@@ -507,7 +507,7 @@ void testServiceDiscovery()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(7, mockTransportService->sent_messages.size());
+  assertEquals(6, mockTransportService->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[0].data[0]);
   assertEquals(6, mockTransportService->sent_messages[0].data[5]); // Number of services
@@ -518,17 +518,17 @@ void testServiceDiscovery()
   assertEquals(1, mockTransportService->sent_messages[1].data[5]); // version
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[2].data[0]);
-  assertEquals(2, mockTransportService->sent_messages[2].data[3]); // index
+  assertEquals(3, mockTransportService->sent_messages[2].data[3]); // index
   assertEquals(SERVICE_ID_CONSUMER, mockTransportService->sent_messages[2].data[4]); // service ID
   assertEquals(1, mockTransportService->sent_messages[2].data[5]); // version
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[3].data[0]);
-  assertEquals(3, mockTransportService->sent_messages[3].data[3]); // index
+  assertEquals(4, mockTransportService->sent_messages[3].data[3]); // index
   assertEquals(SERVICE_ID_PRODUCER, mockTransportService->sent_messages[3].data[4]); // service ID
   assertEquals(1, mockTransportService->sent_messages[3].data[5]); // version
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[4].data[0]);
-  assertEquals(4, mockTransportService->sent_messages[4].data[3]); // index
+  assertEquals(5, mockTransportService->sent_messages[4].data[3]); // index
   assertEquals(SERVICE_ID_STREAMING, mockTransportService->sent_messages[4].data[4]); // service ID
   assertEquals(1, mockTransportService->sent_messages[4].data[5]); // version
 }
@@ -539,7 +539,7 @@ void testServiceDiscoveryLongMessageSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 4}};
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 5}};
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -547,7 +547,7 @@ void testServiceDiscoveryLongMessageSvc()
   // Verify sent messages.
   assertEquals(1, mockTransportService->sent_messages.size());
   assertEquals(OPC_ESD, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(4, mockTransportService->sent_messages[0].data[3]); // index
+  assertEquals(5, mockTransportService->sent_messages[0].data[3]); // index
   assertEquals(SERVICE_ID_STREAMING, mockTransportService->sent_messages[0].data[4]);
   // Not testing service data bytes.
 }
@@ -559,6 +559,25 @@ void testServiceDiscoveryIndexOutOfBand()
   VLCB::Controller controller = createController();
 
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 7}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_RQSD, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_SERVICE, mockTransportService->sent_messages[0].data[5]);
+}
+
+void testServiceDiscoveryIndexForUI()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -800,6 +819,7 @@ void testMinimumNodeService()
   testServiceDiscovery();
   testServiceDiscoveryLongMessageSvc();
   testServiceDiscoveryIndexOutOfBand();
+  testServiceDiscoveryIndexForUI();
   testServiceDiscoveryShortMessage();
   testModeUninitializedToSetup();
   testModeSetupToNormal();

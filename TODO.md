@@ -1,9 +1,5 @@
 # TODO List
 
-## UI Service ID shall be ignored
-UI classes are implemented as services. However they are not services in VLCB sense.
-Therefore the UI services shall not be included in the response to RQSD.
-
 ## Keep Node data in Controller
 NodeNumber etc are split across ```Controller``` and ```Configuration```. 
 Keep all access to these in ```Controller```. 
