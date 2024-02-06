@@ -61,6 +61,11 @@ public:
     params[2] = minor;                //  2 code minor version
     params[20] = beta;                // 20 code beta version
   }
+  
+  void setManufacturerId(byte id)
+  {
+    params[1] = id;
+  }
 
   void setModuleId(byte id)
   {
