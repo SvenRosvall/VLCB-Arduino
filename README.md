@@ -1,4 +1,4 @@
-<img align="right" src="arduino_cbus_logo.png"  width="150" height="75">
+<img align="right" src="ArduinoVLCB.png"  width="150" height="75">
 
 # VLCB-Arduino
 This project implements an Arduino library for [VLCB](https://github.com/Versatile-LCB/VLCB-documents) running over CAN bus.
