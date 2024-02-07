@@ -112,6 +112,7 @@ void setupCBUS() {
   // set module parameters
   CBUSParams params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturerId(MANU_DEV);  // for boards in development.
   params.setModuleId(MODULE_ID);
   params.setFlags(PF_FLiM | PF_COMBI);
 
@@ -151,7 +152,7 @@ void setupCBUS() {
   CBUS.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
   CBUS.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   CBUS.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  
+
   if (!CBUS.begin())
   {
     Serial << F("> error starting CBUS") << endl;
