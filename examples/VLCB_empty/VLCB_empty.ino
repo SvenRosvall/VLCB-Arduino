@@ -32,6 +32,7 @@ const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MODULE_ID = 99;          // VLCB module type
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
@@ -47,14 +48,14 @@ VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&modconfig,
-                            {&mnService, &userInterface, &canService, &nvService, &ecService, &epService, &etService}); // Controller object
+VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
+                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
+void eventhandler(byte, VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 
@@ -83,9 +84,9 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANU_DEV);
   params.setModuleId(MODULE_ID);
-
+  params.setManufacturer(MANUFACTURER);
+ 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
@@ -172,7 +173,7 @@ void loop()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, const VLCB::VlcbMessage *msg)
+void eventhandler(byte index, VLCB::VlcbMessage *msg)
 {
   // as an example, display the opcode and the first EV of this event, which will be ev2 as ev1 defines produced event
 
