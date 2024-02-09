@@ -77,7 +77,8 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
-const byte MODULE_ID = 98;          // VLCB module type
+const byte MODULE_ID = 82;          // VLCB module type
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
@@ -143,8 +144,8 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANU_DEV);
   params.setModuleId(MODULE_ID);
+  params.setManufacturer(MANUFACTURER);
 
   // assign to Controller
   controller.setParams(params.getParams());
@@ -156,7 +157,7 @@ void setupVLCB()
     Serial << F("> switch was pressed at startup") << endl;
     modconfig.resetModule();
   }
-
+  
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
@@ -364,5 +365,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Martin Da Costa (MERG M62237) 2023") << endl;
+  Serial << F("> © Martin Da Costa (MERG M6237) 2023") << endl;
 }
