@@ -29,7 +29,6 @@
 #include "EventProducerService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
-#include "CombinedUserInterface.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
