@@ -214,15 +214,9 @@ bool CanService::sendMessage(const VlcbMessage *msg)
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
   // priority defaults to 1011 low/medium
 
-  CANFrame frame;
-  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  frame.len = msg->len;
-  frame.rtr = false;
-  frame.ext = false;
-  memcpy(frame.data, msg->data, msg->len);
-
   controller->indicateActivity();
-  return sendCanFrame(&frame);
+  uint32_t id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
+  return sendCanFrame(id, false, false, msg);
 }
 
 bool CanService::sendRtrFrame()
@@ -232,13 +226,8 @@ bool CanService::sendRtrFrame()
 
 bool CanService::sendEmptyFrame(bool rtr)
 {
-  CANFrame frame;
-  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  frame.rtr = rtr;
-  frame.ext = false;
-  frame.len = 0;
-
-  return sendCanFrame(&frame);
+  uint32_t id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
+  return sendCanFrame(id, rtr, false, nullptr);
 }
 
 void CanService::checkCANenumTimout()

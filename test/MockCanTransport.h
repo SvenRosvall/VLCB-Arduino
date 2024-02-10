@@ -19,7 +19,7 @@ class MockCanTransport : public VLCB::CanTransport
 public:
   virtual bool available() override;
   virtual VLCB::CANFrame getNextCanFrame() override;
-  virtual bool sendCanFrame(VLCB::CANFrame *frame) override;
+  virtual bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VLCB::VlcbMessage *msg) override;
   
   virtual void reset() override;
 

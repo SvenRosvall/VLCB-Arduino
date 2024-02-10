@@ -95,10 +95,23 @@ namespace VLCB
   /// send a CANMessage message in GridConnect format
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool SerialGC::sendCanFrame(CANFrame *frame)
+  bool SerialGC::sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *msg)
   {
     transmitCount++;
-    bool result = encodeGridConnect(txBuffer, frame);
+    CANFrame frame;
+    frame.id = id;
+    frame.rtr = rtr;
+    frame.ext = ext;
+    if (msg == nullptr)
+    {
+      frame.len = 0;
+    }
+    else
+    {
+      frame.len = msg->len;
+      memcpy(frame.data, msg->data, msg->len);
+    }
+    bool result = encodeGridConnect(txBuffer, &frame);
     if (result)
     {
       // output the message

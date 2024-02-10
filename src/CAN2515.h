@@ -43,7 +43,7 @@ public:
 #endif
   bool available() override;
   CANFrame getNextCanFrame() override;
-  bool sendCanFrame(CANFrame *frame) override;
+  bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *message) override;
   void reset() override;
 
   // these methods are specific to this implementation

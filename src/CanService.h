@@ -40,7 +40,8 @@ private:
   bool sendMessage(const VlcbMessage *msg);
   bool sendRtrFrame();
   bool sendEmptyFrame(bool rtr = false);
-  bool sendCanFrame(CANFrame *msg) { return canTransport->sendCanFrame(msg); }
+  bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *msg)
+    { return canTransport->sendCanFrame(id, rtr, ext, msg); }
   void startCANenumeration(bool fromENUM = false);
 
   void checkIncomingCanFrame();

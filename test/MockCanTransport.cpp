@@ -19,9 +19,22 @@ VLCB::CANFrame MockCanTransport::getNextCanFrame()
   return msg;
 }
 
-bool MockCanTransport::sendCanFrame(VLCB::CANFrame *frame)
+bool MockCanTransport::sendCanFrame(uint32_t id, bool rtr, bool ext, const VLCB::VlcbMessage *msg)
 {
-  sent_frames.push_back(*frame);
+  VLCB::CANFrame frame;
+  frame.id = id;
+  frame.rtr = rtr;
+  frame.ext = ext;
+  if (msg == nullptr)
+  {
+    frame.len = 0;
+  }
+  else
+  {
+    frame.len = msg->len;
+    memcpy(frame.data, msg->data, msg->len);
+  }
+  sent_frames.push_back(frame);
   return true;
 }
 

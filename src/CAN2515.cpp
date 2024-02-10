@@ -137,21 +137,28 @@ CANFrame CAN2515::getNextCanFrame()
 //
 /// send a VLCB message
 //
-bool CAN2515::sendCanFrame(CANFrame *frame)
+bool CAN2515::sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *message)
 {
-  CANMessage msg;
-  msg.id = frame->id;
-  msg.ext = frame->ext;
-  msg.rtr = frame->rtr;
-  msg.len = frame->len;
-  memcpy(msg.data, frame->data, frame->len);
+  CANMessage canMsg;
+  canMsg.id = id;
+  canMsg.ext = ext;
+  canMsg.rtr = rtr;
+  if (message == nullptr)
+  {
+    canMsg.len = 0;
+  }
+  else
+  {
+    canMsg.len = message->len;
+    memcpy(canMsg.data, message->data, message->len);
+  }
 
 //  DEBUG_SERIAL << F("CAN2515 sendCanFrame id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
 //  if (msg->len > 0)
 //    DEBUG_SERIAL << " op=" << _HEX(msg->data[0]);
 //  DEBUG_SERIAL << endl;
 
-  bool ret = canp->tryToSend(msg);
+  bool ret = canp->tryToSend(canMsg);
   _numMsgsSent += ret;
 
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.

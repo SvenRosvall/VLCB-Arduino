@@ -11,6 +11,8 @@
 namespace VLCB
 {
 
+struct VlcbMessage;
+
 struct CANFrame
 {
   uint32_t id;
@@ -26,7 +28,7 @@ class CanTransport : public Transport
 public:
   virtual bool available() = 0;
   virtual CANFrame getNextCanFrame() = 0;
-  virtual bool sendCanFrame(CANFrame *msg) = 0;
+  virtual bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *msg) = 0;
 };
 
 }
