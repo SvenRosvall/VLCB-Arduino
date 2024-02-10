@@ -31,6 +31,7 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 99;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
@@ -83,9 +84,9 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANU_DEV);
-  params.setModuleId(MODULE_ID);
-
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
+ 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);

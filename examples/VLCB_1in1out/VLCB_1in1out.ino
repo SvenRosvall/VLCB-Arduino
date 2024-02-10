@@ -1,5 +1,4 @@
 //  Copyright (C) Sven Rosvall (sven@rosvall.ie)
-//  Copyright (C) Sven Rosvall (sven@rosvall.ie)
 //  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
@@ -28,7 +27,6 @@
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
-#include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
 
@@ -36,6 +34,7 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 99;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
@@ -50,12 +49,11 @@ VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
-VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&modconfig,
-                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
+VLCB::Controller controller(&modconfig, 
+                            { &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, coeService}); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -104,9 +102,9 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANU_DEV);
-  params.setModuleId(MODULE_ID);
-
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
+ 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
