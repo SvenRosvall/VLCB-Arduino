@@ -53,7 +53,7 @@ VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
 VLCB::Controller controller(&modconfig, 
-                            { &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+                            { &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, coeService}); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -214,7 +214,7 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
 
