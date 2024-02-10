@@ -31,8 +31,8 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
-const byte MODULE_ID = 99;          // VLCB module type
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
+const byte MODULE_ID = 99;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
@@ -48,8 +48,8 @@ VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &userInterface, &canService, &nvService, &ecService, &epService, &etService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
@@ -84,8 +84,8 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setModuleId(MODULE_ID);
   params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
  
   // assign to Controller
   controller.setParams(params.getParams());
