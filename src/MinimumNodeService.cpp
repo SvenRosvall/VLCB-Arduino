@@ -342,6 +342,19 @@ void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned in
   }
 }
 
+static int countServices(const VLCB::ArrayHolder<Service *> &services)
+{
+  int count = 0;
+  for (auto svc : services)
+  {
+    if (svc->getServiceID() > 0)
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
 void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
   if (nn == module_config->nodeNum)
@@ -356,7 +369,8 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     if (serviceIndex == 0)
     {
       // Request for summary of services. First a service count
-      controller->sendMessageWithNN(OPC_SD, 0, 0, controller->getServices().size());
+      int serviceCount = countServices(controller->getServices());
+      controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
 
       // and then details of each service.
       byte svcIndex = 0;
@@ -385,6 +399,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     }
     else
     {
+      Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
       // Couldn't find the service.
       controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }

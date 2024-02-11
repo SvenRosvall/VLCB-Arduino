@@ -506,11 +506,13 @@ void testServiceDiscovery()
 
   process(controller);
 
+  size_t serviceCount = controller.getServices().size();
+  size_t expectedResponseServices = serviceCount - 1; // Omit the user interface.
   // Verify sent messages.
-  assertEquals(6, mockTransportService->sent_messages.size());
+  assertEquals(expectedResponseServices + 1, mockTransportService->sent_messages.size());
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(6, mockTransportService->sent_messages[0].data[5]); // Number of services
+  assertEquals(expectedResponseServices, mockTransportService->sent_messages[0].data[5]); // Number of services
 
   assertEquals(OPC_SD, mockTransportService->sent_messages[1].data[0]);
   assertEquals(1, mockTransportService->sent_messages[1].data[3]); // index
