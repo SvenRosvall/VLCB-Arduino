@@ -32,9 +32,9 @@ CAN2515::CAN2515()
 /// default poll arg is set to false, so as not to break existing code
 //
 #ifdef ARDUINO_ARCH_RP2040
-bool CAN2515::begin(bool poll, SPIClassRP2040 spi)
+bool CAN2515::begin(bool poll, SPIClassRP2040 & spi)
 #else
-bool CAN2515::begin(bool poll, SPIClass &spi)
+bool CAN2515::begin(bool poll, SPIClass & spi)
 #endif
 {
   uint16_t ret;
