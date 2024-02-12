@@ -21,7 +21,7 @@ class MockTransportService : public VLCB::Service
 public:
   virtual void setController(VLCB::Controller *cntrl) override;
 
-  virtual byte getServiceID() override { return 0; }
+  virtual byte getServiceID() override { return 99; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(const VLCB::Action * action) override;

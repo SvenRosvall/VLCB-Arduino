@@ -17,7 +17,7 @@ class SerialUserInterface : public Service
 public:
   SerialUserInterface(Transport *transport);
   virtual void setController(Controller *ctrl) override;
-  virtual byte getServiceID() override { return 98; };
+  virtual byte getServiceID() override { return 0; };
   virtual byte getServiceVersionID() override { return 1; };
 
   virtual void process(const Action *action) override;
