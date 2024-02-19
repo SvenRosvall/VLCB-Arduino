@@ -146,16 +146,19 @@ void CanService::checkIncomingCanFrame()
   {
     return;
   }
-  CANFrame canFrame = canTransport->getNextCanFrame();
+  canTransport->getNextCanFrame(this);
+}
 
+void CanService::handleIncomingCanFrame(uint32_t id, bool rtr, bool ext, uint8_t len, uint8_t data[8])
+{
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-  if (canFrame.ext)
+  if (ext)
   {
     return;
   }
 
   // is this a CANID enumeration request from another node (RTR set) ?
-  if (canFrame.rtr)
+  if (rtr)
   {
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
     // send an empty canFrame to show our CANID
@@ -167,18 +170,18 @@ void CanService::checkIncomingCanFrame()
 
   controller->indicateActivity();
 
-  byte remoteCANID = getCANID(canFrame.id);
+  byte remoteCANID = getCANID(id);
 
   /// set flag if we find a CANID conflict with the frame's producer
   /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
-  if (remoteCANID == controller->getModuleCANID() && canFrame.len > 0)
+  if (remoteCANID == controller->getModuleCANID() && len > 0)
   {
     // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
     enumeration_required = true;
   }
 
   // are we enumerating CANIDs ?
-  if (bCANenum && canFrame.len == 0)
+  if (bCANenum && len == 0)
   {
     // store this response in the responses array
     if (remoteCANID > 0)
@@ -192,8 +195,8 @@ void CanService::checkIncomingCanFrame()
   }
 
   // The incoming CAN frame is a VLCB message.
-  Action action = {ACT_MESSAGE_IN, {canFrame.len}};
-  memcpy(action.vlcbMessage.data, canFrame.data, canFrame.len);
+  Action action = {ACT_MESSAGE_IN, {len}};
+  memcpy(action.vlcbMessage.data, data, len);
 
   controller->putAction(action);
 }

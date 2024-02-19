@@ -15,7 +15,7 @@ namespace VLCB
 class Configuration;
 struct VlcbMessage;
 
-class CanService : public Service
+class CanService : public Service, public CreateCanFrameCallback
 {
 
 public:
@@ -47,6 +47,9 @@ private:
   void checkIncomingCanFrame();
   void checkCANenumTimout();
   byte findFreeCanId();
+
+  // Implement interface CreateCanFrameCallback
+  void handleIncomingCanFrame(uint32_t id, bool rtr, bool ext, uint8_t len, uint8_t *data) override;
 
   bool enumeration_required = false;
   bool bCANenum = false;

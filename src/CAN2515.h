@@ -42,7 +42,7 @@ public:
   bool begin(bool poll = false, SPIClass & spi = SPI);
 #endif
   bool available() override;
-  CANFrame getNextCanFrame() override;
+  void getNextCanFrame(CreateCanFrameCallback *callback) override;
   bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *message) override;
   void reset() override;
 

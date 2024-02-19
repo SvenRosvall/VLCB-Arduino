@@ -85,9 +85,9 @@ namespace VLCB
   /// get the available CANMessage
   /// must call available first to ensure there is something to get
   //
-  CANFrame SerialGC::getNextCanFrame()
+  void SerialGC::getNextCanFrame(CreateCanFrameCallback *callback)
   {
-    return rxCANFrame;
+    callback->handleIncomingCanFrame(rxCANFrame.id, rxCANFrame.rtr, rxCANFrame.ext, rxCANFrame.len, rxCANFrame.data);
   }
 
 

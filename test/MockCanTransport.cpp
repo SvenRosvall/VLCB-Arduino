@@ -12,11 +12,11 @@ bool MockCanTransport::available()
   return !incoming_frames.empty();
 }
 
-VLCB::CANFrame MockCanTransport::getNextCanFrame()
+void MockCanTransport::getNextCanFrame(VLCB::CreateCanFrameCallback *callback)
 {
   VLCB::CANFrame msg = incoming_frames.front();
   incoming_frames.pop_front();
-  return msg;
+  callback->handleIncomingCanFrame(msg.id, msg.rtr, msg.ext, msg.len, msg.data);
 }
 
 bool MockCanTransport::sendCanFrame(uint32_t id, bool rtr, bool ext, const VLCB::VlcbMessage *msg)

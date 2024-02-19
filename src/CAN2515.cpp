@@ -110,7 +110,7 @@ bool CAN2515::available()
 /// get next unprocessed message from the buffer
 /// must call available first to ensure there is something to get
 //
-CANFrame CAN2515::getNextCanFrame()
+void CAN2515::getNextCanFrame(CreateCanFrameCallback *callback)
 {
   // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
   CANMessage message;       // ACAN2515 frame class
@@ -123,15 +123,8 @@ CANFrame CAN2515::getNextCanFrame()
 //  DEBUG_SERIAL << endl;
 
   ++_numMsgsRcvd;
-  
-  CANFrame frame;
-  frame.id = message.id;
-  frame.ext = message.ext;
-  frame.rtr = message.rtr;
-  frame.len = message.len;
-  memcpy(frame.data, message.data, message.len);
 
-  return frame;
+  callback->handleIncomingCanFrame(message.id, message.rtr, message.ext, message.len, message.data);
 }
 
 //

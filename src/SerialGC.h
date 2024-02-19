@@ -31,7 +31,7 @@ namespace VLCB
     bool begin();
 
     bool available() override;
-    CANFrame getNextCanFrame() override;
+    void getNextCanFrame(CreateCanFrameCallback *callback) override;
     bool sendCanFrame(uint32_t id, bool rtr, bool ext, const VlcbMessage *msg) override;
     void reset() override;
 
