@@ -1,0 +1,43 @@
+// Copyright (C) Martin Da Costa 2023 (martindc.merg@gmail.com)
+// This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
+// Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+// The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
+
+#pragma once
+
+#include "Service.h"
+#include <vlcbdefs.hpp>
+
+namespace VLCB {
+
+class Configuration;
+struct VlcbMessage;
+
+class OpCodeConsumerService : public Service 
+{
+public:
+  virtual void setController(Controller *cntrl) override;
+  void setOpCodeHandler(void (*fptr)(const VlcbMessage *msg), byte opcodes[] = NULL, byte num_opcodes = 0);
+  virtual void process(const Action * action) override;
+
+  virtual byte getServiceID() override 
+  {
+    return SERVICE_ID_OPCODES;
+  }
+  virtual byte getServiceVersionID() override 
+  {
+    return 1;
+  }
+
+private:
+  Controller *controller;
+  Configuration *module_config;  // Shortcut to reduce indirection code.
+  void (*opcodehandler)(const VlcbMessage *msg) = nullptr;
+  
+  void handleOpCodeMessage(const VlcbMessage *msg);
+  
+  byte *_opcodes;
+  byte _num_opcodes;
+};
+
+} // VLCB
