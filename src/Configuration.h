@@ -44,7 +44,7 @@ public:
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
   byte findEventSpace();
-  byte findExistingEventByEv(byte evindex, byte evval);
+  byte findExistingEventByEv(byte evnum, byte evval);
 
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex);

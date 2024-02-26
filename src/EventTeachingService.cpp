@@ -273,41 +273,52 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 
 void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
-  if (nn == module_config->nodeNum)
+  if (nn != module_config->nodeNum)
   {
-    if (msg->len < 5)
-    {
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_CMD);
-      return;
-    }
+    return;
+  }
 
-    uint8_t eventIndex = msg->data[3];
-    uint8_t evnum = msg->data[4];
+  if (msg->len < 5)
+  {
+    controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
 
-    if (eventIndex >= module_config->EE_MAX_EVENTS)
-    {
-      // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
-      controller->sendCMDERR(CMDERR_INV_EN_IDX);
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
-      return;
-    }
+  uint8_t eventIndex = msg->data[3];
+  uint8_t evnum = msg->data[4];
 
-    if (module_config->getEvTableEntry(eventIndex) == 0)
-    {
-      // DEBUG_SERIAL << F("ets> request for non-existing event") << endl;
-      controller->sendCMDERR(CMDERR_INV_EN_IDX);
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
-      return;
-    }
-    
-    if (evnum > module_config->EE_NUM_EVS)
-    {
-      // DEBUG_SERIAL << F("ets> request for invalid event variable") << endl;
-      controller->sendCMDERR(CMDERR_INV_EV_IDX);
-      controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EV_IDX);
-      return;
-    }
+  if (eventIndex >= module_config->EE_MAX_EVENTS)
+  {
+    // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
+    controller->sendCMDERR(CMDERR_INV_EN_IDX);
+    controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
+    return;
+  }
 
+  if (module_config->getEvTableEntry(eventIndex) == 0)
+  {
+    // DEBUG_SERIAL << F("ets> request for non-existing event") << endl;
+    controller->sendCMDERR(CMDERR_INV_EN_IDX);
+    controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EN_IDX);
+    return;
+  }
+  
+  if (evnum > module_config->EE_NUM_EVS)
+  {
+    // DEBUG_SERIAL << F("ets> request for invalid event variable") << endl;
+    controller->sendCMDERR(CMDERR_INV_EV_IDX);
+    controller->sendGRSP(OPC_REVAL, getServiceID(), CMDERR_INV_EV_IDX);
+    return;
+  }
+
+  if (evnum == 0)
+  {
+    // Return number of EVs. This may be dynamic in other implementations.
+    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->EE_NUM_EVS);
+    // TODO: Should we also return all event values as REQEV does?
+  }
+  else
+  {
     byte value = module_config->getEventEVval(eventIndex, evnum);
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, value);
   }
@@ -382,19 +393,19 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     return;
   }
 
-  byte evindex = msg->data[5];
+  byte evnum = msg->data[5];
   byte evval = msg->data[6];
-  if ((evindex == 0) || (evindex > module_config->EE_NUM_EVS))
+  if ((evnum == 0) || (evnum > module_config->EE_NUM_EVS))
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return;
   }
   // Is this a produced event that we know about?
-  // Search the events table by evindex = 1 for a value match with evval.
-  if ((evindex == 1) && (evval > 0))
+  // Search the events table by evnum = 1 for a value match with evval.
+  if ((evnum == 1) && (evval > 0))
   {
-    byte index = module_config->findExistingEventByEv(evindex, evval);
+    byte index = module_config->findExistingEventByEv(evnum, evval);
     if (index < module_config->EE_MAX_EVENTS)
     {
       module_config->writeEvent(index, &msg->data[1]);
@@ -434,15 +445,15 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   }
 
   // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-  // DEBUG_SERIAL << F("ets> writing EV = ") << evindex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+  // DEBUG_SERIAL << F("ets> writing EV = ") << evnum << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
   // don't repeat this for subsequent EVs
-  if (evindex <= 1)
+  if (evnum <= 1)
   {
     module_config->writeEvent(index, &msg->data[1]);
   }
 
-  module_config->writeEventEV(index, evindex, evval);
+  module_config->writeEventEV(index, evnum, evval);
 
   // recreate event hash table entry
   // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
@@ -526,7 +537,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   }
 
   byte index = module_config->findExistingEvent(nn, en);
-  byte evIndex = msg->data[5];
+  byte evnum = msg->data[5];
 
   if (index >= module_config->EE_MAX_EVENTS)
   {
@@ -536,7 +547,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     return;
   }
 
-  if (evIndex > module_config->EE_NUM_EVS)
+  if (evnum > module_config->EE_NUM_EVS)
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
@@ -544,11 +555,11 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   }
 
   // event found
-  //DEBUG_SERIAL << F("ets> event found. evIndex = ") << evIndex << endl;
+  //DEBUG_SERIAL << F("ets> event found. evnum = ") << evnum << endl;
   VlcbMessage response = *msg;
   response.len = 7;
   response.data[0] = OPC_EVANS;
-  if (evIndex == 0)
+  if (evnum == 0)
   {
     //send all event variables one after the other starting with the number of variables
     // Reuse the incoming message as it contains the event NN/EN and event index.
@@ -565,7 +576,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   else
   {
     // Reuse the incoming message as it contains the event NN/EN and event index.
-    response.data[6] = module_config->getEventEVval(index, evIndex);    
+    response.data[6] = module_config->getEventEVval(index, evnum);    
     controller->sendMessage(&response);
   }
 }
