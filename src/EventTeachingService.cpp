@@ -315,7 +315,11 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   {
     // Return number of EVs. This may be dynamic in other implementations.
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->EE_NUM_EVS);
-    // TODO: Should we also return all event values as REQEV does?
+    for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+    {
+      byte value = module_config->getEventEVval(eventIndex, i);
+      controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
+    }
   }
   else
   {
