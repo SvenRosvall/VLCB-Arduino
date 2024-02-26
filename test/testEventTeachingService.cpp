@@ -988,11 +988,21 @@ void testReval()
   msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 0}};
   mockTransportService->setNextMessage(msg);
   process(controller);
-  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(3, mockTransportService->sent_messages.size());
   assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0, mockTransportService->sent_messages[0].data[3]);
   assertEquals(0, mockTransportService->sent_messages[0].data[4]);
   assertEquals(2, mockTransportService->sent_messages[0].data[5]);
+
+  assertEquals(OPC_NEVAL, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[1].data[3]);
+  assertEquals(1, mockTransportService->sent_messages[1].data[4]);
+  assertEquals(17, mockTransportService->sent_messages[1].data[5]);
+
+  assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[2].data[3]);
+  assertEquals(2, mockTransportService->sent_messages[2].data[4]);
+  assertEquals(42, mockTransportService->sent_messages[2].data[5]);
   mockTransportService->clearMessages();
 
   // Verify the event variable 1
