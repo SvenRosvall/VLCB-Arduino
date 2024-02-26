@@ -950,6 +950,76 @@ void testEvulnErrors()
   assertEquals(CMDERR_INVALID_EVENT, mockTransportService->sent_messages[1].data[5]);
 }
 
+void testReval()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  
+  // Create one event.
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 17}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 2, 42}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // Verify count of event variables.
+  // Data: OP, NN, Event index, EV#
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 0}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[5]);
+  mockTransportService->clearMessages();
+
+  // Verify the event variable 1
+  // Data: OP, NN, Event index, EV#
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(1, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(17, mockTransportService->sent_messages[0].data[5]);
+  mockTransportService->clearMessages();
+
+  // Verify the event variable 2
+  // Data: OP, NN, Event index, EV#
+  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 2}};
+  mockTransportService->setNextMessage(msg);
+  process(controller);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[5]);
+  mockTransportService->clearMessages();
+}
+
 void testRevalErrors()
 {
   test();
@@ -1274,6 +1344,7 @@ void testEventTeachingService()
   testIgnoreIfNotInLearnMode();
   testNenrdWithBadIndex();
   testEvulnErrors();
+  testReval();
   testRevalErrors();
   testReqevErrors();
   testLearnErrors();

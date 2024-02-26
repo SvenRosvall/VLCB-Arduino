@@ -170,12 +170,12 @@ byte Configuration::findEventSpace()
   return evidx;
 }
 
-byte Configuration::findExistingEventByEv(byte evindex, byte evval)
+byte Configuration::findExistingEventByEv(byte evnum, byte evval)
 {
   byte i;
   for (i = 0; i < EE_MAX_EVENTS; i++)
   {
-    if (getEventEVval(i, evindex) == evval)
+    if (getEventEVval(i, evnum) == evval)
     {
       break;
     }
