@@ -43,11 +43,12 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   unsigned int nodeNum = module_config->nodeNum;
   
   byte index = module_config->findEventSpace();
-  //eventNum = (int)index + 1;
   for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
   {
     if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
     {
+      controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
+      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
       break;
     }
   }
