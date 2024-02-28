@@ -39,15 +39,32 @@ void EventProducerService::setProducedEvents()
 
 byte EventProducerService::createDefaultEvent(byte evValue)
 {
+  unsigned int eventNum = 0;
+  unsigned int nodeNum = module_config->nodeNum;
   byte data[4];
-  Configuration::setTwoBytes(&data[0], module_config->nodeNum);
-  data[2] = 0;
-  data[3] = evValue;
   
   byte index = module_config->findEventSpace();
+  //eventNum = (int)index + 1;
+  for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
+  {
+    if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
+    {
+      break;
+    }
+  }
   
+  DEBUG_SERIAL << F("eps>Event Number = ") << eventNum << endl;
+  
+  Configuration::setTwoBytes(&data[0], nodeNum);
+  Configuration::setTwoBytes(&data[2], eventNum);
+   
   module_config->writeEvent(index, data);
   module_config->writeEventEV(index, 1, evValue);
+  
+  for (byte i = 2; i <= module_config->EE_NUM_EVS; i++)
+  {
+    module_config->writeEventEV(index, i, 0);
+  }
   module_config->updateEvHashEntry(index);
   
   return index;
