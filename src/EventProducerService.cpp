@@ -45,9 +45,9 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   
   byte index = module_config->findEventSpace();
   //eventNum = (int)index + 1;
-  for(eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
+  for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
   {
-    if(module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
+    if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
     {
       break;
     }
