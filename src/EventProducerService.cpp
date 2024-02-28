@@ -41,7 +41,6 @@ byte EventProducerService::createDefaultEvent(byte evValue)
 {
   unsigned int eventNum = 0;
   unsigned int nodeNum = module_config->nodeNum;
-  byte data[4];
   
   byte index = module_config->findEventSpace();
   //eventNum = (int)index + 1;
@@ -53,12 +52,13 @@ byte EventProducerService::createDefaultEvent(byte evValue)
     }
   }
   
-  DEBUG_SERIAL << F("eps>Event Number = ") << eventNum << endl;
-  
-  Configuration::setTwoBytes(&data[0], nodeNum);
-  Configuration::setTwoBytes(&data[2], eventNum);
+  // DEBUG_SERIAL << F("eps>Event Number = ") << eventNum << endl;
+
+  byte nn_en[4];
+  Configuration::setTwoBytes(&nn_en[0], nodeNum);
+  Configuration::setTwoBytes(&nn_en[2], eventNum);
    
-  module_config->writeEvent(index, data);
+  module_config->writeEvent(index, nn_en);
   module_config->writeEventEV(index, 1, evValue);
   
   for (byte i = 2; i <= module_config->EE_NUM_EVS; i++)
