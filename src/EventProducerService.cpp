@@ -48,7 +48,7 @@ byte EventProducerService::createDefaultEvent(byte evValue)
     if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
     {
       controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
-      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
+      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
       break;
     }
   }
