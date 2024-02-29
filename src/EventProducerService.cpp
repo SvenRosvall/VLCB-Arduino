@@ -38,12 +38,13 @@ void EventProducerService::setProducedEvents()
 }
 
 byte EventProducerService::createDefaultEvent(byte evValue)
-{
-  unsigned int eventNum = 0;
+{  
   unsigned int nodeNum = module_config->nodeNum;
   
   byte index = module_config->findEventSpace();
-  //eventNum = (int)index + 1;
+  //TODO: Consider full event table error message.
+  
+  unsigned int eventNum = 0;
   for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
   {
     if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
