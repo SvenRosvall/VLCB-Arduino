@@ -38,17 +38,17 @@ void EventProducerService::setProducedEvents()
 }
 
 byte EventProducerService::createDefaultEvent(byte evValue)
-{
-  unsigned int eventNum = 0;
+{  
   unsigned int nodeNum = module_config->nodeNum;
   
   byte index = module_config->findEventSpace();
+  //TODO: Consider full event table error message.
+  
+  unsigned int eventNum = 0;
   for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
   {
     if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
     {
-      controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
-      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
       break;
     }
   }
