@@ -105,9 +105,9 @@ void testCoeFlag()
   assertEquals(OPC_PNN, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-  assertEquals(MANU_VLCB, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(MANU_MERG_VLCB, mockTransportService->sent_messages[0].data[3]);
   assertEquals(MODULE_ID, mockTransportService->sent_messages[0].data[4]);
-  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_COE | PF_SD, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(PF_CONSUMER | PF_PRODUCER | PF_NORMAL | PF_COE | PF_VLCB, mockTransportService->sent_messages[0].data[5]);
 }
 
 byte capturedIndex = -1;

@@ -15,7 +15,7 @@ public:
   explicit Parameters(Configuration const & config)
   {
     params[PAR_NUM] = 20;                     //  0 num params = 20
-    params[PAR_MANU] = MANU_VLCB;              //  1 manf = MERG, 165
+    params[PAR_MANU] = MANU_MERG_VLCB;              //  1 manf = MERG, 165
     params[PAR_EVTNUM] = config.EE_MAX_EVENTS;   //  4 num events
     params[PAR_EVNUM] = config.EE_NUM_EVS;      //  5 num evs per event
     params[PAR_NVNUM] = config.EE_NUM_NVS;      //  6 num NVs

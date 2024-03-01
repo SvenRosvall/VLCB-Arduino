@@ -81,7 +81,7 @@ void Controller::setParams(unsigned char *mparams)
     switch (svc->getServiceID())
     {
       case SERVICE_ID_MNS:
-        flags |= PF_SD;
+        flags |= PF_VLCB;
         break;
       case SERVICE_ID_PRODUCER:
         flags |= PF_PRODUCER;
