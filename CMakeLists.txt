@@ -7,9 +7,10 @@ project(VLCB_Arduino)
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(examples)
-include_directories(examples/CBUS_1in1out)
-include_directories(examples/CBUS_empty)
-include_directories(examples/CBUS_long_message_example)
+include_directories(examples/VLCB_1in1out)
+include_directories(examples/VLCB_4in4out)
+include_directories(examples/VLCB_empty)
+include_directories(examples/VLCB_long_message_example)
 include_directories(src)
 include_directories(Arduino)
 
