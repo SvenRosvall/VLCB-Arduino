@@ -16,7 +16,7 @@ public:
 
 #ifdef __SAM3X8E__
 // If SAM3X8E is defined then this file shall be compilable but this class shall not be instantiatable and will not compile if used anyway.
-  DueEepromEmulationStorage() = delete;
+  EepromInternalStorage() = delete;
 #endif
 
   virtual void begin() override;
