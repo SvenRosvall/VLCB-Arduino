@@ -5,7 +5,9 @@
 
 #include "EepromInternalStorage.h"
 
+#ifndef __SAM3X8E__
 #include <EEPROM.h>
+#endif
 
 namespace VLCB
 {
@@ -51,7 +53,9 @@ byte EepromInternalStorage::readBytes(unsigned int eeaddress, byte nbytes, byte 
 
 byte EepromInternalStorage::getChipEEPROMVal(unsigned int eeaddress)
 {
+#ifndef __SAM3X8E__
   return EEPROM.read(eeaddress);
+#endif
 }
 
 
@@ -83,7 +87,9 @@ void EepromInternalStorage::writeBytes(unsigned int eeaddress, const byte src[],
 //
 void EepromInternalStorage::setChipEEPROMVal(unsigned int eeaddress, byte val)
 {
+#ifndef __SAM3X8E__
   EEPROM.write(eeaddress, val);
+#endif
 
 #if defined ESP32 || defined ESP8266 || defined ARDUINO_ARCH_RP2040
   EEPROM.commit();
