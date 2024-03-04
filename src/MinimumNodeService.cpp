@@ -149,9 +149,6 @@ void MinimumNodeService::process(const Action *action)
 
       default:
           break;
-
-      default:
-        break;
     }
   }
 
