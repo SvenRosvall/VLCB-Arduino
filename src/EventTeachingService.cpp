@@ -410,7 +410,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   // Search the events table by evnum = 1 for a value match with evval.
   if ((evnum == 1) && (evval > 0))
   {
-    byte index = module_config->findExistingEventByEv(evnum, evval);
+    byte index = module_config->findExistingEventByEv1(evval);
     if (index < module_config->EE_MAX_EVENTS)
     {
       module_config->writeEvent(index, &msg->data[1]);
@@ -506,7 +506,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
         //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
         // Writes the first four bytes NN & EN only if they have changed.
-        byte eventTableNNEN[4];
+        byte eventTableNNEN[EE_HASH_BYTES];
         module_config->readEvent(index, eventTableNNEN);
         if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
         {

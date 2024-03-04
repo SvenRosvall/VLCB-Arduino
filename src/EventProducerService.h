@@ -6,6 +6,7 @@
 #pragma once
 
 #include "Service.h"
+#include "Configuration.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB {
@@ -40,7 +41,7 @@ private:
   void handleProdSvcMessage(const VlcbMessage *msg);
   void setProducedEvents();
   byte createDefaultEvent(byte evValue);
-  void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);
+  void findOrCreateEventByEv1(byte evValue, byte tarr[EE_HASH_BYTES]);
   void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
 
   bool uninit = false;

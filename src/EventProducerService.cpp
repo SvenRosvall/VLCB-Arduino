@@ -87,9 +87,9 @@ void EventProducerService::process(const Action * action)
   }
 }
 
-void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byte nn_en[4])
+void EventProducerService::findOrCreateEventByEv1(byte evValue, byte nn_en[EE_HASH_BYTES])
 {
-  byte index = module_config->findExistingEventByEv(evIndex, evValue);
+  byte index = module_config->findExistingEventByEv1(evValue);
   if (index >= module_config->EE_MAX_EVENTS)
   {
     index = createDefaultEvent(evValue);
@@ -117,8 +117,8 @@ void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte
 
 void EventProducerService::sendEvent(bool state, byte evValue)
 {
-  byte nn_en[4];
-  findOrCreateEventByEv(1, evValue, nn_en);
+  byte nn_en[EE_HASH_BYTES];
+  findOrCreateEventByEv1(evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -138,8 +138,8 @@ void EventProducerService::sendEvent(bool state, byte evValue)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
-  byte nn_en[4];
-  findOrCreateEventByEv(1, evValue, nn_en);
+  byte nn_en[EE_HASH_BYTES];
+  findOrCreateEventByEv1(evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -161,8 +161,8 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
-  byte nn_en[4];
-  findOrCreateEventByEv(1, evValue, nn_en);
+  byte nn_en[EE_HASH_BYTES];
+  findOrCreateEventByEv1(evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -184,8 +184,8 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
-  byte nn_en[4];
-  findOrCreateEventByEv(1, evValue, nn_en);
+  byte nn_en[EE_HASH_BYTES];
+  findOrCreateEventByEv1(evValue, nn_en);
 
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
