@@ -148,6 +148,8 @@ void MinimumNodeService::process(const Action *action)
       case ACT_MESSAGE_IN:
         handleMessage(&action->vlcbMessage);
 
+      default:
+        break;
     }
   }
 

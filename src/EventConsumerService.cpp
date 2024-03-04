@@ -63,6 +63,9 @@ void EventConsumerService::process(const Action *action)
     case ACT_MESSAGE_IN:
       handleConsumedMessage(&action->vlcbMessage);
       break;
+      
+    default:
+      break;
   }
 }
 

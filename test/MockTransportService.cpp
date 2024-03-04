@@ -30,6 +30,9 @@ void MockTransportService::process(const VLCB::Action *action)
     case VLCB::ACT_MESSAGE_OUT:
       sent_messages.push_back(action->vlcbMessage);
       break;
+      
+    default:
+      break;
   }
 }
 
