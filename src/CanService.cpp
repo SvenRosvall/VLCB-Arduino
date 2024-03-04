@@ -50,6 +50,9 @@ void CanService::process(const Action *action)
     case ACT_START_CAN_ENUMERATION:
       startCANenumeration(action->fromENUM);
       break;
+      
+    default:
+      break;
   }
 }
 
