@@ -128,7 +128,6 @@ void MinimumNodeService::process(const Action *action)
     switch (action->actionType)
     {
       case ACT_CHANGE_MODE:
-      {
         switch (module_config->currentMode)
         {
         case MODE_UNINITIALISED:
@@ -143,10 +142,10 @@ void MinimumNodeService::process(const Action *action)
           break;
         }
         break;
-      }
       
       case ACT_MESSAGE_IN:
         handleMessage(&action->vlcbMessage);
+        break;
 
       default:
         break;
