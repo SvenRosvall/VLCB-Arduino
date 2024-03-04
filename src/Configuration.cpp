@@ -255,17 +255,7 @@ void Configuration::makeEvHashTable()
 
   for (byte idx = 0; idx < EE_MAX_EVENTS; idx++)
   {
-    readEvent(idx, evarray);
-
-    // empty slots have all four bytes set to 0xff
-    if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
-    {
-      evhashtbl[idx] = 0;
-    }
-    else
-    {
-      evhashtbl[idx] = makeHash(evarray);
-    }
+    updateEvHashEntry(idx);
   }
 }
 
@@ -280,7 +270,7 @@ void Configuration::updateEvHashEntry(byte idx)
   readEvent(idx, evarray);
 
   // empty slots have all four bytes set to 0xff
-  if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
+  if (nnenEquals(evarray, unused_entry))
   {
     evhashtbl[idx] = 0;
   }
@@ -586,6 +576,11 @@ void Configuration::setTwoBytes(byte *target, unsigned int value)
 unsigned int Configuration::getTwoBytes(const byte *bytes)
 {
   return (bytes[0] << 8) + bytes[1];
+}
+
+bool Configuration::nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_HASH_BYTES])
+{
+  return memcmp(rhs, lhs, EE_HASH_BYTES) == 0;
 }
 
 }

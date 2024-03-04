@@ -6,6 +6,7 @@
 #include <Streaming.h>
 
 #include "EventTeachingService.h"
+#include "Configuration.h"
 #include <Controller.h>
 #include <vlcbdefs.hpp>
 
@@ -507,7 +508,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
         // Writes the first four bytes NN & EN only if they have changed.
         byte eventTableNNEN[4];
         module_config->readEvent(index, eventTableNNEN);
-                if (memcmp(eventTableNNEN, &msg->data[1], 4) != 0)
+        if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
         {
           module_config->writeEvent(index, &msg->data[1]);
           //DEBUG_SERIAL << F("ets> Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
