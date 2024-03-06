@@ -38,13 +38,15 @@ void EventProducerService::setProducedEvents()
 }
 
 byte EventProducerService::createDefaultEvent(byte evValue)
-{  
+{
+  // This function is only called when an event needs to be created, so no need to check if event exists.
   unsigned int nodeNum = module_config->nodeNum;
   
   byte index = module_config->findEventSpace();
   //TODO: Consider full event table error message.
   
-  unsigned int eventNum = 0;
+  // Find next available event number.
+  unsigned int eventNum;
   for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
   {
     if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
@@ -55,7 +57,7 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   
   // DEBUG_SERIAL << F("eps>Event Number = ") << eventNum << endl;
 
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   Configuration::setTwoBytes(&nn_en[0], nodeNum);
   Configuration::setTwoBytes(&nn_en[2], eventNum);
    
@@ -100,6 +102,7 @@ void EventProducerService::findOrCreateEventByEv1(byte evValue, byte nn_en[EE_HA
   if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
   {
     // This table entry was not initalised correctly.
+    // This may happen if an event is deleted but the hash table is not updated.
     index = createDefaultEvent(evValue);
     module_config->readEvent(index, nn_en);
   }
