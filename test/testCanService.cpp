@@ -53,18 +53,18 @@ void testServiceDiscovery()
   // Verify sent messages.
   assertEquals(3, mockCanTransport->sent_frames.size());
 
-  assertEquals(OPC_SD, mockCanTransport->sent_frames[0].data[0]);
-  assertEquals(2, mockCanTransport->sent_frames[0].data[5]); // Number of services
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[0].data()[0]);
+  assertEquals(2, mockCanTransport->sent_frames[0].data()[5]); // Number of services
 
-  assertEquals(OPC_SD, mockCanTransport->sent_frames[1].data[0]);
-  assertEquals(1, mockCanTransport->sent_frames[1].data[3]); // index
-  assertEquals(SERVICE_ID_MNS, mockCanTransport->sent_frames[1].data[4]); // service ID
-  assertEquals(1, mockCanTransport->sent_frames[1].data[5]); // version
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[1].data()[0]);
+  assertEquals(1, mockCanTransport->sent_frames[1].data()[3]); // index
+  assertEquals(SERVICE_ID_MNS, mockCanTransport->sent_frames[1].data()[4]); // service ID
+  assertEquals(1, mockCanTransport->sent_frames[1].data()[5]); // version
 
-  assertEquals(OPC_SD, mockCanTransport->sent_frames[2].data[0]);
-  assertEquals(2, mockCanTransport->sent_frames[2].data[3]); // index
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[2].data[4]); // service ID
-  assertEquals(1, mockCanTransport->sent_frames[2].data[5]); // version
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[2].data()[0]);
+  assertEquals(2, mockCanTransport->sent_frames[2].data()[3]); // index
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[2].data()[4]); // service ID
+  assertEquals(1, mockCanTransport->sent_frames[2].data()[5]); // version
 }
 
 void testServiceDiscoveryCanSvc()
@@ -80,9 +80,9 @@ void testServiceDiscoveryCanSvc()
 
   // Verify sent messages.
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(OPC_ESD, mockCanTransport->sent_frames[0].data[0]);
-  assertEquals(2, mockCanTransport->sent_frames[0].data[3]); // index
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[0].data[4]); // service ID
+  assertEquals(OPC_ESD, mockCanTransport->sent_frames[0].data()[0]);
+  assertEquals(2, mockCanTransport->sent_frames[0].data()[3]); // index
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[0].data()[4]); // service ID
   // Not testing service data bytes.
 }
 
@@ -103,8 +103,8 @@ void testCanidEnumerationOnUserAction()
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
 
   // Processing after enumeration timeout
   addMillis(101);
@@ -134,12 +134,12 @@ void testCanidEnumerationOnSetUp()
   // Expect message to make other modules report their CANID's
   assertEquals(2, mockCanTransport->sent_frames.size());
 
-  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
 
-  assertEquals(OPC_RQNN, mockCanTransport->sent_frames[1].data[0]);
-  assertEquals(0, mockCanTransport->sent_frames[1].data[1]);
-  assertEquals(0, mockCanTransport->sent_frames[1].data[2]);
+  assertEquals(OPC_RQNN, mockCanTransport->sent_frames[1].data()[0]);
+  assertEquals(0, mockCanTransport->sent_frames[1].data()[1]);
+  assertEquals(0, mockCanTransport->sent_frames[1].data()[2]);
 
   // Processing after enumeration timeout
   addMillis(101);
@@ -169,8 +169,8 @@ void testCanidEnumerationOnENUM()
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
 
   // Processing after enumeration timeout
   addMillis(101);
@@ -178,7 +178,7 @@ void testCanidEnumerationOnENUM()
   process(controller);
 
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(OPC_NNACK, mockCanTransport->sent_frames[0].data[0]);
+  assertEquals(OPC_NNACK, mockCanTransport->sent_frames[0].data()[0]);
 
   // Expect first available CANID
   assertEquals(1, controller.getModuleCANID());
@@ -198,8 +198,8 @@ void testCanidEnumerationOnConflict()
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
 
   // Processing after enumeration timeout
   addMillis(101);
@@ -226,9 +226,9 @@ void testRtrMessage()
 
   // Verify sent messages.
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
-  assertEquals(false, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(3, mockCanTransport->sent_frames[0].id & 0x7F);
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
+  assertEquals(false, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(3, mockCanTransport->sent_frames[0].id() & 0x7F);
 }
 
 void testFindFreeCanidOnPopulatedBus()
@@ -248,8 +248,8 @@ void testFindFreeCanidOnPopulatedBus()
 
   // Expect message to make other modules report their CANID's
   assertEquals(1, mockCanTransport->sent_frames.size());
-  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
-  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr());
+  assertEquals(0, mockCanTransport->sent_frames[0].len());
   mockCanTransport->sent_frames.clear();
 
   // Simulate other nodes
@@ -285,11 +285,11 @@ void testCANID()
   process(controller);
 
   assertEquals(2, mockCanTransport->sent_frames.size());
-  assertEquals(OPC_WRACK, mockCanTransport->sent_frames[0].data[0]);
-  assertEquals(OPC_GRSP, mockCanTransport->sent_frames[1].data[0]);
-  assertEquals(OPC_CANID, mockCanTransport->sent_frames[1].data[3]);
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[1].data[4]);
-  assertEquals(GRSP_OK, mockCanTransport->sent_frames[1].data[5]);
+  assertEquals(OPC_WRACK, mockCanTransport->sent_frames[0].data()[0]);
+  assertEquals(OPC_GRSP, mockCanTransport->sent_frames[1].data()[0]);
+  assertEquals(OPC_CANID, mockCanTransport->sent_frames[1].data()[3]);
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[1].data()[4]);
+  assertEquals(GRSP_OK, mockCanTransport->sent_frames[1].data()[5]);
 
   // Expect first available CANID
   assertEquals(33, controller.getModuleCANID());
