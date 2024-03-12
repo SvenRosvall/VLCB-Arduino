@@ -11,22 +11,19 @@
 namespace VLCB
 {
 
+template <typename T>
 struct CANFrame
 {
-  uint32_t id;
-  bool ext;
-  bool rtr;
-  uint8_t len;
-  uint8_t data[8];
 };
 
 // Interface for CAN transports 
+template <typename T>
 class CanTransport : public Transport
 {
 public:
   virtual bool available() = 0;
-  virtual CANFrame getNextCanFrame() = 0;
-  virtual bool sendCanFrame(CANFrame *msg) = 0;
+  virtual CANFrame<T> getNextCanFrame() = 0;
+  virtual bool sendCanFrame(CANFrame<T> *msg) = 0;
 };
 
 }

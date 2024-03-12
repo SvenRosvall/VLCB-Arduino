@@ -15,11 +15,12 @@ namespace VLCB
 class Configuration;
 struct VlcbMessage;
 
+template<typename T>
 class CanService : public Service
 {
 
 public:
-  CanService(CanTransport * tpt) : canTransport(tpt) {}
+  CanService(CanTransport<T> * tpt) : canTransport(tpt) {}
 
   virtual void setController(Controller *cntrl) override;
   virtual byte getServiceID() override { return SERVICE_ID_CAN; }
@@ -31,7 +32,7 @@ private:
 
   Controller *controller;
   Configuration * module_config;  // Shortcut to reduce indirection code.
-  CanTransport * canTransport;
+  CanTransport<T> * canTransport;
 
   void handleCanServiceMessage(const VlcbMessage *msg);
   void handleEnumeration(unsigned int nn);
@@ -40,7 +41,7 @@ private:
   bool sendMessage(const VlcbMessage *msg);
   bool sendRtrFrame();
   bool sendEmptyFrame(bool rtr = false);
-  bool sendCanFrame(CANFrame *msg) { return canTransport->sendCanFrame(msg); }
+  bool sendCanFrame(CANFrame<T> *msg) { return canTransport->sendCanFrame(msg); }
   void startCANenumeration(bool fromENUM = false);
 
   void checkIncomingCanFrame();
@@ -55,3 +56,5 @@ private:
 };
 
 }
+
+#include "CanService.cpp"

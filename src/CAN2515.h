@@ -29,7 +29,17 @@ static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency
 /// to support the MCP2515/25625 CAN controllers
 //
 
-class CAN2515 : public CanTransport
+template <>
+struct CANFrame<CANMessage>
+{
+  uint32_t id;
+  bool ext;
+  bool rtr;
+  uint8_t len;
+  uint8_t data[8];
+};
+
+class CAN2515 : public CanTransport<CANMessage>
 {
 public:
 
@@ -42,8 +52,8 @@ public:
   bool begin(bool poll = false, SPIClass & spi = SPI);
 #endif
   bool available() override;
-  CANFrame getNextCanFrame() override;
-  bool sendCanFrame(CANFrame *frame) override;
+  CANFrame<CANMessage> getNextCanFrame() override;
+  bool sendCanFrame(CANFrame<CANMessage> *frame) override;
   void reset() override;
 
   // these methods are specific to this implementation
