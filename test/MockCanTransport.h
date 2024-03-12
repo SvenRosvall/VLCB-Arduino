@@ -16,17 +16,42 @@
 
 struct MockCanFrame
 {
-
-};
-
-template <>
-struct VLCB::CANFrame<MockCanFrame>
-{
   uint32_t id;
   bool ext;
   bool rtr;
   uint8_t len;
   uint8_t data[8];
+};
+
+template <>
+struct VLCB::CANFrame<MockCanFrame>
+{
+  CANFrame() {}
+  CANFrame(int id, bool ext, bool rtr, int len, std::initializer_list<byte> il)
+  {
+    msg.id = id;
+    msg.ext = ext;
+    msg.rtr = rtr;
+    msg.len = len;
+    memcpy(msg.data, il.begin(), len);
+  }
+
+  MockCanFrame &getMessage() { return msg; }
+
+  uint32_t id() const { return msg.id; }
+  bool ext() const { return msg.ext; }
+  bool rtr() const { return msg.rtr; }
+  byte len() const { return msg.len; }
+  const byte *data() const { return msg.data; }
+
+  void id(uint32_t id) { msg.id = id; }
+  void ext(bool ext) { msg.ext = ext; }
+  void rtr(bool rtr) { msg.rtr = rtr; }
+  void len(byte len) { msg.len = len; }
+  byte *data() { return msg.data; }
+
+private:
+  MockCanFrame msg;
 };
 
 // This is to replace the hardware layer. It uses the CanTransport class for CAN processing.

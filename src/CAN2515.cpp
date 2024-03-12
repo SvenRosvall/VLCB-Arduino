@@ -113,9 +113,9 @@ bool CAN2515::available()
 CANFrame<CANMessage> CAN2515::getNextCanFrame()
 {
   // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
-  CANMessage message;       // ACAN2515 frame class
 
-  canp->receive(message);
+  CANFrame<CANMessage> frame;       // contains a ACAN2515 frame class
+  canp->receive(frame.getMessage());
 
 //  DEBUG_SERIAL << F("CAN2515 getNextCanFrame id=") << (msg.id & 0x7F) << " len=" << msg.len << " rtr=" << msg.rtr;
 //  if (msg.len > 0)
@@ -123,13 +123,6 @@ CANFrame<CANMessage> CAN2515::getNextCanFrame()
 //  DEBUG_SERIAL << endl;
 
   ++_numMsgsRcvd;
-  
-  CANFrame<CANMessage> frame;
-  frame.id = message.id;
-  frame.ext = message.ext;
-  frame.rtr = message.rtr;
-  frame.len = message.len;
-  memcpy(frame.data, message.data, message.len);
 
   return frame;
 }
@@ -139,19 +132,12 @@ CANFrame<CANMessage> CAN2515::getNextCanFrame()
 //
 bool CAN2515::sendCanFrame(CANFrame<CANMessage> *frame)
 {
-  CANMessage msg;
-  msg.id = frame->id;
-  msg.ext = frame->ext;
-  msg.rtr = frame->rtr;
-  msg.len = frame->len;
-  memcpy(msg.data, frame->data, frame->len);
-
 //  DEBUG_SERIAL << F("CAN2515 sendCanFrame id=") << (msg->id & 0x7F) << " len=" << msg->len << " rtr=" << rtr;
 //  if (msg->len > 0)
 //    DEBUG_SERIAL << " op=" << _HEX(msg->data[0]);
 //  DEBUG_SERIAL << endl;
 
-  bool ret = canp->tryToSend(msg);
+  bool ret = canp->tryToSend(frame->getMessage());
   _numMsgsSent += ret;
 
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.
