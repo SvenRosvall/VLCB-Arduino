@@ -8,6 +8,7 @@ struct Serial_T
   char read();
   void flush();
   unsigned char readBytesUntil(int termChar, char *string, int length);
+  void print(const char *);
   void println(const char *);
 };
 extern struct Serial_T Serial;

@@ -3,8 +3,9 @@
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
-#include "CanTransport.h"
-#include <Streaming.h>
+#pragma once
+//#include "CanTransport.h"
+//#include <Streaming.h>
 #include "CanService.h"
 #include "Controller.h"
 
@@ -13,13 +14,15 @@ namespace VLCB
 
 const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
-void CanService::setController(Controller *cntrl)
+template <typename T>
+void CanService<T>::setController(Controller *cntrl)
 {
   this->controller = cntrl;
   this->module_config = cntrl->getModuleConfig();
 }
 
-void CanService::process(const Action *action)
+template <typename T>
+void CanService<T>::process(const Action *action)
 {
   checkIncomingCanFrame();
 
@@ -56,7 +59,8 @@ void CanService::process(const Action *action)
   }
 }
 
-void CanService::handleCanServiceMessage(const VlcbMessage *msg)
+template <typename T>
+void CanService<T>::handleCanServiceMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
   unsigned int nn = (msg->data[1] << 8) + msg->data[2];
@@ -75,7 +79,8 @@ void CanService::handleCanServiceMessage(const VlcbMessage *msg)
   }
 }
 
-void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
+template <typename T>
+void CanService<T>::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
@@ -97,7 +102,8 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
   }
 }
 
-void CanService::handleEnumeration(unsigned int nn)
+template <typename T>
+void CanService<T>::handleEnumeration(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
   // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
@@ -120,7 +126,8 @@ inline byte getCANID(unsigned long header)
 //
 /// if in Normal mode, initiate a CAN ID enumeration cycle
 //
-void CanService::startCANenumeration(bool fromENUM)
+template <typename T>
+void CanService<T>::startCANenumeration(bool fromENUM)
 {
   if (bCANenum)
   {
@@ -142,14 +149,15 @@ void CanService::startCANenumeration(bool fromENUM)
   // DEBUG_SERIAL << F("> enumeration cycle initiated") << endl;
 }
 
-void CanService::checkIncomingCanFrame()
+template <typename T>
+void CanService<T>::checkIncomingCanFrame()
 {
   // Check concrete transport for messages and put on controller action queue.
   if (!canTransport->available())
   {
     return;
   }
-  CANFrame canFrame = canTransport->getNextCanFrame();
+  CANFrame<T> canFrame = canTransport->getNextCanFrame();
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
   if (canFrame.ext)
@@ -210,14 +218,15 @@ inline uint32_t makeHeader_impl(byte id, byte priority)
   return (priority << 7) + (id & 0x7f);
 }
 
-bool CanService::sendMessage(const VlcbMessage *msg)
+template <typename T>
+bool CanService<T>::sendMessage(const VlcbMessage *msg)
 {
   // caller must populate the frame data
   // this method will create the correct frame header (CAN ID and priority bits)
   // rtr and ext default to false unless arguments are supplied - see method definition in .h
   // priority defaults to 1011 low/medium
 
-  CANFrame frame;
+  CANFrame<T> frame;
   frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
   frame.len = msg->len;
   frame.rtr = false;
@@ -228,14 +237,16 @@ bool CanService::sendMessage(const VlcbMessage *msg)
   return sendCanFrame(&frame);
 }
 
-bool CanService::sendRtrFrame()
+template <typename T>
+bool CanService<T>::sendRtrFrame()
 {
   return sendEmptyFrame(true);
 }
 
-bool CanService::sendEmptyFrame(bool rtr)
+template <typename T>
+bool CanService<T>::sendEmptyFrame(bool rtr)
 {
-  CANFrame frame;
+  CANFrame<T> frame;
   frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
   frame.rtr = rtr;
   frame.ext = false;
@@ -244,7 +255,8 @@ bool CanService::sendEmptyFrame(bool rtr)
   return sendCanFrame(&frame);
 }
 
-void CanService::checkCANenumTimout()
+template <typename T>
+void CanService<T>::checkCANenumTimout()
 {
   //
   /// check the 100ms CAN enumeration cycle timer
@@ -273,7 +285,8 @@ void CanService::checkCANenumTimout()
   }
 }
 
-byte CanService::findFreeCanId()
+template <typename T>
+byte CanService<T>::findFreeCanId()
 {
   // iterate through the 128 bit field
   for (byte i = 0; i < 16; i++)

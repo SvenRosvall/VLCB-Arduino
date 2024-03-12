@@ -30,8 +30,8 @@ VLCB::Controller createController()
 
   mockCanTransport.reset(new MockCanTransport);
 
-  static std::unique_ptr<VLCB::CanService> canService;
-  canService.reset(new VLCB::CanService(mockCanTransport.get()));
+  static std::unique_ptr<VLCB::CanService<MockCanFrame>> canService;
+  canService.reset(new VLCB::CanService<MockCanFrame>(mockCanTransport.get()));
 
   VLCB::Controller controller = ::createController({minimumNodeService.get(), canService.get()});
   controller.begin();
@@ -45,7 +45,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::CANFrame<MockCanFrame> msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
@@ -73,7 +73,7 @@ void testServiceDiscoveryCanSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::CANFrame<MockCanFrame> msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
@@ -162,7 +162,7 @@ void testCanidEnumerationOnENUM()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_ENUM, 0x01, 0x04, 2}};
+  VLCB::CANFrame<MockCanFrame> msg = {0x11, false, false, 4, {OPC_ENUM, 0x01, 0x04, 2}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
@@ -191,7 +191,7 @@ void testCanidEnumerationOnConflict()
   VLCB::Controller controller = createController();
   controller.getModuleConfig()->setCANID(3);
 
-  VLCB::CANFrame msg = {3, false, false, 1, {OPC_RQNP}};
+  VLCB::CANFrame<MockCanFrame> msg = {3, false, false, 1, {OPC_RQNP}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
@@ -219,7 +219,7 @@ void testRtrMessage()
   VLCB::Controller controller = createController();
   controller.getModuleConfig()->CANID = 3;
 
-  VLCB::CANFrame msg = {0x11, false, true, 0, {}};
+  VLCB::CANFrame<MockCanFrame> msg = {0x11, false, true, 0, {}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
@@ -255,7 +255,7 @@ void testFindFreeCanidOnPopulatedBus()
   // Simulate other nodes
   for (byte remoteCanid = 1 ; remoteCanid <= 19 ; ++remoteCanid)
   {
-    VLCB::CANFrame msg = {remoteCanid, false, false, 0, {}};
+    VLCB::CANFrame<MockCanFrame> msg = {remoteCanid, false, false, 0, {}};
     mockCanTransport->setNextMessage(msg);
     controller.process();
     mockCanTransport->incoming_frames.clear();
@@ -279,7 +279,7 @@ void testCANID()
 
   VLCB::Controller controller = createController();
 
-  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_CANID, 0x01, 0x04, 33}};
+  VLCB::CANFrame<MockCanFrame> msg = {0x11, false, false, 4, {OPC_CANID, 0x01, 0x04, 33}};
   mockCanTransport->setNextMessage(msg);
 
   process(controller);
