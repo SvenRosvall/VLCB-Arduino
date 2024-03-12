@@ -32,11 +32,22 @@ static const uint32_t OSCFREQ = 16000000UL;                 // crystal frequency
 template <>
 struct CANFrame<CANMessage>
 {
-  uint32_t id;
-  bool ext;
-  bool rtr;
-  uint8_t len;
-  uint8_t data[8];
+  CANMessage &getMessage() { return msg; }
+
+  uint32_t id() const { return msg.id; }
+  bool ext() const { return msg.ext; }
+  bool rtr() const { return msg.rtr; }
+  uint8_t len() const { return msg.len; }
+  const void *data() const { return msg.data; }
+
+  void id(uint32_t id) { msg.id = id; }
+  void ext(bool ext) { msg.ext = ext; }
+  void rtr(bool rtr) { msg.rtr = rtr; }
+  void len(byte len) { msg.len = len; }
+  byte *data() { return msg.data; }
+
+private:
+  CANMessage msg;
 };
 
 class CAN2515 : public CanTransport<CANMessage>

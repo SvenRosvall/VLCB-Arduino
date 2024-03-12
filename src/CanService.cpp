@@ -160,13 +160,13 @@ void CanService<T>::checkIncomingCanFrame()
   CANFrame<T> canFrame = canTransport->getNextCanFrame();
 
   // is this an extended frame ? we currently ignore these as bootloader, etc data may confuse us !
-  if (canFrame.ext)
+  if (canFrame.ext())
   {
     return;
   }
 
   // is this a CANID enumeration request from another node (RTR set) ?
-  if (canFrame.rtr)
+  if (canFrame.rtr())
   {
     // DEBUG_SERIAL << F("> CANID enumeration RTR from CANID = ") << remoteCANID << endl;
     // send an empty canFrame to show our CANID
@@ -178,18 +178,18 @@ void CanService<T>::checkIncomingCanFrame()
 
   controller->indicateActivity();
 
-  byte remoteCANID = getCANID(canFrame.id);
+  byte remoteCANID = getCANID(canFrame.id());
 
   /// set flag if we find a CANID conflict with the frame's producer
   /// doesn't apply to RTR or zero-length frames, so as not to trigger an enumeration loop
-  if (remoteCANID == controller->getModuleCANID() && canFrame.len > 0)
+  if (remoteCANID == controller->getModuleCANID() && canFrame.len() > 0)
   {
     // DEBUG_SERIAL << F("> CAN id clash, enumeration required") << endl;
     enumeration_required = true;
   }
 
   // are we enumerating CANIDs ?
-  if (bCANenum && canFrame.len == 0)
+  if (bCANenum && canFrame.len() == 0)
   {
     // store this response in the responses array
     if (remoteCANID > 0)
@@ -203,8 +203,8 @@ void CanService<T>::checkIncomingCanFrame()
   }
 
   // The incoming CAN frame is a VLCB message.
-  Action action = {ACT_MESSAGE_IN, {canFrame.len}};
-  memcpy(action.vlcbMessage.data, canFrame.data, canFrame.len);
+  Action action = {ACT_MESSAGE_IN, {canFrame.len()}};
+  memcpy(action.vlcbMessage.data, canFrame.data(), canFrame.len());
 
   controller->putAction(action);
 }
@@ -227,11 +227,11 @@ bool CanService<T>::sendMessage(const VlcbMessage *msg)
   // priority defaults to 1011 low/medium
 
   CANFrame<T> frame;
-  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  frame.len = msg->len;
-  frame.rtr = false;
-  frame.ext = false;
-  memcpy(frame.data, msg->data, msg->len);
+  frame.id(makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY));
+  frame.len(msg->len);
+  frame.rtr(false);
+  frame.ext(false);
+  memcpy(frame.data(), msg->data, msg->len);
 
   controller->indicateActivity();
   return sendCanFrame(&frame);
@@ -247,10 +247,10 @@ template <typename T>
 bool CanService<T>::sendEmptyFrame(bool rtr)
 {
   CANFrame<T> frame;
-  frame.id = makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY);
-  frame.rtr = rtr;
-  frame.ext = false;
-  frame.len = 0;
+  frame.id(makeHeader_impl(controller->getModuleCANID(), DEFAULT_PRIORITY));
+  frame.rtr(rtr);
+  frame.ext(false);
+  frame.len(0);
 
   return sendCanFrame(&frame);
 }
