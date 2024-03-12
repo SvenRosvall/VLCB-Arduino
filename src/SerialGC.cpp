@@ -85,7 +85,7 @@ namespace VLCB
   /// get the available CANMessage
   /// must call available first to ensure there is something to get
   //
-  CANFrame SerialGC::getNextCanFrame()
+  CANFrame<GCFrame> SerialGC::getNextCanFrame()
   {
     return rxCANFrame;
   }
@@ -95,7 +95,7 @@ namespace VLCB
   /// send a CANMessage message in GridConnect format
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool SerialGC::sendCanFrame(CANFrame *frame)
+  bool SerialGC::sendCanFrame(CANFrame<GCFrame> *frame)
   {
     transmitCount++;
     bool result = encodeGridConnect(txBuffer, frame);

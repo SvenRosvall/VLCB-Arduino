@@ -12,14 +12,14 @@ bool MockCanTransport::available()
   return !incoming_frames.empty();
 }
 
-VLCB::CANFrame MockCanTransport::getNextCanFrame()
+VLCB::CANFrame<MockCanFrame> MockCanTransport::getNextCanFrame()
 {
-  VLCB::CANFrame msg = incoming_frames.front();
+  VLCB::CANFrame<MockCanFrame> msg = incoming_frames.front();
   incoming_frames.pop_front();
   return msg;
 }
 
-bool MockCanTransport::sendCanFrame(VLCB::CANFrame *frame)
+bool MockCanTransport::sendCanFrame(VLCB::CANFrame<MockCanFrame> *frame)
 {
   sent_frames.push_back(*frame);
   return true;
@@ -30,7 +30,7 @@ void MockCanTransport::reset()
 
 }
 
-void MockCanTransport::setNextMessage(VLCB::CANFrame frame)
+void MockCanTransport::setNextMessage(VLCB::CANFrame<MockCanFrame> frame)
 {
   incoming_frames.push_back(frame);
 }

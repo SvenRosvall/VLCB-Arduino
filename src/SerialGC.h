@@ -24,15 +24,15 @@ namespace VLCB
   /// to support the gridconnect protocol over serial
   //
 
-  class SerialGC : public CanTransport
+  class SerialGC : public CanTransport<GCFrame>
   {
   public:
     SerialGC(typeof(Serial)& _serial = Serial) : serial(_serial) {}
     bool begin();
 
     bool available() override;
-    CANFrame getNextCanFrame() override;
-    bool sendCanFrame(CANFrame *frame) override;
+    CANFrame<GCFrame> getNextCanFrame() override;
+    bool sendCanFrame(CANFrame<GCFrame> *frame) override;
     void reset() override;
 
     unsigned int receiveCounter() override { return receivedCount; }
@@ -47,14 +47,14 @@ namespace VLCB
 	
     char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
     char txBuffer[RXBUFFERSIZE]; // Define a byte array to store the outgoing data
-    CANFrame rxCANFrame;
+    CANFrame<GCFrame> rxCANFrame;
 
     unsigned int receivedCount = 0;
     unsigned int transmitCount = 0;
     unsigned int receiveErrorCount = 0;
     unsigned int transmitErrorCount = 0;
 
-    void debugCANMessage(CANFrame frame);
+    void debugCANMessage(CANFrame<GCFrame> frame);
 
   };
 

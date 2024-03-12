@@ -52,7 +52,7 @@
 namespace VLCB
 {
 
-  bool encodeGridConnect(char * gcBuffer, CANFrame *frame)
+  bool encodeGridConnect(char * gcBuffer, CANFrame<GCFrame> *frame)
   {
       byte offset = 0;
       gcBuffer[0] = 0;  // null terminate buffer to start with
@@ -146,7 +146,7 @@ namespace VLCB
   // convert a gridconnect message to CANFrame object
   // see Gridconnect format at beginning of file for byte positions
   //
-  bool decodeGridConnect(const char * gcBuffer, CANFrame *frame) 
+  bool decodeGridConnect(const char * gcBuffer, CANFrame<GCFrame> *frame) 
   {
     int gcIndex = 0;                          // index used to 'walk' gc frame
     int gcBufferLength = strlen(gcBuffer);    // save for later use

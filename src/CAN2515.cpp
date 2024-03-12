@@ -110,7 +110,7 @@ bool CAN2515::available()
 /// get next unprocessed message from the buffer
 /// must call available first to ensure there is something to get
 //
-CANFrame CAN2515::getNextCanFrame()
+CANFrame<CANMessage> CAN2515::getNextCanFrame()
 {
   // DEBUG_SERIAL << F("CAN2515 trying to get next message.") << endl;
   CANMessage message;       // ACAN2515 frame class
@@ -124,7 +124,7 @@ CANFrame CAN2515::getNextCanFrame()
 
   ++_numMsgsRcvd;
   
-  CANFrame frame;
+  CANFrame<CANMessage> frame;
   frame.id = message.id;
   frame.ext = message.ext;
   frame.rtr = message.rtr;
@@ -137,7 +137,7 @@ CANFrame CAN2515::getNextCanFrame()
 //
 /// send a VLCB message
 //
-bool CAN2515::sendCanFrame(CANFrame *frame)
+bool CAN2515::sendCanFrame(CANFrame<CANMessage> *frame)
 {
   CANMessage msg;
   msg.id = frame->id;

@@ -4,7 +4,7 @@
 
 #include "GridConnect.h"
 
-void debugCANMessage(VLCB::CANFrame frame)
+void debugCANMessage(VLCB::CANFrame<VLCB::GCFrame> frame)
 {
   std::cout << std::endl << "VLCB::CANFrame:";
   std::cout << " id " << frame.id << " length " << frame.len;
@@ -23,7 +23,7 @@ void testGridConnectEncode_StandardID(int ID, const char * expectedMessage, bool
 {
   test();
   char msgBuffer[28]; 
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   frame.ext = false;
   frame.len = 2;
   frame.rtr = false;
@@ -44,7 +44,7 @@ void testGridConnectEncode_ExtendedID(int ID, const char * expectedMessage, bool
 {
   test();
   char msgBuffer[28]; 
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   frame.ext = true;
   frame.len = 2;
   frame.rtr = false;
@@ -65,7 +65,7 @@ void testGridConnectEncode_RTR(bool rtr, const char * expectedMessage, bool expe
 {
   test();
   char msgBuffer[28]; 
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   frame.ext = false;
   frame.len = 2;
   frame.rtr = rtr;
@@ -85,7 +85,7 @@ void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expe
 {
   test();
   char msgBuffer[30]; 
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   frame.ext = false;
   frame.len = len;
   frame.rtr = false;
@@ -107,7 +107,7 @@ void testGridConnectEncode_DATA(int len, const char * expectedMessage, bool expe
 void testGridConnectDecode_ID(const char * inputMessage, bool expectedEXT, int expectedID, bool expectedResult)
 {
   test();
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
@@ -122,7 +122,7 @@ void testGridConnectDecode_ID(const char * inputMessage, bool expectedEXT, int e
 void testGridConnectDecode_RTR(const char * inputMessage, bool expectedRTR, bool expectedResult)
 {
   test();
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
@@ -135,7 +135,7 @@ void testGridConnectDecode_RTR(const char * inputMessage, bool expectedRTR, bool
 void testGridConnectDecode_DATA(const char * inputMessage, int expectedLEN, bool expectedResult)
 {
   test();
-  VLCB::CANFrame frame;
+  VLCB::CANFrame<VLCB::GCFrame> frame;
   bool result = VLCB::decodeGridConnect(inputMessage, &frame);
 
   assertEquals(expectedResult, result);
