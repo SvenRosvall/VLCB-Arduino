@@ -7,7 +7,6 @@
 
 #include <Arduino.h>                // for definition of byte datatype
 
-#include <UserInterface.h>
 #include "Storage.h"
 #include "vlcbdefs.hpp"
 
@@ -45,6 +44,7 @@ public:
 
   byte findExistingEvent(unsigned int nn, unsigned int en);
   byte findEventSpace();
+  byte findExistingEventByEv(byte evnum, byte evval);
 
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex);
@@ -57,14 +57,14 @@ public:
   byte readNV(byte idx);
   void writeNV(byte idx, byte val);
 
-  void readEvent(byte idx, byte tarr[]);
-  void writeEvent(byte index, byte data[]);
+  void readEvent(byte idx, byte tarr[EE_HASH_BYTES]);
+  void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
-  void resetModule(UserInterface * ui);
   void resetModule();
 
   void setCANID(byte canid);
-  void setModuleMode(VlcbModeParams m);
+  void setModuleUninitializedMode();
+  void setModuleNormalMode(unsigned int nodeNumber);
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
   void setEventAck(bool ea);
@@ -91,22 +91,23 @@ public:
   unsigned int freeSRAM();
   void reboot();
 
+  static void setTwoBytes(byte *target, unsigned int value);
+  static unsigned int getTwoBytes(const byte *bytes);
+  static bool nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_HASH_BYTES]);
+
 private:
   Storage * storage;
 
-  // Stuff below are not confirmed to be needed to be publically available.
-private:
-  byte makeHash(byte tarr[]);
+  void setModuleMode(VlcbModeParams m);
+  byte makeHash(byte tarr[EE_HASH_BYTES]);
   void getEvArray(byte idx);
   void makeEvHashTable();
-  bool check_hash_collisions();
 
   void loadNVs();
 
   unsigned int getEVAddress(byte idx, byte evnum);
 
   byte *evhashtbl;
-  bool hash_collision;
 };
 
 }

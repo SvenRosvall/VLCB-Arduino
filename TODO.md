@@ -16,10 +16,6 @@ Configuration today has
 Need to change the notion of SLiM/FLiM to VLCB modes.
 Should be part of the MNS service.
 
-## Update LedUserInterface class
-The Minimum Node Specification describes a few more states that the LED's need to indicate. 
-Review this spec again and update the user interface. 
-Also need to update the interface class and add support for these states in the Controller class.
 
 ## Updates to the Storage interface
 The begin method should take a size parameter. 
@@ -38,66 +34,24 @@ This adds code bloat.
 Split this class in two: 
   1. do the same things as the push-button does, i.e. initiate CAN enumeration, 
      initiate setup mode.
-  1. all the other stuff a developer would want.
+  1. all the other stuff a developer would want, such as transport statistics and
+     resetting the module.
 
-## Introduce a class/struct for CAN Frames
-Currently, we are using ```CANMessage``` from the ACAN2515 library. 
-This is convenient for the CAN2515 driver but for other CAN drivers it is an unnecessary
-dependency.
-Instead, we should introduce a CAN Frame struct that holds CAN information.
-This will be used to with the CAN driver who in turn converts this to/from a data structure
-type used here.
+## Move CAN2515 to its own package/repo
+Now that we are getting more CAN transport implementations it is time to move CAN2515 
+away into its own library. 
+This breaks the dependency on ACAN2515 which should not be required for other CAN transports.
 
-## Make CAN drivers objects instead of child of CanTransport
-The relationship between CanTransport and CAN driver can be confusing as ```CanTransport```
-implements some methods in the ```Transport``` interface and also introduces a some
-new virtual methods that the CAN driver must implement.
-Making the CAN Driver a separate object clarifies the responsibilities of ```CanTransport```
-and CAN driver implementations.
+## Ideas for reducing memory usage
+### Make CanFrame polymorphic
+Use virtual functions to get each field.
+Each CAN transport implementation must implement CAN Frame functions.
 
-## Introduce a Command Queue for communication between services
-Today we have a few pieces of code where services communicate between each other.
-Each of these solve the relationship between services in different ways.
-1. MinimumNodeService needs to tell CanService to start CANID enumeration when changing mode.
-   This is done by making a call to controller which looks up the CanService and forwards the call.
-2. EventProducerService passes a produced event to CoEService which then makes it available to
-   the EventConsumerService.
-   This is done by including a pointer to the CoEService in the EPService and the ECService.
-3. Pending pull request:Clear Events message (NNCLR) is handled by the EventTeachingService. 
-   It needs to tell the EventProducerService to re-create the default events.
-   The EventTeachingService raises a flag that the EventProducerService checks and if set it
-   re-creates the default events.
+This should reduce the amount of copying between CanFrame and the datastructure used 
+within the CAN transport implementation.
 
-Three different solutions to a problem with inter-service communication. We need something better.
-
-Introduce a queue of commands.
-Each command is a structure with a command (enum) and a payload that is different for each command.
-The service that needs to instruct another service puts a command on the queue. 
-The Controller manages the queue and passes the command on top the queue to the services in their process() call.
-This command can be null if there is no command in the queue.
-
-The impact on program memory shouldn't be too severe as a queue implementation is already kept in
-the CoEService.
-The existing specific code pieces for handling intra-service communication will go away.
-The CoEService will go away.
-
-### Additional Improvements
-If this command queue is successful we could even use it for passing incoming messages from the Transport
-to services. 
-And vice versa use this queue for sending response messages and produced event messages as commands to the
-Transport.
-
-This idea can even go further and make the Transport a service (as originally envisaged).
-Having the Transport as a service also allows for multiple transport connections and implement bridges
-between different types of transport media such as CAN and Ethernet.
-
-The UserInterface also generates actions that could be passed on as a Command on this queue instead of
-being passed as a parameter to the Service process(). 
-Thus, the UserInterface could also be converted to a service and will receive commands such as indicate
-activity from other services.
-
-The ```CombinedUserInterface``` won't be needed anymore as the ```LedUserInterface``` and
-```SerialUserInterface``` can now be added to the list of services side by side.
+However, the added coding and memory used for virtual functions may negate the benefits 
+of a polymorphic CanFrame class.
 
 ## Documentation
 
@@ -114,15 +68,3 @@ How to create service objects and the controller object.
 How to configure any parameters and service specifics.
 
 This can only be started once we have finalized how VLCB will be set up.
-
-## Potential bugs and opportunities for improvement
-
-### Event lookup
-Duncan use a hash value for quick search in the event table and reduce the 
-number of EEPROM reads.
-
-This code can probably be changed to loop over the hash table and for each
-match with the event hash, check the EEPROM for those locations.
-
-No need to know if there are any hash collisions in the table. 
-Searching the table will be fast enough as there will be less than 255 entries, all in RAM.

@@ -32,7 +32,7 @@ byte MockStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
   return 0;
 }
 
-void MockStorage::writeBytes(unsigned int eeaddress, byte src[], byte numbytes)
+void MockStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
   for (byte i = 0; i < numbytes; i++)
   {

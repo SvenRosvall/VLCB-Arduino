@@ -9,6 +9,9 @@ void doAssertEquals(const char * file, int line,
 void doAssertEquals(const char * file, int line,
                     const char * expected, const char * actual, const char * expression);
 
+void doAssertEquals(const char * file, int line,
+                    const void * expected, const void * actual, const char * expression);
+
 #define test() \
         newTest(__FUNCTION__, __FILE__)
 

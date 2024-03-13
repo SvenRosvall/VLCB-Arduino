@@ -18,7 +18,6 @@ void doAssertEquals(const char * file, int line,
   }
 }
 
-
 void doAssertEquals(const char * file, int line,
                     const char * expected, const char * actual, const char * expression)
 {
@@ -27,6 +26,19 @@ void doAssertEquals(const char * file, int line,
     printf("%s:%d: '%s' is '%s', but expected '%s'\n",
            file, line,
            expression, actual, expected);
+    fail();
+  }
+}
+
+void doAssertEquals(const char * file, int line,
+                    const void * expected, const void * actual, const char * expression)
+{
+  if (expected != actual)
+  {
+    printf("%s:%d: '%s' is %0x, but expected %0x\n",
+           file, line,
+           expression, actual, expected);
+    fflush(stdout);
     fail();
   }
 }

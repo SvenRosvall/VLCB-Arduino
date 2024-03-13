@@ -15,7 +15,7 @@ public:
   explicit Parameters(Configuration const & config)
   {
     params[PAR_NUM] = 20;                     //  0 num params = 20
-    params[PAR_MANU] = MANU_VLCB;              //  1 manf = MERG, 165
+    params[PAR_MANU] = MANU_MERG_VLCB;              //  1 manf = MERG, 165
     params[PAR_EVTNUM] = config.EE_MAX_EVENTS;   //  4 num events
     params[PAR_EVNUM] = config.EE_NUM_EVS;      //  5 num evs per event
     params[PAR_NVNUM] = config.EE_NUM_NVS;      //  6 num NVs
@@ -32,6 +32,11 @@ public:
     params[PAR_MAJVER] = major;                //  7 code major version
     params[PAR_MINVER] = minor;                //  2 code minor version
     params[PAR_BETA] = beta;                // 20 code beta version
+  }
+  
+  void setManufacturer(byte id)
+  {
+    params[PAR_MANU] = id;
   }
 
   void setModuleId(byte id)

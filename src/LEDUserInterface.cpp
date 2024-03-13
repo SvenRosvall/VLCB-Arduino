@@ -21,7 +21,7 @@ bool LEDUserInterface::isButtonPressed()
   return pushButton.isPressed();
 }
 
-void LEDUserInterface::run()
+void LEDUserInterface::process(const Action *action)
 {
   pushButton.run();
   greenLed.run();
@@ -29,25 +29,35 @@ void LEDUserInterface::run()
 
   if (resetRequested())
   {
-    //DEBUG_SERIAL << "> Button is pressed for mode change" << endl;
+    //DEBUG_SERIAL << F("> Button is pressed for mode change") << endl;
     indicateMode(MODE_SETUP);
   }
+  
+  handleAction(action);
+
+  checkRequestedAction();
 }
 
-void LEDUserInterface::indicateResetting()
+void LEDUserInterface::handleAction(const Action *action)
 {
-  pushButton.reset();
-  greenLed.blink();
-  yellowLed.blink();
-}
+  if (action == nullptr)
+  {
+    return;
+  }
 
-void LEDUserInterface::indicateResetDone()
-{
-  Serial << "UI indicateResetDone()" << endl;
-  greenLed.off();
-  yellowLed.off();
-  greenLed.run();
-  yellowLed.run();
+  switch (action->actionType)
+  {
+    case ACT_INDICATE_ACTIVITY:
+      indicateActivity();
+      break;
+
+    case ACT_INDICATE_MODE:
+      indicateMode(action->mode);
+      break;
+      
+    default:
+      break;
+  }
 }
 
 void LEDUserInterface::indicateActivity()
@@ -61,23 +71,24 @@ bool LEDUserInterface::resetRequested()
   return pushButton.isPressed() && pushButton.getCurrentStateDuration() > SW_TR_HOLD;
 }
 
-void LEDUserInterface::indicateMode(byte mode) {
-  switch (mode) {
-
+void LEDUserInterface::indicateMode(VlcbModeParams mode)
+{
+  switch (mode)
+  {
     case MODE_NORMAL:
-      //Serial << "UI indicateMode Normal" << endl;
+      //Serial << F("UI indicateMode Normal") << endl;
       yellowLed.on();
       greenLed.off();
       break;
 
     case MODE_UNINITIALISED:
-      //Serial << "UI indicateMode Uninitialised" << endl;
+      //Serial << F("UI indicateMode Uninitialised") << endl;
       yellowLed.off();
       greenLed.on();
       break;
 
     case MODE_SETUP:
-      //Serial << "UI indicateMode changing" << endl;
+      //Serial << F("UI indicateMode changing") << endl;
       yellowLed.blink();
       greenLed.off();
       break;
@@ -87,46 +98,48 @@ void LEDUserInterface::indicateMode(byte mode) {
   }
 }
 
-UserInterface::RequestedAction LEDUserInterface::checkRequestedAction()
+void LEDUserInterface::checkRequestedAction()
 {
-  //Serial << "UI checkRequestedAction()" << endl;
+  //Serial << F("UI> checkRequestedAction()") << endl;
   if (pushButton.stateChanged())
   {
-    //Serial << "  state changed to " << pushButton.isPressed() << endl;
+    //Serial << F("  button state changed to ") << pushButton.isPressed() << endl; Serial.flush();
     // has switch been released ?
     if (!pushButton.isPressed())
     {
 
       // how long was it pressed for ?
       unsigned long press_time = pushButton.getLastStateDuration();
-      //Serial << "  button released, pressed for " << pushButton.getLastStateDuration() << endl;
+      //Serial << F("  button released, pressed for ") << pushButton.getLastStateDuration() << endl; Serial.flush();
 
       // long hold > 6 secs
       if (press_time > SW_TR_HOLD)
       {
-        //Serial << "  long press - change mode" << endl;
-        return CHANGE_MODE;
+        //Serial << F("  long press - change mode") << endl;
+        controller->putAction(ACT_CHANGE_MODE);
+        return;
       }
 
       // short 1-2 secs
       if (press_time >= 1000 && press_time < 2000)
       {
-        //Serial << "  medium press - renegotiate" << endl;
-        return RENEGOTIATE;
+        //Serial << F("  medium press - renegotiate") << endl;
+        controller->putAction(ACT_RENEGOTIATE);
+        return;
       }
 
       // very short < 0.5 sec
       if (press_time < 500)
       {
-        //Serial << "  short press - enumeration" << endl;
-        return ENUMERATION;
+        //Serial << F("  short press - enumeration") << endl;
+        controller->putAction(ACT_START_CAN_ENUMERATION);
+        return;
       }
 
     } else {
       // do any switch release processing here
     }
   }
-  return NONE;
 }
 
 }

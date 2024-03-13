@@ -33,7 +33,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::CanService> canService;
   canService.reset(new VLCB::CanService(mockCanTransport.get()));
 
-  VLCB::Controller controller = ::createController(mockCanTransport.get(), {minimumNodeService.get(), canService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), canService.get()});
   controller.begin();
 
   return controller;
@@ -45,26 +45,26 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  CANMessage msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
-  assertEquals(3, mockCanTransport->sent_messages.size());
+  assertEquals(3, mockCanTransport->sent_frames.size());
 
-  assertEquals(OPC_SD, mockCanTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockCanTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[0].data[0]);
+  assertEquals(2, mockCanTransport->sent_frames[0].data[5]); // Number of services
 
-  assertEquals(OPC_SD, mockCanTransport->sent_messages[1].data[0]);
-  assertEquals(1, mockCanTransport->sent_messages[1].data[3]); // index
-  assertEquals(SERVICE_ID_MNS, mockCanTransport->sent_messages[1].data[4]); // service ID
-  assertEquals(1, mockCanTransport->sent_messages[1].data[5]); // version
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[1].data[0]);
+  assertEquals(1, mockCanTransport->sent_frames[1].data[3]); // index
+  assertEquals(SERVICE_ID_MNS, mockCanTransport->sent_frames[1].data[4]); // service ID
+  assertEquals(1, mockCanTransport->sent_frames[1].data[5]); // version
 
-  assertEquals(OPC_SD, mockCanTransport->sent_messages[2].data[0]);
-  assertEquals(2, mockCanTransport->sent_messages[2].data[3]); // index
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_messages[2].data[4]); // service ID
-  assertEquals(1, mockCanTransport->sent_messages[2].data[5]); // version
+  assertEquals(OPC_SD, mockCanTransport->sent_frames[2].data[0]);
+  assertEquals(2, mockCanTransport->sent_frames[2].data[3]); // index
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[2].data[4]); // service ID
+  assertEquals(1, mockCanTransport->sent_frames[2].data[5]); // version
 }
 
 void testServiceDiscoveryCanSvc()
@@ -73,16 +73,16 @@ void testServiceDiscoveryCanSvc()
 
   VLCB::Controller controller = createController();
 
-  CANMessage msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(OPC_ESD, mockCanTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockCanTransport->sent_messages[0].data[3]); // index
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(OPC_ESD, mockCanTransport->sent_frames[0].data[0]);
+  assertEquals(2, mockCanTransport->sent_frames[0].data[3]); // index
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[0].data[4]); // service ID
   // Not testing service data bytes.
 }
 
@@ -93,25 +93,25 @@ void testCanidEnumerationOnUserAction()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
   minimumNodeService->setSetupMode();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
-  controller.process();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+  controller.putAction({VLCB::ACT_START_CAN_ENUMERATION});
+
+  process(controller);
 
   // Expect message to make other modules report their CANID's
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(true, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
 
   // Processing after enumeration timeout
   addMillis(101);
-  mockCanTransport->sent_messages.clear();
-  controller.process();
+  mockCanTransport->sent_frames.clear();
+  process(controller);
 
-  assertEquals(0, mockCanTransport->sent_messages.size());
+  assertEquals(0, mockCanTransport->sent_frames.size());
 
   // Expect first available CANID
   assertEquals(1, controller.getModuleCANID());
@@ -123,34 +123,34 @@ void testCanidEnumerationOnSetUp()
 
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::CHANGE_MODE);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
-  controller.process();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
+
+  process(controller);
 
   // Expect message to make other modules report their CANID's
-  assertEquals(2, mockCanTransport->sent_messages.size());
+  assertEquals(2, mockCanTransport->sent_frames.size());
 
-  assertEquals(true, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
 
-  assertEquals(OPC_RQNN, mockCanTransport->sent_messages[1].data[0]);
-  assertEquals(0, mockCanTransport->sent_messages[1].data[1]);
-  assertEquals(0, mockCanTransport->sent_messages[1].data[2]);
+  assertEquals(OPC_RQNN, mockCanTransport->sent_frames[1].data[0]);
+  assertEquals(0, mockCanTransport->sent_frames[1].data[1]);
+  assertEquals(0, mockCanTransport->sent_frames[1].data[2]);
 
   // Processing after enumeration timeout
   addMillis(101);
-  mockCanTransport->sent_messages.clear();
-  controller.process();
+  mockCanTransport->sent_frames.clear();
+  process(controller);
 
   // Expect first available CANID
   assertEquals(1, controller.getModuleCANID());
 
   // Expect no further messages
-  assertEquals(0, mockCanTransport->sent_messages.size());
+  assertEquals(0, mockCanTransport->sent_frames.size());
 
   // Note: RQNN shouldn't really be sent until a CANID has been set.
   // But this works so going to leave as is.
@@ -162,23 +162,23 @@ void testCanidEnumerationOnENUM()
 
   VLCB::Controller controller = createController();
 
-  CANMessage msg = {0x11, false, false, 4, {OPC_ENUM, 0x01, 0x04, 2}};
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_ENUM, 0x01, 0x04, 2}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Expect message to make other modules report their CANID's
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(true, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
 
   // Processing after enumeration timeout
   addMillis(101);
-  mockCanTransport->sent_messages.clear();
-  controller.process();
+  mockCanTransport->sent_frames.clear();
+  process(controller);
 
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(OPC_NNACK, mockCanTransport->sent_messages[0].data[0]);
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(OPC_NNACK, mockCanTransport->sent_frames[0].data[0]);
 
   // Expect first available CANID
   assertEquals(1, controller.getModuleCANID());
@@ -191,26 +191,22 @@ void testCanidEnumerationOnConflict()
   VLCB::Controller controller = createController();
   controller.getModuleConfig()->setCANID(3);
 
-  CANMessage msg = {3, false, false, 1, {OPC_RQNP}};
+  VLCB::CANFrame msg = {3, false, false, 1, {OPC_RQNP}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
-  assertEquals(0, mockCanTransport->sent_messages.size());
-
-  // Collision above only sets a flag. Enumeration happens next.
-  controller.process();
+  process(controller);
 
   // Expect message to make other modules report their CANID's
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(true, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
 
   // Processing after enumeration timeout
   addMillis(101);
-  mockCanTransport->sent_messages.clear();
-  controller.process();
+  mockCanTransport->sent_frames.clear();
+  process(controller);
 
-  assertEquals(0, mockCanTransport->sent_messages.size());
+  assertEquals(0, mockCanTransport->sent_frames.size());
 
   // Expect first available CANID
   assertEquals(1, controller.getModuleCANID());
@@ -223,16 +219,16 @@ void testRtrMessage()
   VLCB::Controller controller = createController();
   controller.getModuleConfig()->CANID = 3;
 
-  CANMessage msg = {0x11, false, true, 0, {}};
+  VLCB::CANFrame msg = {0x11, false, true, 0, {}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
-  assertEquals(false, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(3, mockCanTransport->sent_messages[0].id & 0x7F);
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  assertEquals(false, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(3, mockCanTransport->sent_frames[0].id & 0x7F);
 }
 
 void testFindFreeCanidOnPopulatedBus()
@@ -242,36 +238,36 @@ void testFindFreeCanidOnPopulatedBus()
   VLCB::Controller controller = createController();
   minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
   minimumNodeService->setSetupMode();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::ENUMERATION);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
 
-  controller.process();
-  mockUserInterface->setRequestedAction(VLCB::UserInterface::NONE);
+  controller.putAction({VLCB::ACT_START_CAN_ENUMERATION});
+
+  process(controller);
 
   // Expect message to make other modules report their CANID's
-  assertEquals(1, mockCanTransport->sent_messages.size());
-  assertEquals(true, mockCanTransport->sent_messages[0].rtr);
-  assertEquals(0, mockCanTransport->sent_messages[0].len);
-  mockCanTransport->sent_messages.clear();
+  assertEquals(1, mockCanTransport->sent_frames.size());
+  assertEquals(true, mockCanTransport->sent_frames[0].rtr);
+  assertEquals(0, mockCanTransport->sent_frames[0].len);
+  mockCanTransport->sent_frames.clear();
 
   // Simulate other nodes
   for (byte remoteCanid = 1 ; remoteCanid <= 19 ; ++remoteCanid)
   {
-    CANMessage msg = {remoteCanid, false, false, 0, {}};
+    VLCB::CANFrame msg = {remoteCanid, false, false, 0, {}};
     mockCanTransport->setNextMessage(msg);
     controller.process();
-    mockCanTransport->incoming_messages.clear();
+    mockCanTransport->incoming_frames.clear();
   }
-  assertEquals(0, mockCanTransport->sent_messages.size());
+  assertEquals(0, mockCanTransport->sent_frames.size());
 
   // Processing after enumeration timeout
   addMillis(101);
-  mockCanTransport->sent_messages.clear();
-  controller.process();
+  mockCanTransport->sent_frames.clear();
+  process(controller);
 
-  assertEquals(0, mockCanTransport->sent_messages.size());
+  assertEquals(0, mockCanTransport->sent_frames.size());
 
   // Expect first available CANID
   assertEquals(20, controller.getModuleCANID());
@@ -283,17 +279,17 @@ void testCANID()
 
   VLCB::Controller controller = createController();
 
-  CANMessage msg = {0x11, false, false, 4, {OPC_CANID, 0x01, 0x04, 33}};
+  VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_CANID, 0x01, 0x04, 33}};
   mockCanTransport->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
-  assertEquals(2, mockCanTransport->sent_messages.size());
-  assertEquals(OPC_WRACK, mockCanTransport->sent_messages[0].data[0]);
-  assertEquals(OPC_GRSP, mockCanTransport->sent_messages[1].data[0]);
-  assertEquals(OPC_CANID, mockCanTransport->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_messages[1].data[4]);
-  assertEquals(GRSP_OK, mockCanTransport->sent_messages[1].data[5]);
+  assertEquals(2, mockCanTransport->sent_frames.size());
+  assertEquals(OPC_WRACK, mockCanTransport->sent_frames[0].data[0]);
+  assertEquals(OPC_GRSP, mockCanTransport->sent_frames[1].data[0]);
+  assertEquals(OPC_CANID, mockCanTransport->sent_frames[1].data[3]);
+  assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[1].data[4]);
+  assertEquals(GRSP_OK, mockCanTransport->sent_frames[1].data[5]);
 
   // Expect first available CANID
   assertEquals(33, controller.getModuleCANID());

@@ -27,14 +27,15 @@
 #include "NodeVariableService.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
+#include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
-#include "CombinedUserInterface.h"
 
 // constants
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 99;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
@@ -45,16 +46,16 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
-VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
+VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+VLCB::Controller controller(&modconfig, 
+                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -64,9 +65,7 @@ VLCB::LED moduleLED(6);                  // an example LED as output
 unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
 
 // forward function declarations
-byte checkInputProduced();
-void eventhandler(byte, VLCB::VlcbMessage *);
-void processSerialInput();
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processModuleSwitchChange();
 
@@ -81,7 +80,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 20;
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
-  modconfig.EE_NUM_EVS = 1;
+  modconfig.EE_NUM_EVS = 2; // EV1: Produced event ; EV2: LED1
  
 
   // initialise and load configuration
@@ -105,33 +104,24 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setModuleId(MODULE_ID);
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
  
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
 
-  // module reset - if switch is depressed at startup and module is in Uninitialised mode
-//  if (userInterface.isButtonPressed() && modconfig.currentMode == MODE_UNINITIALISED)
-//  {
-//    Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
-//    modconfig.resetModule(&userInterface);
-//  }
-
-  // opportunity to set default NVs after module reset
-  if (modconfig.isResetFlagSet())
+  // module reset - if switch is depressed at startup
+  if (ledUserInterface.isButtonPressed())
   {
-    Serial << F("> module has been reset") << endl;
-    modconfig.clearResetFlag();
+    Serial << F("> switch was pressed at startup") << endl;
+    modconfig.resetModule();
   }
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
-  // register check produced handler for assigning short and spoof codes
-  etService.setcheckInputProduced(checkInputProduced);
-
-  // set Controller LEDs to indicate mode
+  // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
 
   // configure and start CAN bus and VLCB message processing
@@ -205,25 +195,6 @@ void loop()
 }
 
 //
-// Callback used when teaching produced events. 
-// Returns the index of the switch that was pressed which is the taught event shall relate to.
-//
-byte checkInputProduced()
-{
-  moduleSwitch.run();
-  if (moduleSwitch.stateChanged())
-  {
-    // Button was pressed so event is for it. Index 0.
-    return 0;
-  }
-  else
-  {
-    // No button pressed. Event is for consumed event.
-    return 0xFF;
-  }
-}
-
-//
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
 /// then send a long VLCB event with opcode ACON for on and ACOF for off
@@ -235,8 +206,8 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte eventIndex = 0;  
-    epService.sendEvent(state, eventIndex);
+    byte inputChannel = 1;  
+    epService.sendEvent(state, inputChannel);
   }
 }
 
@@ -245,38 +216,41 @@ void processModuleSwitchChange()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
 
-  byte evval = modconfig.getEventEVval(index, 1);
+  byte evval = modconfig.getEventEVval(index, 2);  //read ev2 because ev1 defines producer.
   // Event Off op-codes have odd numbers.
   bool ison = (msg->data[0] & 0x01) == 0;
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
+  Serial << F("> EV2 = ") << evval << endl;
 
-  // read the value of the first event variable (EV) associated with this learned event
-  Serial << F("> EV1 = ") << evval << endl;
-
-  // set the LED according to the opcode of the received event, if the first EV equals 0
-  // we turn on the LED and if the first EV equals 1 we use the blink() method of the LED object as an example
+  // set the LED according to the opcode of the received event, if the second EV equals 1
+  // we turn on the LED and if the first EV equals 2 we use the blink() method of the LED object as an example.
   if (ison)
   {
-    if (evval == 0)
+    switch (evval)
     {
-      Serial << F("> switching the LED on") << endl;
-      moduleLED.on();
-    }
-    else if (evval == 1)
-    {
-      Serial << F("> switching the LED to blink") << endl;
-      moduleLED.blink();
+      case 1:
+        Serial << F("> switching the LED on") << endl;
+        moduleLED.on();
+        break;
+
+      case 2:
+        Serial << F("> switching the LED to blink") << endl;
+        moduleLED.blink();
+        break;
     }
   }
   else
   {
-    Serial << F("> switching the LED off") << endl;
-    moduleLED.off();
+    if (evval > 0)
+    {
+      Serial << F("> switching the LED off") << endl;
+      moduleLED.off();
+    }
   }
 }
 

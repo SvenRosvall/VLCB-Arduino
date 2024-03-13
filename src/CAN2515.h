@@ -37,13 +37,13 @@ public:
 
   // these methods are declared virtual in the base class and must be implemented by the derived class
 #ifdef ARDUINO_ARCH_RP2040
-  bool begin(bool poll = false, SPIClassRP2040 spi = SPI);    // note default args
+  bool begin(bool poll = false, SPIClassRP2040 & spi = SPI);    // note default args
 #else
-  bool begin(bool poll = false, SPIClass spi = SPI);
+  bool begin(bool poll = false, SPIClass & spi = SPI);
 #endif
   bool available() override;
-  CANMessage getNextCanMessage() override;
-  bool sendCanMessage(CANMessage *msg) override;
+  CANFrame getNextCanFrame() override;
+  bool sendCanFrame(CANFrame *frame) override;
   void reset() override;
 
   // these methods are specific to this implementation

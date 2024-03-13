@@ -7,9 +7,10 @@ project(VLCB_Arduino)
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(examples)
-include_directories(examples/CBUS_1in1out)
-include_directories(examples/CBUS_empty)
-include_directories(examples/CBUS_long_message_example)
+include_directories(examples/VLCB_1in1out)
+include_directories(examples/VLCB_4in4out)
+include_directories(examples/VLCB_empty)
+include_directories(examples/VLCB_long_message_example)
 include_directories(src)
 include_directories(Arduino)
 
@@ -33,8 +34,6 @@ add_library(hardware_library OBJECT
         src/LEDUserInterface.h
         src/SerialUserInterface.cpp
         src/SerialUserInterface.h
-        src/CombinedUserInterface.h
-        src/CombinedUserInterface.cpp
         src/SerialGC.h
         src/SerialGC.cpp
         )
@@ -49,10 +48,8 @@ add_library(core_library OBJECT
         src/Parameters.cpp
         src/Parameters.h
         src/Transport.h
-        src/CanTransport.cpp
         src/CanTransport.h
         src/Storage.h
-        src/UserInterface.h
         src/Service.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp
@@ -72,6 +69,7 @@ add_library(core_library OBJECT
         src/ConsumeOwnEventsService.cpp
         src/GridConnect.cpp
         src/GridConnect.h
+        src/CircularBuffer.h
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -101,11 +99,11 @@ add_executable(testAll
         test/testNodeVariableService.cpp
         test/testCanService.cpp
         test/MockUserInterface.cpp
-        test/MockTransport.cpp
         test/MockStorage.cpp
-        test/MockTransport.h
         test/MockCanTransport.cpp
         test/MockCanTransport.h
+        test/MockTransportService.cpp
+        test/MockTransportService.h
         test/VlcbCommon.cpp
         test/testEventProducerService.cpp
         test/testEventConsumerService.cpp
@@ -113,4 +111,7 @@ add_executable(testAll
         test/testConsumeOwnEventsService.cpp
         test/testLongMessageService.cpp
         test/testGridConnect.cpp
+        test/testConfiguration.cpp
+        test/testCircularBuffer.cpp
+        test/MockUserInterface.h
 )

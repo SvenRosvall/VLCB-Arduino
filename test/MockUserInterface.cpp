@@ -6,48 +6,17 @@
 //
 
 #include "MockUserInterface.h"
+#include "Controller.h"
 
-void MockUserInterface::run()
+void MockUserInterface::process(const VLCB::Action *action)
 {
-
+  if (action != nullptr && action->actionType == VLCB::ACT_INDICATE_MODE)
+  {
+    indicatedMode = action->mode;
+  }
 }
 
-void MockUserInterface::indicateResetting()
-{
-
-}
-
-void MockUserInterface::indicateResetDone()
-{
-
-}
-
-void MockUserInterface::indicateActivity()
-{
-
-}
-
-void MockUserInterface::indicateMode(byte mode)
-{
-  indicatedMode = mode;
-}
-
-bool MockUserInterface::resetRequested()
-{
-  return false;
-}
-
-VLCB::UserInterface::RequestedAction MockUserInterface::checkRequestedAction()
-{
-  return requestedAction;
-}
-
-void MockUserInterface::setRequestedAction(VLCB::UserInterface::RequestedAction action)
-{
-  requestedAction = action;
-}
-
-byte MockUserInterface::getIndicatedMode()
+VlcbModeParams MockUserInterface::getIndicatedMode()
 {
   return indicatedMode;
 }

@@ -5,62 +5,70 @@ This document describes the main components within the VLCB library and how they
 This VLCB library is based on Duncan Greenwood's [CBUS library](https://github.com/MERG-DEV/CBUS)
 and extended with VLCB specific features.
 
-This library is still in progress.
+This library is still work in progress.
 
 ## High Level Architecture
-The code is organized as a central controller object that controls a transport object, 
-a storage object, a user interface object and a set of service objects.
+The code is organised as a central controller object that controls functionality
+via a storage object and a set of service objects.
 
-The library is designed to support a set of different transports such as CAN, Wifi and BLE.
+Services implement various groups of functionality within VLCB such as events or DCC control.
+The user sketch can select the set of services needed to provide the necessary functionality
+for the VLCB module that is created.
+There are also services for user interfaces and communication over different transports such as CAN, Wifi and BLE.
 Currently only a CAN transport using the CAN2515 chip is included in the library.
 
-The library supports a set of storage for node variables and event variables in EEPROM or Flash memory.
-
-The services are split in functionalities so that the user sketch can bring in the functionality
-that is necessary for the VLCB module that is created.
+The library supports storage for node variables and event variables in EEPROM or Flash memory.
+A Configuration object controls persistence of node specific data such as parameter, node variables
+and events using the chosen storage.
 
 A class diagram is shown below with a selection of concrete implementations of transports, storage, 
 and services.
 ![Class Diagram](VLCB-Arduino-Classes.png)
 
 ### Details
-* There is no queuing in this diagram. Message queuing is expected to happen in the transport layer.
+* There is no message queuing in this diagram. Message queuing is expected to happen in the transport layer.
   Some transport hardware has message queues builtin, for others the transport implementation
   will include queues.
 
 ## Workflow
+The Controller maintains a ```Action``` bus, which is implemented as a circular buffer.
+Each service can put actions on this bus and act on actions placed there by other services.
+An action represents tasks or information to be shared with other services. 
+The Action bus decouples services from each other and makes it easier to add new services.
+
 The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function.
-Each iteration checks the transport object if there are any incoming messages.
-Such incoming messages are offered to each of the service objects in turn.
-The service object responds with a code to say if the message has been taken care of and no other
-services need to look at this.
+During each iteration the controller calls out to each service to do any processing it needs to do. 
+The top element on the action bus (if any) is included in this call.
+
+The ```CanService``` checks for incoming messages on the CAN bus and if the action object passed
+from the controller is an outgoing message it sends it to the CAN bus.
 
 The ```EventConsumerService``` may react to consumed events by calling a user registered callback so that
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
-The user sketch may produce events when are passed on the ```EventProducerService``` object which in turn passes
-this event as a message via the Controller to the transport object.
+The user sketch may produce events that are managed by the ```EventProducerService``` object which then passes
+the event as a Action via the Controller to the transport object.
 
 ### Dataflow
-Within most of VLCB components a message object ```VlcbMessage``` is used to pass incoming and
-outgoing messages around. 
+Most of the VLCB functionality uses a message object ```VlcbMessage``` that passes incoming and
+outgoing messages around via the Action bus. 
 The ```VlcbMessage``` object contains 8 bytes where the first is the op-code and the remaining 7 bytes
 are any optional data bytes for that op-code.
 
-The ```CanTransport``` object translates the VlcbMessage object to from an object that represents
-a CAN frame which contains an id, 8 bytes of data (same as the VlcbMessage) and the flags
+The ```CanService``` translates the ```VlcbMessage``` to/from a ```CANFrame``` class that contains 
+CAN specific fields and a ```VlcbMessage``` in its data portion.
+
+The ```CanTransport``` object translates the ```CANFrame``` object to and from an object that represents
+a CAN frame containing an id, 8 bytes of data (same as the VlcbMessage) and the flags
 ```rtr``` and ```ext```.
-This CAN frame is then passed to/from the CAN driver such as CAN2515. 
+This CAN frame is then passed to or from a CAN driver, such as CAN2515. 
 CAN drivers may need to convert this CAN frame to a data structure used by any library
 that is used by that driver.
-
-Currently, this CAN frame is stored in a ```CANMessage``` object defined in the ACAN2515 library.
-This should be replaced with another class that doesn't depend on an external library
 
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
 that is required. It makes use of a storage object that has different implementations for different
-storage types. Not all Arduino modules have EEPROM or enough EEPROM. Instead, external EEPROM or
+storage types. Not all Arduino modules have EEPROM or enough EEPROM, in which case external EEPROM or
 Flash memory can be used.
 See furter details in [Persistent Storage](PersistentStorage.md) documentation.
 
@@ -84,31 +92,6 @@ FlashStorage
 : Stores data in Flash memory. Useful for modules that do not have onboard EEPROM or too
 little EEPROM.
 
-## Transport
-The Transport interface encapsulates the transmission of VLCB message across some
-media such as CAN bus.
-
-The class ```CanTransport``` serves as a base class for implementations of CAN based transports. 
-It handles CANID enumeration and conflict detection that would be the same for all CAN based transports. 
-
-Current implementing transport classes:
-
-CAN2515
-: Transport over CAN bus using the MCP2515 chip.
-
-More transports implementations exist but have not yet been imported here.
-
-Read more about the ```Transport``` interface and how to implement new transports in
-[Transport documentation.](Transport.md)
-
-## User Interface
-
-LEDUserInterface
-: Implements a low level UI using a push button, a green LED and a yellow LED. 
-
-It will be possible to implement new user interfaces that make use of an OLED screen or simply
-uses the USB connection for serial communication.
-
 ## Services
 
 The interpretation of incoming messages is handled by a set of services.
@@ -123,21 +106,26 @@ Examples of some services:
 
 MinimumNodeService
 : Handles all the mandatory op-codes that all VLCB modules must implement. 
-These op-codes involves running modes and basic node configuration such as node number and
+These op-codes involve running modes and basic node configuration such as node number and
 module parameters.
 
 EventConsumerService
 : Handles incoming events that shall result in actions on the module.
+If the COE parameter is set it will also handle outgoing events.
 
 ConsumeOwnEventsService
-: Passes events produced by the producer service back to the consumer service.
-It is not posible to receive an event whilst transmitting it for self consumption. This service
-provides a buffer that holds a copy of produced events and allows them to be subsequently read
-by the consumer service for action as with any other received event.  It uses no op codes and
-is only a bridge between the producer and consumer services.
+: Enables passing events produced by the producer service back to the consumer service.
+It doesn't do anything else than setting the COE parameter flag which also tells
+the EventConsumerService to also look for outgoing events on the action bus.
 
 LongMessageService
 : Handles the long message extension to CBUS as defined in RFC005.
+
+LEDUserInterface
+: Implements a low level UI using a push button, a green LED and a yellow LED.
+
+It will be possible to implement new user interfaces that make use of, for example, an OLED screen or simply
+use the USB connection for serial communication.
 
 ## User Sketch
 
@@ -148,11 +136,12 @@ The setup code may look like:
 ```
 // Global definitions
 VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
-VLCB::CAN2515 canTransport(interruptPin, csPin); 
+VLCB::CAN2515 can2515(interruptPin, csPin); 
+VLCB::CanService canService(&can2515);
 VLCB::EepromInternalStorage eepromStorage;
 VLCB::MnsService mnsService;
 VLCB::EventConsumerService eventConsumerService(myActionCallback);
-VLCB::Controller moduleController(userInterface, canTransport, eepromStorage, {mnsService, eventConsumerService});
+VLCB::Controller moduleController(eepromStorage, {mnsService, userInterface, canService, eventConsumerService});
 
 setup()
 {
@@ -161,3 +150,4 @@ setup()
   canTransport.begin();
 }
 ```
+See also the example sketches how to use the VLCB library.

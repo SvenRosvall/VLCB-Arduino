@@ -13,12 +13,18 @@ namespace VLCB
 class EepromInternalStorage : public Storage
 {
 public:
+
+#ifdef __SAM3X8E__
+// If SAM3X8E is defined then this file shall be compilable but this class shall not be instantiatable and will not compile if used anyway.
+  EepromInternalStorage() = delete;
+#endif
+
   virtual void begin() override;
 
   virtual byte read(unsigned int eeaddress) override;
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;
   virtual void write(unsigned int eeaddress, byte data) override;
-  virtual void writeBytes(unsigned int eeaddress, byte src[], byte numbytes) override;
+  virtual void writeBytes(unsigned int eeaddress, const byte src[], byte numbytes) override;
   virtual void reset() override;
 
 private:

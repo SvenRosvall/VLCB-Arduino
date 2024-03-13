@@ -12,13 +12,14 @@ namespace VLCB
 {
 
 class Configuration;
+struct VlcbMessage;
 
 class EventTeachingService : public Service 
 {
 public:
   virtual void setController(Controller *cntrl) override;
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-  void setcheckInputProduced(byte (*fptr)());
+  virtual void process(const Action * action) override;
+
   virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
@@ -28,24 +29,23 @@ public:
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  byte (*checkInputProduced)();
 
   bool bLearn = false;
-  const unsigned long TIME_OUT = 5000; // Time to apply producer input when teaching.
 
-  Processed handleLearnMode(const VlcbMessage *msg);
-  Processed handleLearn(unsigned int nn);
-  Processed handleUnlearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
-  Processed handleUnlearn(unsigned int nn);
-  Processed handleRequestEventCount(unsigned int nn);
-  Processed handleReadEvents(VlcbMessage *msg, unsigned int nn);
-  Processed handleReadEventIndex(VlcbMessage *msg, unsigned int nn);
-  Processed handleReadEventVariable(const VlcbMessage *msg, unsigned int nn);
-  Processed handleClearEvents(unsigned int nn);
-  Processed handleGetFreeEventSlots(unsigned int nn);
-  Processed handleLearnEvent(VlcbMessage *msg, unsigned int nn, unsigned int en);
-  Processed handleLearnEventIndex(VlcbMessage *msg);
-  Processed handleRequestEventVariable(VlcbMessage *msg, unsigned int nn, unsigned int en);
+  void handleMessage(const VlcbMessage *msg);
+  void handleLearnMode(const VlcbMessage *msg);
+  void handleLearn(unsigned int nn);
+  void handleUnlearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
+  void handleUnlearn(unsigned int nn);
+  void handleRequestEventCount(unsigned int nn);
+  void handleReadEvents(unsigned int nn);
+  void handleReadEventIndex(unsigned int nn, byte eventIndex);
+  void handleReadEventVariable(const VlcbMessage *msg, unsigned int nn);
+  void handleClearEvents(unsigned int nn);
+  void handleGetFreeEventSlots(unsigned int nn);
+  void handleLearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
+  void handleLearnEventIndex(const VlcbMessage *msg);
+  void handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en);
 };
 
 }  // VLCB

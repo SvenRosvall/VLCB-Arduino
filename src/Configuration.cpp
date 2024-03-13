@@ -27,6 +27,8 @@ extern "C" char* sbrk(int incr);
 namespace VLCB
 {
 
+static const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
+
 //
 /// ctor
 //
@@ -60,6 +62,18 @@ void Configuration::begin()
   }
 
   makeEvHashTable();
+}
+
+void Configuration::setModuleUninitializedMode()
+{
+  setModuleMode(MODE_UNINITIALISED);
+  setNodeNum(0);
+}
+
+void Configuration::setModuleNormalMode(unsigned int nodeNumber)
+{
+  setModuleMode(MODE_NORMAL);
+  setNodeNum(nodeNumber);
 }
 
 void Configuration::setModuleMode(VlcbModeParams f)
@@ -109,89 +123,31 @@ void Configuration::setNodeNum(unsigned int nn)
 byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
 {
   byte tarray[EE_HASH_BYTES];
-  byte tmphash, i, j, matches;
-  bool confirmed = false;
 
   // DEBUG_SERIAL << F("> looking for match with ") << nn << ", " << en << endl;
 
-  tarray[0] = highByte(nn);
-  tarray[1] = lowByte(nn);
-  tarray[2] = highByte(en);
-  tarray[3] = lowByte(en);
+  setTwoBytes(&tarray[0], nn);
+  setTwoBytes(&tarray[2], en);
 
   // calc the hash of the incoming event to match
-  tmphash = makeHash(tarray);
+  byte tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (i = 0; i < EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < EE_MAX_EVENTS; i++)
   {
     if (evhashtbl[i] == tmphash)
     {
-      if (!hash_collision)
+      // check the EEPROM for a match with the incoming NN and EN
+      readEvent(i, tarray);
+      if (getTwoBytes(&tarray[0]) == nn && getTwoBytes(&tarray[2]) == en)
       {
-        // NN + EN hash matches and there are no hash collisions in the hash table
+        return i;
       }
-      else
-      {
-        // there is a potential hash collision, so we have to check the slower way
-        // first, check if this hash appears in the table more than once
-
-        // DEBUG_SERIAL << F("> there are hash collisions") << endl;
-
-        for (j = 0, matches = 0; j < EE_MAX_EVENTS; j++)
-        {
-          if (evhashtbl[j] == tmphash)
-          {
-            ++matches;
-          }
-        }
-
-        if (matches > 1)
-        {
-          // one or more collisions for this hash exist, so check the very slow way
-          // DEBUG_SERIAL << F("> this hash matches = ") << matches << endl;
-
-          for (i = 0; i < EE_MAX_EVENTS; i++)
-          {
-            if (evhashtbl[i] == tmphash)
-            {
-              // check the EEPROM for a match with the incoming NN and EN
-              readEvent(i, tarray);
-              if ((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en)
-              {
-                // the stored NN and EN match this event, so no further checking is required
-                confirmed = true;
-                break;
-              }
-            }
-          }
-        }
-        else
-        {
-          // no collisions for this specific hash, so no further checking is required
-          break;
-        }
-      }
-
-      break;
     }
   }
 
-  // finally, there may be a collision with an event that we haven't seen before
-  // so we still need to check the candidate match to be certain, if we haven't done so already
-  if (i < EE_MAX_EVENTS && !confirmed)
-  {
-    readEvent(i, tarray);
-    if (!((unsigned int)((tarray[0] << 8) + tarray[1]) == nn && (unsigned int)((tarray[2] << 8) + tarray[3]) == en))
-    {
-      // the stored NN and EN do not match this event
-      // DEBUG_SERIAL << F("> hash result does not match stored event") << endl;
-      i = EE_MAX_EVENTS;
-    }
-  }
-
-  // if (i >= EE_MAX_EVENTS) DEBUG_SERIAL << F("> unable to find matching event") << endl;
-  return i;
+  // DEBUG_SERIAL << F("> unable to find matching event") << endl;
+  return EE_MAX_EVENTS;
 }
 
 //
@@ -214,14 +170,27 @@ byte Configuration::findEventSpace()
   return evidx;
 }
 
+byte Configuration::findExistingEventByEv(byte evnum, byte evval)
+{
+  byte i;
+  for (i = 0; i < EE_MAX_EVENTS; i++)
+  {
+    if (getEventEVval(i, evnum) == evval)
+    {
+      break;
+    }
+  }
+  return i;
+}
+
 //
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
 byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 {
   // make a hash from a 4-byte NN + EN event
-  unsigned int nn = (tarr[0] << 8) + tarr[1];
-  unsigned int en = (tarr[2] << 8) + tarr[3];
+  unsigned int nn = getTwoBytes(&tarr[0]);
+  unsigned int en = getTwoBytes(&tarr[2]);
 
   // need to hash the NN and EN to a uniform distribution across HASH_LENGTH
   byte hash = nn ^ (nn >> 8);
@@ -239,7 +208,7 @@ byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 /// return an existing EEPROM event as a 4-byte array -- NN + EN
 //
 
-void Configuration::readEvent(byte idx, byte tarr[])
+void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES])
 {
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
   for (byte i = 0; i < EE_HASH_BYTES; i++)
@@ -247,7 +216,7 @@ void Configuration::readEvent(byte idx, byte tarr[])
     tarr[i] = storage->read(EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + i);
   }
 
-  // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << (tarr[0] << 8) + tarr[1] << F(", en = ") << (tarr[2] << 8) + tarr[3] << endl;
+  // DEBUG_SERIAL << F("> readEvent - idx = ") << idx << F(", nn = ") << getTwoBytes(&tarr[0]) << F(", en = ") << getTwoBytes(&tarr[2]) << endl;
 }
 
 // return the address an event variable is stored in the eeprom.
@@ -279,7 +248,6 @@ void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 void Configuration::makeEvHashTable()
 {
   byte evarray[EE_HASH_BYTES];
-  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
@@ -287,20 +255,8 @@ void Configuration::makeEvHashTable()
 
   for (byte idx = 0; idx < EE_MAX_EVENTS; idx++)
   {
-    readEvent(idx, evarray);
-
-    // empty slots have all four bytes set to 0xff
-    if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
-    {
-      evhashtbl[idx] = 0;
-    }
-    else
-    {
-      evhashtbl[idx] = makeHash(evarray);
-    }
+    updateEvHashEntry(idx);
   }
-
-  hash_collision = check_hash_collisions();
 }
 
 //
@@ -309,13 +265,12 @@ void Configuration::makeEvHashTable()
 void Configuration::updateEvHashEntry(byte idx)
 {
   byte evarray[EE_HASH_BYTES];
-  const byte unused_entry[EE_HASH_BYTES] = { 0xff, 0xff, 0xff, 0xff};
 
   // read the first four bytes from EEPROM - NN + EN
   readEvent(idx, evarray);
 
   // empty slots have all four bytes set to 0xff
-  if (memcmp(evarray, unused_entry, EE_HASH_BYTES) == 0)
+  if (nnenEquals(evarray, unused_entry))
   {
     evhashtbl[idx] = 0;
   }
@@ -323,8 +278,6 @@ void Configuration::updateEvHashEntry(byte idx)
   {
     evhashtbl[idx] = makeHash(evarray);
   }
-
-  hash_collision = check_hash_collisions();
 
   // DEBUG_SERIAL << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
 }
@@ -341,8 +294,6 @@ void Configuration::clearEvHashTable()
   {
     evhashtbl[i] = 0;
   }
-
-  hash_collision = false;
 }
 
 //
@@ -355,7 +306,7 @@ void Configuration::printEvHashTable(bool raw)
   (void)raw;
 
   /*
-    DEBUG_SERIAL << F("> Event hash table - ") << hash_collision << endl;
+    DEBUG_SERIAL << F("> Event hash table - ") << endl;
 
     for (byte i = 0; i < EE_MAX_EVENTS; i++) 
     {
@@ -431,7 +382,7 @@ void Configuration::writeNV(byte idx, byte val)
 /// write (or clear) an event to EEPROM
 /// just the first four bytes -- NN and EN
 //
-void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
+void Configuration::writeEvent(byte index, const byte data[EE_HASH_BYTES])
 {
   unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);
 
@@ -444,8 +395,6 @@ void Configuration::writeEvent(byte index, byte data[EE_HASH_BYTES])
 //
 void Configuration::cleareventEEPROM(byte index)
 {
-  byte unused_entry[4] = { 0xff, 0xff, 0xff, 0xff };
-
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
   writeEvent(index, unused_entry);
 }
@@ -501,7 +450,7 @@ void Configuration::reboot()
 #endif
 
 #endif  // which AVR
-#endif  // AVR
+#endif  // __AVR__
 
 // for ESP32
 #if defined ESP32 || defined ESP8266
@@ -549,48 +498,8 @@ unsigned int Configuration::freeSRAM()
 }
 
 //
-/// manually reset the module to factory defaults
+/// reset the module to factory defaults
 //
-void Configuration::resetModule(UserInterface * ui)
-{
-  /// standard implementation of resetModule()
-
-  bool bDone;
-  unsigned long waittime;
-
-  // start timeout timer
-  waittime = millis();
-  bDone = false;
-
-  // DEBUG_SERIAL << F("> waiting for a further 5 sec button push, as a safety measure") << endl;
-
-  ui->indicateResetting();
-
-  // wait for a further (5 sec) button press -- as a 'safety' mechanism
-  while (!bDone)
-  {
-    // 30 sec timeout
-    if ((millis() - waittime) > 30000)
-    {
-      // DEBUG_SERIAL << F("> timeout expired, reset not performed") << endl;
-      return;
-    }
-
-    ui->run();
-
-    // wait until switch held for a further 5 secs
-    if (ui->resetRequested())
-    {
-      bDone = true;
-    }
-  }
-
-  // do the reset
-  // DEBUG_SERIAL << F("> performing module reset ...") <<  endl;
-  ui->indicateResetDone();
-  resetModule();
-}
-
 void Configuration::resetModule()
 {
   /// implementation of resetModule() without VLCB Switch or LEDs
@@ -639,27 +548,6 @@ void Configuration::loadNVs()
 }
 
 //
-/// check whether there is a collision for any hash in the event hash table
-//
-bool Configuration::check_hash_collisions()
-{
-  for (byte i = 0; i < EE_MAX_EVENTS - 1; i++)
-  {
-    for (byte j = i + 1; j < EE_MAX_EVENTS; j++)
-    {
-      if (evhashtbl[i] == evhashtbl[j] && evhashtbl[i] != 0)
-      {
-        // DEBUG_SERIAL << F("> hash collision detected, val = ") << evhashtbl[i] << endl;
-        // return when first collision detected
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-//
 /// a group of methods to get and set the reset flag
 /// the resetModule method writes the value 99 to EEPROM address 5 when a module reset has been performed
 /// this can be tested at module startup for e.g. setting default NVs or creating producer events
@@ -677,6 +565,22 @@ void Configuration::clearResetFlag()
 bool Configuration::isResetFlagSet()
 {
   return (storage->read(LOCATION_RESET_FLAG) == 99);
+}
+
+void Configuration::setTwoBytes(byte *target, unsigned int value)
+{
+  target[0] = highByte(value);
+  target[1] = lowByte(value);
+}
+
+unsigned int Configuration::getTwoBytes(const byte *bytes)
+{
+  return (bytes[0] << 8) + bytes[1];
+}
+
+bool Configuration::nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_HASH_BYTES])
+{
+  return memcmp(rhs, lhs, EE_HASH_BYTES) == 0;
 }
 
 }

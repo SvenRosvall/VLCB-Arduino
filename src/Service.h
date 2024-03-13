@@ -6,30 +6,22 @@
 #pragma once
 
 #include <Arduino.h>
-#include "UserInterface.h"
 
 namespace VLCB
 {
 
 class Controller;
-struct VlcbMessage;
-
-enum Processed
-{
-  NOT_PROCESSED=0,
-  PROCESSED=1
-};
+struct Action;
 
 class Service
 {
 public:
-  virtual void setController(Controller *controller) {}
+  virtual void setController(Controller * /*controller*/) {}
   virtual void begin() {}
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
-  virtual void process(UserInterface::RequestedAction requestedAction) {}
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) = 0;
+  virtual void process(const Action * action) = 0;
 };
 
 }

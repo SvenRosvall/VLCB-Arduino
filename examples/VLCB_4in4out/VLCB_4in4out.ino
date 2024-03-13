@@ -70,7 +70,6 @@
 #include "ConsumeOwnEventsService.h"
 #include "EventTeachingService.h"
 #include "SerialUserInterface.h"
-#include "CombinedUserInterface.h"
 
 #include "LEDControl.h"
 
@@ -78,7 +77,8 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
-const byte MODULE_ID = 98;          // VLCB module type
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
+const byte MODULE_ID = 82;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
@@ -88,17 +88,16 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&modconfig, &can2515);
-VLCB::CombinedUserInterface combinedUserInterface(&ledUserInterface, &serialUserInterface);
+VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService(&coeService);
+VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService(&coeService);
-VLCB::Controller controller(&combinedUserInterface, &modconfig, &can2515,
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService, &coeService }); // Controller object
+VLCB::EventProducerService epService;
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
@@ -116,8 +115,7 @@ LEDControl moduleLED[NUM_LEDS];     //  LED as output
 byte switchState[NUM_SWITCHES];
 
 // forward function declarations
-byte checkInputProduced();
-void eventhandler(byte, VLCB::VlcbMessage *);
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
 
@@ -132,8 +130,7 @@ void setupVLCB()
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = NUM_LEDS;
-
+  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
 
   // initialise and load configuration
   controller.begin();
@@ -147,17 +144,22 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANUFACTURER);
   params.setModuleId(MODULE_ID);
 
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
 
+  // module reset - if switch is depressed at startup
+  if (ledUserInterface.isButtonPressed())
+  {
+    Serial << F("> switch was pressed at startup") << endl;
+    modconfig.resetModule();
+  }
+  
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
-
-  // register check produced handler for assigning short and spoof codes
-  etService.setcheckInputProduced(checkInputProduced);
 
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
@@ -217,7 +219,7 @@ void loop()
   //
   controller.process();
 
-   // Run the LED code
+  // Run the LED code
   for (int i = 0; i < NUM_LEDS; i++)
   {
     moduleLED[i].run();
@@ -229,24 +231,6 @@ void loop()
   // bottom of loop()
 }
 
-//
-// Callback used when teaching produced events.
-// Returns the index of the switch that was pressed which is the taught event shall relate to.
-//
-byte checkInputProduced(void)
-{
- for (byte i = 0; i < NUM_SWITCHES; i++)
-    {
-      moduleSwitch[i].update();
-      if (moduleSwitch[i].changed())
-      {
-        //DEBUG_PRINT(F("sk> Check index is ") << i);
-        return i;
-      }
-    }
-      return 0xFF;
-}
-
 void processSwitches(void) 
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
@@ -254,54 +238,55 @@ void processSwitches(void)
     moduleSwitch[i].update();
     if (moduleSwitch[i].changed())
     {
-      byte nv = i+1;
+      byte nv = i + 1;
       byte nvval = modconfig.readNV(nv);
       bool state;
+      byte swNum = i + 1;
 
       // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
       switch (nvval)
       {
-        case 0:
+        case 1:
           // ON and OFF
           state = (moduleSwitch[i].fell());
           //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
-          epService.sendEvent(state, i);
+          epService.sendEvent(state, swNum);
           break;
 
-        case 1:
+        case 2:
           // Only ON
           if (moduleSwitch[i].fell()) 
           {
             state = true;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-            epService.sendEvent(state, i);
+            epService.sendEvent(state, swNum);
           }
           break;
 
-        case 2:
+        case 3:
           // Only OFF
           if (moduleSwitch[i].fell())
           {
             state = false;
             //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-            epService.sendEvent(state, i);
+            epService.sendEvent(state, swNum);
           }
           break;
 
-        case 3:
+        case 4:
           // Toggle button
           if (moduleSwitch[i].fell())
           {
             switchState[i] = !switchState[i];
             state = (switchState[i]);
             //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
-            epService.sendEvent(state, i);
+            epService.sendEvent(state, swNum);
           }
           break;
 
         default:
-          //DEBUG_PRINT(F("sk> Invalid NV value."));
+          //DEBUG_PRINT(F("sk> Button ") << i << F(" do nothing."));
           break;
       }
     }
@@ -311,7 +296,7 @@ void processSwitches(void)
 //
 /// called from the VLCB library when a learned event is received
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 
@@ -329,7 +314,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
       //DEBUG_PRINT(F("sk> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
         //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
@@ -358,7 +343,7 @@ void eventhandler(byte index, VLCB::VlcbMessage *msg)
     //DEBUG_PRINT(F("sk> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
-        byte ev = i + 1;
+        byte ev = i + 2;
         byte evval = modconfig.getEventEVval(index, ev);
 
         if (evval > 0)
@@ -380,5 +365,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Martin Da Costa (MERG M62237) 2023") << endl;
+  Serial << F("> © Martin Da Costa (MERG M6237) 2023") << endl;
 }

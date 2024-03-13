@@ -12,19 +12,24 @@
 #include "EventProducerService.h"
 #include "Parameters.h"
 #include "VlcbCommon.h"
+#include "MockTransportService.h"
 
 namespace
 {
 std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 std::unique_ptr<VLCB::EventProducerService> eventProducerService;
+static std::unique_ptr<MockTransportService> mockTransportService;
 
 VLCB::Controller createController()
 {
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
+  mockTransportService.reset(new MockTransportService);
+
   eventProducerService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get()});
+  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
+  controller.begin();
 
   return controller;
 }
@@ -37,25 +42,25 @@ void testServiceDiscovery()
   controller.begin();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
-  mockTransport->setNextMessage(msg);
+  mockTransportService->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
-  assertEquals(3, mockTransport->sent_messages.size());
+  assertEquals(4, mockTransportService->sent_messages.size());
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[5]); // Number of services
+  assertEquals(OPC_SD, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(3, mockTransportService->sent_messages[0].data[5]); // Number of services
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[1].data[0]);
-  assertEquals(1, mockTransport->sent_messages[1].data[3]); // index
-  assertEquals(SERVICE_ID_MNS, mockTransport->sent_messages[1].data[4]); // service ID
-  assertEquals(1, mockTransport->sent_messages[1].data[5]); // version
+  assertEquals(OPC_SD, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(1, mockTransportService->sent_messages[1].data[3]); // index
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[1].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages[1].data[5]); // version
 
-  assertEquals(OPC_SD, mockTransport->sent_messages[2].data[0]);
-  assertEquals(2, mockTransport->sent_messages[2].data[3]); // index
-  assertEquals(SERVICE_ID_PRODUCER, mockTransport->sent_messages[2].data[4]); // service ID
-  assertEquals(1, mockTransport->sent_messages[2].data[5]); // version
+  assertEquals(OPC_SD, mockTransportService->sent_messages[2].data[0]);
+  assertEquals(2, mockTransportService->sent_messages[2].data[3]); // index
+  assertEquals(SERVICE_ID_PRODUCER, mockTransportService->sent_messages[2].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages[2].data[5]); // version
 }
 
 void testServiceDiscoveryEventProdSvc()
@@ -66,15 +71,15 @@ void testServiceDiscoveryEventProdSvc()
   controller.begin();
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
-  mockTransport->setNextMessage(msg);
+  mockTransportService->setNextMessage(msg);
 
-  controller.process();
+  process(controller);
 
   // Verify sent messages.
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_ESD, mockTransport->sent_messages[0].data[0]);
-  assertEquals(2, mockTransport->sent_messages[0].data[3]); // index
-  assertEquals(SERVICE_ID_PRODUCER, mockTransport->sent_messages[0].data[4]); // service ID
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ESD, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[3]); // index
+  assertEquals(SERVICE_ID_PRODUCER, mockTransportService->sent_messages[0].data[4]); // service ID
   // Not testing service data bytes.
 }
 
@@ -88,16 +93,19 @@ void testSendOn()
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
   controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEvent(true, 0);
+  eventProducerService->sendEvent(true, 1);
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(5, mockTransport->sent_messages[0].len);
-  assertEquals(OPC_ACON, mockTransport->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
 }
 
 void testSend1Off()
@@ -110,17 +118,20 @@ void testSend1Off()
   // Initialize a produced event
   byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
   controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEvent(false, 0, 42);
+  eventProducerService->sendEvent(false, 1, 42);
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_ACOF1, mockTransport->sent_messages[0].data[0]);
-  assertEquals(6, mockTransport->sent_messages[0].len);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[4]);
-  assertEquals(42, mockTransport->sent_messages[0].data[5]);
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ACOF1, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(6, mockTransportService->sent_messages[0].len);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[5]);
 }
 
 void testSendShort2On()
@@ -133,18 +144,21 @@ void testSendShort2On()
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
   controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEvent(true, 0, 42, 17);
+  eventProducerService->sendEvent(true, 7, 42, 17);
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_ASON2, mockTransport->sent_messages[0].data[0]);
-  assertEquals(7, mockTransport->sent_messages[0].len);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0x05, mockTransport->sent_messages[0].data[4]);
-  assertEquals(42, mockTransport->sent_messages[0].data[5]);
-  assertEquals(17, mockTransport->sent_messages[0].data[6]);
+  process(controller);
+  
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ASON2, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(7, mockTransportService->sent_messages[0].len);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x05, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(17, mockTransportService->sent_messages[0].data[6]);
 }
 
 void testSendShort3Off()
@@ -157,19 +171,22 @@ void testSendShort3Off()
   // Initialize a produced event
   byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
   controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEvent(false, 0, 42, 17, 234);
+  eventProducerService->sendEvent(false, 7, 42, 17, 234);
 
-  assertEquals(1, mockTransport->sent_messages.size());
-  assertEquals(OPC_ASOF3, mockTransport->sent_messages[0].data[0]);
-  assertEquals(8, mockTransport->sent_messages[0].len);
-  assertEquals(0x01, mockTransport->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransport->sent_messages[0].data[2]);
-  assertEquals(0x00, mockTransport->sent_messages[0].data[3]);
-  assertEquals(0x05, mockTransport->sent_messages[0].data[4]);
-  assertEquals(42, mockTransport->sent_messages[0].data[5]);
-  assertEquals(17, mockTransport->sent_messages[0].data[6]);
-  assertEquals(234, mockTransport->sent_messages[0].data[7]);
+  process(controller);
+  
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ASOF3, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(8, mockTransportService->sent_messages[0].len);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x05, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(17, mockTransportService->sent_messages[0].data[6]);
+  assertEquals(234, mockTransportService->sent_messages[0].data[7]);
 }
 
 void testSetProducedDefaultEventsOnNewBoard()
@@ -183,14 +200,70 @@ void testSetProducedDefaultEventsOnNewBoard()
 
   controller.begin();
 
-  minimumNodeService->setNormal();
+  minimumNodeService->setNormal(0x0104);
 
   // Should have no events configured at start
   assertEquals(0, controller.getModuleConfig()->numEvents());
 
-  controller.process();
+  process(controller);
 
   assertEquals(1, controller.getModuleConfig()->numEvents());
+  byte eventArray[VLCB::EE_HASH_BYTES];
+  controller.getModuleConfig()->readEvent(0, eventArray);
+  assertEquals(0x01, eventArray[0]);
+  assertEquals(0x04, eventArray[1]);
+  assertEquals(0x00, eventArray[2]);
+  assertEquals(0x01, eventArray[3]);
+  assertEquals(1, controller.getModuleConfig()->getEventEVval(0, 1));
+}
+
+void testSendEventMissingInTable()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  // No event exists in event table.
+  eventProducerService->sendEvent(true, 1);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
+}
+
+void testSendEventDeletedFromTable()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  // Create a default produced event.
+  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
+  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEventEV(0, 1, 1);
+  // And delete it.
+  controller.getModuleConfig()->cleareventEEPROM(0);
+
+  // Event with EV1=1 exists but its nn/en has been cleared.
+  eventProducerService->sendEvent(true, 1);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ACON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
 }
 
 }
@@ -204,4 +277,6 @@ void testEventProducerService()
   testSendShort2On();
   testSendShort3Off();
   testSetProducedDefaultEventsOnNewBoard();
+  testSendEventMissingInTable();
+  testSendEventDeletedFromTable();
 }

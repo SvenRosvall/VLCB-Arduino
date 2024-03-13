@@ -7,25 +7,19 @@
 
 #pragma once
 
-#include "UserInterface.h"
+#include "Service.h"
 #include "Configuration.h"
 #include "vlcbdefs.hpp"
 
-class MockUserInterface : public VLCB::UserInterface
+class MockUserInterface : public VLCB::Service
 {
 public:
-  virtual void run() override;
-  virtual void indicateResetting() override;
-  virtual void indicateResetDone() override;
-  virtual void indicateActivity() override;
-  virtual void indicateMode(byte mode) override;
-  virtual bool resetRequested() override;
-  virtual RequestedAction checkRequestedAction() override;
+  virtual void process(const VLCB::Action *action) override;
+  virtual byte getServiceID() override { return 0; };
+  virtual byte getServiceVersionID() override { return 1; };
   
-  void setRequestedAction(RequestedAction action);
-  byte getIndicatedMode();
+  VlcbModeParams getIndicatedMode();
 
 private:
-  RequestedAction requestedAction = NONE;
-  byte indicatedMode = MODE_UNINITIALISED;
+  VlcbModeParams indicatedMode = MODE_UNINITIALISED;
 };

@@ -31,6 +31,7 @@
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
+const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 99;          // VLCB module type
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
@@ -47,14 +48,14 @@ VLCB::NodeVariableService nvService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&userInterface, &modconfig, &can2515, 
-                            { &mnService, &canService, &nvService, &ecService, &epService, &etService }); // Controller object
+VLCB::Controller controller(&modconfig,
+                            {&mnService, &userInterface, &canService, &nvService, &ecService, &epService, &etService}); // Controller object
 
 // module name, must be 7 characters, space padded.
 unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
 
 // forward function declarations
-void eventhandler(byte, VLCB::VlcbMessage *);
+void eventhandler(byte, const VLCB::VlcbMessage *);
 void processSerialInput();
 void printConfig();
 
@@ -70,7 +71,6 @@ void setupVLCB()
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-  
 
   // initialise and load configuration
   controller.begin();
@@ -84,17 +84,18 @@ void setupVLCB()
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setModuleId(MODULE_ID);
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
  
   // assign to Controller
   controller.setParams(params.getParams());
   controller.setName(mname);
 
-  // module reset - if switch is depressed at startup and module is in Uninitialised mode
-  if (userInterface.isButtonPressed() && modconfig.currentMode == MODE_UNINITIALISED)
+  // module reset - if switch is depressed at startup
+  if (userInterface.isButtonPressed())
   {
-    Serial << F("> switch was pressed at startup in Uninitialised mode") << endl;
-    modconfig.resetModule(&userInterface);
+    Serial << F("> switch was pressed at startup") << endl;
+    modconfig.resetModule();
   }
 
   // register our VLCB event handler, to receive event messages of learned events
@@ -172,12 +173,12 @@ void loop()
 /// called from the VLCB library when a learned event is received
 /// it receives the event table index and the CAN frame
 //
-void eventhandler(byte index, VLCB::VlcbMessage *msg)
+void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
-  // as an example, display the opcode and the first EV of this event
+  // as an example, display the opcode and the first EV of this event, which will be ev2 as ev1 defines produced event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
-  Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 1) << endl;
+  Serial << F("> EV1 = ") << modconfig.getEventEVval(index, 2) << endl;
 }
 
 //

@@ -7,41 +7,26 @@
 
 #include <Arduino.h>
 #include "Transport.h"
-#include "ACAN2515.h"
-#include "UserInterface.h"
 
 namespace VLCB
 {
 
+struct CANFrame
+{
+  uint32_t id;
+  bool ext;
+  bool rtr;
+  uint8_t len;
+  uint8_t data[8];
+};
+
+// Interface for CAN transports 
 class CanTransport : public Transport
 {
 public:
-  void setController(Controller *ctrl) override { this->controller = ctrl; }
-
-  void process(UserInterface::RequestedAction requestedAction);
-
-  virtual VlcbMessage getNextMessage() override;
-  virtual CANMessage getNextCanMessage() = 0;
-
-  virtual bool sendMessage(VlcbMessage *msg) override;
-  bool sendRtrMessage();
-  virtual bool sendCanMessage(CANMessage *msg) = 0;
-
-  void startCANenumeration(bool fromENUM = false);
-
-protected: // TODO: CAN2515 needs access to controller during refactoring.
-  Controller *controller;
-
-private:
-  void checkCANenumTimout();
-  byte findFreeCanId();
-
-  bool enumeration_required = false;
-  bool bCANenum = false;
-  bool startedFromEnumMessage = false;
-  unsigned long CANenumTime;
-  byte enum_responses[16];     // 128 bits for storing CAN ID enumeration results
-
+  virtual bool available() = 0;
+  virtual CANFrame getNextCanFrame() = 0;
+  virtual bool sendCanFrame(CANFrame *msg) = 0;
 };
 
 }

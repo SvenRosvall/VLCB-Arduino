@@ -6,19 +6,17 @@
 #pragma once
 
 #include "Service.h"
-#include "ConsumeOwnEventsService.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB {
 
 class Configuration;
+struct VlcbMessage;
 
 class EventProducerService : public Service {
 public:
-  EventProducerService(ConsumeOwnEventsService *s = nullptr) : coeService(s) {}
   virtual void setController(Controller *cntrl) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override;
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
+  virtual void process(const Action * action) override;
 
   virtual byte getServiceID() override
   {
@@ -29,18 +27,22 @@ public:
     return 1;
   }
   void begin() override;
-  void sendEvent(bool state, byte index);
-  void sendEvent(bool state, byte index, byte data1);
-  void sendEvent(bool state, byte index, byte data1, byte data2);
-  void sendEvent(bool state, byte index, byte data1, byte data2, byte data3);
+  void sendEvent(bool state, byte evValue);
+  void sendEvent(bool state, byte evValue, byte data1);
+  void sendEvent(bool state, byte evValue, byte data1, byte data2);
+  void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
 
 private:
   Controller *controller;
   Configuration *module_config;  // Shortcut to reduce indirection code.
-  ConsumeOwnEventsService *coeService;
-  void (*eventhandler)(byte index, VlcbMessage *msg);
+  void (*eventhandler)(byte index, const VlcbMessage *msg);
 
+  void handleProdSvcMessage(const VlcbMessage *msg);
   void setProducedEvents();
+  byte createDefaultEvent(byte evValue);
+  void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);
+  void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
+
   bool uninit = false;
 };
 

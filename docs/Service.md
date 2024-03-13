@@ -19,8 +19,7 @@ public:
   virtual byte getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
-  virtual void process(UserInterface::RequestedAction requestedAction) {}
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) = 0;
+  virtual void process(Action * action) = 0;
 };
 ```
 
@@ -46,17 +45,11 @@ service.
 There is no need to bump up the version number for minor changes and bug fixes. 
 
 process
-: This is an optional method that will be called regularly.
+: This method that be called regularly. 
+It has a pointer to a Action that needs to be processed or a null pointer if there is
+no Action to be processed.
 Use this for any processing that needs to be performed now and then such as polling for
 changes of input pins.
-
-handleMessage
-: Handle an incoming message.
-The op-code is provided to help the service deciding what to do for the message.
-Return a value ```PROCESSED``` if the message was handled and no other services need
-to see this message. 
-Otherwise, return ```NOT_PROCESSED``` so that the system knows that this message was not
-processed and other services shall get a chance to process this message.
 
 
 ## Services provided in this VLCB library
@@ -70,7 +63,7 @@ This is a service that is specifically for modules on a CAN bus and is required 
 Handles OP-codes CANID and ENUM for re-assigning CANID for the module.
 
 The ```CanService``` works in tandem with a CAN transport object, derived from the 
-```CanTransport``` class, which must be provided as an argument to its constructor.
+[```CanTransport```](CanTransport.md) interface, which must be provided as an argument to its constructor.
 
 ### NodeVariableService
 Handles configuration of node variables for the module.
@@ -79,16 +72,13 @@ Handles configuration of node variables for the module.
 Handles incoming events.
 To use this the module application needs to register an event handler function with
 ```setEventHandler()```.
-The signature of the handler function shall be one of
+The signature of the handler function shall be
 ```C++
-void handler(byte index, VlcbMessage *msg);
-void handler(byte index, VlcbMessage *msg, bool ison, byte evval);
+void handler(byte index, const VlcbMessage *msg);
 ```
 The arguments provided to the handler function are:
 * ```index``` : The index number of the incoming event in the event table.
 * ```msg``` : The message structure that contains the event.
-* ```ison``` : A flag to indicate if the event is an on or off event.
-* ```evval``` : The value of event variable 1 for the incoming event.
 
 ### EventProducerService
 Facilitates sending events. 
@@ -104,5 +94,14 @@ Both consumed and produced events can be taught.
 
 ### ConsumeOwnEventsService
 This service facilitates sent events to be received by the same module.
-Simply add a pointer to this service to the constructors of the EventConsumerService
-and the EventProducerService. 
+
+### LedUserInterface
+Manages the green and yellow LEDs and also the push button on the VLCB module.
+Updates the LEDs based on activities on the module. 
+When the push button is pressed sends an Action to tell the other services that the
+user has requested some action.
+
+### SerialUserInterface
+Provides a user interface on the serial port on the Arduino.
+Prints status messages and also handles actions the user enters on the serial port.
+See more details in [SerialUserInterface](SerialUserInterface.md) documentation.
