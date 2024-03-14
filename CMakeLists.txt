@@ -86,7 +86,8 @@ add_executable(VLCB_Arduino
         Arduino/EEPROM.h
         examples/VLCB_1in1out/VLCB_1in1out.ino
         examples/VLCB_empty/VLCB_empty.ino
-        examples/VLCB_long_message_example/VLCB_long_message_example.ino)
+        examples/VLCB_long_message_example/VLCB_long_message_example.ino
+        examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino)
 
 add_executable(testAll
         $<TARGET_OBJECTS:core_library>
