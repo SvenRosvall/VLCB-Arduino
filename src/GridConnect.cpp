@@ -57,9 +57,9 @@ namespace VLCB
       byte offset = 0;
       gcBuffer[0] = 0;  // null terminate buffer to start with
       // set starting character & standard or extended CAN identifier
-      if (frame->ext)
+      if (frame->ext())
       {
-        if (frame->id > 0x1FFFFFFF)
+        if (frame->id() > 0x1FFFFFFF)
         {
           // id is greater than 29 bits, so fail the encoding
           return false;
@@ -68,40 +68,40 @@ namespace VLCB
         strcpy (gcBuffer,":X");
         // extended 29 bit CAN idenfier in bytes 2 to 9
         // chars 2 & 3 are ID bits 21 to 28
-        sprintf(gcBuffer + 2, "%02X", (frame->id) >> 21);
+        sprintf(gcBuffer + 2, "%02X", (frame->id()) >> 21);
         // char 4 -  bits 1 to 3 are ID bits 18 to 20
-        sprintf(gcBuffer + 4, "%01X", ((frame->id) >> 17) & 0xE);
+        sprintf(gcBuffer + 4, "%01X", ((frame->id()) >> 17) & 0xE);
         // char 5 -  bits 0 to 1 are ID bits 16 & 17
-        sprintf(gcBuffer + 5, "%01X", ((frame->id) >> 16) & 0x3);
+        sprintf(gcBuffer + 5, "%01X", ((frame->id()) >> 16) & 0x3);
         // chars 6 to 9 are ID bits 0 to 15
-        sprintf(gcBuffer + 6, "%04X", frame->id & 0xFFFF);
+        sprintf(gcBuffer + 6, "%04X", frame->id() & 0xFFFF);
         offset = 10;
       } 
       else
       {
         // mark sas standard frame
-        if (frame->id > 0x7FF)
+        if (frame->id() > 0x7FF)
         {
           // id is greater than 11 bits, so fail the encoding
           return false;
         }
         strcpy (gcBuffer,":S");
         // standard 11 bit CAN idenfier in bytes 2 to 5, left shifted 5 to occupy highest bits
-        sprintf(gcBuffer + 2, "%04X", frame->id << 5);
+        sprintf(gcBuffer + 2, "%04X", frame->id() << 5);
         offset = 6;
       }
       // set RTR or normal - byte 6 or 10
-      strcpy(gcBuffer + offset++, frame->rtr ? "R" : "N");
-      if (frame->len > 8)
+      strcpy(gcBuffer + offset++, frame->rtr() ? "R" : "N");
+      if (frame->len() > 8)
       { 
         // if greater than 8 then faulty frame
         gcBuffer[0] = 0;
         return false;
       }
       //now add hex data from byte 7 if len > 0
-      for (int i=0; i < frame->len; i++)
+      for (int i=0; i < frame->len(); i++)
       {
-        sprintf(gcBuffer + offset, "%02X", frame->data[i]);
+        sprintf(gcBuffer + offset, "%02X", frame->data()[i]);
         offset += 2;
       }
       // add terminator
@@ -160,7 +160,7 @@ namespace VLCB
     // do CAN Identifier, must be either 'X' or 'S'
     if (gcBuffer[gcIndex] == 'X') 
     {
-      frame->ext = true;
+      frame->ext(true);
       // now get 29 bit ID - convert from hex, but check they are all hex first
       if (checkHexChars(&gcBuffer[2], 8) == false)
       {
@@ -168,27 +168,28 @@ namespace VLCB
       }
       // ok, all hex, so build up id from characters 2 to 9
       // chars 2 & 3 are bits 21 to 28
-      frame->id = uint32_t(ascii_pair_to_byte(&gcBuffer[2])) << 21;
+      uint32_t id = uint32_t(ascii_pair_to_byte(&gcBuffer[2])) << 21;
       // chars 4 & 5 -  bits 5 to 7 are bits 18 to 20
-      frame->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0xE0) << 13;
+      id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0xE0) << 13;
       // chars 4 & 5 -  bits 0 to 1 are bits 16 & 17
-      frame->id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0x3) << 16;
+      id += uint32_t(ascii_pair_to_byte(&gcBuffer[4]) & 0x3) << 16;
       // chars 6 & 7 are bits 8 to 15
-      frame->id += uint32_t(ascii_pair_to_byte(&gcBuffer[6])) << 8;
+      id += uint32_t(ascii_pair_to_byte(&gcBuffer[6])) << 8;
       // chars 8 & 9 are bits 0 to 7 
-      frame->id += ascii_pair_to_byte(&gcBuffer[8]);
+      id += ascii_pair_to_byte(&gcBuffer[8]);
+      frame->id(id);
       gcIndex = 10;
     }
     else if (gcBuffer[gcIndex] == 'S') 
     {
-      frame->ext = false;
+      frame->ext(false);
       // now get 11 bit ID - convert from hex, but check they are all hex first
       if (checkHexChars(&gcBuffer[2], 4) == false)
       {
         return false;
       }
       // 11 bit identifier needs to be shifted right by 5
-      frame->id = strtol(&gcBuffer[2], NULL, 16) >> 5;
+      frame->id(strtol(&gcBuffer[2], NULL, 16) >> 5);
       gcIndex = 6;
     } 
     else 
@@ -199,11 +200,11 @@ namespace VLCB
     // do RTR flag
     if (gcBuffer[gcIndex] == 'R') 
     {
-      frame->rtr = true;
+      frame->rtr(true);
     } 
     else if (gcBuffer[gcIndex] == 'N')
     {
-      frame->rtr = false;
+      frame->rtr(false);
     } 
     else 
     {
@@ -221,7 +222,7 @@ namespace VLCB
       return false;
     } 
     // set length of data segment
-    frame->len = dataLength / 2;
+    frame->len(dataLength / 2);
     // now convert hex data into bytes
     for (int i = 0; i < dataLength/2; i++) 
     {
@@ -230,7 +231,7 @@ namespace VLCB
       {
         return false;
       }
-      frame->data[i] = ascii_pair_to_byte(&gcBuffer[gcIndex]);
+      frame->data()[i] = ascii_pair_to_byte(&gcBuffer[gcIndex]);
       gcIndex += 2;
     }
     //

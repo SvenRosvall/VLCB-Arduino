@@ -55,7 +55,7 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::SerialGC serialGC;                  // CAN transport object using serial
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::MinimumNodeService mnService;
-VLCB::CanService canService(&serialGC);
+VLCB::CanService<VLCB::GCFrame> canService(&serialGC);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
