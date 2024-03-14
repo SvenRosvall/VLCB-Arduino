@@ -1,4 +1,4 @@
-//  Copyright (C) Sven Rosvall (sven@rosvall.ie)
+//  Copyright (C) David Ellis (david@ellis128.co.uk)
 //  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
@@ -7,15 +7,22 @@
       3rd party libraries needed for compilation: (not for binary-only distributions)
 
       Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
 */
+
+
+//
+// This is a modified version of VLCB_1in1out
+// It uses the ModifiedGridConnect protocol over serial instead of a CAN interface
+// this allows a single module to connect via a USB cable to a management tool like FCU
+// without a CAN network
+//
+
 
 // 3rd party libraries
 #include <Streaming.h>
 
 // VLCB library header files
 #include <Controller.h>                   // Controller class
-//#include <CAN2515.h>               // CAN controller
 #include <SerialGC.h>               // replaces CAN controller
 #include <Switch.h>             // pushbutton switch
 #include <LED.h>                // VLCB LEDs
@@ -45,10 +52,8 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
 VLCB::Configuration modconfig;               // configuration object
-//VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::SerialGC serialGC;                  // CAN transport object using serial
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-//VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&serialGC);
 VLCB::NodeVariableService nvService;
@@ -58,10 +63,6 @@ VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
 VLCB::Controller controller(&modconfig, 
                             {&mnService, &ledUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
-/*
-VLCB::Controller controller(&modconfig, 
-                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
-*/
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -129,16 +130,6 @@ void setupVLCB()
 
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
-/*
-  // configure and start CAN bus and VLCB message processing
-  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  if (!can2515.begin())
-  {
-    Serial << F("> error starting VLCB") << endl;
-  }
-  */
 
 }
 
@@ -176,30 +167,6 @@ void loop()
   /// Check if smich changed and do any processing for this change.
   //
   processModuleSwitchChange();
-
-/*
-  //
-  /// check CAN message buffers
-  //
-  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize())
-  {
-    Serial << F("> receive buffer overflow") << endl;
-  }
-
-  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0))
-  {
-    Serial << F("> transmit buffer overflow") << endl;
-  }
-
-  //
-  /// check CAN bus state
-  //
-  byte s = can2515.canp->errorFlagRegister();
-  if (s != 0)
-  {
-    Serial << F("> error flag register is non-zero") << endl;
-  }
-*/
 
   // bottom of loop()
 }
