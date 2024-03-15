@@ -112,10 +112,11 @@ const byte NUM_SWITCHES = sizeof(SWITCH) / sizeof(SWITCH[0]);
 // module objects
 Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
 LEDControl moduleLED[NUM_LEDS];     //  LED as output
-byte switchState[NUM_SWITCHES];
+bool state[NUM_SWITCHES];
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
+void requesthandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
 
@@ -160,6 +161,7 @@ void setupVLCB()
   
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
+  epService.setRequestEventHandler(eventhandler);
 
   // set Controller LEDs to indicate the current mode
   controller.indicateMode(modconfig.currentMode);
@@ -182,7 +184,7 @@ void setupModule()
   {
     moduleSwitch[i].attach(SWITCH[i], INPUT_PULLUP);
     moduleSwitch[i].interval(5);
-    switchState[i] = false;
+    state[i] = false;
   }
 
   // configure the module LEDs
@@ -240,7 +242,6 @@ void processSwitches(void)
     {
       byte nv = i + 1;
       byte nvval = modconfig.readNV(nv);
-      bool state;
       byte swNum = i + 1;
 
       // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
@@ -249,18 +250,18 @@ void processSwitches(void)
       {
         case 1:
           // ON and OFF
-          state = (moduleSwitch[i].fell());
-          //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
-          epService.sendEvent(state, swNum);
+          state[i] = (moduleSwitch[i].fell());
+          //DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+          epService.sendEvent(state[i], swNum);
           break;
 
         case 2:
           // Only ON
           if (moduleSwitch[i].fell()) 
           {
-            state = true;
-            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-            epService.sendEvent(state, swNum);
+            state[i] = true;
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
+            epService.sendEvent(state[i], swNum);
           }
           break;
 
@@ -268,9 +269,9 @@ void processSwitches(void)
           // Only OFF
           if (moduleSwitch[i].fell())
           {
-            state = false;
-            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state);
-            epService.sendEvent(state, swNum);
+            state[i] = false;
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
+            epService.sendEvent(state[i], swNum);
           }
           break;
 
@@ -278,10 +279,9 @@ void processSwitches(void)
           // Toggle button
           if (moduleSwitch[i].fell())
           {
-            switchState[i] = !switchState[i];
-            state = (switchState[i]);
-            //DEBUG_PRINT(F("sk> Button ") << i << (moduleSwitch[i].fell() ? F(" pressed, send state: ") : F(" released, send state: ")) << state);
-            epService.sendEvent(state, swNum);
+            state[i] = !state[i];
+            //DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+            epService.sendEvent(state[i], swNum);
           }
           break;
 
@@ -352,6 +352,12 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
         }
       }
       break;
+      
+    case OPC_AREQ:
+    case OPC_ASRQ:
+      byte evval = modconfig.getEventEVval(index, 1) - 1;
+      DEBUG_PRINT(F("> Handling request op =  ") << _HEX(opc) << F(", request input = ") << evval << F(", state = ") << state[evval]);
+      epService.sendRequestResponse(state[evval], index);
   }
 }
 

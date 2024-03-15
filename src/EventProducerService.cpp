@@ -21,6 +21,14 @@ void EventProducerService::setController(Controller *cntrl)
   this->module_config = cntrl->getModuleConfig();
 }
 
+//
+/// register the user handler for learned events
+//
+void EventProducerService::setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg)) 
+{
+  requesteventhandler = fptr;
+}
+
 void EventProducerService::begin()
 {  
   if (module_config->currentMode == MODE_UNINITIALISED)
@@ -213,26 +221,43 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
   unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
-  // DEBUG_SERIAL << ">VLCBProdSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
-
-  switch (opc) 
-  {    
-
-    case OPC_AREQ:
-      // AREQ message - request for node state, only producer nodes
-
-      if ((nn == module_config->nodeNum) && (eventhandler != nullptr)) 
+  unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
+  //DEBUG_SERIAL << ">EPService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
+  
+  if ((opc = OPC_AREQ) || (opc == OPC_ASRQ))
+  {
+    byte index = module_config->findExistingEvent(nn, en);
+    
+    if (index < module_config->EE_MAX_EVENTS)
+    {
+      if (requesteventhandler != nullptr)
       {
-        (void)(*eventhandler)(0, msg);
+        (void)(*requesteventhandler)(index, msg);
       }
-      break;
-
-    case OPC_ASRQ:
-
-
-
-      break;
-
+    }   
   }
 }
+
+void EventProducerService::sendRequestResponse(bool state, byte index)
+{
+  byte nn_en[4];
+  module_config->readEvent(index, nn_en);
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[1]) << _HEX(nn_en[1])<< endl;
+  
+  byte opCode;
+  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  {
+    opCode = (state ? OPC_ARSON : OPC_ARSOF);
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
+  }
+  else
+  {
+    opCode = (state ? OPC_ARON : OPC_AROF);
+  }
+  
+  VlcbMessage msg;
+  msg.len = 5;
+  sendMessage(msg, opCode, nn_en);
+}
+
 }
