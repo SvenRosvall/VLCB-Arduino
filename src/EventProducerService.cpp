@@ -3,7 +3,7 @@
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
-// TODO: Add AREQ and ASRQ opcode support.
+// TODO: 
 // Check error messages
 // Set Params flags
 // Trap for EVs <2
@@ -222,19 +222,31 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
   unsigned int opc = msg->data[0];
   unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
   unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
-  //DEBUG_SERIAL << ">EPService handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
   
-  if ((opc = OPC_AREQ) || (opc == OPC_ASRQ))
+  if (requesteventhandler != nullptr)
   {
+    switch (opc)
+    {
+      case OPC_ASRQ:
+        nn = 0000;
+        break;
+        
+      case OPC_AREQ:
+        break;
+        
+      default:
+        return;
+    }
+  
     byte index = module_config->findExistingEvent(nn, en);
-    
+ 
     if (index < module_config->EE_MAX_EVENTS)
     {
-      if (requesteventhandler != nullptr)
+      if (module_config->getEventEVval(index, 1) != 0)
       {
         (void)(*requesteventhandler)(index, msg);
       }
-    }   
+    }      
   }
 }
 
@@ -242,7 +254,7 @@ void EventProducerService::sendRequestResponse(bool state, byte index)
 {
   byte nn_en[4];
   module_config->readEvent(index, nn_en);
-  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[1]) << _HEX(nn_en[1])<< endl;
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
   
   byte opCode;
   if ((nn_en[0] == 0) && (nn_en[1] == 0))
@@ -259,5 +271,4 @@ void EventProducerService::sendRequestResponse(bool state, byte index)
   msg.len = 5;
   sendMessage(msg, opCode, nn_en);
 }
-
 }
