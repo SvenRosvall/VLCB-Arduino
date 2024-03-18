@@ -116,7 +116,6 @@ bool state[NUM_SWITCHES];
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
-void requesthandler(byte, const VLCB::VlcbMessage *);
 void printConfig();
 void processSwitches();
 
@@ -161,6 +160,7 @@ void setupVLCB()
   
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
+  // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
 
   // set Controller LEDs to indicate the current mode
