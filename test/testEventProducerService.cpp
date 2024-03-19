@@ -266,6 +266,199 @@ void testSendEventDeletedFromTable()
   assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
 }
 
+byte capturedIndex;
+VLCB::VlcbMessage capturedMessage;
+
+void mockHandler(byte index, const VLCB::VlcbMessage * msg)
+{
+  capturedIndex = index;
+  capturedMessage = *msg;
+}
+
+void testLongRequestStatus()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x01, 0x04, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  VLCB::VlcbMessage msg = {5, {OPC_AREQ, 0x01, 0x04, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(1, capturedIndex);
+  assertEquals(5, capturedMessage.len);
+  assertEquals(OPC_AREQ, capturedMessage.data[0]);
+}
+
+void testShortRequestStatusWithNN()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x04, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(1, capturedIndex);
+  assertEquals(5, capturedMessage.len);
+  assertEquals(OPC_ASRQ, capturedMessage.data[0]);
+}
+
+void testShortRequestStatusWithoutNN()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0, 0, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(1, capturedIndex);
+  assertEquals(5, capturedMessage.len);
+  assertEquals(OPC_ASRQ, capturedMessage.data[0]);
+}
+
+void testShortRequestStatusWithDifferentNN()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x05, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(0xFF, capturedIndex);
+}
+
+void testLongSendRequestResponse()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x01, 0x04, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  eventProducerService->sendRequestResponse(true, 1);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ARON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
+}
+
+void testShortSendRequestResponse()
+{
+  test();
+  capturedIndex = 0xFF;
+
+  VLCB::Controller controller = createController();
+  eventProducerService->setRequestEventHandler(mockHandler);
+  controller.begin();
+
+  // Add some long events
+  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
+  configuration->writeEvent(0, eventData);
+  configuration->updateEvHashEntry(0);
+
+  eventData[3] = 0x01;
+  configuration->writeEvent(1, eventData);
+  configuration->updateEvHashEntry(1);
+
+  eventProducerService->sendRequestResponse(false, 1);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(OPC_ARSOF, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
+}
+
 }
 
 void testEventProducerService()
@@ -279,4 +472,10 @@ void testEventProducerService()
   testSetProducedDefaultEventsOnNewBoard();
   testSendEventMissingInTable();
   testSendEventDeletedFromTable();
+  testLongRequestStatus();
+  testShortRequestStatusWithNN();
+  testShortRequestStatusWithoutNN();
+  testShortRequestStatusWithDifferentNN();
+  testLongSendRequestResponse();
+  testShortSendRequestResponse();
 }

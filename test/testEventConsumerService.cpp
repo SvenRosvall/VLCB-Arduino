@@ -93,6 +93,7 @@ void eventHandler(byte index, const VLCB::VlcbMessage *msg)
 void testEventHandlerOff()
 {
   test();
+  capturedIndex = 0xFF;
 
   VLCB::Controller controller = createController();
   eventConsumerService->setEventHandler(eventHandler);
@@ -122,6 +123,7 @@ void testEventHandlerOff()
 void testEventHandlerShortOn()
 {
   test();
+  capturedIndex = 0xFF;
 
   VLCB::Controller controller = createController();
   eventConsumerService->setEventHandler(eventHandler);
