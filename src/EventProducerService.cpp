@@ -237,7 +237,9 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
       default:
         return;
     }
-  
+    
+    // Handler only called for producer events.  Producer events are recognised by having EV1
+    // set to an input channel (ev value > 0)
     byte index = module_config->findExistingEvent(nn, en);
  
     if (index < module_config->EE_MAX_EVENTS)
