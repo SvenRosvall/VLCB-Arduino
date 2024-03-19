@@ -3,7 +3,7 @@
 // Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 // The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0/
 
-// TODO: Add AREQ and ASRQ opcode support.
+// TODO: 
 // Check error messages
 // Set Params flags
 // Trap for EVs <2
@@ -19,6 +19,14 @@ void EventProducerService::setController(Controller *cntrl)
 {
   this->controller = cntrl;
   this->module_config = cntrl->getModuleConfig();
+}
+
+//
+/// register the user handler for learned events
+//
+void EventProducerService::setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg)) 
+{
+  requesteventhandler = fptr;
 }
 
 void EventProducerService::begin()
@@ -213,26 +221,60 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
   unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
-  // DEBUG_SERIAL << ">VLCBProdSvc handling message op=" << _HEX(opc) << " nn=" << nn << " en" << en << endl;
-
-  switch (opc) 
-  {    
-
-    case OPC_AREQ:
-      // AREQ message - request for node state, only producer nodes
-
-      if ((nn == module_config->nodeNum) && (eventhandler != nullptr)) 
+  unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
+  
+  if (requesteventhandler != nullptr)
+  {
+    switch (opc)
+    {
+      case OPC_ASRQ:
+        if ((nn != module_config->nodeNumber) || (nn != 0000))
+        {
+          return;
+        }
+        nn = 0000;
+        break;
+        
+      case OPC_AREQ:
+        break;
+        
+      default:
+        return;
+    }
+    
+    // Handler only called for producer events.  Producer events are recognised by having EV1
+    // set to an input channel (ev value > 0)
+    byte index = module_config->findExistingEvent(nn, en);
+ 
+    if (index < module_config->EE_MAX_EVENTS)
+    {
+      if (module_config->getEventEVval(index, 1) != 0)
       {
-        (void)(*eventhandler)(0, msg);
+        (void)(*requesteventhandler)(index, msg);
       }
-      break;
-
-    case OPC_ASRQ:
-
-
-
-      break;
-
+    }      
   }
+}
+
+void EventProducerService::sendRequestResponse(bool state, byte index)
+{
+  byte nn_en[4];
+  module_config->readEvent(index, nn_en);
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
+  
+  byte opCode;
+  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  {
+    opCode = (state ? OPC_ARSON : OPC_ARSOF);
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
+  }
+  else
+  {
+    opCode = (state ? OPC_ARON : OPC_AROF);
+  }
+  
+  VlcbMessage msg;
+  msg.len = 5;
+  sendMessage(msg, opCode, nn_en);
 }
 }
