@@ -34,9 +34,9 @@ namespace VLCB
   {
     bool result = false;
     static int rxIndex = 0;
-    if (Serial.available())
+    if (serial.available())
     {     
-      char c = Serial.read();
+      char c = serial.read();
       c = toupper(c);
       //
       // if 'start of message' already seen, save the character, and check for 'end of message'
@@ -102,7 +102,7 @@ namespace VLCB
     if (result)
     {
       // output the message
-      Serial.print(txBuffer);
+      serial.print(txBuffer);
     }
     else
     {

@@ -27,7 +27,7 @@ namespace VLCB
   class SerialGC : public CanTransport
   {
   public:
-
+    SerialGC(typeof(Serial)& _serial = Serial) : serial(_serial) {}
     bool begin();
 
     bool available() override;
@@ -43,7 +43,8 @@ namespace VLCB
 
 
   private:
-
+    typeof(Serial)& serial;
+	
     char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
     char txBuffer[RXBUFFERSIZE]; // Define a byte array to store the outgoing data
     CANFrame rxCANFrame;
