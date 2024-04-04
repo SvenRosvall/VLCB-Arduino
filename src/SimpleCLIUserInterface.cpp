@@ -17,20 +17,9 @@ namespace VLCB
 // Create CLI Object
 SimpleCLI simpleCli(CLI_COMMAND_QUEUE_SIZE); // Default of 10 commands
 
-// Callback function for exit command
-/*
-void exitHelpCallback(cmd* c) {
-    Command cmd(c); // Create wrapper object
-
-    Serial.println("Exit help");
-	// I need a way to exit the help system from here.
-}
-*/
-
 Command cmdHelp;
 Command cmdHelpWithArg;
 Command cmdSerialInterface;
-//Command cmdExit;
 
 //////////////////////////////////////////////////////////////////
 // See Modern C++ Design, Andrei Alexandrescu, 2001(!) page 116
@@ -76,7 +65,6 @@ void SimpleCLIUserInterface::serialCallback(cmd *c) {
 	// Copy the char into the instance.
 	serialChar = local_serialChar;
     Serial.print(serialChar);
-    //Serial.print(cmd.getName()); //(same as toString())
     Serial.print(" : ");
     Serial.println(cmd.toString());
 	processSerialInputImpl(serialChar); 
@@ -86,11 +74,8 @@ void local_serialCallback(cmd *c) {
     Command cmd(c); // Create wrapper object
     Serial.print("called as ");
     Serial.print(local_serialChar);
-    //Serial.print(cmd.getName()); //(same as toString())
     Serial.print(" : ");
     Serial.println(cmd.toString());
-	// How can I get access to the instance of simpleUserInterface??
-	// The answer is to use local_simpleUserInterface.
 	(simpleCLIUserInterface.*pSerialCallback)(c);
 }
 
@@ -109,15 +94,11 @@ void SimpleCLIUserInterface::setupHelp()
     cmdSerialInterface = simpleCli.addCommand("n,e,v,c,h,y,s,z,*",local_serialCallback);
 	cmdSerialInterface.setDescription("serial commands n, e, v, c, h, y, s, z and * for the module");
 	
-
-    //Serial.println(cli.toString());  // Prints all the help items.
     Serial.println("> VLCB help system started!!");
 }
 
 void SimpleCLIUserInterface::getHelp()
 {
-   //Serial << "VLCB help system available" << endl;
-	 // Ideally this should be in a separate task allowing other things to go on.
    if (Serial.available()) {
         String input = Serial.readStringUntil('\n');
 
@@ -169,8 +150,6 @@ void SimpleCLIUserInterface::getHelp()
 
 void SimpleCLIUserInterface::processSerialInput()
 {
-  //byte uev = 0;
-  //char msgstr[32], dstr[32];
 
   if (Serial.available())
   {
@@ -185,10 +164,6 @@ void SimpleCLIUserInterface::processSerialInputImpl(char c)
 {
   byte uev = 0;
   char msgstr[32], dstr[32];
-
-  //if (Serial.available())
-  //{
-  //  char c = Serial.read();
 
     switch (c)
     {
@@ -323,15 +298,11 @@ void SimpleCLIUserInterface::processSerialInputImpl(char c)
         Serial << endl;
         break;
 
-      //case 'x':
-	  //  getHelp();
-	  //break;
-
       default:
         Serial << F("> unknown command ") << c << endl;
         break;
     }
-//}
+
 }
 
 void SimpleCLIUserInterface::handleAction(const Action *action)
