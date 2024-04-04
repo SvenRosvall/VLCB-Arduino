@@ -46,7 +46,6 @@ public:
 };
 
 extern SimpleCLI simpleCli;
-//extern char local_serial_char;
 
 } // end namespace VLCB
 
@@ -54,7 +53,5 @@ extern SimpleCLI simpleCli;
 // Note that this is not in the VLCB namespace.
 extern VLCB::SimpleCLIUserInterface simpleCLIUserInterface;
 
-//using VLCB::cli;
-//extern VLCB::SimpleCLI cli;
 
 
