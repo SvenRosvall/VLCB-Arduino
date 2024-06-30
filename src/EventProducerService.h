@@ -32,7 +32,11 @@ public:
   void sendEvent(bool state, byte evValue, byte data1);
   void sendEvent(bool state, byte evValue, byte data1, byte data2);
   void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
-  void sendRequestResponse(bool state, byte index);
+  void sendRequestResponse(bool state, byte evValue);
+  void sendRequestResponse(bool state, byte evValue, byte data1);
+  void sendRequestResponse(bool state, byte evValue, byte data1, byte data2);
+  void sendRequestResponse(bool state, byte evValue, byte data1, byte data2, byte data3);
+  
 
 private:
   Controller *controller;
