@@ -51,7 +51,7 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   unsigned int nodeNum = module_config->nodeNum;
   
   byte index = module_config->findEventSpace();
-  //TODO: Consider full event table error message.
+  //TODO: Consider full event table error message. Should error come from Configuration?
   
   // Find next available event number.
   unsigned int eventNum;
@@ -275,6 +275,78 @@ void EventProducerService::sendRequestResponse(bool state, byte index)
   
   VlcbMessage msg;
   msg.len = 5;
+  sendMessage(msg, opCode, nn_en);
+}
+
+void EventProducerService::sendRequestResponse(bool state, byte index, byte data1)
+{
+  byte nn_en[4];
+  module_config->readEvent(index, nn_en);
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
+  
+  byte opCode;
+  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  {
+    opCode = (state ? OPC_ARSON1 : OPC_ARSOF1);
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
+  }
+  else
+  {
+    opCode = (state ? OPC_ARON1 : OPC_AROF1);
+  }
+  
+  VlcbMessage msg;
+  msg.len = 6;
+  msg.data[5] = data1;
+  sendMessage(msg, opCode, nn_en);
+}
+
+void EventProducerService::sendRequestResponse(bool state, byte index, byte data1, byte data2)
+{
+  byte nn_en[4];
+  module_config->readEvent(index, nn_en);
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
+  
+  byte opCode;
+  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  {
+    opCode = (state ? OPC_ARSON2 : OPC_ARSOF2);
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
+  }
+  else
+  {
+    opCode = (state ? OPC_ARON2 : OPC_AROF2);
+  }
+  
+  VlcbMessage msg;
+  msg.len = 7;
+  msg.data[5] = data1;
+  msg.data[6] = data2;
+  sendMessage(msg, opCode, nn_en);
+}
+
+void EventProducerService::sendRequestResponse(bool state, byte index, byte data1, byte data2, byte data3)
+{
+  byte nn_en[4];
+  module_config->readEvent(index, nn_en);
+  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
+  
+  byte opCode;
+  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  {
+    opCode = (state ? OPC_ARSON3 : OPC_ARSOF3);
+    Configuration::setTwoBytes(&nn_en[0], module_config->nodeNum);
+  }
+  else
+  {
+    opCode = (state ? OPC_ARON3 : OPC_AROF3);
+  }
+  
+  VlcbMessage msg;
+  msg.len = 8;
+  msg.data[5] = data1;
+  msg.data[6] = data2;
+  msg.data[7] = data3;
   sendMessage(msg, opCode, nn_en);
 }
 }
