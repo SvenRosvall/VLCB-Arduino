@@ -256,7 +256,7 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
   }
 }
 
-void EventProducerService::sendRequestResponse(bool state, byte index)
+void EventProducerService::sendEventResponse(bool state, byte index)
 {
   byte nn_en[4];
   module_config->readEvent(index, nn_en);
@@ -278,7 +278,7 @@ void EventProducerService::sendRequestResponse(bool state, byte index)
   sendMessage(msg, opCode, nn_en);
 }
 
-void EventProducerService::sendRequestResponse(bool state, byte index, byte data1)
+void EventProducerService::sendEventResponse(bool state, byte index, byte data1)
 {
   byte nn_en[4];
   module_config->readEvent(index, nn_en);
@@ -301,7 +301,7 @@ void EventProducerService::sendRequestResponse(bool state, byte index, byte data
   sendMessage(msg, opCode, nn_en);
 }
 
-void EventProducerService::sendRequestResponse(bool state, byte index, byte data1, byte data2)
+void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2)
 {
   byte nn_en[4];
   module_config->readEvent(index, nn_en);
@@ -325,7 +325,7 @@ void EventProducerService::sendRequestResponse(bool state, byte index, byte data
   sendMessage(msg, opCode, nn_en);
 }
 
-void EventProducerService::sendRequestResponse(bool state, byte index, byte data1, byte data2, byte data3)
+void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2, byte data3)
 {
   byte nn_en[4];
   module_config->readEvent(index, nn_en);

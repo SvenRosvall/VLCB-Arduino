@@ -32,10 +32,10 @@ public:
   void sendEvent(bool state, byte evValue, byte data1);
   void sendEvent(bool state, byte evValue, byte data1, byte data2);
   void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
-  void sendRequestResponse(bool state, byte evValue);
-  void sendRequestResponse(bool state, byte evValue, byte data1);
-  void sendRequestResponse(bool state, byte evValue, byte data1, byte data2);
-  void sendRequestResponse(bool state, byte evValue, byte data1, byte data2, byte data3);
+  void sendEventResponse(bool state, byte index);
+  void sendEventResponse(bool state, byte index, byte data1);
+  void sendEventResponse(bool state, byte index, byte data1, byte data2);
+  void sendEventResponse(bool state, byte index, byte data1, byte data2, byte data3);
   
 
 private:

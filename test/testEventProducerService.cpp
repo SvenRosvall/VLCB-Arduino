@@ -411,7 +411,7 @@ void testLongSendRequestResponse()
   configuration->writeEvent(1, eventData);
   configuration->updateEvHashEntry(1);
 
-  eventProducerService->sendRequestResponse(true, 1);
+  eventProducerService->sendEventResponse(true, 1);
 
   process(controller);
 
@@ -444,7 +444,7 @@ void testShortSendRequestResponse()
   configuration->writeEvent(1, eventData);
   configuration->updateEvHashEntry(1);
 
-  eventProducerService->sendRequestResponse(false, 1);
+  eventProducerService->sendEventResponse(false, 1);
 
   process(controller);
 
