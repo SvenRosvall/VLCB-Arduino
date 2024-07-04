@@ -24,3 +24,16 @@ byte lowByte(unsigned int);
 void pinMode(int, PinMode);
 void digitalWrite(int, int);
 byte digitalRead(int);
+
+struct Serial_T
+{
+  void begin(int baudrate);
+
+  bool available();
+  char read();
+  void flush();
+  unsigned char readBytesUntil(int termChar, char *string, int length);
+  void print(const char *);
+  void println(const char *);
+};
+extern struct Serial_T Serial;

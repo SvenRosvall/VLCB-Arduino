@@ -1,16 +1,7 @@
 #pragma once
 
-struct Serial_T
-{
-  void begin(int baudrate);
+#include <Arduino.h>
 
-  bool available();
-  char read();
-  void flush();
-  unsigned char readBytesUntil(int termChar, char *string, int length);
-  void println(const char *);
-};
-extern struct Serial_T Serial;
 struct ENDL_T {};
 
 Serial_T & operator<<(Serial_T &, int);

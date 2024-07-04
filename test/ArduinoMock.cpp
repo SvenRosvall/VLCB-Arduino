@@ -110,6 +110,10 @@ char Serial_T::read()
   return ' ';
 }
 
+void Serial_T::print(const char *)
+{
+}
+
 void Serial_T::println(const char *)
 {
 }
