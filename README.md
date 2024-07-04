@@ -14,6 +14,31 @@ See [Design documents](docs/Design.md) for how this library is structured.
 
 There will be documentation for sketch authors that describe how to use this library.
 
+## File Structure
+This library consists of the following sub-directories and files:
+
+src
+  : This where the library source code resides.
+
+examples
+  : A few example sketches that illustrate how this library can be used.
+
+docs
+  : [Design documents](docs/Design.md) for the library.
+
+Arduino
+  : A set of stub header files to allow the library to be compiled outside the Arduino IDE.
+
+test
+  : Unit tests for the library. See its [README](test/README.md).
+
+library.properties
+  : Properties for exporting this library to the Arduino library manager.
+
+CmakeLists.txt
+  : CMake project definition. CMake is used for building the library outside the Arduino IDE 
+    and running unit tests.
+
 ## Dependencies
 Note that this library depends on a number of other libraries which must also be downloaded and included in the sketch:
 
