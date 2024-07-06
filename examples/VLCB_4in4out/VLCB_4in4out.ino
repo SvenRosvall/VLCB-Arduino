@@ -357,7 +357,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
     case OPC_ASRQ:
       byte evval = modconfig.getEventEVval(index, 1) - 1;
       DEBUG_PRINT(F("> Handling request op =  ") << _HEX(opc) << F(", request input = ") << evval << F(", state = ") << state[evval]);
-      epService.sendRequestResponse(state[evval], index);
+      epService.sendEventResponse(state[evval], index);
   }
 }
 
