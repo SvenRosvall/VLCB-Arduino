@@ -81,7 +81,7 @@ void setupVLCB()
   // initialise and load configuration
   controller.begin();
 
-  Serial << F("> mode = ") << ((modconfig.currentMode) ? "Normal" : "Uninitialised") << F(", CANID = ") << modconfig.CANID;
+  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
   Serial << F(", NN = ") << modconfig.nodeNum << endl;
 
   // show code version and copyright notice

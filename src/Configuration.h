@@ -94,6 +94,7 @@ public:
   static void setTwoBytes(byte *target, unsigned int value);
   static unsigned int getTwoBytes(const byte *bytes);
   static bool nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_HASH_BYTES]);
+  static const char * modeString(VlcbModeParams mode);
 
 private:
   Storage * storage;

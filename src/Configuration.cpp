@@ -282,6 +282,18 @@ void Configuration::updateEvHashEntry(byte idx)
   // DEBUG_SERIAL << F("> updateEvHashEntry for idx = ") << idx << F(", hash = ") << hash << endl;
 }
 
+// Return a readable string for a mode value
+const char * Configuration::modeString(VlcbModeParams mode)
+{
+  switch (mode & 0x07)
+  {
+    case MODE_NORMAL: return "Normal";
+    case MODE_UNINITIALISED: return "Uninitialised";
+    case MODE_SETUP: return "Setup";
+    default: return "Unknown"; 
+  }
+}
+
 //
 /// clear the hash table
 //

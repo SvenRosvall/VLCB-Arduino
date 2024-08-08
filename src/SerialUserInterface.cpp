@@ -47,7 +47,7 @@ void SerialUserInterface::processSerialInput()
 
         // node identity
         Serial << F("> VLCB node configuration") << endl;
-        Serial << F("> mode = ") << (modconfig->currentMode == MODE_NORMAL ? "Normal" : "Unitialised") << F(", CANID = ") << modconfig->CANID << F(", node number = ") << modconfig->nodeNum << endl;
+        Serial << F("> mode = ") << Configuration::modeString(modconfig->currentMode) << F(", CANID = ") << modconfig->CANID << F(", node number = ") << modconfig->nodeNum << endl;
         Serial << endl;
         break;
 
