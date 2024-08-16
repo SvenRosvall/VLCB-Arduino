@@ -551,6 +551,12 @@ void Configuration::resetModule()
 void Configuration::loadNVs()
 {
   currentMode = (VlcbModeParams) (storage->read(LOCATION_MODE) ); // Bit 0 persists Uninitialised / Normal mode
+  if (currentMode == VlcbModeParams::MODE_SETUP)
+  {
+    // currentMode should never be setup but may happen on re-initialized boards.
+    currentMode = VlcbModeParams::MODE_UNINITIALISED;
+    storage->write(LOCATION_MODE, currentMode);
+  }
   CANID = storage->read(LOCATION_CANID);
   nodeNum = (storage->read(LOCATION_NODE_NUMBER_HIGH) << 8) + storage->read(LOCATION_NODE_NUMBER_LOW);
   byte flags = storage->read(LOCATION_FLAGS);
