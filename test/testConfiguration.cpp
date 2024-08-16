@@ -14,7 +14,7 @@ namespace
 {
 const int NOTFOUND = 20;
 
-void testFindInEmptyTable()
+void testFindEventInEmptyTable()
 {
   test();
   
@@ -25,7 +25,7 @@ void testFindInEmptyTable()
   assertEquals(NOTFOUND, result);
 }
 
-void testFindFound()
+void testFindEventFound()
 {
   test();
 
@@ -40,7 +40,7 @@ void testFindFound()
   assertEquals(3, result);
 }
 
-void testFindNotFound()
+void testFindEventNotFound()
 {
   test();
 
@@ -55,7 +55,7 @@ void testFindNotFound()
   assertEquals(NOTFOUND, result);
 }
 
-void testFindNotFoundWithSameHash()
+void testFindEventNotFoundWithSameHash()
 {
   test();
 
@@ -70,7 +70,7 @@ void testFindNotFoundWithSameHash()
   assertEquals(NOTFOUND, result);
 }
 
-void testFindFoundWithSameHash()
+void testFindEventFoundWithSameHash()
 {
   test();
 
@@ -89,7 +89,7 @@ void testFindFoundWithSameHash()
   assertEquals(5, result);
 }
 
-void testFindFoundWithOtherSameHash()
+void testFindEventFoundWithOtherSameHash()
 {
   test();
 
@@ -112,7 +112,7 @@ void testFindFoundWithOtherSameHash()
   assertEquals(7, result);
 }
 
-void testFindNotFoundWithOtherSameHash()
+void testFindEventNotFoundWithOtherSameHash()
 {
   test();
 
@@ -135,11 +135,11 @@ void testFindNotFoundWithOtherSameHash()
 
 void testConfiguration()
 {
-  testFindInEmptyTable();
-  testFindFound();
-  testFindNotFound();
-  testFindNotFoundWithSameHash();
-  testFindFoundWithSameHash();
-  testFindFoundWithOtherSameHash();
-  testFindNotFoundWithOtherSameHash();
+  testFindEventInEmptyTable();
+  testFindEventFound();
+  testFindEventNotFound();
+  testFindEventNotFoundWithSameHash();
+  testFindEventFoundWithSameHash();
+  testFindEventFoundWithOtherSameHash();
+  testFindEventNotFoundWithOtherSameHash();
 }
