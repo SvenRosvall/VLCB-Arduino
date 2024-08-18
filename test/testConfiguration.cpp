@@ -9,10 +9,28 @@
 #include "Configuration.h"
 #include "TestTools.hpp"
 #include "VlcbCommon.h"
+#include "MockStorage.h"
 
 namespace
 {
 const int NOTFOUND = 20;
+
+void testLoadNVsFromZeroedEEPROM()
+{
+  // Sometimes when a module is reprogrammed the EEPROM gets zero-ed rather than getting all 0xFF.
+  // This upsets currentMode.
+  test();
+  static std::unique_ptr<MockStorage> mockStorage;
+  mockStorage.reset(new MockStorage);
+  for (unsigned int addr = 0; addr < 100; ++addr)
+  {
+    mockStorage->write(addr, 0);
+  }
+  VLCB::Configuration *configuration = createConfiguration(mockStorage.get());
+  configuration->begin();
+
+  assertEquals(VlcbModeParams::MODE_UNINITIALISED, configuration->currentMode);
+}
 
 void testFindEventInEmptyTable()
 {
@@ -135,6 +153,7 @@ void testFindEventNotFoundWithOtherSameHash()
 
 void testConfiguration()
 {
+  testLoadNVsFromZeroedEEPROM();
   testFindEventInEmptyTable();
   testFindEventFound();
   testFindEventNotFound();
