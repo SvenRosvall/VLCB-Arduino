@@ -17,7 +17,6 @@ struct VlcbMessage;
 class EventTeachingService : public Service 
 {
 public:
-  virtual void setController(Controller *cntrl) override;
   virtual void process(const Action * action) override;
 
   virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_OLD_TEACH; }
@@ -27,9 +26,6 @@ public:
   void inhibitLearn();
 
 private:
-  Controller *controller;
-  Configuration *module_config;  // Shortcut to reduce indirection code.
-
   bool bLearn = false;
 
   void handleMessage(const VlcbMessage *msg);

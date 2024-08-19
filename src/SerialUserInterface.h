@@ -16,15 +16,13 @@ class SerialUserInterface : public Service
 {
 public:
   SerialUserInterface(Transport *transport);
-  virtual void setController(Controller *ctrl) override;
+
   virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_HIDDEN; };
   virtual byte getServiceVersionID() override { return 1; };
 
   virtual void process(const Action *action) override;
 
 private:
-  Controller * controller;
-  Configuration * modconfig;
   Transport * transport;
   bool isResetRequested = false;
 

@@ -17,12 +17,6 @@ SerialUserInterface::SerialUserInterface(Transport *transport)
 {
 }
 
-void SerialUserInterface::setController(Controller *ctrl)
-{
-  this->controller = ctrl;
-  this->modconfig = ctrl->getModuleConfig();
-}
-
 void SerialUserInterface::process(const Action *action)
 {
   handleAction(action);
@@ -37,6 +31,7 @@ void SerialUserInterface::processSerialInput()
 
   if (Serial.available())
   {
+    Configuration *modconfig = controller->getModuleConfig();
     char c = Serial.read();
 
     switch (c)

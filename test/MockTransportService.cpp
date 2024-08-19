@@ -6,11 +6,6 @@
 #include "MockTransportService.h"
 #include "Controller.h"
 
-void MockTransportService::setController(VLCB::Controller *cntrl)
-{
-  this->controller = cntrl;
-}
-
 void MockTransportService::process(const VLCB::Action *action)
 {
   if (!incoming_messages.empty())

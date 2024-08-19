@@ -11,12 +11,6 @@
 
 namespace VLCB {
 
-void EventConsumerService::setController(Controller *cntrl) 
-{
-  this->controller = cntrl;
-  this->module_config = cntrl->getModuleConfig();
-}
-
 //
 /// register the user handler for learned events
 //
@@ -31,11 +25,11 @@ void EventConsumerService::setEventHandler(void (*fptr)(byte index, const VlcbMe
 void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en) 
 {
   // try to find a matching stored event -- match on nn, en
-  byte index = module_config->findExistingEvent(nn, en);
+  byte index = controller->getModuleConfig()->findExistingEvent(nn, en);
 
   // call any registered event handler
 
-  if (index < module_config->EE_MAX_EVENTS)
+  if (index < controller->getModuleConfig()->EE_MAX_EVENTS)
   {
     if (eventhandler != nullptr)
     {

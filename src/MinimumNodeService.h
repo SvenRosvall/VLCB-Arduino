@@ -19,7 +19,6 @@ class MinimumNodeService : public Service
 
 public:
 
-  virtual void setController(Controller *cntrl) override;
   virtual void process(const Action *action) override; 
 
   virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_MNS; }
@@ -34,9 +33,6 @@ public:
   void setNormal(unsigned int nn);
 
 private:
-
-  Controller *controller;
-  Configuration * module_config;  // Shortcut to reduce indirection code.
 
   bool requestingNewNN = false;
   unsigned long timeOutTimer;

@@ -12,12 +12,6 @@
 
 namespace VLCB {
 
-void EventTeachingService::setController(Controller *cntrl) 
-{
-  this->controller = cntrl;
-  this->module_config = cntrl->getModuleConfig();
-}
-
 void EventTeachingService::enableLearn() 
 {
   bLearn = true;
@@ -139,7 +133,7 @@ void EventTeachingService::handleLearn(unsigned int nn)
 {
   //DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
 
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
     enableLearn();
   }
@@ -168,15 +162,15 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
       // DEBUG_SERIAL << F("ets> searching for existing event to unlearn") << endl;
 
       // search for this NN and EN pair
-      byte index = module_config->findExistingEvent(nn, en);
+      byte index = controller->getModuleConfig()->findExistingEvent(nn, en);
 
-      if (index < module_config->EE_MAX_EVENTS)
+      if (index < controller->getModuleConfig()->EE_MAX_EVENTS)
       {
         // DEBUG_SERIAL << F("ets> deleting event at index = ") << index << F(", evs ") << endl;
-        module_config->cleareventEEPROM(index);
+        controller->getModuleConfig()->cleareventEEPROM(index);
 
         // update hash table
-        module_config->updateEvHashEntry(index);
+        controller->getModuleConfig()->updateEvHashEntry(index);
 
         // respond with WRACK
         controller->sendWRACK();
@@ -196,7 +190,7 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
 void EventTeachingService::handleUnlearn(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NNULN for nn = ") << nn << endl;
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
     inhibitLearn();
   }
@@ -206,10 +200,10 @@ void EventTeachingService::handleRequestEventCount(unsigned int nn)
 {
   // DEBUG_SERIAL << F("ets> RQEVN -- number of stored events for nn = ") << nn << endl;
 
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
     // respond with 0x74 NUMEV
-    controller->sendMessageWithNN(OPC_NUMEV, module_config->numEvents());
+    controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
   }
 }
 
@@ -217,7 +211,7 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
   
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
     VlcbMessage msg;
     msg.len = 8;
@@ -225,14 +219,14 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
     msg.data[1] = highByte(nn);  // my NN hi
     msg.data[2] = lowByte(nn);   // my NN lo
 
-    for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
+    for (byte i = 0; i < controller->getModuleConfig()->EE_MAX_EVENTS; i++)
     {
-      if (module_config->getEvTableEntry(i) != 0)
+      if (controller->getModuleConfig()->getEvTableEntry(i) != 0)
       {
         // it's a valid stored event
         // read the event data from EEPROM
         // construct and send a ENRSP message
-        module_config->readEvent(i, &msg.data[3]);
+        controller->getModuleConfig()->readEvent(i, &msg.data[3]);
         msg.data[7] = i;  // event table index
 
         //DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
@@ -246,9 +240,9 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 {
   // DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
 
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
-    if ((eventIndex >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(eventIndex) == 0))
+    if ((eventIndex >= controller->getModuleConfig()->EE_MAX_EVENTS) && (controller->getModuleConfig()->getEvTableEntry(eventIndex) == 0))
     {
       controller->sendCMDERR(CMDERR_INV_EN_IDX);
       controller->sendGRSP(OPC_NENRD, getServiceID(), CMDERR_INV_EN_IDX);
@@ -263,7 +257,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
       response.data[0] = OPC_ENRSP;     // response opcode
       response.data[1] = highByte(nn);  // my NN hi
       response.data[2] = lowByte(nn);   // my NN lo
-      module_config->readEvent(eventIndex, &response.data[3]);
+      controller->getModuleConfig()->readEvent(eventIndex, &response.data[3]);
       response.data[7] = eventIndex;  // event table index
 
       // DEBUG_SERIAL << F("ets> sending ENRSP reply for event index = ") << eventIndex << endl;
@@ -274,6 +268,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 
 void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
+  Configuration *module_config = controller->getModuleConfig();
   if (nn != module_config->nodeNum)
   {
     return;
@@ -331,24 +326,24 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
 
 void EventTeachingService::handleClearEvents(unsigned int nn)
 {
-  if (nn == module_config->nodeNum)
+  if (nn == controller->getModuleConfig()->nodeNum)
   {
     if (bLearn)
     {
       // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 
-      for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++)
+      for (byte e = 0; e < controller->getModuleConfig()->EE_MAX_EVENTS; e++)
       {
-        module_config->cleareventEEPROM(e);
+        controller->getModuleConfig()->cleareventEEPROM(e);
       }
 
       // recreate the hash table
-      module_config->clearEvHashTable();
+      controller->getModuleConfig()->clearEvHashTable();
       // DEBUG_SERIAL << F("ets> cleared all events") << endl;
       
       if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
       {
-        module_config->setResetFlag();
+        controller->getModuleConfig()->setResetFlag();
       }
 
       controller->sendWRACK();
@@ -364,14 +359,14 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
 
 void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
 {
-  if (module_config->nodeNum == nn)
+  if (controller->getModuleConfig()->nodeNum == nn)
   {
     byte free_slots = 0;
 
     // count free slots using the event hash table
-    for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
+    for (byte i = 0; i < controller->getModuleConfig()->EE_MAX_EVENTS; i++)
     {
-      if (module_config->getEvTableEntry(i) == 0)
+      if (controller->getModuleConfig()->getEvTableEntry(i) == 0)
       {
         ++free_slots;
       }
@@ -400,6 +395,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
 
   byte evnum = msg->data[5];
   byte evval = msg->data[6];
+  Configuration *module_config = controller->getModuleConfig();
   if ((evnum == 0) || (evnum > module_config->EE_NUM_EVS))
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
@@ -490,6 +486,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
       byte evVal = msg->data[7];
 
       // invalid index
+      Configuration *module_config = controller->getModuleConfig();
       if (index >= module_config->EE_MAX_EVENTS)
       {
         //DEBUG_SERIAL << F("> invalid index") << endl;
@@ -503,7 +500,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
       else
       {
         // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-        //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+        //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (controller->getModuleConfig()->EE_EVENTS_START + (index * controller->getModuleConfig()->EE_BYTES_PER_EVENT)) << endl;
 
         // Writes the first four bytes NN & EN only if they have changed.
         byte eventTableNNEN[4];
@@ -541,6 +538,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     return;
   }
 
+  Configuration *module_config = controller->getModuleConfig();
   byte index = module_config->findExistingEvent(nn, en);
   byte evnum = msg->data[5];
 
