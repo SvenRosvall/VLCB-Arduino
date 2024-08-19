@@ -22,6 +22,7 @@ src
 
 examples
   : A few example sketches that illustrate how this library can be used.
+  See [description](docs/Examples.md) of these.
 
 docs
   : [Design documents](docs/Design.md) for the library.
