@@ -3,7 +3,7 @@ A few example sketches are included in the `examples` directory.
 These illustrate how this library can be used.
 
 ## Common structure
-All the example sketches have a structure that define all the necessary
+All the example sketches have a structure that defines all the necessary
 elements in order.
 
 * Header files for types used in the sketch.
@@ -18,7 +18,7 @@ elements in order.
   Here it runs the controller object to process any VLCB messages coming in and out.
   It also runs any module specific code.
 
-All sketches included here are configured for communication over CAN bus
+Most sketches included here are configured for communication over CAN bus
 using the MCP2515 transceiver.
 If your module is using another transceiver change the VLCB::CAN2515 for 
 a class that supports that transceiver.
@@ -26,7 +26,7 @@ a class that supports that transceiver.
 ## [VLCB_empty](../examples/VLCB_empty/VLCB_empty.ino)
 A bare minimum sketch that only contains the necessary services (MinimumNodeService
 and CANService). 
-It can demonstrate that the Arduino module can communicate with CAN bus
+It can be used to demonstrate that the Arduino module can communicate with CAN bus
 and can communicate with FCU.
 The FCU can assign a node number and query the module parameters.
 
@@ -56,7 +56,7 @@ Create an event with EV#1 set to 1 to react to the moduleSwitch.
 Set EV#2 to make moduleLED change.
 Now the LED will react when the switch is changed.
 
-## [VLCB_4in4out](../examples/VLCB_4in4out/VLCB_4in4out.ion)
+## [VLCB_4in4out](../examples/VLCB_4in4out/VLCB_4in4out.ino)
 This is a larger sketch that handles 4 input pins and 4 output pins.
 See full documentation for this sketch in its own [README](../docs/VLCB4in4out_README.md).
 
