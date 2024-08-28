@@ -1,4 +1,4 @@
-# Minimum Node Service Interface
+# Minimum Node Service
 
 The Minimum Node Service provides the basic VLCB interface and functions for the library. As such,
 it is the only service whose inclusion is mandatory.
