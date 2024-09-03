@@ -123,7 +123,7 @@ void Controller::indicateMode(VlcbModeParams mode)
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
 }
 
-void Controller::setParamFlag(unsigned char flag, bool set)
+void Controller::setParamFlag(VlcbParamFlags flag, bool set)
 { 
   if (set)
   {
@@ -170,7 +170,7 @@ bool Controller::sendMessage(const VlcbMessage *msg)
   return true;
 }
 
-bool Controller::sendMessageWithNNandData(int opc, int len, ...)
+bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
 {
   va_list args;
   va_start(args, len);
@@ -204,7 +204,7 @@ bool Controller::sendCMDERR(byte cerrno)
   return sendMessageWithNN(OPC_CMDERR, cerrno);
 }
 
-void Controller::sendGRSP(byte opCode, byte serviceType, byte errCode)
+void Controller::sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode)
 {
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }

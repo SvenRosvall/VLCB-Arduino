@@ -22,7 +22,7 @@ public:
   CanService(CanTransport * tpt) : canTransport(tpt) {}
 
   virtual void setController(Controller *cntrl) override;
-  virtual byte getServiceID() override { return SERVICE_ID_CAN; }
+  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() override { return 1; }
 
   virtual void process(const Action * action) override;

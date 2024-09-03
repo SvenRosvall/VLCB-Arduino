@@ -15,7 +15,7 @@ class Configuration;
 class ConsumeOwnEventsService : public Service
 {
 public:
-  virtual byte getServiceID() override
+  virtual VlcbServiceTypes getServiceID() override
   {
     return SERVICE_ID_CONSUME_OWN_EVENTS;
   }

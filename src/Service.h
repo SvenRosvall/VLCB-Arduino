@@ -6,6 +6,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <vlcbdefs.hpp>
 
 namespace VLCB
 {
@@ -18,7 +19,7 @@ class Service
 public:
   virtual void setController(Controller * /*controller*/) {}
   virtual void begin() {}
-  virtual byte getServiceID() = 0;
+  virtual VlcbServiceTypes getServiceID() = 0;
   virtual byte getServiceVersionID() = 0;
 
   virtual void process(const Action * action) = 0;

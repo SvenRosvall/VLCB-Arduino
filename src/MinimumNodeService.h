@@ -22,7 +22,7 @@ public:
   virtual void setController(Controller *cntrl) override;
   virtual void process(const Action *action) override; 
 
-  virtual byte getServiceID() override { return SERVICE_ID_MNS; }
+  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;

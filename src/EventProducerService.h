@@ -19,7 +19,7 @@ public:
   void setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
   virtual void process(const Action * action) override;
 
-  virtual byte getServiceID() override
+  virtual VlcbServiceTypes getServiceID() override
   {
     return SERVICE_ID_PRODUCER;
   }

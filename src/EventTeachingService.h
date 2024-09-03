@@ -20,7 +20,7 @@ public:
   virtual void setController(Controller *cntrl) override;
   virtual void process(const Action * action) override;
 
-  virtual byte getServiceID() override { return SERVICE_ID_OLD_TEACH; }
+  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() override { return 1; }
 
   void enableLearn();
