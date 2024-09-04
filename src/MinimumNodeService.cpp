@@ -498,7 +498,7 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
 
     case MODE_HEARTBEAT_ON:
     case MODE_HEARTBEAT_OFF:
-      noHeartbeat = requestedMode == MODE_HEARTBEAT_OFF;
+      noHeartbeat = (requestedMode == MODE_HEARTBEAT_OFF);
       module_config->setHeartbeat(!noHeartbeat);
       break;
       
