@@ -488,6 +488,7 @@ enum VlcbServiceTypes : unsigned char
   // 
   // VLCB Service Types
   // 
+  SERVICE_ID_HIDDEN = 0, // Pseudo services that shall not be exposed externally.
   SERVICE_ID_MNS = 1, // The minimum node service. All modules must implement this.
   SERVICE_ID_NV = 2, // The NV service.
   SERVICE_ID_CAN = 3, // CAN service. Deals with CANID enumeration.

@@ -20,7 +20,7 @@ class NodeVariableService : public Service
 public:
 
   virtual void setController(Controller *cntrl) override;
-  virtual byte getServiceID() override { return SERVICE_ID_NV; }
+  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_NV; }
   virtual byte getServiceVersionID() override { return 1; }
   virtual void process(const Action * action) override;
 
