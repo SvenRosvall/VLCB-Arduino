@@ -611,6 +611,63 @@ void testServiceDiscoveryShortMessage()
   assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[0].data[5]);
 }
 
+void testRequestDiagnosticsIndexOutOfBand()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 7, 0}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_RDGN, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_SERVICE, mockTransportService->sent_messages[0].data[5]);
+}
+
+void testRequestDiagnosticsIndexForUI()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 2, 0}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_RDGN, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_SERVICE, mockTransportService->sent_messages[0].data[5]);
+}
+
+void testRequestDiagnosticsShortMessage()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RDGN, 0x01, 0x04, 1}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_RDGN, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[0].data[5]);
+}
+
 void testModeUninitializedToSetup()
 {
   test();
@@ -823,6 +880,9 @@ void testMinimumNodeService()
   testServiceDiscoveryIndexOutOfBand();
   testServiceDiscoveryIndexForUI();
   testServiceDiscoveryShortMessage();
+  testRequestDiagnosticsIndexOutOfBand();
+  testRequestDiagnosticsIndexForUI();
+  testRequestDiagnosticsShortMessage();
   testModeUninitializedToSetup();
   testModeSetupToNormal();
   testModeSetupToUnininitialized();

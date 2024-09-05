@@ -404,25 +404,34 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
 
 void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 5)
-    {
-      controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
-      return;
-    }
-    byte serviceIndex = msg->data[3];
-    if (serviceIndex <= controller->getServices().size())
-    {
-      Service *theService = controller->getServices()[serviceIndex - 1];
-      byte diagnosticCode = msg->data[4];
-      // TODO: more stuff to go in here    
-    }
-    else
-    {
-        controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_SERVICE);
-    }
+    // Not for this module.
+    return;
   }
+
+  if (msg->len < 5)
+  {
+    controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
+
+  byte serviceIndex = msg->data[3];
+  if (serviceIndex > controller->getServices().size())
+  {
+    controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
+    return;
+  }
+
+  Service *theService = controller->getServices()[serviceIndex - 1];
+  if (theService->getServiceID() == 0)
+  {
+    controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
+    return;
+  }
+
+  byte diagnosticCode = msg->data[4];
+  // TODO: more stuff to go in here    
 }
 
 void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
