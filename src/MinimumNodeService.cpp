@@ -423,15 +423,41 @@ void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsign
     return;
   }
 
-  Service *theService = controller->getServices()[serviceIndex - 1];
-  if (theService->getServiceID() == 0)
+  if (serviceIndex == 0)
   {
-    controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
-    return;
-  }
+    // Request for diagnostics for all services.
+    for (serviceIndex = 1; serviceIndex <= controller->getServices().size(); serviceIndex++)
+    {
+      Service * svc = controller->getServices()[serviceIndex - 1];
+      if (svc->getServiceID() == 0)
+      {
+        // Not a real service, skip it.
+        continue;
+      }
 
-  byte diagnosticCode = msg->data[4];
-  // TODO: more stuff to go in here    
+      svc->reportAllDiagnostics(serviceIndex);
+    }
+  }
+  else
+  {
+    // Request for diagnostics for a specific service.
+    Service *svc = controller->getServices()[serviceIndex - 1];
+    if (svc->getServiceID() == 0)
+    {
+      // Not a real service, send error response.
+      controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
+      return;
+    }
+    byte diagnosticCode = msg->data[4];
+    if (diagnosticCode == 0)
+    {
+      svc->reportAllDiagnostics(serviceIndex);
+    }
+    else
+    {
+      svc->reportDiagnostics(serviceIndex, diagnosticCode);
+    }
+  }
 }
 
 void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)

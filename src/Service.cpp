@@ -14,4 +14,16 @@ bool Service::isThisNodeNumber(unsigned int nn)
   return nn == controller->getModuleConfig()->nodeNum;
 }
 
+void Service::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
+{
+  // Default implementation is to not support diagnostics.
+  controller->sendGRSP(OPC_RDGN, SERVICE_ID_MNS, GRSP_INVALID_DIAGNOSTIC);
+}
+
+void Service::reportAllDiagnostics(byte serviceIndex)
+{
+  // Default implementation is to not support diagnostics.
+  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 0);
+}
+
 }

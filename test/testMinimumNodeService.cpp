@@ -12,9 +12,9 @@
 // * RQNP - Done
 // * RQMN - Done
 // * RQNPN - Done
-// * RDGN - No support in MNS yet
-// * RQSD - Done - Tests done
-// * MODE - No support in MNS yet
+// * RDGN - Done
+// * RQSD - Done
+// * MODE - Done in MNS.
 // * SQU - ????
 // * NNRST - Done
 // * NNRSM - Done
@@ -668,6 +668,95 @@ void testRequestDiagnosticsShortMessage()
   assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[0].data[5]);
 }
 
+void testRequestAllDiagnosticsIndexForMockService()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Request all diagnostics for MockCanService as it does not implement any diagnostics.
+  const byte mockServiceIndex = 6;
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, mockServiceIndex, 0}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(mockServiceIndex, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[5]);  
+  assertEquals(0, mockTransportService->sent_messages[0].data[6]);  
+}
+
+void testRequestInvalidDiagnosticsIndexForMockService()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Request all diagnostics for MockCanService as it does not implement any diagnostics.
+  const byte mockServiceIndex = 6;
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, mockServiceIndex, 7}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_RDGN, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_DIAGNOSTIC, mockTransportService->sent_messages[0].data[5]);
+}
+
+void testRequestAllDiagnosticsAllServices()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Request all diagnostics for MockCanService as it does not implement any diagnostics.
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 0, 0}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(5, mockTransportService->sent_messages.size());
+
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(1, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[6]);
+  
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(3, mockTransportService->sent_messages[1].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[1].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[1].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[1].data[6]);
+  
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[2].data[0]);
+  assertEquals(4, mockTransportService->sent_messages[2].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[2].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[2].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[2].data[6]);
+  
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[3].data[0]);
+  assertEquals(5, mockTransportService->sent_messages[3].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[3].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[3].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[3].data[6]);
+  
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[4].data[0]);
+  assertEquals(6, mockTransportService->sent_messages[4].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[4].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[4].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[4].data[6]);
+}
+
 void testModeUninitializedToSetup()
 {
   test();
@@ -883,6 +972,9 @@ void testMinimumNodeService()
   testRequestDiagnosticsIndexOutOfBand();
   testRequestDiagnosticsIndexForUI();
   testRequestDiagnosticsShortMessage();
+  testRequestAllDiagnosticsIndexForMockService();
+  testRequestInvalidDiagnosticsIndexForMockService();
+  testRequestAllDiagnosticsAllServices();
   testModeUninitializedToSetup();
   testModeSetupToNormal();
   testModeSetupToUnininitialized();
