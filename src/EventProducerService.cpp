@@ -94,20 +94,21 @@ void EventProducerService::process(const Action * action)
 
 void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byte nn_en[4])
 {
-  byte index = controller->getModuleConfig()->findExistingEventByEv(evIndex, evValue);
-  if (index >= controller->getModuleConfig()->EE_MAX_EVENTS)
+  Configuration *module_config = controller->getModuleConfig();
+  byte index = module_config->findExistingEventByEv(evIndex, evValue);
+  if (index >= module_config->EE_MAX_EVENTS)
   {
     index = createDefaultEvent(evValue);
   }
 
-  controller->getModuleConfig()->readEvent(index, nn_en);
+  module_config->readEvent(index, nn_en);
   //DEBUG_SERIAL << F("eps>index = ") << index << F(" , Node Number = 0x") << _HEX(nn_en[0]) << _HEX(nn_en[1]) << endl;
   if ((nn_en[0] == 0xff) && (nn_en[1] == 0xff))
   {
     // This table entry was not initalised correctly.
     // This may happen if an event is deleted but the hash table is not updated.
     index = createDefaultEvent(evValue);
-    controller->getModuleConfig()->readEvent(index, nn_en);
+    module_config->readEvent(index, nn_en);
   }
 }
 
@@ -217,13 +218,14 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
   unsigned int opc = msg->data[0];
   unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
   unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
+  Configuration *module_config = controller->getModuleConfig();
   
   if (requesteventhandler != nullptr)
   {
     switch (opc)
     {
       case OPC_ASRQ:
-        if ((nn != controller->getModuleConfig()->nodeNum) && (nn != 0000))
+        if ((nn != module_config->nodeNum) && (nn != 0000))
         {
           return;
         }
@@ -239,11 +241,11 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
     
     // Handler only called for producer events.  Producer events are recognised by having EV1
     // set to an input channel (ev value > 0)
-    byte index = controller->getModuleConfig()->findExistingEvent(nn, en);
+    byte index = module_config->findExistingEvent(nn, en);
  
-    if (index < controller->getModuleConfig()->EE_MAX_EVENTS)
+    if (index < module_config->EE_MAX_EVENTS)
     {
-      if (controller->getModuleConfig()->getEventEVval(index, 1) != 0)
+      if (module_config->getEventEVval(index, 1) != 0)
       {
         (void)(*requesteventhandler)(index, msg);
       }

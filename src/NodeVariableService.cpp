@@ -81,7 +81,8 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
-  if (nn == controller->getModuleConfig()->nodeNum)
+  Configuration *module_config = controller->getModuleConfig();
+  if (nn == module_config->nodeNum)
   {
     if (msg->len < 5)
     {
@@ -89,7 +90,7 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
       return;
     }
 
-    if (msg->data[3] > controller->getModuleConfig()->EE_NUM_NVS)
+    if (msg->data[3] > module_config->EE_NUM_NVS)
     {
       controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_NV_IDX);
       controller->sendCMDERR(CMDERR_INV_NV_IDX);
@@ -97,7 +98,7 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
     else
     {
       // update EEPROM for this NV -- NVs are indexed from 1, not zero
-      controller->getModuleConfig()->writeNV(msg->data[3], msg->data[4]);
+      module_config->writeNV(msg->data[3], msg->data[4]);
       // respond with WRACK
       controller->sendWRACK();
       // DEBUG_SERIAL << F("> set NV ok") << endl;
@@ -109,7 +110,8 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
 {
   // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
 
-  if (nn == controller->getModuleConfig()->nodeNum)
+  Configuration *module_config = controller->getModuleConfig();
+  if (nn == module_config->nodeNum)
   {
     if (msg->len < 5)
     {
@@ -118,7 +120,7 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
     }
 
     byte nvindex = msg->data[3];
-    if (nvindex > controller->getModuleConfig()->EE_NUM_NVS)
+    if (nvindex > module_config->EE_NUM_NVS)
     {
       controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_NV_IDX);
       controller->sendCMDERR(CMDERR_INV_NV_IDX);
@@ -126,10 +128,10 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
     else
     {
       // update EEPROM for this NV -- NVs are indexed from 1, not zero
-      controller->getModuleConfig()->writeNV(msg->data[3], msg->data[4]);
+      module_config->writeNV(msg->data[3], msg->data[4]);
 
       // respond with NVANS
-      controller->sendMessageWithNN(OPC_NVANS, nvindex, controller->getModuleConfig()->readNV(nvindex));
+      controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
       // DEBUG_SERIAL << F("> set NV ok") << endl;
     }
   }
