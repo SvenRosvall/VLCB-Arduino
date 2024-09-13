@@ -212,7 +212,6 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
 
-  Configuration *module_config = controller->getModuleConfig();
   if (isThisNodeNumber(nn))
   {
     VlcbMessage msg;
@@ -221,6 +220,7 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
     msg.data[1] = highByte(nn);  // my NN hi
     msg.data[2] = lowByte(nn);   // my NN lo
 
+    Configuration *module_config = controller->getModuleConfig();
     for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
     {
       if (module_config->getEvTableEntry(i) != 0)
@@ -242,9 +242,9 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 {
   // DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
 
-  Configuration *module_config = controller->getModuleConfig();
   if (isThisNodeNumber(nn))
   {
+    Configuration *module_config = controller->getModuleConfig();
     if ((eventIndex >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(eventIndex) == 0))
     {
       controller->sendCMDERR(CMDERR_INV_EN_IDX);
@@ -271,7 +271,6 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 
 void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
-  Configuration *module_config = controller->getModuleConfig();
   if (!isThisNodeNumber(nn))
   {
     return;
@@ -286,6 +285,7 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   uint8_t eventIndex = msg->data[3];
   uint8_t evnum = msg->data[4];
 
+  Configuration *module_config = controller->getModuleConfig();
   if (eventIndex >= module_config->EE_MAX_EVENTS)
   {
     // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
@@ -329,13 +329,13 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
 
 void EventTeachingService::handleClearEvents(unsigned int nn)
 {
-  Configuration *module_config = controller->getModuleConfig();
   if (isThisNodeNumber(nn))
   {
     if (bLearn)
     {
       // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 
+      Configuration *module_config = controller->getModuleConfig();
       for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++)
       {
         module_config->cleareventEEPROM(e);
@@ -363,12 +363,12 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
 
 void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
 {
-  Configuration *module_config = controller->getModuleConfig();
   if (isThisNodeNumber(nn))
   {
     byte free_slots = 0;
 
     // count free slots using the event hash table
+    Configuration *module_config = controller->getModuleConfig();
     for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
     {
       if (module_config->getEvTableEntry(i) == 0)

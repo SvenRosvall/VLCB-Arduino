@@ -218,7 +218,6 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
   unsigned int opc = msg->data[0];
   unsigned int nn = Configuration::getTwoBytes(&msg->data[1]);
   unsigned int en = Configuration::getTwoBytes(&msg->data[3]);
-  Configuration *module_config = controller->getModuleConfig();
   
   if (requesteventhandler != nullptr)
   {
@@ -241,6 +240,7 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
     
     // Handler only called for producer events.  Producer events are recognised by having EV1
     // set to an input channel (ev value > 0)
+    Configuration *module_config = controller->getModuleConfig();
     byte index = module_config->findExistingEvent(nn, en);
  
     if (index < module_config->EE_MAX_EVENTS)
