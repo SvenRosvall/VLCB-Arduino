@@ -17,6 +17,8 @@ struct Action;
 class Service
 {
 protected:
+  bool isThisNodeNumber(unsigned int nn);
+
   Controller * controller;
 
 public:

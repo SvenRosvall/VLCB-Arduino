@@ -133,7 +133,7 @@ void EventTeachingService::handleLearn(unsigned int nn)
 {
   //DEBUG_SERIAL << F("> NNLRN for node = ") << nn << F(", learn mode on") << endl;
 
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     enableLearn();
   }
@@ -191,7 +191,7 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
 void EventTeachingService::handleUnlearn(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NNULN for nn = ") << nn << endl;
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     inhibitLearn();
   }
@@ -201,7 +201,7 @@ void EventTeachingService::handleRequestEventCount(unsigned int nn)
 {
   // DEBUG_SERIAL << F("ets> RQEVN -- number of stored events for nn = ") << nn << endl;
 
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     // respond with 0x74 NUMEV
     controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
@@ -213,7 +213,7 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
   //DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
 
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     VlcbMessage msg;
     msg.len = 8;
@@ -243,7 +243,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
   // DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
 
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if ((eventIndex >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(eventIndex) == 0))
     {
@@ -272,7 +272,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
 void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
   Configuration *module_config = controller->getModuleConfig();
-  if (nn != module_config->nodeNum)
+  if (!isThisNodeNumber(nn))
   {
     return;
   }
@@ -330,7 +330,7 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
 void EventTeachingService::handleClearEvents(unsigned int nn)
 {
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (bLearn)
     {
@@ -364,7 +364,7 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
 void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
 {
   Configuration *module_config = controller->getModuleConfig();
-  if (module_config->nodeNum == nn)
+  if (isThisNodeNumber(nn))
   {
     byte free_slots = 0;
 

@@ -225,7 +225,7 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
     switch (opc)
     {
       case OPC_ASRQ:
-        if ((nn != module_config->nodeNum) && (nn != 0000))
+        if ((!isThisNodeNumber(nn)) && (nn != 0000))
         {
           return;
         }

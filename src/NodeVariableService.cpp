@@ -46,7 +46,7 @@ void NodeVariableService::handleMessage(const VlcbMessage *msg)
 void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 4)
     {
@@ -82,7 +82,7 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
   // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
 
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 5)
     {
@@ -111,7 +111,7 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
   // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
 
   Configuration *module_config = controller->getModuleConfig();
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 5)
     {

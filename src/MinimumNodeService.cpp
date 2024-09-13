@@ -237,7 +237,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
 
     case OPC_NNRSM:
       //4F - reset to manufacturer's defaults 
-      if (nn == module_config->nodeNum)
+      if (isThisNodeNumber(nn))
       {        
         controller->sendMessageWithNN(OPC_NNREL);  // release node number first
         module_config->resetModule();        
@@ -246,7 +246,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       
     case OPC_NNRST:
       //5E - software reset
-      if (nn == module_config->nodeNum)
+      if (isThisNodeNumber(nn))
       {
         module_config->reboot();
       }
@@ -281,7 +281,7 @@ void MinimumNodeService::handleRequestNodeParameters()
 
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 4)
     {
@@ -353,7 +353,7 @@ static int countServices(const VLCB::ArrayHolder<Service *> &services)
 
 void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 4)
     {
@@ -404,7 +404,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
 
 void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
-  if (nn == controller->getModuleConfig()->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     if (msg->len < 5)
     {
@@ -428,7 +428,7 @@ void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsign
 void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
-  if (nn != controller->getModuleConfig()->nodeNum)
+  if (!isThisNodeNumber(nn))
   {
     // Not for this module.
     return;
