@@ -13,7 +13,6 @@
 
 #include <Configuration.h>
 #include <Transport.h>
-#include "Service.h"
 #include "initializer_list.h"
 #include "ArrayHolder.h"
 #include "CircularBuffer.h"
@@ -54,6 +53,8 @@ struct Action
     VlcbModeParams mode; // with ACT_INDICATE_MODE
   };
 };
+
+class Service;
 
 //
 /// Main object in VLCB. Coordinates transport, ui, configuration and services.
