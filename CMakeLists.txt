@@ -6,55 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 include(cmake/lto.cmake)
 include(cmake/arduino_flags.cmake)
 
-include_directories(examples)
-include_directories(examples/VLCB_1in1out)
-include_directories(examples/VLCB_4in4out)
-include_directories(examples/VLCB_empty)
-include_directories(examples/VLCB_long_message_example)
-include_directories(src)
-
-add_library(hardware_library OBJECT
-        src/CAN2515.cpp
-        src/LED.cpp
-        src/Switch.cpp
-        src/CreateDefaultStorageForPlatform.cpp
-        src/DueEepromEmulationStorage.cpp
-        src/EepromExternalStorage.cpp
-        src/EepromInternalStorage.cpp
-        src/FlashStorage.cpp
-        src/LEDUserInterface.cpp
-        src/SerialUserInterface.cpp
-        src/CombinedUserInterface.cpp
-        src/SerialGC.cpp
-        )
-target_include_directories(hardware_library INTERFACE
-        src
-        )
-
-target_link_libraries(hardware_library PUBLIC ArduinoFlags)
-target_link_libraries(hardware_library PUBLIC ArduinoLibs)
-target_link_libraries(hardware_library PUBLIC ArduinoStreaming)
-target_link_libraries(hardware_library PUBLIC ArduinoACAN2515)
-
-add_library(core_library OBJECT
-        src/Controller.cpp
-        src/Configuration.cpp
-        src/LongMessageService.cpp
-        src/Parameters.cpp
-        src/CanTransport.cpp
-        src/MinimumNodeService.cpp
-        src/CanService.cpp
-        src/EventConsumerService.cpp
-        src/EventTeachingService.cpp
-        src/EventProducerService.cpp
-        src/NodeVariableService.cpp
-        src/ConsumeOwnEventsService.cpp
-        src/GridConnect.cpp
-        )
-
-target_include_directories(core_library INTERFACE
-        src
-        )
+add_subdirectory(src)
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
   set(ARDUINO_PORT "/dev/ttyACM0" CACHE STRING
@@ -67,59 +19,9 @@ if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
   include(examples/VLCB_empty/VLCB_empty.cmake)
   include(examples/VLCB_long_message_example/VLCB_long_message_example.cmake)
 else()
-        target_link_libraries(core_library PUBLIC ArduinoFlags)
-        target_link_libraries(core_library PUBLIC ArduinoMock)
-endif()
-
-add_library(ArduinoMock INTERFACE)
-target_include_directories(ArduinoMock INTERFACE
-        Arduino
-        )
-
-add_executable(testAll
-        test/ArduinoMock.cpp
-        test/TestTools.cpp
-        test/testArduino.cpp
-        test/testAll.cpp
-        test/testMinimumNodeService.cpp
-        test/testNodeVariableService.cpp
-        test/testCanService.cpp
-        test/testEventProducerService.cpp
-        test/MockUserInterface.cpp
-        test/MockStorage.cpp
-        test/MockCanTransport.cpp
-        test/MockTransportService.cpp
-        test/VlcbCommon.cpp
-        test/testEventProducerService.cpp
-        test/testEventConsumerService.cpp
-        test/testEventTeachingService.cpp
-        test/testConsumeOwnEventsService.cpp
-        test/testLongMessageService.cpp
-        test/testGridConnect.cpp
-        test/testConfiguration.cpp
-        test/testCircularBuffer.cpp
-        )
-
-target_link_libraries(testAll PUBLIC ArduinoFlags)
-target_link_libraries(testAll PUBLIC ArduinoMock)
-target_link_libraries(testAll PUBLIC core_library)
-
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
-        set(ARDUINO_PORT "/dev/ttyACM0" CACHE STRING
-                "The serial port for uploading using avrdude")
-
-        include(examples/VLCB_1in1out/VLCB_1in1out.cmake)
-        include(examples/VLCB_4in4out/VLCB_4in4out.cmake)
-        include(examples/VLCB_empty/VLCB_empty.cmake)
-        include(examples/VLCB_long_message_example/VLCB_long_message_example.cmake)
-else()
-        enable_testing()
-        add_test(NAME testAll COMMAND $<TARGET_FILE:testAll>)
-=======
   add_subdirectory(Arduino)
   add_subdirectory(test)
 
   enable_testing()
   add_test(NAME testAll COMMAND $<TARGET_FILE:testAll>)
->>>>>>> 432f251 (Ensure only relevant targets are configured.)
 endif()
