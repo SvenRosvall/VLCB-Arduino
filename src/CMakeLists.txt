@@ -1,4 +1,4 @@
-file(GLOB HEADER_LIST CONFIGURE_DEPENDS "${VLCB_Arduino_SOURCE_DIR}/src/*.h")
+
 
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
 
@@ -13,7 +13,6 @@ if (CMAKE_SYSTEM_PROCESSOR STREQUAL "avr")
     FlashStorage.cpp
     LEDUserInterface.cpp
     SerialUserInterface.cpp
-    CombinedUserInterface.cpp
   )
   target_include_directories(hardware_library PUBLIC .)
 
@@ -29,7 +28,6 @@ add_library(core_library OBJECT
   Configuration.cpp
   LongMessageService.cpp
   Parameters.cpp
-  CanTransport.cpp
   MinimumNodeService.cpp
   CanService.cpp
   EventConsumerService.cpp

@@ -2,9 +2,9 @@ add_library(test_library OBJECT
         ArduinoMock.cpp
         TestTools.cpp
         MockUserInterface.cpp
-        MockTransport.cpp
         MockStorage.cpp
         MockCanTransport.cpp
+        MockTransportService.cpp
         VlcbCommon.cpp
       )
 target_link_libraries(test_library PUBLIC ArduinoFlags)
@@ -23,6 +23,8 @@ add_executable(testAll
         testConsumeOwnEventsService.cpp
         testLongMessageService.cpp
 	testGridConnect.cpp
+        testCircularBuffer.cpp
+        testConfiguration.cpp
         )
 
 target_link_libraries(testAll PUBLIC ArduinoFlags)
