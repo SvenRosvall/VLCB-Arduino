@@ -2,12 +2,12 @@
 
 # VLCB-Arduino
 This project implements an Arduino library for [VLCB](https://github.com/Versatile-LCB/VLCB-documents) running over CAN bus.
-VLCB is an extension of [CBUS](https://www.merg.org.uk/resources/cbus). 
+VLCB is an extension of [CBUS](https://www.merg.org.uk/resources/cbus).
 
 CBUS(R) is a registered trademark of Dr. Michael Bolton.
 
 This VLCB library code is based on a [CBUS library](https://github.com/MERG-DEV/CBUS) created by Duncan Greenwood
-and extended by members of [MERG](https://www.merg.org.uk/). 
+and extended by members of [MERG](https://www.merg.org.uk/).
 See below under Credits.
 
 See [Design documents](docs/Design.md) for how this library is structured.
@@ -57,6 +57,14 @@ At the moment this library is still in early development and thus not fully supp
 If you have any questions or suggestions please contact the library maintainers
 by email to vlcb@rosvall.ie or create an issue in GitHub.
 
+## Building
+
+This code may be built in multiple ways:
+
+* Using the Arduino IDE, treating this repository as a Library.
+* Directly using CMake.
+* Using an IDE (e.g. VSCode) and its CMake integration.
+
 ## Credits
 
 * Duncan Greenwood - Created the CBUS library for Arduinos which this VLCB library is based on.
@@ -73,3 +81,9 @@ The code contained in this repository and the executable distributions are licen
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](LICENSE.md).
 
 If you have questions about licensing this library please contact [license@rosvall.ie](mailto:license@rosvall.ie)
+
+## Arduino-AVR-CMake License
+
+Portions of code in the `cmake` directory are Copyright (c) 2023 PieterP.
+
+See the Arduino-AVR-CMake-LICENSE file in this repository.
