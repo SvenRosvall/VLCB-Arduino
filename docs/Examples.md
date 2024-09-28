@@ -64,7 +64,7 @@ See full documentation for this sketch in its own [README](../docs/VLCB4in4out_R
 This is an example sketch that makes use of long messages.
 
 ## [VLCB_SerialGC_1in1out](../examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino)
-This example sketch has the same functionality as VLCB_1in1out above
+This example sketch has the same functionality as [VLCB_1in1out](Examples.md#vlcb_1in1out) above
 but uses a serial connection instead of CAN bus.
 This setup is useful for testing as it does not require any CAN bus equipment
 such as CANUSB or CANETHER. 
