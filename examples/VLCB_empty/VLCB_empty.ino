@@ -56,13 +56,31 @@ void printConfig();
 //
 void setupVLCB()
 {
-  // set config layout parameters
-  modconfig.EE_NVS_START = 10;
-  modconfig.EE_NUM_NVS = 0;
-  modconfig.EE_EVENTS_START = 20;
-  modconfig.EE_MAX_EVENTS = 0;
-  modconfig.EE_PRODUCED_EVENTS = 0;
-  modconfig.EE_NUM_EVS = 0;
+  // set module parameters
+  VLCB::Parameters params(modconfig);
+  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
+ 
+  // assign to Controller
+  controller.setParams(params);
+  controller.setName(mname);
+
+  // module reset - if switch is depressed at startup
+  if (ledUserInterface.isButtonPressed())
+  {
+    Serial << F("> switch was pressed at startup") << endl;
+    modconfig.resetModule();
+  }
+
+  // configure and start CAN bus and VLCB message processing
+  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
+  can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
+  can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
+  if (!can2515.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
 
   // initialise and load configuration
   controller.begin();
@@ -73,34 +91,6 @@ void setupVLCB()
   // show code version and copyright notice
   printConfig();
 
-  // set module parameters
-  VLCB::Parameters params(modconfig);
-  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANUFACTURER);
-  params.setModuleId(MODULE_ID);  
- 
-  // assign to Controller
-  controller.setParams(params.getParams());
-  controller.setName(mname);
-
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    modconfig.resetModule();
-  }
-
-  // set Controller LEDs to indicate the current mode
-  controller.indicateMode(modconfig.currentMode);
-
-  // configure and start CAN bus and VLCB message processing
-  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  if (!can2515.begin())
-  {
-    Serial << F("> error starting VLCB") << endl;
-  }
 }
 
 //

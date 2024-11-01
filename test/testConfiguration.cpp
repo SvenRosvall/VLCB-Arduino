@@ -15,6 +15,46 @@ namespace
 {
 const int NOTFOUND = 20;
 
+void testDefaultEepromValues()
+{
+  test();
+
+  static std::unique_ptr<MockStorage> mockStorage;
+  mockStorage.reset(new MockStorage);
+  VLCB::Configuration * configuration = createConfiguration(mockStorage.get());
+  configuration->begin();
+
+  assertEquals(VLCB::LOCATION_RESERVED_SIZE, configuration->EE_NVS_START);
+  assertEquals(0, configuration->EE_NUM_NVS);
+  assertEquals(VLCB::LOCATION_RESERVED_SIZE, configuration->EE_EVENTS_START);
+  assertEquals(0, configuration->EE_MAX_EVENTS);
+  assertEquals(0, configuration->EE_PRODUCED_EVENTS);
+  assertEquals(0, configuration->EE_NUM_EVS);
+  assertEquals(VLCB::EE_HASH_BYTES, configuration->EE_BYTES_PER_EVENT);
+}
+
+void testCalculatedEepromValues()
+{
+  test();
+
+  static std::unique_ptr<MockStorage> mockStorage;
+  mockStorage.reset(new MockStorage);
+  VLCB::Configuration * configuration = createConfiguration(mockStorage.get());
+  configuration->EE_NUM_NVS = 3;
+  configuration->EE_MAX_EVENTS = 7;
+  configuration->EE_PRODUCED_EVENTS = 1;
+  configuration->EE_NUM_EVS = 2;
+  configuration->begin();
+
+  assertEquals(VLCB::LOCATION_RESERVED_SIZE, configuration->EE_NVS_START);
+  assertEquals(3, configuration->EE_NUM_NVS);
+  assertEquals(VLCB::LOCATION_RESERVED_SIZE + 3, configuration->EE_EVENTS_START);
+  assertEquals(7, configuration->EE_MAX_EVENTS);
+  assertEquals(1, configuration->EE_PRODUCED_EVENTS);
+  assertEquals(2, configuration->EE_NUM_EVS);
+  assertEquals(VLCB::EE_HASH_BYTES + 2, configuration->EE_BYTES_PER_EVENT);
+}
+
 void testLoadNVsFromZeroedEEPROM()
 {
   // Sometimes when a module is reprogrammed the EEPROM gets zero-ed rather than getting all 0xFF.
@@ -153,6 +193,8 @@ void testFindEventNotFoundWithOtherSameHash()
 
 void testConfiguration()
 {
+  testDefaultEepromValues();
+  testCalculatedEepromValues();
   testLoadNVsFromZeroedEEPROM();
   testFindEventInEmptyTable();
   testFindEventFound();

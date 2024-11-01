@@ -71,21 +71,10 @@ char lmsg_out[32], lmsg_in[32];     // message buffers
 void setupVLCB()
 {
   // set config layout parameters
-  modconfig.EE_NVS_START = 10;
   modconfig.EE_NUM_NVS = 10;
-  modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 1;
-
-  // initialise and load configuration
-  controller.begin();
-
-  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
-
-  // show code version and copyright notice
-  printConfig();
 
   // set module parameters
   VLCB::Parameters params(modconfig);
@@ -110,14 +99,20 @@ void setupVLCB()
   // subscribe to long message streams and register our handler function
   lmsg.subscribe(streams, sizeof(streams) / sizeof(byte), lmsg_in, 32, longmessagehandler);
 
-  // set Controller LEDs to indicate the current mode
-  controller.indicateMode(modconfig.currentMode);
-
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(4, 2);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   can2515.begin();
+
+  // initialise and load configuration
+  controller.begin();
+
+  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
+  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+
+  // show code version and copyright notice
+  printConfig();
 }
 
 //
