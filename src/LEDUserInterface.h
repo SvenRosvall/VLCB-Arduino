@@ -19,7 +19,7 @@ class LEDUserInterface : public Service
 {
 public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
-  virtual void setController(Controller *ctrl) override { this->controller = ctrl; }
+
   virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_HIDDEN; };
   virtual byte getServiceVersionID() override { return 1; };
 
@@ -27,7 +27,6 @@ public:
   virtual void process(const Action *action) override;
 
 private:
-  Controller * controller;
   LED greenLed;
   LED yellowLed;
   Switch pushButton;

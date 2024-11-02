@@ -51,6 +51,7 @@ add_library(core_library OBJECT
         src/CanTransport.h
         src/Storage.h
         src/Service.h
+        src/Service.cpp
         src/LongMessageService.h
         src/MinimumNodeService.cpp
         src/MinimumNodeService.h

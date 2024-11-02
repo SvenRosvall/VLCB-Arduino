@@ -13,12 +13,6 @@ namespace VLCB
 
 const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
-void CanService::setController(Controller *cntrl)
-{
-  this->controller = cntrl;
-  this->module_config = cntrl->getModuleConfig();
-}
-
 void CanService::process(const Action *action)
 {
   checkIncomingCanFrame();
@@ -79,7 +73,7 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
     byte newCANID = msg->data[3];
@@ -90,7 +84,7 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
     }
     else
     {
-      module_config->setCANID(newCANID);
+      controller->getModuleConfig()->setCANID(newCANID);
       controller->sendWRACK();
       controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
     }
@@ -100,9 +94,9 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 void CanService::handleEnumeration(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
-  // DEBUG_SERIAL << F("> my nn = ") << module_config->nodeNum << endl;
+  // DEBUG_SERIAL << F("> my nn = ") << controller->getModuleConfig()->nodeNum << endl;
 
-  if (nn == module_config->nodeNum)
+  if (isThisNodeNumber(nn))
   {
     // DEBUG_SERIAL << F("> initiating enumeration") << endl;
     startCANenumeration(true);
