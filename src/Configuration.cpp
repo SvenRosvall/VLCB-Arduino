@@ -49,6 +49,12 @@ Configuration::Configuration(Storage * theStorage)
 void Configuration::begin()
 {
   EE_BYTES_PER_EVENT = EE_HASH_BYTES + EE_NUM_EVS;
+  if (EE_EVENTS_START == 0)
+  {
+    EE_EVENTS_START = EE_NVS_START + EE_NUM_NVS;
+    // Note: The formula above does not allow for upgrades to user app where NVs are added 
+    // as this would move the location for stored events. 
+  }
 
   storage->begin();
   loadNVs();

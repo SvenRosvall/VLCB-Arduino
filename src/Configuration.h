@@ -23,7 +23,8 @@ enum EepromLocations {
   LOCATION_NODE_NUMBER_HIGH = 2,
   LOCATION_NODE_NUMBER_LOW = 3,
   LOCATION_FLAGS = 4,
-  LOCATION_RESET_FLAG = 5
+  LOCATION_RESET_FLAG = 5,
+  LOCATION_RESERVED_SIZE = 10 // NVs/EVs can start from here.
 };
 
 enum FlagBits {
@@ -73,13 +74,13 @@ public:
   void clearResetFlag();
   bool isResetFlagSet();
 
-  unsigned int EE_EVENTS_START;
-  byte EE_MAX_EVENTS;
-  byte EE_NUM_EVS;
-  byte EE_BYTES_PER_EVENT;
-  unsigned int EE_NVS_START;
-  byte EE_NUM_NVS;
-  byte EE_PRODUCED_EVENTS;
+  unsigned int EE_NVS_START = LOCATION_RESERVED_SIZE;
+  byte EE_NUM_NVS = 0;
+  unsigned int EE_EVENTS_START = 0; // Value calculated in begin() unless set by user.
+  byte EE_MAX_EVENTS = 0;
+  byte EE_NUM_EVS = 0;
+  byte EE_PRODUCED_EVENTS = 0;
+  byte EE_BYTES_PER_EVENT; // Value calculated in begin()
 
   bool heartbeat;
   bool eventAck;
@@ -101,7 +102,6 @@ private:
 
   void setModuleMode(VlcbModeParams m);
   byte makeHash(byte tarr[EE_HASH_BYTES]);
-  void getEvArray(byte idx);
   void makeEvHashTable();
 
   void loadNVs();

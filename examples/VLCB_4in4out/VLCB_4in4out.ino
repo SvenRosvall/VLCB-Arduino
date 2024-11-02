@@ -125,21 +125,11 @@ void processSwitches();
 void setupVLCB()
 {
   // set config layout parameters
-  modconfig.EE_NVS_START = 10;
   modconfig.EE_NUM_NVS = NUM_SWITCHES;
   modconfig.EE_EVENTS_START = 50;
   modconfig.EE_MAX_EVENTS = 64;
   modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
   modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
-
-  // initialise and load configuration
-  controller.begin();
-
-  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
-
-  // show code version and copyright notice
-  printConfig();
 
   // set module parameters
   VLCB::Parameters params(modconfig);
@@ -174,6 +164,15 @@ void setupVLCB()
   {
     Serial << F("> error starting VLCB") << endl;
   }
+
+  // initialise and load configuration
+  controller.begin();
+
+  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
+  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+
+  // show code version and copyright notice
+  printConfig();
 }
 
 void setupModule()

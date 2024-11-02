@@ -17,6 +17,12 @@ VLCB::Configuration * createConfiguration()
   static std::unique_ptr<MockStorage> mockStorage;
   mockStorage.reset(new MockStorage);
   VLCB::Configuration *configuration = createConfiguration(mockStorage.get());
+  configuration->EE_NVS_START = 10;
+  configuration->EE_NUM_NVS = 4;
+  configuration->EE_EVENTS_START = 20;
+  configuration->EE_MAX_EVENTS = 20;
+  configuration->EE_PRODUCED_EVENTS = 1;
+  configuration->EE_NUM_EVS = 2;
   configuration->begin();
   return configuration;
 }
@@ -25,12 +31,6 @@ VLCB::Configuration * createConfiguration()
 VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage)
 {
   auto configuration = new VLCB::Configuration(mockStorage);
-  configuration->EE_NVS_START = 10;
-  configuration->EE_NUM_NVS = 4;
-  configuration->EE_EVENTS_START = 20;
-  configuration->EE_MAX_EVENTS = 20;
-  configuration->EE_PRODUCED_EVENTS = 1;
-  configuration->EE_NUM_EVS = 2;
   return configuration;
 }
 
@@ -39,10 +39,7 @@ VLCB::Controller createController(const std::initializer_list<VLCB::Service *> s
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
 
-  static std::unique_ptr<MockStorage> mockStorage;
-  mockStorage.reset(new MockStorage);
-
-  configuration.reset(createConfiguration(mockStorage.get()));
+  configuration.reset(createConfiguration());
 
   VLCB::Controller controller(configuration.get(), services);
 

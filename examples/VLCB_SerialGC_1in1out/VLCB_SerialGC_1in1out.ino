@@ -82,24 +82,11 @@ void processModuleSwitchChange();
 void setupVLCB()
 {
   // set config layout parameters
-  modconfig.EE_NVS_START = 10;
   modconfig.EE_NUM_NVS = 10;
-  modconfig.EE_EVENTS_START = 20;
   modconfig.EE_MAX_EVENTS = 32;
   modconfig.EE_PRODUCED_EVENTS = 1;
   modconfig.EE_NUM_EVS = 2; // EV1: Produced event ; EV2: LED1
  
-
-  // initialise and load configuration
-  controller.begin();
-
-  Serial << F("> mode = (") << _HEX(modconfig.currentMode) << ") " << VLCB::Configuration::modeString(modconfig.currentMode);
-  Serial << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
-
-  // show code version and copyright notice
-  printConfig();
-
   // set module parameters
   VLCB::Parameters params(modconfig);
   params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
@@ -120,9 +107,15 @@ void setupVLCB()
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
-  // set Controller LEDs to indicate the current mode
-  controller.indicateMode(modconfig.currentMode);
+  // initialise and load configuration
+  controller.begin();
 
+  Serial << F("> mode = (") << _HEX(modconfig.currentMode) << ") " << VLCB::Configuration::modeString(modconfig.currentMode);
+  Serial << F(", CANID = ") << modconfig.CANID;
+  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+
+  // show code version and copyright notice
+  printConfig();
 }
 
 //
