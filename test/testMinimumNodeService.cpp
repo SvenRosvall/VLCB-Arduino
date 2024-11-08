@@ -724,37 +724,151 @@ void testRequestAllDiagnosticsAllServices()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(5, mockTransportService->sent_messages.size());
+  assertEquals(11, mockTransportService->sent_messages.size());
 
+  int messageIndex = 0;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(6, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(1, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(2, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(3, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(4, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(5, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(6, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_CAN, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_PRODUCER, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[messageIndex].data[0]);
+  assertEquals(SERVICE_ID_CONSUMER, mockTransportService->sent_messages[messageIndex].data[3]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[5]);
+  assertEquals(0, mockTransportService->sent_messages[messageIndex].data[6]);
+}
+
+void testRequestMnsDiagnosticsUptime()
+{
+  test();
+
+  addMillis(123456789);
+
+  VLCB::Controller controller = createController();
+
+  // Request upper word of uptime
+  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 2}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
   assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(1, mockTransportService->sent_messages[0].data[3]);
-  assertEquals(0, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[4]);
+  unsigned long uptime = (mockTransportService->sent_messages[0].data[5] << 24)
+          + (mockTransportService->sent_messages[0].data[6] << 16);
+
+  // Request lower word of uptime
+  mockTransportService->sent_messages.clear();
+  msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 3}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(3, mockTransportService->sent_messages[0].data[4]);
+  uptime += (mockTransportService->sent_messages[0].data[5] << 8)
+            + (mockTransportService->sent_messages[0].data[6]);
+
+  assertEquals(123456, uptime);
+}
+
+void testRequestMnsDiagnosticsNodeNumberChanges()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Change node number
+  minimumNodeService->setSetupMode();
+  VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
+  mockTransportService->setNextMessage(msg_rqsd);
+  process(controller);
+  mockTransportService->sent_messages.clear();
+
+  // Request upper word of uptime
+  msg_rqsd = {5, {OPC_RDGN, 0x02, 0x07, SERVICE_ID_MNS, 5}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(5, mockTransportService->sent_messages[0].data[4]);
   assertEquals(0, mockTransportService->sent_messages[0].data[5]);
-  assertEquals(0, mockTransportService->sent_messages[0].data[6]);
-  
-  assertEquals(OPC_DGN, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(3, mockTransportService->sent_messages[1].data[3]);
-  assertEquals(0, mockTransportService->sent_messages[1].data[4]);
-  assertEquals(0, mockTransportService->sent_messages[1].data[5]);
-  assertEquals(0, mockTransportService->sent_messages[1].data[6]);
-  
-  assertEquals(OPC_DGN, mockTransportService->sent_messages[2].data[0]);
-  assertEquals(4, mockTransportService->sent_messages[2].data[3]);
-  assertEquals(0, mockTransportService->sent_messages[2].data[4]);
-  assertEquals(0, mockTransportService->sent_messages[2].data[5]);
-  assertEquals(0, mockTransportService->sent_messages[2].data[6]);
-  
-  assertEquals(OPC_DGN, mockTransportService->sent_messages[3].data[0]);
-  assertEquals(5, mockTransportService->sent_messages[3].data[3]);
-  assertEquals(0, mockTransportService->sent_messages[3].data[4]);
-  assertEquals(0, mockTransportService->sent_messages[3].data[5]);
-  assertEquals(0, mockTransportService->sent_messages[3].data[6]);
-  
-  assertEquals(OPC_DGN, mockTransportService->sent_messages[4].data[0]);
-  assertEquals(6, mockTransportService->sent_messages[4].data[3]);
-  assertEquals(0, mockTransportService->sent_messages[4].data[4]);
-  assertEquals(0, mockTransportService->sent_messages[4].data[5]);
-  assertEquals(0, mockTransportService->sent_messages[4].data[6]);
+  assertEquals(1, mockTransportService->sent_messages[0].data[6]);
 }
 
 void testModeUninitializedToSetup()
@@ -975,6 +1089,8 @@ void testMinimumNodeService()
   testRequestAllDiagnosticsIndexForMockService();
   testRequestInvalidDiagnosticsIndexForMockService();
   testRequestAllDiagnosticsAllServices();
+  testRequestMnsDiagnosticsUptime();
+  testRequestMnsDiagnosticsNodeNumberChanges();
   testModeUninitializedToSetup();
   testModeSetupToNormal();
   testModeSetupToUnininitialized();
