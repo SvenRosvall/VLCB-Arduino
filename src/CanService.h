@@ -22,9 +22,12 @@ public:
   CanService(CanTransport * tpt) : canTransport(tpt) {}
 
   virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_CAN; }
-  virtual byte getServiceVersionID() override { return 1; }
+  virtual byte getServiceVersionID() override { return 2; }
 
   virtual void process(const Action * action) override;
+
+  virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
+  virtual void reportAllDiagnostics(byte serviceIndex) override;
 
 private:
 

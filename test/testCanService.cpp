@@ -64,7 +64,7 @@ void testServiceDiscovery()
   assertEquals(OPC_SD, mockCanTransport->sent_frames[2].data[0]);
   assertEquals(2, mockCanTransport->sent_frames[2].data[3]); // index
   assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[2].data[4]); // service ID
-  assertEquals(1, mockCanTransport->sent_frames[2].data[5]); // version
+  assertEquals(2, mockCanTransport->sent_frames[2].data[5]); // version
 }
 
 void testServiceDiscoveryCanSvc()
@@ -295,6 +295,156 @@ void testCANID()
   assertEquals(33, controller.getModuleCANID());
 }
 
+void testRequestAllDiagnosticsCanService()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Request all diagnostics for MockCanService as it does not implement any diagnostics.
+  const byte serviceIndex = 2;
+  VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_RDGN, 0x01, 0x04, serviceIndex, 0}};
+  mockCanTransport->setNextMessage(msg);
+
+  process(controller);
+
+  // Verify sent messages.
+  assertEquals(19, mockCanTransport->sent_frames.size());
+
+  int messageIndex = 0;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(18, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(1, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(2, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(3, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(4, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(5, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(6, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(42, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(7, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(8, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(9, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(17, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(10, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(11, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(12, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(13, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(14, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(15, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(16, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(17, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+
+  ++messageIndex;
+  assertEquals(OPC_DGN, mockCanTransport->sent_frames[messageIndex].data[0]);
+  assertEquals(serviceIndex, mockCanTransport->sent_frames[messageIndex].data[3]);
+  assertEquals(18, mockCanTransport->sent_frames[messageIndex].data[4]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[5]);
+  assertEquals(0, mockCanTransport->sent_frames[messageIndex].data[6]);
+}
+
 }
 
 void testCanService()
@@ -308,4 +458,5 @@ void testCanService()
   testRtrMessage();
   testFindFreeCanidOnPopulatedBus();
   testCANID(); // Deprecated
+  testRequestAllDiagnosticsCanService();
 }

@@ -23,8 +23,8 @@ public:
   
   virtual void reset() override;
 
-  virtual unsigned int receiveCounter() override { return 0; }
-  virtual unsigned int transmitCounter() override { return 0; }
+  virtual unsigned int receiveCounter() override { return 17; }
+  virtual unsigned int transmitCounter() override { return 42; }
   virtual unsigned int receiveErrorCounter() override { return 0; }
   virtual unsigned int transmitErrorCounter() override { return 0; }
   virtual unsigned int errorStatus() override { return 0; }
