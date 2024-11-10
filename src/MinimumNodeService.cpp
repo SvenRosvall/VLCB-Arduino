@@ -557,42 +557,42 @@ void MinimumNodeService::reportDiagnostics(byte serviceIndex, byte diagnosticsCo
       reportAllDiagnostics(serviceIndex);
       break;
     case 0x01: // Status code -- TODO: not implemented, always good
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, 0, 0);
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
       break;
     case 0x02: // Uptime upper word
     {
       unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, (now >> 24) & 0xFF , (now >> 16) & 0xFF);
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 24) & 0xFF , (now >> 16) & 0xFF);
       break;
     }
     case 0x03: // Uptime lower word
     {
       unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, (now >> 8) & 0xFF , now & 0xFF);
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 8) & 0xFF , now & 0xFF);
       break;
     }
     case 0x04: // Memory error count -- TODO: not implemented
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, 0, 0);
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
       break;
     case 0x05: // Node Number changes
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
       break;
     case 0x06: // Received messages acted on -- TODO: not implemented
       // TODO: Need to increment diagMsgsActed in appropriate places.
-      controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
       break;
     default:
-      controller->sendGRSP(OPC_RDGN, SERVICE_ID_MNS, GRSP_INVALID_DIAGNOSTIC);
+      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
       return;
   }
 }
 
 void MinimumNodeService::reportAllDiagnostics(byte serviceIndex)
 {
-  controller->sendMessageWithNN(OPC_DGN, SERVICE_ID_MNS, 0, 0, 6);
+  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 6);
   for (byte i = 1; i <= 0x06 ; ++i)
   {
-    reportDiagnostics(SERVICE_ID_MNS, i);
+    reportDiagnostics(serviceIndex, i);
   }
 }
 
