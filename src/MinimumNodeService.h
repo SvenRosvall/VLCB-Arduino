@@ -25,6 +25,9 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;
+
+  virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
+  virtual void reportAllDiagnostics(byte serviceIndex) override;
   
   // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
@@ -37,6 +40,9 @@ private:
   bool requestingNewNN = false;
   unsigned long timeOutTimer;
   VlcbModeParams instantMode;
+  
+  unsigned int diagMsgsActed = 0;
+  unsigned int diagNodeNumberChanges = 0;
   
   void checkModeChangeTimeout();
   void initSetup();

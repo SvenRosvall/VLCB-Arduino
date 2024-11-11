@@ -334,6 +334,8 @@ void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned in
       // respond with NNACK
       controller->sendMessageWithNN(OPC_NNACK);
       // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->getModuleConfig()->nodeNum << endl;
+      
+      ++diagNodeNumberChanges;
     }
   }
 }
@@ -404,23 +406,58 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
 
 void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 5)
+    // Not for this module.
+    return;
+  }
+
+  if (msg->len < 5)
+  {
+    controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
+
+  byte serviceIndex = msg->data[3];
+  if (serviceIndex > controller->getServices().size())
+  {
+    controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
+    return;
+  }
+
+  if (serviceIndex == 0)
+  {
+    // Request for diagnostics for all services.
+    for (serviceIndex = 1; serviceIndex <= controller->getServices().size(); serviceIndex++)
     {
-      controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
+      Service * svc = controller->getServices()[serviceIndex - 1];
+      if (svc->getServiceID() == 0)
+      {
+        // Not a real service, skip it.
+        continue;
+      }
+
+      svc->reportAllDiagnostics(serviceIndex);
+    }
+  }
+  else
+  {
+    // Request for diagnostics for a specific service.
+    Service *svc = controller->getServices()[serviceIndex - 1];
+    if (svc->getServiceID() == 0)
+    {
+      // Not a real service, send error response.
+      controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
       return;
     }
-    byte serviceIndex = msg->data[3];
-    if (serviceIndex <= controller->getServices().size())
+    byte diagnosticCode = msg->data[4];
+    if (diagnosticCode == 0)
     {
-      Service *theService = controller->getServices()[serviceIndex - 1];
-      byte diagnosticCode = msg->data[4];
-      // TODO: more stuff to go in here    
+      svc->reportAllDiagnostics(serviceIndex);
     }
     else
     {
-        controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_SERVICE);
+      svc->reportDiagnostics(serviceIndex, diagnosticCode);
     }
   }
 }
@@ -510,6 +547,53 @@ void MinimumNodeService::setSetupMode()
 {
   instantMode = MODE_SETUP;
   timeOutTimer = 0;
+}
+
+void MinimumNodeService::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
+{
+  switch (diagnosticsCode)
+  {
+    case 0x00:
+      reportAllDiagnostics(serviceIndex);
+      break;
+    case 0x01: // Status code -- TODO: not implemented, always good
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      break;
+    case 0x02: // Uptime upper word
+    {
+      unsigned long now = millis() / 1000;
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 24) & 0xFF , (now >> 16) & 0xFF);
+      break;
+    }
+    case 0x03: // Uptime lower word
+    {
+      unsigned long now = millis() / 1000;
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 8) & 0xFF , now & 0xFF);
+      break;
+    }
+    case 0x04: // Memory error count -- TODO: not implemented
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      break;
+    case 0x05: // Node Number changes
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
+      break;
+    case 0x06: // Received messages acted on -- TODO: not implemented
+      // TODO: Need to increment diagMsgsActed in appropriate places.
+      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
+      break;
+    default:
+      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
+      return;
+  }
+}
+
+void MinimumNodeService::reportAllDiagnostics(byte serviceIndex)
+{
+  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 6);
+  for (byte i = 1; i <= 0x06 ; ++i)
+  {
+    reportDiagnostics(serviceIndex, i);
+  }
 }
 
 }

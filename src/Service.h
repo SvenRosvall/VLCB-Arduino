@@ -28,6 +28,9 @@ public:
   virtual byte getServiceVersionID() = 0;
 
   virtual void process(const Action * action) = 0;
+
+  virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode);
+  virtual void reportAllDiagnostics(byte serviceIndex);
 };
 
 }
