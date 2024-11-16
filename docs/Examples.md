@@ -24,11 +24,14 @@ If your module is using another transceiver change the VLCB::CAN2515 for
 a class that supports that transceiver.
 
 ## [VLCB_empty](../examples/VLCB_empty/VLCB_empty.ino)
-A bare minimum sketch that only contains the necessary services (MinimumNodeService
-and CANService). 
+A bare minimum sketch that only contains the necessary services 
+(```MinimumNodeServiceWithDiagnostics``` and ```CANServiceWithDiagnostics```). 
 It can be used to demonstrate that the Arduino module can communicate with CAN bus
 and can communicate with FCU.
 The FCU can assign a node number and query the module parameters.
+
+The services used in this sketch have enabled diagnostics so that all
+features of VLCB can be demonstrated.
 
 Note that there are no support for node variables or events.
 
@@ -56,9 +59,14 @@ Create an event with EV#1 set to 1 to react to the moduleSwitch.
 Set EV#2 to make moduleLED change.
 Now the LED will react when the switch is changed.
 
+This sketch uses services with diagnostics enabled to demonstrate them.
+
 ## [VLCB_4in4out](../examples/VLCB_4in4out/VLCB_4in4out.ino)
 This is a larger sketch that handles 4 input pins and 4 output pins.
 See full documentation for this sketch in its own [README](../docs/VLCB4in4out_README.md).
+
+This sketch does not enable diagnostics to save memory on small processors
+and also to demonstrate that diagnostics is optional.
 
 ## [VLCB_long_message_example](../examples/VLCB_long_message_example/VLCB_long_message_example.ino)
 This is an example sketch that makes use of long messages.

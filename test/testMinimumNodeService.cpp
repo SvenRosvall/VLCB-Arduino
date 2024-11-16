@@ -23,7 +23,7 @@
 #include "TestTools.hpp"
 #include "ArduinoMock.hpp"
 #include "Controller.h"
-#include "MinimumNodeService.h"
+#include "MinimumNodeServiceWithDiagnostics.h"
 #include "LongMessageService.h"
 #include "EventConsumerService.h"
 #include "EventProducerService.h"
@@ -32,12 +32,12 @@
 
 namespace
 {
-std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
+std::unique_ptr<VLCB::MinimumNodeServiceWithDiagnostics> minimumNodeService;
 static std::unique_ptr<MockTransportService> mockTransportService;
 
 VLCB::Controller createController()
 {
-  minimumNodeService.reset(new VLCB::MinimumNodeService);
+  minimumNodeService.reset(new VLCB::MinimumNodeServiceWithDiagnostics);
   
   mockUserInterface.reset(new MockUserInterface);
 

@@ -55,8 +55,12 @@ add_library(core_library OBJECT
         src/LongMessageService.h
         src/MinimumNodeService.cpp
         src/MinimumNodeService.h
+        src/MinimumNodeServiceWithDiagnostics.h
+        src/MinimumNodeServiceWithDiagnostics.cpp
         src/CanService.cpp
         src/CanService.h
+        src/CanServiceWithDiagnostics.cpp
+        src/CanServiceWithDiagnostics.h
         src/EventConsumerService.cpp
         src/EventConsumerService.h
         src/EventTeachingService.cpp

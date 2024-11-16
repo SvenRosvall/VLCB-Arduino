@@ -241,11 +241,6 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       handleRequestServiceDefinitions(msg, nn);
       break;
 
-    case OPC_RDGN:
-      // 87 - Request Diagnostic Data
-      handleRequestDiagnostics(msg, nn);
-      break;
-
     case OPC_MODE:
       // 76 - Set Operating Mode
       handleModeMessage(msg, nn);
@@ -420,64 +415,6 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
   }
 }
 
-void MinimumNodeService::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
-{
-  if (!isThisNodeNumber(nn))
-  {
-    // Not for this module.
-    return;
-  }
-
-  if (msg->len < 5)
-  {
-    controller->sendGRSP(OPC_RDGN, getServiceID(), CMDERR_INV_CMD);
-    return;
-  }
-
-  byte serviceIndex = msg->data[3];
-  if (serviceIndex > controller->getServices().size())
-  {
-    controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
-    return;
-  }
-
-  if (serviceIndex == 0)
-  {
-    // Request for diagnostics for all services.
-    for (serviceIndex = 1; serviceIndex <= controller->getServices().size(); serviceIndex++)
-    {
-      Service * svc = controller->getServices()[serviceIndex - 1];
-      if (svc->getServiceID() == 0)
-      {
-        // Not a real service, skip it.
-        continue;
-      }
-
-      svc->reportAllDiagnostics(serviceIndex);
-    }
-  }
-  else
-  {
-    // Request for diagnostics for a specific service.
-    Service *svc = controller->getServices()[serviceIndex - 1];
-    if (svc->getServiceID() == 0)
-    {
-      // Not a real service, send error response.
-      controller->sendGRSP(OPC_RDGN, getServiceID(), GRSP_INVALID_SERVICE);
-      return;
-    }
-    byte diagnosticCode = msg->data[4];
-    if (diagnosticCode == 0)
-    {
-      svc->reportAllDiagnostics(serviceIndex);
-    }
-    else
-    {
-      svc->reportDiagnostics(serviceIndex, diagnosticCode);
-    }
-  }
-}
-
 void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("> MODE -- request op-code received for NN = ") << nn << endl;
@@ -559,53 +496,6 @@ void MinimumNodeService::setSetupMode()
 {
   instantMode = MODE_SETUP;
   timeOutTimer = 0;
-}
-
-void MinimumNodeService::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
-{
-  switch (diagnosticsCode)
-  {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      break;
-    case 0x01: // Status code -- TODO: not implemented, always good
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
-      break;
-    case 0x02: // Uptime upper word
-    {
-      unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 24) & 0xFF , (now >> 16) & 0xFF);
-      break;
-    }
-    case 0x03: // Uptime lower word
-    {
-      unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 8) & 0xFF , now & 0xFF);
-      break;
-    }
-    case 0x04: // Memory error count -- TODO: not implemented
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
-      break;
-    case 0x05: // Node Number changes
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
-      break;
-    case 0x06: // Received messages acted on -- TODO: not implemented
-      // TODO: Need to increment diagMsgsActed in appropriate places.
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
-      break;
-    default:
-      controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
-      return;
-  }
-}
-
-void MinimumNodeService::reportAllDiagnostics(byte serviceIndex)
-{
-  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 6);
-  for (byte i = 1; i <= 0x06 ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
 }
 
 }

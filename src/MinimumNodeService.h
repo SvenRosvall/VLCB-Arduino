@@ -25,9 +25,6 @@ public:
   virtual byte getServiceVersionID() override { return 1; }
   
   virtual void begin() override;
-
-  virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
-  virtual void reportAllDiagnostics(byte serviceIndex) override;
   
   // backdoors for testing
   void setHeartBeat(bool f) { noHeartbeat = !f; }
@@ -41,9 +38,6 @@ private:
   unsigned long timeOutTimer;
   VlcbModeParams instantMode;
   
-  unsigned int diagMsgsActed = 0;
-  unsigned int diagNodeNumberChanges = 0;
-  
   void checkModeChangeTimeout();
   void initSetup();
   void initSetupFromNormal();
@@ -55,13 +49,16 @@ private:
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
 
-  void handleMessage(const VlcbMessage *msg);
   void handleRequestNodeParameters();
   void handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
   void handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
   void handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
-  void handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn);
   void handleModeMessage(const VlcbMessage *msg, unsigned int nn);
+
+protected:
+  virtual void handleMessage(const VlcbMessage *msg);
+  unsigned int diagMsgsActed = 0;
+  unsigned int diagNodeNumberChanges = 0;
 };
 
 }
