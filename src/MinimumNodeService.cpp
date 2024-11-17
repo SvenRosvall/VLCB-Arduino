@@ -59,6 +59,7 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
+  controller->sendMessageWithNN(OPC_NNREL);  // release node number first
   controller->getModuleConfig()->setModuleUninitializedMode();
   controller->getModuleConfig()->setCANID(0);
 
@@ -129,6 +130,21 @@ void MinimumNodeService::process(const Action *action)
           break;
            
         case MODE_NORMAL:
+          setUninitialised();
+          break;
+           
+        default:
+          break;
+        }
+        break;
+      
+      case ACT_RENEGOTIATE:
+        switch (controller->getModuleConfig()->currentMode)
+        {
+        case MODE_UNINITIALISED:
+          break;
+           
+        case MODE_NORMAL:
           initSetupFromNormal();
           break;
            
@@ -182,7 +198,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
 
     case OPC_RQNN:
       // 50 - Another module has entered setup.
-      // If we are in setup, abort (MNS Spec 3.2.1)
+      // If we are in setup, abort (MNS Spec 3.1.1)
 
       if (instantMode == MODE_SETUP)
       {
@@ -485,34 +501,30 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
   {
     case MODE_UNINITIALISED:
       // Request factory reset mode
-      if (instantMode == MODE_SETUP)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-        setUninitialised();
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+        case MODE_SETUP:
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          setUninitialised();
+          break;
+      
+        default:
+          controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
+          break;
       }
       break;
 
     case MODE_SETUP:
       // Request Setup
-      switch (instantMode)
+      if (instantMode == MODE_NORMAL)
       {
-        case MODE_NORMAL:
-          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          initSetupFromNormal();
-          break;
-      
-        case MODE_UNINITIALISED:
-          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-          initSetup();
-          break;
-
-        default:
-          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
-          break;
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+        initSetupFromNormal();
+      }
+      else
+      {
+        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
       }
       break;
       

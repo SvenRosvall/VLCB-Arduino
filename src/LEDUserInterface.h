@@ -13,7 +13,7 @@
 namespace VLCB
 {
 
-const unsigned int SW_TR_HOLD = 6000U;  // Controller push button hold time for SLiM/FLiM transition in millis = 6 seconds
+const unsigned int SW_TR_HOLD = 4000U;  // Controller push button hold time for SLiM/FLiM transition in millis = 4 seconds
 
 class LEDUserInterface : public Service
 {
