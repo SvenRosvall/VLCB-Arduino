@@ -20,8 +20,8 @@
 #include <Parameters.h>             // VLCB parameters
 #include <vlcbdefs.hpp>               // VLCB constants
 #include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-#include "CanService.h"
+#include "MinimumNodeServiceWithDiagnostics.h"
+#include "CanServiceWithDiagnostics.h"
 #include "SerialUserInterface.h"
 
 // constants
@@ -40,8 +40,8 @@ VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::SerialUserInterface serialUserInterface(&can2515);
-VLCB::MinimumNodeService mnService;
-VLCB::CanService canService(&can2515);
+VLCB::MinimumNodeServiceWithDiagnostics mnService;
+VLCB::CanServiceWithDiagnostics canService(&can2515);
 VLCB::Controller controller(&modconfig,
                             {&mnService, &ledUserInterface, &serialUserInterface, &canService}); // Controller object
 

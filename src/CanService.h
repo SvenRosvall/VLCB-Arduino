@@ -26,13 +26,10 @@ public:
 
   virtual void process(const Action * action) override;
 
-  virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
-  virtual void reportAllDiagnostics(byte serviceIndex) override;
-
-private:
-
+protected:
   CanTransport * canTransport;
 
+private:
   void handleCanServiceMessage(const VlcbMessage *msg);
   void handleEnumeration(unsigned int nn);
   void handleSetCANID(const VlcbMessage *msg, unsigned int nn);

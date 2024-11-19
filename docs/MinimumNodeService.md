@@ -69,6 +69,10 @@ the MinimumNode Service Document, the CBUS(R) Developers Guide and the FCU user 
 module developer's and users responsibility to ensure that any software setup tool meets these
 requirements.
 
+## Diagnostics
+
+Diagnostics is optional and can be enabled by using the class ```MinimumNodeServiceWithDiagnostics```.
+
 ## Operational Op-Codes
 
 The following Op-Codes are used when a module is in Normal Mode:
@@ -135,6 +139,9 @@ services supported.  It will then send an OPC_DGN for each of those services.
 If the Service Index is greater than zero, then a single OPC_DGN(0xAC) will be sent relating
 to that specific service.
 
+This OP-code is only available when using the diagnostics enabled service
+class ```MinimumNodeServiceWithDiagnostics```.
+
 ## User Sketch
 
 A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
@@ -161,7 +168,6 @@ VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::MinimumNodeService mnService;
 VLCB::Controller controller( &modconfig, ledUserInterface,
                             { &mnService }); // Controller object
-
 
 setup()
 {

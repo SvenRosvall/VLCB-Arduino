@@ -127,6 +127,21 @@ LEDUserInterface
 It will be possible to implement new user interfaces that make use of, for example, an OLED screen or simply
 use the USB connection for serial communication.
 
+## Diagnostics
+
+Diagnostics are optional. 
+The implementation of diagnostics uses substantial amount of memory which
+might not be available in smaller processors.
+This library provides a choice to enable or omit diagnostics by using a
+variation of service classes.
+
+The services listed above do not have diagnostics included.
+To enable diagnostics choose service classes with a "WithDiagnostics" suffix.
+E.g. The CAN service class ```CanService``` does not provide diagnostics
+while the class ```CanServiceWithDiagnostics``` does provide diagnostics.
+
+Note: Not all services have a diagnostics enabled counterpart yet.
+
 ## User Sketch
 
 A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
