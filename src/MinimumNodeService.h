@@ -39,7 +39,7 @@ private:
   VlcbModeParams instantMode;
   
   void checkModeChangeTimeout();
-  void initSetup();
+  void initSetupFromUninitialised();
   void initSetupFromNormal();
 
   void heartbeat();
