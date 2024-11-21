@@ -20,7 +20,7 @@ std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 std::unique_ptr<VLCB::EventProducerService> eventProducerService;
 static std::unique_ptr<MockTransportService> mockTransportService;
 
-VLCB::Controller createController()
+VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
 {
   minimumNodeService.reset(new VLCB::MinimumNodeService);
 
@@ -28,7 +28,7 @@ VLCB::Controller createController()
 
   eventProducerService.reset(new VLCB::EventProducerService);
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
+  VLCB::Controller controller = ::createController(startupMode, {minimumNodeService.get(), eventProducerService.get(), mockTransportService.get()});
   controller.begin();
 
   return controller;
@@ -193,10 +193,7 @@ void testSetProducedDefaultEventsOnNewBoard()
 {
   test();
 
-  VLCB::Controller controller = createController();
-
-  // Set module into Uninitialized mode to get unitialized memory.
-  minimumNodeService->setUninitialised();
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
 
   controller.begin();
 

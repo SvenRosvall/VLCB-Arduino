@@ -24,7 +24,7 @@ std::unique_ptr<VLCB::MinimumNodeServiceWithDiagnostics> minimumNodeService;
 // Use MockCanTransport to test CanTransport class.
 std::unique_ptr<MockCanTransport> mockCanTransport;
 
-VLCB::Controller createController()
+VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
 {
   minimumNodeService.reset(new VLCB::MinimumNodeServiceWithDiagnostics);
 
@@ -33,7 +33,7 @@ VLCB::Controller createController()
   static std::unique_ptr<VLCB::CanServiceWithDiagnostics> canService;
   canService.reset(new VLCB::CanServiceWithDiagnostics(mockCanTransport.get()));
 
-  VLCB::Controller controller = ::createController({minimumNodeService.get(), canService.get()});
+  VLCB::Controller controller = ::createController(startupMode, {minimumNodeService.get(), canService.get()});
   controller.begin();
 
   return controller;
@@ -90,8 +90,7 @@ void testCanidEnumerationOnUserAction()
 {
   test();
 
-  VLCB::Controller controller = createController();
-  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
   // Check that CANID is unset on creation.
@@ -121,8 +120,7 @@ void testCanidEnumerationOnSetUp()
 {
   test();
 
-  VLCB::Controller controller = createController();
-  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
 
   // Check that CANID is unset on creation.
   assertEquals(0, controller.getModuleCANID());
@@ -235,8 +233,7 @@ void testFindFreeCanidOnPopulatedBus()
 {
   test();
 
-  VLCB::Controller controller = createController();
-  minimumNodeService->setUninitialised(); // Clear all state as if module is factory fresh.
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
   // Check that CANID is unset on creation.
