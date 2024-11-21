@@ -23,7 +23,7 @@ void MinimumNodeService::begin()
 //
 /// initiate the transition from Uninitialised to Normal mode
 //
-void MinimumNodeService::initSetup()
+void MinimumNodeService::initSetupFromUninitialised()
 {
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
@@ -71,10 +71,19 @@ void MinimumNodeService::setUninitialised()
 //
 void MinimumNodeService::initSetupFromNormal()
 {
-  // DEBUG_SERIAL << F("> reverting to Uninitialised mode") << endl;
+  // DEBUG_SERIAL << F("> reverting to Setup mode") << endl;
   requestingNewNN = true;
   controller->sendMessageWithNN(OPC_NNREL);
-  initSetup();
+  // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
+
+  instantMode = MODE_SETUP;
+  controller->indicateMode(MODE_SETUP);
+  timeOutTimer = millis();
+  
+  // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
+  controller->sendMessageWithNN(OPC_RQNN);
+
+  // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << controller->getModuleConfig()->nodeNum << endl;
 }
 
 //
@@ -126,7 +135,7 @@ void MinimumNodeService::process(const Action *action)
         switch (controller->getModuleConfig()->currentMode)
         {
         case MODE_UNINITIALISED:
-          initSetup();
+          initSetupFromUninitialised();
           break;
            
         case MODE_NORMAL:
@@ -139,9 +148,23 @@ void MinimumNodeService::process(const Action *action)
         break;
       
       case ACT_RENEGOTIATE:
-        switch (controller->getModuleConfig()->currentMode)
+        switch (instantMode)
         {
         case MODE_UNINITIALISED:
+          break;
+          
+        case MODE_SETUP:
+          // Cancel setup and revert to previous mode.
+          instantMode = controller->getModuleConfig()->currentMode;
+          controller->indicateMode(instantMode);
+
+          if (requestingNewNN)
+          {
+            // Revert to previous NN   
+            requestingNewNN = false;
+            controller->sendMessageWithNN(OPC_NNACK);
+          }
+            
           break;
            
         case MODE_NORMAL:
