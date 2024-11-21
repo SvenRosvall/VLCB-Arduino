@@ -139,9 +139,22 @@ void MinimumNodeService::process(const Action *action)
         break;
       
       case ACT_RENEGOTIATE:
-        switch (controller->getModuleConfig()->currentMode)
+        switch (instantMode)
         {
         case MODE_UNINITIALISED:
+          break;
+          
+        case MODE_SETUP:
+          instantMode = controller->getModuleConfig()->currentMode;
+          controller->indicateMode(instantMode);
+
+          if (requestingNewNN)
+          {
+            // Revert to previous NN   
+            requestingNewNN = false;
+            controller->sendMessageWithNN(OPC_NNACK);
+          }
+            
           break;
            
         case MODE_NORMAL:
