@@ -112,7 +112,7 @@ void LEDUserInterface::checkRequestedAction()
       unsigned long press_time = pushButton.getLastStateDuration();
       //Serial << F("  button released, pressed for ") << pushButton.getLastStateDuration() << endl; Serial.flush();
 
-      // long hold > 6 secs
+      // long hold > 4 secs
       if (press_time > SW_TR_HOLD)
       {
         //Serial << F("  long press - change mode") << endl;

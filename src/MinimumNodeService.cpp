@@ -59,7 +59,10 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
-  controller->sendMessageWithNN(OPC_NNREL);  // release node number first
+  if (controller->getModuleConfig()->nodeNum != 0)
+  {
+    controller->sendMessageWithNN(OPC_NNREL);  // release node number first
+  }
   controller->getModuleConfig()->setModuleUninitializedMode();
   controller->getModuleConfig()->setCANID(0);
 
