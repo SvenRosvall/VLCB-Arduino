@@ -107,7 +107,6 @@ void testUninitializedRequestNodeNumberMissingSNN()
   process(controller);
 
   assertEquals(0, mockTransportService->sent_messages.size());
-  //assertEquals(OPC_NNACK, mockTransportService->sent_frames[0].data[0]);
 
   assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_UNINITIALISED, configuration->currentMode);
@@ -176,12 +175,36 @@ void testNormalRequestNodeNumberMissingSNN()
   assertEquals(0x104, configuration->nodeNum);
 }
 
-void testReleaseNodeNumberByUI()
+void testNormalChangeModeToUninitialized()
+{
+  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
+
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // User requests to change mode.
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0x0, configuration->nodeNum);
+}
+
+void testNormalChangeModeToSetup()
 {
   test();
 
   VLCB::Controller controller = createController();
 
+  // User requests to enter Setup mode.
   controller.putAction({VLCB::ACT_RENEGOTIATE});
 
   process(controller);
@@ -190,7 +213,6 @@ void testReleaseNodeNumberByUI()
   assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-
   assertEquals(OPC_RQNN, mockTransportService->sent_messages[1].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
@@ -202,7 +224,27 @@ void testReleaseNodeNumberByUI()
   assertEquals(0x104, configuration->nodeNum);
 }
 
-void testRequestNodeNumberElsewhere()
+void testSetupFromUninitializedReceiveRequestNodeNumberElsewhere()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
+  minimumNodeService->setSetupMode();
+
+  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNN, 0x02, 0x07}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // Expect module to not respond, but to change to non-setup mode.
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // TODO: Need a better way of determining the instantMode.
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+}
+
+void testSetupFromNormalReceiveRequestNodeNumberElsewhere()
 {
   test();
 
@@ -216,6 +258,44 @@ void testRequestNodeNumberElsewhere()
 
   // Expect module to not respond, but to change to non-setup mode.
 
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // TODO: Need a better way of determining the instantMode.
+  assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
+}
+
+void testSetupFromUninitializedAbort()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
+  minimumNodeService->setSetupMode();
+
+  controller.putAction({VLCB::ACT_RENEGOTIATE});
+
+  process(controller);
+
+  // Expect module to not respond, but to change to non-setup mode.
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // TODO: Need a better way of determining the instantMode.
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+}
+
+void testSetupFromNormalAbort()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  controller.putAction({VLCB::ACT_RENEGOTIATE});
+
+  process(controller);
+
+  // Expect module to not respond, but to change to non-setup mode.
+  // TODO Question: Shouldn't this reclaim NN with NNACK?
   assertEquals(0, mockTransportService->sent_messages.size());
 
   // TODO: Need a better way of determining the instantMode.
@@ -943,6 +1023,25 @@ void testModeNormalToSetup()
   assertEquals(0x104, configuration->nodeNum);
 }
 
+void testModeUninitializedToSetup()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
+
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  // TODO Question: Should the node respond to this?
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_MODE, mockTransportService->sent_messages[0].data[5]);
+}
+
 void testModeUninitializedToOtherThanSetup()
 {
   test();
@@ -954,6 +1053,7 @@ void testModeUninitializedToOtherThanSetup()
 
   process(controller);
 
+  // TODO Question: Should the node respond to this?
   assertEquals(1, mockTransportService->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
   assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
@@ -1025,8 +1125,12 @@ void testMinimumNodeService()
   testUninitializedRequestNodeNumberMissingSNN();
   testNormalRequestNodeNumber();
   testNormalRequestNodeNumberMissingSNN();
-  testReleaseNodeNumberByUI();
-  testRequestNodeNumberElsewhere();
+  testNormalChangeModeToUninitialized();
+  testNormalChangeModeToSetup();
+  testSetupFromUninitializedReceiveRequestNodeNumberElsewhere();
+  testSetupFromNormalReceiveRequestNodeNumberElsewhere();
+  testSetupFromUninitializedAbort();
+  testSetupFromNormalAbort();
   testSetNodeNumber();
   testSetNodeNumberNormal();
   testSetNodeNumberShort();
@@ -1057,6 +1161,7 @@ void testMinimumNodeService()
   testModeSetupToNormal();
   testModeSetupToUnininitialized();
   testModeNormalToSetup();
+  testModeUninitializedToSetup();
   testModeUninitializedToOtherThanSetup();
   testModeSetupToOtherThanNormal();
   testModeNormalToNormal();
