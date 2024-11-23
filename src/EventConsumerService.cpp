@@ -33,6 +33,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
   {
     if (eventhandler != nullptr)
     {
+      ++diagEventsConsumed;
       (void)(*eventhandler)(index, msg);
     }
   }

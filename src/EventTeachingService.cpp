@@ -425,6 +425,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
 
       // Note that the op-code spec only lists WRACK as successful response.
       controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+      ++diagEventsTaught;
       return;
     }
   }     
@@ -471,6 +472,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   
   // Note that the op-code spec only lists WRACK as successful response.
   controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
+  ++diagEventsTaught;
 }
 
 void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
@@ -525,6 +527,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
         // respond with WRACK
         controller->sendWRACK();  // Deprecated in favour of GRSP_OK
         controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
+        ++diagEventsTaught;
       }
     }
   }

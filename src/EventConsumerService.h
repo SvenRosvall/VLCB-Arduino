@@ -30,9 +30,12 @@ public:
 
 private:
   void (*eventhandler)(byte index, const VlcbMessage *msg) = nullptr;
-
-  void processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
   void handleConsumedMessage(const VlcbMessage *msg);
+  void processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);  
+  
+protected:
+  unsigned int diagEventsConsumed = 0;
+
 };
 
 }  // VLCB
