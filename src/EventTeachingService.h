@@ -42,6 +42,9 @@ private:
   void handleLearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
   void handleLearnEventIndex(const VlcbMessage *msg);
   void handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en);
+    
+protected:
+  unsigned int diagEventsTaught = 0;
 };
 
 }  // VLCB

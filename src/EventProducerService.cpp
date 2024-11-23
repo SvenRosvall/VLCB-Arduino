@@ -141,6 +141,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
   VlcbMessage msg;
   msg.len = 5;
   sendMessage(msg, opCode, nn_en);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
@@ -163,7 +164,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
   msg.len = 6;
   msg.data[5] = data1;
   sendMessage(msg, opCode, nn_en);
-
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
@@ -187,6 +188,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   msg.data[5] = data1;
   msg.data[6] = data2;
   sendMessage(msg, opCode, nn_en);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
@@ -211,6 +213,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
   msg.data[6] = data2;
   msg.data[7] = data3;
   sendMessage(msg, opCode, nn_en);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg) 

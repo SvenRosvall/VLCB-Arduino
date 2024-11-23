@@ -39,14 +39,18 @@ public:
 
 private:
   void (*requesteventhandler)(byte index, const VlcbMessage *msg);
-
   void handleProdSvcMessage(const VlcbMessage *msg);
+  
   void setProducedEvents();
   byte createDefaultEvent(byte evValue);
   void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);
   void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
 
   bool uninit = false;
+  
+protected:
+  unsigned int diagEventsProduced = 0;
+
 };
 
 }  // VLCB
