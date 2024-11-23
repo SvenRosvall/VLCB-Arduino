@@ -1060,7 +1060,7 @@ void testModeUninitializedToSetup()
   assertEquals(0, mockTransportService->sent_messages.size());
 }
 
-void testModeUninitializedToOtherThanSetup()
+void testModeUninitializedToNormal()
 {
   test();
 
@@ -1074,7 +1074,21 @@ void testModeUninitializedToOtherThanSetup()
   assertEquals(0, mockTransportService->sent_messages.size());
 }
 
-void testModeSetupToOtherThanNormal()
+void testModeUninitializedToUninitialized()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
+
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+}
+
+void testModeSetupToSetup()
 {
   test();
 
@@ -1176,8 +1190,9 @@ void testMinimumNodeService()
   testModeSetupToUnininitialized();
   testModeNormalToSetup();
   testModeUninitializedToSetup();
-  testModeUninitializedToOtherThanSetup();
-  testModeSetupToOtherThanNormal();
+  testModeUninitializedToNormal();
+  testModeUninitializedToUninitialized();
+  testModeSetupToSetup();
   testModeNormalToNormal();
   testModeShortMessage();
 }

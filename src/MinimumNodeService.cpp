@@ -473,7 +473,6 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
           break;
       
         default:
-          controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
           break;
       }
       break;
