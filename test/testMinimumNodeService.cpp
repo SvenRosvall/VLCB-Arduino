@@ -946,7 +946,7 @@ void testRequestMnsDiagnosticsNodeNumberChanges()
   assertEquals(1, mockTransportService->sent_messages[0].data[6]);
 }
 
-void testModeSetupToNormal()
+void testModeSetupFromUninitializedToNormal()
 {
   test();
 
@@ -967,6 +967,29 @@ void testModeSetupToNormal()
   assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0, configuration->nodeNum);
+}
+
+void testModeSetupFromNormalToNormal()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_NORMAL);
+  minimumNodeService->setSetupMode();
+
+  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(GRSP_INVALID_MODE, mockTransportService->sent_messages[0].data[5]);
+
+  assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_NORMAL, configuration->currentMode);
+  assertEquals(0x104, configuration->nodeNum);
 }
 
 void testModeSetupToUnininitialized()
@@ -1034,12 +1057,7 @@ void testModeUninitializedToSetup()
 
   process(controller);
 
-  // TODO Question: Should the node respond to this?
-  assertEquals(1, mockTransportService->sent_messages.size());
-  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
-  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
-  assertEquals(GRSP_INVALID_MODE, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(0, mockTransportService->sent_messages.size());
 }
 
 void testModeUninitializedToOtherThanSetup()
@@ -1053,12 +1071,7 @@ void testModeUninitializedToOtherThanSetup()
 
   process(controller);
 
-  // TODO Question: Should the node respond to this?
-  assertEquals(1, mockTransportService->sent_messages.size());
-  assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
-  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
-  assertEquals(GRSP_INVALID_MODE, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(0, mockTransportService->sent_messages.size());
 }
 
 void testModeSetupToOtherThanNormal()
@@ -1158,7 +1171,8 @@ void testMinimumNodeService()
   testRequestAllDiagnosticsAllServices();
   testRequestMnsDiagnosticsUptime();
   testRequestMnsDiagnosticsNodeNumberChanges();
-  testModeSetupToNormal();
+  testModeSetupFromUninitializedToNormal();
+  testModeSetupFromNormalToNormal();
   testModeSetupToUnininitialized();
   testModeNormalToSetup();
   testModeUninitializedToSetup();

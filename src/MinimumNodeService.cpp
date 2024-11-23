@@ -480,26 +480,36 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
 
     case MODE_SETUP:
       // Request Setup
-      if (instantMode == MODE_NORMAL)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-        initSetupFromNormal();
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetupFromNormal();
+          break;
+
+        case MODE_SETUP:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          break;
+
+        default:
+          break;
       }
       break;
       
     case MODE_NORMAL:
       // Request Normal. Only OK if we are already in Normal mode.
-      if (instantMode == MODE_NORMAL)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          break;
+
+        case MODE_SETUP:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          break;
+
+        default:
+          break;
       }
       break;
 
