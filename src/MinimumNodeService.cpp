@@ -59,7 +59,10 @@ void MinimumNodeService::setUninitialised()
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
   requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
-  controller->sendMessageWithNN(OPC_NNREL);  // release node number first
+  if (controller->getModuleConfig()->nodeNum != 0)
+  {
+    controller->sendMessageWithNN(OPC_NNREL);  // release node number first
+  }
   controller->getModuleConfig()->setModuleUninitializedMode();
   controller->getModuleConfig()->setCANID(0);
 
@@ -470,33 +473,42 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
           break;
       
         default:
-          controller->sendGRSP(OPC_MODE, getServiceID(), CMDERR_INV_CMD);
           break;
       }
       break;
 
     case MODE_SETUP:
       // Request Setup
-      if (instantMode == MODE_NORMAL)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-        initSetupFromNormal();
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          initSetupFromNormal();
+          break;
+
+        case MODE_SETUP:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          break;
+
+        default:
+          break;
       }
       break;
       
     case MODE_NORMAL:
       // Request Normal. Only OK if we are already in Normal mode.
-      if (instantMode == MODE_NORMAL)
+      switch (instantMode)
       {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
-      }
-      else
-      {
-        controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+        case MODE_NORMAL:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_OK);
+          break;
+
+        case MODE_SETUP:
+          controller->sendGRSP(OPC_MODE, getServiceID(), GRSP_INVALID_MODE);
+          break;
+
+        default:
+          break;
       }
       break;
 

@@ -36,14 +36,21 @@ VLCB::Configuration * createConfiguration(VLCB::Storage * mockStorage)
 
 VLCB::Controller createController(const std::initializer_list<VLCB::Service *> services)
 {
+  return createController(MODE_NORMAL, services);
+}
+
+VLCB::Controller createController(VlcbModeParams startupMode, const std::initializer_list<VLCB::Service *> services)
+{
   // Use pointers to objects to create the controller with.
   // Use unique_ptr so that next invocation deletes the previous objects.
 
   configuration.reset(createConfiguration());
 
   VLCB::Controller controller(configuration.get(), services);
-
-  configuration->setModuleNormalMode(0x0104);
+  if (startupMode == MODE_NORMAL)
+  {
+    configuration->setModuleNormalMode(0x0104);
+  }
   static std::unique_ptr<VLCB::Parameters> params;
   params.reset(new VLCB::Parameters(*configuration));
   params->setVersion(1, 1, 'a');
