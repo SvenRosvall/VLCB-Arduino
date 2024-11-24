@@ -27,14 +27,19 @@ void MinimumNodeService::initSetupFromUninitialised()
 {
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
+  // enumerate the CAN bus to allocate a free CAN ID
+  Action action = {ACT_START_CAN_ENUMERATION, false };
+  controller->putAction(action);
+
+  initSetupCommon();
+}
+
+void MinimumNodeService::initSetupCommon()
+{
   instantMode = MODE_SETUP;
   controller->indicateMode(MODE_SETUP);
 
   timeOutTimer = millis();
-  
-  // enumerate the CAN bus to allocate a free CAN ID
-  Action action = {ACT_START_CAN_ENUMERATION, false };
-  controller->putAction(action);
 
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
@@ -57,20 +62,18 @@ void MinimumNodeService::setNormal(unsigned int nn)
 void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
-  requestingNewNN = false;
-  instantMode = MODE_UNINITIALISED;
   if (controller->getModuleConfig()->nodeNum != 0)
   {
     controller->sendMessageWithNN(OPC_NNREL);  // release node number first
   }
+  requestingNewNN = false;
+  instantMode = MODE_UNINITIALISED;
   controller->getModuleConfig()->setModuleUninitializedMode();
-  controller->getModuleConfig()->setCANID(0);
-
   controller->indicateMode(MODE_UNINITIALISED);
 }
 
 //
-/// revert from Normal to Uninitialised mode
+/// request new node number
 //
 void MinimumNodeService::initSetupFromNormal()
 {
@@ -79,14 +82,7 @@ void MinimumNodeService::initSetupFromNormal()
   controller->sendMessageWithNN(OPC_NNREL);
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
-  instantMode = MODE_SETUP;
-  controller->indicateMode(MODE_SETUP);
-  timeOutTimer = millis();
-  
-  // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
-  controller->sendMessageWithNN(OPC_RQNN);
-
-  // DEBUG_SERIAL << F("> requesting NN with RQNN message for NN = ") << controller->getModuleConfig()->nodeNum << endl;
+  initSetupCommon();
 }
 
 //
