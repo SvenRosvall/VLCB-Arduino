@@ -4,7 +4,7 @@ and must be implemented by concrete service classes.
 
 The VLCB system is configured with a set of services that implement the functionality
 needed by the VLCB module.
-A list of services provided in this VLCB library are listed in the section [Provided Services](#provided-services).
+A list of services provided in this VLCB library are listed in the section [Provided Services](#services-provided-in-this-vlcb-library).
 
 User defined services are encouraged to implement new functionality that is not covered
 by the provided services
