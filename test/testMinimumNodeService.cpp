@@ -195,9 +195,11 @@ void testSetupFromNormalAbort()
 
   process(controller);
 
-  // Expect module to not respond, but to change to non-setup mode.
-  // TODO Question: Shouldn't this reclaim NN with NNACK?
-  assertEquals(0, mockTransportService->sent_messages.size());
+  // Expect module to revert back to NORMAL and reclaim its node number.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NNACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
 
   // TODO: Need a better way of determining the instantMode.
   assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
