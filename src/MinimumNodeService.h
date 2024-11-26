@@ -34,7 +34,6 @@ public:
 
 private:
 
-  bool requestingNewNN = false;
   VlcbModeParams instantMode;
   
   void initSetupFromUninitialised();
