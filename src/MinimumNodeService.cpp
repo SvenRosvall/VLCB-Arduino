@@ -246,7 +246,6 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       //4F - reset to manufacturer's defaults 
       if (isThisNodeNumber(nn))
       {        
-        controller->sendMessageWithNN(OPC_NNREL);  // release node number first
         module_config->resetModule();        
       }
       break;
