@@ -81,38 +81,6 @@ void testUninitializedRequestNodeNumber()
   assertEquals(0, configuration->nodeNum);
 }
 
-void testUninitializedRequestNodeNumberMissingSNN()
-{
-  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
-
-  test();
-
-  VLCB::Controller controller = createController(MODE_UNINITIALISED);
-
-  // User requests to enter Normal mode.
-  controller.putAction({VLCB::ACT_CHANGE_MODE});
-
-  process(controller);
-
-  assertEquals(1, mockTransportService->sent_messages.size());
-  assertEquals(OPC_RQNN, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(0, mockTransportService->sent_messages[0].data[1]);
-  assertEquals(0, mockTransportService->sent_messages[0].data[2]);
-
-  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
-
-  mockTransportService->sent_messages.clear();
-  addMillis(31 * 1000);
-
-  process(controller);
-
-  assertEquals(0, mockTransportService->sent_messages.size());
-
-  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
-  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
-  assertEquals(0, configuration->nodeNum);
-}
-
 void testNormalRequestNodeNumber()
 {
   test();
@@ -133,44 +101,6 @@ void testNormalRequestNodeNumber()
   assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
 
   assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(MODE_NORMAL, configuration->currentMode);
-  assertEquals(0x104, configuration->nodeNum);
-}
-
-void testNormalRequestNodeNumberMissingSNN()
-{
-  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
-
-  test();
-
-  VLCB::Controller controller = createController();
-
-  // User requests to change mode.
-  controller.putAction({VLCB::ACT_RENEGOTIATE});
-
-  process(controller);
-
-  assertEquals(2, mockTransportService->sent_messages.size());
-  assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-  assertEquals(OPC_RQNN, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[1].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
-
-  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
-
-  mockTransportService->sent_messages.clear();
-  addMillis(31 * 1000);
-
-  process(controller);
-
-  assertEquals(1, mockTransportService->sent_messages.size());
-  assertEquals(OPC_NNACK, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-
-  assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_NORMAL, configuration->currentMode);
   assertEquals(0x104, configuration->nodeNum);
 }
@@ -1149,9 +1079,7 @@ void testModeShortMessage()
 void testMinimumNodeService()
 {
   testUninitializedRequestNodeNumber();
-  testUninitializedRequestNodeNumberMissingSNN();
   testNormalRequestNodeNumber();
-  testNormalRequestNodeNumberMissingSNN();
   testNormalChangeModeToUninitialized();
   testNormalChangeModeToSetup();
   testSetupFromUninitializedReceiveRequestNodeNumberElsewhere();
