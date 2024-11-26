@@ -41,6 +41,7 @@ private:
   void checkModeChangeTimeout();
   void initSetupFromUninitialised();
   void initSetupFromNormal();
+  void initSetupCommon();
 
   void heartbeat();
   

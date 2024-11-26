@@ -74,6 +74,7 @@ void Configuration::setModuleUninitializedMode()
 {
   setModuleMode(MODE_UNINITIALISED);
   setNodeNum(0);
+  setCANID(0);
 }
 
 void Configuration::setModuleNormalMode(unsigned int nodeNumber)
