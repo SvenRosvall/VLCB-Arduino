@@ -77,8 +77,6 @@ void MinimumNodeService::initSetupFromNormal()
 {
   // DEBUG_SERIAL << F("> reverting to Setup mode") << endl;
   requestingNewNN = true;
-  controller->sendMessageWithNN(OPC_NNREL);
-  // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
   initSetupCommon();
 }
