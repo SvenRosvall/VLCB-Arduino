@@ -35,10 +35,8 @@ public:
 private:
 
   bool requestingNewNN = false;
-  unsigned long timeOutTimer;
   VlcbModeParams instantMode;
   
-  void checkModeChangeTimeout();
   void initSetupFromUninitialised();
   void initSetupFromNormal();
   void initSetupCommon();

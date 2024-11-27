@@ -39,8 +39,6 @@ void MinimumNodeService::initSetupCommon()
   instantMode = MODE_SETUP;
   controller->indicateMode(MODE_SETUP);
 
-  timeOutTimer = millis();
-
   // send RQNN message with current NN, which may be zero if a virgin/Uninitialised node
   controller->sendMessageWithNN(OPC_RQNN);
 
@@ -83,27 +81,6 @@ void MinimumNodeService::initSetupFromNormal()
   // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
 
   initSetupCommon();
-}
-
-//
-/// check 30 sec timeout for MODE_CHANGE negotiation with FCU
-//
-void MinimumNodeService::checkModeChangeTimeout()
-{
-  if (instantMode == MODE_SETUP && ((millis() - timeOutTimer) >= 30000)) 
-  {
-    // Revert to previous mode.
-    // DEBUG_SERIAL << F("> timeout expired, currentMode = ") << instantMode << F(", saved mode = ") << controller->getModuleConfig()->currentMode << endl;
-    instantMode = controller->getModuleConfig()->currentMode;
-    controller->indicateMode(instantMode);
-
-    if (requestingNewNN)
-    {
-      // Renegotiating timed out.  Revert to previous NN   
-      requestingNewNN = false;
-      controller->sendMessageWithNN(OPC_NNACK);
-    }
-  }
 }
 
 void MinimumNodeService::heartbeat()
@@ -184,7 +161,6 @@ void MinimumNodeService::process(const Action *action)
     }
   }
 
-  checkModeChangeTimeout();
   heartbeat();
 }
 
@@ -526,7 +502,6 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
 void MinimumNodeService::setSetupMode()
 {
   instantMode = MODE_SETUP;
-  timeOutTimer = 0;
 }
 
 }
