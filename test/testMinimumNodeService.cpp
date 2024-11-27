@@ -794,30 +794,26 @@ void testRequestMnsDiagnosticsUptime()
   VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 2}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
-
-  // Verify sent messages.
-  assertEquals(1, mockTransportService->sent_messages.size());
-  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
-  assertEquals(2, mockTransportService->sent_messages[0].data[4]);
-  unsigned long uptime = (mockTransportService->sent_messages[0].data[5] << 24)
-          + (mockTransportService->sent_messages[0].data[6] << 16);
-
   // Request lower word of uptime
-  mockTransportService->sent_messages.clear();
   msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 3}};
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
 
   // Verify sent messages.
-  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(2, mockTransportService->sent_messages.size());
+
   assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
   assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
-  assertEquals(3, mockTransportService->sent_messages[0].data[4]);
-  uptime += (mockTransportService->sent_messages[0].data[5] << 8)
-            + (mockTransportService->sent_messages[0].data[6]);
+  assertEquals(2, mockTransportService->sent_messages[0].data[4]);
+  unsigned long uptime = (mockTransportService->sent_messages[0].data[5] << 24)
+                         + (mockTransportService->sent_messages[0].data[6] << 16);
+
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[1].data[3]);
+  assertEquals(3, mockTransportService->sent_messages[1].data[4]);
+  uptime += (mockTransportService->sent_messages[1].data[5] << 8)
+            + (mockTransportService->sent_messages[1].data[6]);
 
   assertEquals(123456, uptime);
 }
@@ -835,7 +831,7 @@ void testRequestMnsDiagnosticsNodeNumberChanges()
   process(controller);
   mockTransportService->sent_messages.clear();
 
-  // Request upper word of uptime
+  // Request node number changes
   msg_rqsd = {5, {OPC_RDGN, 0x02, 0x07, SERVICE_ID_MNS, 5}};
   mockTransportService->setNextMessage(msg_rqsd);
 
