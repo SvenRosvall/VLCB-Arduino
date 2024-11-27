@@ -92,13 +92,10 @@ void testNormalRequestNodeNumber()
 
   process(controller);
 
-  assertEquals(2, mockTransportService->sent_messages.size());
-  assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_RQNN, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-  assertEquals(OPC_RQNN, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[1].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
 
   assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_NORMAL, configuration->currentMode);
@@ -126,32 +123,6 @@ void testNormalChangeModeToUninitialized()
   assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_UNINITIALISED, configuration->currentMode);
   assertEquals(0x0, configuration->nodeNum);
-}
-
-void testNormalChangeModeToSetup()
-{
-  test();
-
-  VLCB::Controller controller = createController();
-
-  // User requests to enter Setup mode.
-  controller.putAction({VLCB::ACT_RENEGOTIATE});
-
-  process(controller);
-
-  assertEquals(2, mockTransportService->sent_messages.size());
-  assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
-  assertEquals(OPC_RQNN, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[1].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
-
-  assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
-  assertEquals(MODE_NORMAL, configuration->currentMode);
-
-  // Module will hold on to node number in case setup times out.
-  assertEquals(0x104, configuration->nodeNum);
 }
 
 void testSetupFromUninitializedReceiveRequestNodeNumberElsewhere()
@@ -224,9 +195,11 @@ void testSetupFromNormalAbort()
 
   process(controller);
 
-  // Expect module to not respond, but to change to non-setup mode.
-  // TODO Question: Shouldn't this reclaim NN with NNACK?
-  assertEquals(0, mockTransportService->sent_messages.size());
+  // Expect module to revert back to NORMAL and reclaim its node number.
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NNACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
 
   // TODO: Need a better way of determining the instantMode.
   assertEquals(MODE_NORMAL, mockUserInterface->getIndicatedMode());
@@ -956,20 +929,16 @@ void testModeNormalToSetup()
 
   process(controller);
 
-  assertEquals(3, mockTransportService->sent_messages.size());
+  assertEquals(2, mockTransportService->sent_messages.size());
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[0].data[0]);
   assertEquals(OPC_MODE, mockTransportService->sent_messages[0].data[3]);
   assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[4]);
   assertEquals(GRSP_OK, mockTransportService->sent_messages[0].data[5]);
   // NN should be 0.
 
-  assertEquals(OPC_NNREL, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(OPC_RQNN, mockTransportService->sent_messages[1].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[1].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[1].data[2]);
-
-  assertEquals(OPC_RQNN, mockTransportService->sent_messages[2].data[0]);
-  assertEquals(0x01, mockTransportService->sent_messages[2].data[1]);
-  assertEquals(0x04, mockTransportService->sent_messages[2].data[2]);
 
   assertEquals(MODE_SETUP, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_NORMAL, configuration->currentMode);
@@ -1081,7 +1050,6 @@ void testMinimumNodeService()
   testUninitializedRequestNodeNumber();
   testNormalRequestNodeNumber();
   testNormalChangeModeToUninitialized();
-  testNormalChangeModeToSetup();
   testSetupFromUninitializedReceiveRequestNodeNumberElsewhere();
   testSetupFromNormalReceiveRequestNodeNumberElsewhere();
   testSetupFromUninitializedAbort();

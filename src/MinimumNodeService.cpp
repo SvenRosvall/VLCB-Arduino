@@ -48,7 +48,6 @@ void MinimumNodeService::initSetupCommon()
 void MinimumNodeService::setNormal(unsigned int nn)
 {
   // DEBUG_SERIAL << F("> set Normal") << endl;
-  requestingNewNN = false;
   instantMode = MODE_NORMAL;
   controller->getModuleConfig()->setModuleNormalMode(nn);
   controller->indicateMode(MODE_NORMAL);
@@ -64,7 +63,6 @@ void MinimumNodeService::setUninitialised()
   {
     controller->sendMessageWithNN(OPC_NNREL);  // release node number first
   }
-  requestingNewNN = false;
   instantMode = MODE_UNINITIALISED;
   controller->getModuleConfig()->setModuleUninitializedMode();
   controller->indicateMode(MODE_UNINITIALISED);
@@ -76,10 +74,6 @@ void MinimumNodeService::setUninitialised()
 void MinimumNodeService::initSetupFromNormal()
 {
   // DEBUG_SERIAL << F("> reverting to Setup mode") << endl;
-  requestingNewNN = true;
-  controller->sendMessageWithNN(OPC_NNREL);
-  // DEBUG_SERIAL << F("> initiating Normal negotation") << endl;
-
   initSetupCommon();
 }
 
@@ -134,10 +128,9 @@ void MinimumNodeService::process(const Action *action)
           instantMode = controller->getModuleConfig()->currentMode;
           controller->indicateMode(instantMode);
 
-          if (requestingNewNN)
+          if (controller->getModuleConfig()->nodeNum != 0)
           {
             // Revert to previous NN   
-            requestingNewNN = false;
             controller->sendMessageWithNN(OPC_NNACK);
           }
             
