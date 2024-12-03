@@ -95,7 +95,6 @@ public:
   void process();
   void indicateMode(VlcbModeParams mode);
   void indicateActivity();
-  void setLearnMode(byte reqMode);
   
   void putAction(const Action & action);
   void putAction(ACTION action);
