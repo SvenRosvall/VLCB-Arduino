@@ -109,6 +109,7 @@ void MinimumNodeService::process(const Action *action)
           break;
            
         case MODE_NORMAL:
+        case MODE_SETUP:
           setUninitialised();
           break;
            
