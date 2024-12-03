@@ -127,7 +127,7 @@ void Configuration::setNodeNum(unsigned int nn)
 //
 /// lookup an event by node number and event number, using the hash table
 //
-byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
+byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
 {
   byte tarray[EE_HASH_BYTES];
 
@@ -161,7 +161,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en)
 /// find the first empty EEPROM event slot - the hash table entry == 0
 //
 
-byte Configuration::findEventSpace()
+byte Configuration::findEventSpace() const
 {
   byte evidx;
 
@@ -177,7 +177,7 @@ byte Configuration::findEventSpace()
   return evidx;
 }
 
-byte Configuration::findExistingEventByEv(byte evnum, byte evval)
+byte Configuration::findExistingEventByEv(byte evnum, byte evval) const
 {
   byte i;
   for (i = 0; i < EE_MAX_EVENTS; i++)
@@ -193,7 +193,7 @@ byte Configuration::findExistingEventByEv(byte evnum, byte evval)
 //
 /// create a hash from a 4-byte event entry array -- NN + EN
 //
-byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
+byte Configuration::makeHash(byte tarr[EE_HASH_BYTES]) const
 {
   // make a hash from a 4-byte NN + EN event
   unsigned int nn = getTwoBytes(&tarr[0]);
@@ -215,7 +215,7 @@ byte Configuration::makeHash(byte tarr[EE_HASH_BYTES])
 /// return an existing EEPROM event as a 4-byte array -- NN + EN
 //
 
-void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES])
+void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES]) const
 {
   // populate the array with the first 4 bytes (NN + EN) of the event entry from the EEPROM
   for (byte i = 0; i < EE_HASH_BYTES; i++)
@@ -228,7 +228,7 @@ void Configuration::readEvent(byte idx, byte tarr[EE_HASH_BYTES])
 
 // return the address an event variable is stored in the eeprom.
 // Note that the evnum is 1 based and needs to be converted to 0 based.
-unsigned int Configuration::getEVAddress(byte idx, byte evnum)
+unsigned int Configuration::getEVAddress(byte idx, byte evnum) const
 {
   return EE_EVENTS_START + (idx * EE_BYTES_PER_EVENT) + EE_HASH_BYTES + evnum - 1;
 }
@@ -236,7 +236,7 @@ unsigned int Configuration::getEVAddress(byte idx, byte evnum)
 //
 /// return an event variable (EV) value given the event table index and EV number
 //
-byte Configuration::getEventEVval(byte idx, byte evnum)
+byte Configuration::getEventEVval(byte idx, byte evnum) const
 {
   return storage->read(getEVAddress(idx, evnum));
 }
@@ -345,7 +345,7 @@ void Configuration::printEvHashTable(bool raw)
 //
 /// return the number of stored events
 //
-byte Configuration::numEvents()
+byte Configuration::numEvents() const
 {
   byte numevents = 0;
 
@@ -363,7 +363,7 @@ byte Configuration::numEvents()
 //
 /// return a single hash table entry by index
 //
-byte Configuration::getEvTableEntry(byte tindex)
+byte Configuration::getEvTableEntry(byte tindex) const
 {
   if (tindex < EE_MAX_EVENTS)
   {
@@ -379,7 +379,7 @@ byte Configuration::getEvTableEntry(byte tindex)
 /// read an NV value from EEPROM
 /// note that NVs number from 1, not 0
 //
-byte Configuration::readNV(byte idx)
+byte Configuration::readNV(byte idx) const
 {
   return (storage->read(EE_NVS_START + (idx - 1)));
 }
