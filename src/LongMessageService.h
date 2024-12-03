@@ -51,8 +51,8 @@ public:
   void setDelay(byte delay_in_millis);
   void setTimeout(unsigned int timeout_in_millis);
 
-  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_STREAMING; }
-  virtual byte getServiceVersionID() override { return 1; }
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_STREAMING; }
+  virtual byte getServiceVersionID() const override { return 1; }
 
 protected:
 

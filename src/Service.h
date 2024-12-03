@@ -24,8 +24,8 @@ protected:
 public:
   void setController(Controller * ctrl) { this->controller = ctrl; }
   virtual void begin() {}
-  virtual VlcbServiceTypes getServiceID() = 0;
-  virtual byte getServiceVersionID() = 0;
+  virtual VlcbServiceTypes getServiceID() const = 0;
+  virtual byte getServiceVersionID() const = 0;
 
   virtual void process(const Action * action) = 0;
 
