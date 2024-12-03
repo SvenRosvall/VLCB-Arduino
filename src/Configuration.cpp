@@ -101,7 +101,7 @@ void Configuration::setEventAck(bool ea)
 {
   eventAck = ea;
   byte servicePersist = storage->read(LOCATION_FLAGS);
-  bitWrite(servicePersist, HEARTBEAT_BIT, ea);
+  bitWrite(servicePersist, EVENT_ACK_BIT, ea);
   storage->write(LOCATION_FLAGS, servicePersist);
 }
 
