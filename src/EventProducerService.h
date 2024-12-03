@@ -10,7 +10,6 @@
 
 namespace VLCB {
 
-class Configuration;
 struct VlcbMessage;
 
 class EventProducerService : public Service {

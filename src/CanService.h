@@ -12,7 +12,6 @@
 namespace VLCB
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class CanService : public Service

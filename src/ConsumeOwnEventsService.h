@@ -10,8 +10,6 @@
 
 namespace VLCB {
 
-class Configuration;
-
 class ConsumeOwnEventsService : public Service
 {
 public:

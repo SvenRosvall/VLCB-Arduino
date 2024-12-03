@@ -11,7 +11,6 @@
 namespace VLCB
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class MinimumNodeService : public Service

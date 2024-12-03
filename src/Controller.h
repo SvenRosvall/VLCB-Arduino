@@ -11,7 +11,6 @@
 
 #include <SPI.h>
 
-#include <Configuration.h>
 #include <Transport.h>
 #include "initializer_list.h"
 #include "ArrayHolder.h"
@@ -20,6 +19,8 @@
 
 namespace VLCB
 {
+
+class Configuration;
 
 //
 /// CAN/Controller message type

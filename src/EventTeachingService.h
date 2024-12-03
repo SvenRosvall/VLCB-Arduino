@@ -11,7 +11,6 @@
 namespace VLCB 
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class EventTeachingService : public Service 
