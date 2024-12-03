@@ -59,7 +59,7 @@ void MinimumNodeService::setNormal(unsigned int nn)
 void MinimumNodeService::setUninitialised()
 {
   // DEBUG_SERIAL << F("> set Uninitialised") << endl;
-  if (controller->getModuleConfig()->nodeNum != 0)
+  if (controller->getModuleConfig()->nodeNum != 0  && instantMode == MODE_NORMAL)
   {
     controller->sendMessageWithNN(OPC_NNREL);  // release node number first
   }
@@ -102,7 +102,7 @@ void MinimumNodeService::process(const Action *action)
     switch (action->actionType)
     {
       case ACT_CHANGE_MODE:
-        switch (controller->getModuleConfig()->currentMode)
+        switch (instantMode)
         {
         case MODE_UNINITIALISED:
           initSetupFromUninitialised();
