@@ -60,7 +60,7 @@ VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
   return controller;
 }
 
-void testUninitializedRequestNodeNumber()
+void testUninitializedChangeModeToSetup()
 {
   test();
 
@@ -104,8 +104,6 @@ void testNormalRequestNodeNumber()
 
 void testNormalChangeModeToUninitialized()
 {
-  // Send an NNACK if no SNN received within 30 seconds from RENEGOTIATE action.
-
   test();
 
   VLCB::Controller controller = createController();
@@ -119,6 +117,44 @@ void testNormalChangeModeToUninitialized()
   assertEquals(OPC_NNREL, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
   assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0x0, configuration->nodeNum);
+}
+
+void testSetupFromUninitializedChangeModeToUninitialized()
+{
+  test();
+
+  VLCB::Controller controller = createController(MODE_UNINITIALISED);
+  minimumNodeService->setSetupMode();
+
+  // User requests to change mode.
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
+  assertEquals(MODE_UNINITIALISED, configuration->currentMode);
+  assertEquals(0x0, configuration->nodeNum);
+}
+
+void testSetupFromNormalChangeModeToUninitialized()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  minimumNodeService->setSetupMode();
+
+  // User requests to change mode.
+  controller.putAction({VLCB::ACT_CHANGE_MODE});
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
 
   assertEquals(MODE_UNINITIALISED, mockUserInterface->getIndicatedMode());
   assertEquals(MODE_UNINITIALISED, configuration->currentMode);
@@ -1043,9 +1079,11 @@ void testModeShortMessage()
 
 void testMinimumNodeService()
 {
-  testUninitializedRequestNodeNumber();
+  testUninitializedChangeModeToSetup();
   testNormalRequestNodeNumber();
   testNormalChangeModeToUninitialized();
+  testSetupFromUninitializedChangeModeToUninitialized();
+  testSetupFromNormalChangeModeToUninitialized();
   testSetupFromUninitializedReceiveRequestNodeNumberElsewhere();
   testSetupFromNormalReceiveRequestNodeNumberElsewhere();
   testSetupFromUninitializedAbort();
