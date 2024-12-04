@@ -51,6 +51,8 @@ private:
   void handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
   void handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
   void handleModeMessage(const VlcbMessage *msg, unsigned int nn);
+  
+  void messageActedOn() { ++diagMsgsActed; }
 
 protected:
   virtual void handleMessage(const VlcbMessage *msg);

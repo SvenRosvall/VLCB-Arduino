@@ -881,6 +881,40 @@ void testRequestMnsDiagnosticsNodeNumberChanges()
   assertEquals(1, mockTransportService->sent_messages[0].data[6]);
 }
 
+void testRequestMnsDiagnosticsMessagesActedOn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send some messages that MNS will act on.
+  VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
+  mockTransportService->setNextMessage(msg_rqsd);
+  msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 3}};
+  mockTransportService->setNextMessage(msg_rqsd);
+  msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 5}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  // Process them
+  process(controller);
+  // Ignore any responses
+  mockTransportService->sent_messages.clear();
+
+
+  // Get the message acted on count
+  msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 6}};
+  mockTransportService->setNextMessage(msg_rqsd);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_DGN, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(SERVICE_ID_MNS, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(6, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(3, mockTransportService->sent_messages[0].data[6]);
+}
+
 void testModeSetupFromUninitializedToNormal()
 {
   test();
@@ -1115,6 +1149,7 @@ void testMinimumNodeService()
   testRequestAllDiagnosticsAllServices();
   testRequestMnsDiagnosticsUptime();
   testRequestMnsDiagnosticsNodeNumberChanges();
+  testRequestMnsDiagnosticsMessagesActedOn();
   testModeSetupFromUninitializedToNormal();
   testModeSetupFromNormalToNormal();
   testModeSetupToUnininitialized();
