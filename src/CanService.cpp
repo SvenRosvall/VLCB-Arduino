@@ -73,21 +73,23 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
 {
   // DEBUG_SERIAL << F("> CANID for nn = ") << nn << F(" with new CANID = ") << msg->data[3] << endl;
 
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
-    byte newCANID = msg->data[3];
-    if (newCANID < 1 || newCANID > 99)
-    {
-      controller->sendCMDERR(CMDERR_INV_EN_IDX);
-      controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
-    }
-    else
-    {
-      controller->getModuleConfig()->setCANID(newCANID);
-      controller->sendWRACK();
-      controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
-    }
+    return;
+  }
+
+  // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
+  byte newCANID = msg->data[3];
+  if (newCANID < 1 || newCANID > 99)
+  {
+    controller->sendCMDERR(CMDERR_INV_EN_IDX);
+    controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
+  }
+  else
+  {
+    controller->getModuleConfig()->setCANID(newCANID);
+    controller->sendWRACK();
+    controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
   }
 }
 

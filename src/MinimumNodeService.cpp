@@ -284,35 +284,37 @@ void MinimumNodeService::handleRequestNodeParameters()
 
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 4)
+    return;
+  }
+
+  if (msg->len < 4)
+  {
+    controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_CMD);
+  }
+  else
+  {
+    byte paran = msg->data[3];
+
+    //DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
+
+    if (paran == 0)
     {
-      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_CMD);
+      for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
+      {
+        controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
+      }
+    }
+    else if (paran <= controller->getParam(PAR_NUM))
+    {
+      controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
     }
     else
     {
-      byte paran = msg->data[3];
-
-      //DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
-
-      if (paran == 0)
-      {
-        for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
-        {
-          controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
-        }
-      }
-      else if (paran <= controller->getParam(PAR_NUM))
-      {
-        controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
-      }
-      else
-      {
-        // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
-        controller->sendCMDERR(CMDERR_INV_PARAM_IDX);
-        controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
-      }
+      // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
+      controller->sendCMDERR(CMDERR_INV_PARAM_IDX);
+      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
     }
   }
 }
@@ -358,52 +360,53 @@ static int countServices(const VLCB::ArrayHolder<Service *> &services)
 
 void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 4)
-    {
-      controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_CMD);
-      return;
-    }
+    return;
+  }
+  if (msg->len < 4)
+  {
+    controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
 
-    byte serviceIndex = msg->data[3];
-    if (serviceIndex == 0)
-    {
-      // Request for summary of services. First a service count
-      int serviceCount = countServices(controller->getServices());
-      controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
+  byte serviceIndex = msg->data[3];
+  if (serviceIndex == 0)
+  {
+    // Request for summary of services. First a service count
+    int serviceCount = countServices(controller->getServices());
+    controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
 
-      // and then details of each service.
-      byte svcIndex = 0;
-      for (auto svc: controller->getServices())
+    // and then details of each service.
+    byte svcIndex = 0;
+    for (auto svc: controller->getServices())
+    {
+      ++svcIndex;
+      if (svc->getServiceID() > 0)
       {
-        ++svcIndex;
-        if (svc->getServiceID() > 0)
-        {
-          // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
-          controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
-        }
+        // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
+        controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
       }
     }
-    else if (serviceIndex <= controller->getServices().size())
+  }
+  else if (serviceIndex <= controller->getServices().size())
+  {
+    // Request for details of a single service.
+    Service *theService = controller->getServices()[serviceIndex - 1];
+    if (theService->getServiceID() == 0)
     {
-      // Request for details of a single service.
-      Service *theService = controller->getServices()[serviceIndex - 1];
-      if (theService->getServiceID() == 0)
-      {
-        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
-      }
-      else
-      {
-        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
-      }
+      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }
     else
     {
-      Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
-      // Couldn't find the service.
-      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
     }
+  }
+  else
+  {
+    Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
+    // Couldn't find the service.
+    controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
   }
 }
 
