@@ -28,7 +28,7 @@ If the MERG Kit 110 CAN Shield is used, the following pins are connected by defa
 
 Pin | Description
 --- | ---
-Digital pin 2 | Interupt CAN
+Digital pin 2 | Interrupt CAN
 Digital pin 10| (SS)    CS    CAN
 Digital pin 11| (MOSI)  SI    CAN
 Digital pin 12| (MISO)  SO    CAN
@@ -43,7 +43,7 @@ Digital pin 7 | VLCB Yellow LED
 Digital pin 8 | VLCB Switch
 
 **It is the users responsibility that the total current that the Arduino is asked to supply 
-stays within the capacity of the on board regulator.  Failure to do this will result in 
+stays within the capacity of the on-board regulator.  Failure to do this will result in 
 terminal damage to your Arduino.**
 
 Pins defined as inputs are active low.  That is to say that they are pulled up by an 
@@ -124,9 +124,9 @@ learn mode.
 A module can also be taught a short event or, indeed, a spoof event. This is
 easily done using any of the normal FCU teach techniques.  For example, a short
 event can be dragged from the Software Node and dropped onto the VLCB4in4out in
-the Node Window.  When the event variable dialgue opens, put the index number of
+the Node Window.  When the event variable dialogue opens, put the index number of
 the switch to be associated with the event in EV1 and press OK.  The selected
-switch will now generate that short event (but see FCU Anomolies below).
+switch will now generate that short event (but see [FCU Anomalies](#fcu-anomalies) below).
 
 If a switch default has been unlearnt and that switch not been assigned to an
 event by the FCU, operation of the switch will result in a new default event
@@ -170,7 +170,7 @@ The module is initialised by pressing the VLCB button (formerly CBUS button) for
 6 seconds when the green LED goes off and the Yellow LED flashes. A module name and
 Node Number can then be set via the FCU in the normal manner.
 
-## FCU Anomolies
+## FCU Anomalies
 
 Whilst the FCU will show newly taught events, if these re-assign a switch, as when
 teaching a short event, it will not, for some reason, remove the now gone original

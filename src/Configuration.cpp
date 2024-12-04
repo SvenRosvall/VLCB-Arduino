@@ -254,10 +254,9 @@ void Configuration::writeEventEV(byte idx, byte evnum, byte evval)
 //
 void Configuration::makeEvHashTable()
 {
-  byte evarray[EE_HASH_BYTES];
-
   // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
+  // TODO: Check for null return. Don't call updateEvHashEntry in that case.
   evhashtbl = (byte *)malloc(EE_MAX_EVENTS * sizeof(byte));
 
   for (byte idx = 0; idx < EE_MAX_EVENTS; idx++)

@@ -64,7 +64,7 @@ process, the module will send error codes to the FCU indicating the point in the
 problem arose.  If the FCU doesn't respond within 30 seconds, the module will revert to
 Uninitialised Mode. 
 
-This process using the FCU follows a defined comunication sequence. This sequence is defined in
+This process using the FCU follows a defined communication sequence. This sequence is defined in
 the MinimumNode Service Document, the CBUS(R) Developers Guide and the FCU user guide.  It is the
 module developer's and users responsibility to ensure that any software setup tool meets these
 requirements.
@@ -81,7 +81,7 @@ The following Op-Codes are used when a module is in Normal Mode:
 
 Requests an OPC_PNN response.  This is a broadcast message and so will elicit a response from
 every node on the network.  The OPC_QNN(0xB6) response is the Node Number (2 bytes), 
-the Manufacturers ID (1 byte), the ModuleID )1 byte) and the Module Flags (1 byte).  The flags
+the Manufacturers ID (1 byte), the ModuleID (1 byte) and the Module Flags (1 byte).  The flags
 are specified in the vlcbdefs.h file
 
 ### Reset to Manufacturers Defaults - OPC_NNRSM(0x4F)
@@ -91,12 +91,12 @@ manufacturer's default settings.
 
 ### Software Reset - OPC_NNRST(0x5E)
 
-Resets the module's microprocessr without changing any settings.
+Resets the module's microprocessor without changing any settings.
 
 ### Request Node Parameters by Index - OPC_RQNPN(0x73)
 
 Sends a OPC_PARAN(0x9B) with the specific parameter value requested.  The exception is
-if the parameter inex is zero in which case a PARAN message is sent with the numebr of 
+if the parameter index is zero in which case a PARAN message is sent with the number of 
 parameters available followed by a sequence of PARAN messages, one for each available
 parameter.
 
@@ -110,15 +110,15 @@ Controller will offer it, in sequence, to other services.
 
 The following command values are used by the Minimum Node Service:
 
-|    Value     |   Type    |        Request Command        |
-|--------------|-----------|-------------------------------|
-|    0xFF      | Exclusive | Change to Unitialised Request |
-|    0x00      | State     | Change to Setup Request       |
-|    0x01      | Changes   | Change to Normal Mode         |
-| 0x02 to 0x07 |           | Reserved                      |
-|--------------|-----------|-------------------------------|
-|    0x0C      | Service   | Turn on Heartbeat             |
-|    0x0D      | Usage     | Turn off Heartbeat            |
+|    Value     |   Type    | Request Command                 |
+|--------------|-----------|---------------------------------|
+|    0xFF      | Exclusive | Change to Uninitialised Request |
+|    0x00      | State     | Change to Setup Request         |
+|    0x01      | Changes   | Change to Normal Mode           |
+| 0x02 to 0x07 |           | Reserved                        |
+|--------------|-----------| ------------------------------- |
+|    0x0C      | Service   | Turn on Heartbeat               |
+|    0x0D      | Usage     | Turn off Heartbeat              |
 
 Service Usage Command Code Turn on Heartbeat will cause a OPC_HEARTB(0xAB) to be sent every
 5000mS.  Turn of Heartbeat will stop the transmission of OPC_HEARTB.

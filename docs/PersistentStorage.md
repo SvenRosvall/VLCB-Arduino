@@ -33,7 +33,7 @@ by EE_NUM_EVS. The bytes in the Event structure are:
 | 4      | Event Variable 1 |
 | ...    | Any further EVs  |
 
-The total number of bytes for each events are calculated and available in EE_BYTES_PER_EVENT.
+The total number of bytes for each event are calculated and available in EE_BYTES_PER_EVENT.
 There is storage available for EE_MAX_EVENTS events. 
 Event data is starting at address EE_EVENTS_START and uses 
 (EE_MAX_EVENTS * EE_BYTES_PER_EVENT) bytes.

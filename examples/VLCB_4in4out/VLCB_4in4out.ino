@@ -1,25 +1,17 @@
 // VLCB_4in4out
 
-
 /*
   Copyright (C) 2023 Martin Da Costa
-  //  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
-//  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-//  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
+  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
+  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
-/*
-      3rd party libraries needed for compilation: (not for binary-only distributions)
+  3rd party libraries needed for compilation: (not for binary-only distributions)
 
-      Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
+  Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
+  ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
 */
 
-/*
-      3rd party libraries needed for compilation:
-
-      Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
-*/
 ///////////////////////////////////////////////////////////////////////////////////
 // Pin Use map UNO:
 // Digital pin 2          Interupt CAN
@@ -177,7 +169,6 @@ void setupVLCB()
 
 void setupModule()
 {
-  unsigned int nodeNum = modconfig.nodeNum;
   // configure the module switches, active low
   for (byte i = 0; i < NUM_SWITCHES; i++)
   {
