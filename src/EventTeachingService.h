@@ -11,7 +11,6 @@
 namespace VLCB 
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class EventTeachingService : public Service 
@@ -19,8 +18,8 @@ class EventTeachingService : public Service
 public:
   virtual void process(const Action * action) override;
 
-  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_OLD_TEACH; }
-  virtual byte getServiceVersionID() override { return 1; }
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }
+  virtual byte getServiceVersionID() const override { return 1; }
 
   void enableLearn();
   void inhibitLearn();

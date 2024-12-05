@@ -20,8 +20,8 @@ class LEDUserInterface : public Service
 public:
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 
-  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_HIDDEN; };
-  virtual byte getServiceVersionID() override { return 1; };
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_HIDDEN; };
+  virtual byte getServiceVersionID() const override { return 1; };
 
   bool isButtonPressed();
   virtual void process(const Action *action) override;

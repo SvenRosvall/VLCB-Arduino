@@ -11,7 +11,6 @@
 namespace VLCB
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class NodeVariableService : public Service
@@ -19,8 +18,8 @@ class NodeVariableService : public Service
 
 public:
 
-  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_NV; }
-  virtual byte getServiceVersionID() override { return 1; }
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NV; }
+  virtual byte getServiceVersionID() const override { return 1; }
   virtual void process(const Action * action) override;
 
 private:

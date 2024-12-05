@@ -10,17 +10,15 @@
 
 namespace VLCB {
 
-class Configuration;
-
 class ConsumeOwnEventsService : public Service
 {
 public:
-  virtual VlcbServiceTypes getServiceID() override
+  virtual VlcbServiceTypes getServiceID() const override
   {
     return SERVICE_ID_CONSUME_OWN_EVENTS;
   }
   
-  virtual byte getServiceVersionID() override
+  virtual byte getServiceVersionID() const override
   {
     return 1;
   }

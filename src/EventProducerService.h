@@ -10,7 +10,6 @@
 
 namespace VLCB {
 
-class Configuration;
 struct VlcbMessage;
 
 class EventProducerService : public Service {
@@ -18,11 +17,11 @@ public:
   void setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
   virtual void process(const Action * action) override;
 
-  virtual VlcbServiceTypes getServiceID() override
+  virtual VlcbServiceTypes getServiceID() const override
   {
     return SERVICE_ID_PRODUCER;
   }
-  virtual byte getServiceVersionID() override
+  virtual byte getServiceVersionID() const override
   {
     return 1;
   }

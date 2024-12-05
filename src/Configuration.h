@@ -43,22 +43,22 @@ public:
   Configuration(Storage * theStorage);
   void begin();
 
-  byte findExistingEvent(unsigned int nn, unsigned int en);
-  byte findEventSpace();
-  byte findExistingEventByEv(byte evnum, byte evval);
+  byte findExistingEvent(unsigned int nn, unsigned int en) const;
+  byte findEventSpace() const;
+  byte findExistingEventByEv(byte evnum, byte evval) const;
 
   void printEvHashTable(bool raw);
-  byte getEvTableEntry(byte tindex);
-  byte numEvents();
+  byte getEvTableEntry(byte tindex) const;
+  byte numEvents() const;
   void updateEvHashEntry(byte idx);
   void clearEvHashTable();
-  byte getEventEVval(byte idx, byte evnum);
+  byte getEventEVval(byte idx, byte evnum) const;
   void writeEventEV(byte idx, byte evnum, byte evval);
 
-  byte readNV(byte idx);
+  byte readNV(byte idx) const;
   void writeNV(byte idx, byte val);
 
-  void readEvent(byte idx, byte tarr[EE_HASH_BYTES]);
+  void readEvent(byte idx, byte tarr[EE_HASH_BYTES]) const;
   void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
   void resetModule();
@@ -101,12 +101,12 @@ private:
   Storage * storage;
 
   void setModuleMode(VlcbModeParams m);
-  byte makeHash(byte tarr[EE_HASH_BYTES]);
+  byte makeHash(byte tarr[EE_HASH_BYTES]) const;
   void makeEvHashTable();
 
   void loadNVs();
 
-  unsigned int getEVAddress(byte idx, byte evnum);
+  unsigned int getEVAddress(byte idx, byte evnum) const;
 
   byte *evhashtbl;
 };

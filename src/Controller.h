@@ -11,7 +11,6 @@
 
 #include <SPI.h>
 
-#include <Configuration.h>
 #include <Transport.h>
 #include "initializer_list.h"
 #include "ArrayHolder.h"
@@ -20,6 +19,8 @@
 
 namespace VLCB
 {
+
+class Configuration;
 
 //
 /// CAN/Controller message type
@@ -65,17 +66,17 @@ public:
   Controller(std::initializer_list<Service *> services);
   Controller(Configuration *conf, std::initializer_list<Service *> services);
 
-  Configuration * getModuleConfig() { return module_config; }
+  Configuration * getModuleConfig() const { return module_config; }
 
   void setName(const unsigned char *mname);
-  const unsigned char *getModuleName() { return _mname; }
+  const unsigned char *getModuleName() const { return _mname; }
 
   const ArrayHolder<Service *> & getServices() { return services; }
 
   void setParams(VLCB::Parameters & params) { setParams( params.getParams()); }
   void setParams(unsigned char *mparams);
   void setParamFlag(VlcbParamFlags flag, bool set);
-  unsigned char getParam(unsigned int param) { return _mparams[param]; }
+  unsigned char getParam(unsigned int param) const { return _mparams[param]; }
 
   bool sendMessage(const VlcbMessage *msg);
 
@@ -90,11 +91,10 @@ public:
   bool sendCMDERR(byte cerrno);
   void sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode);
 
-  byte getModuleCANID() { return module_config->CANID; }
+  byte getModuleCANID() const { return module_config->CANID; }
   void process();
   void indicateMode(VlcbModeParams mode);
   void indicateActivity();
-  void setLearnMode(byte reqMode);
   
   void putAction(const Action & action);
   void putAction(ACTION action);

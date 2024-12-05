@@ -12,7 +12,6 @@
 namespace VLCB
 {
 
-class Configuration;
 struct VlcbMessage;
 
 class CanService : public Service
@@ -21,8 +20,8 @@ class CanService : public Service
 public:
   CanService(CanTransport * tpt) : canTransport(tpt) {}
 
-  virtual VlcbServiceTypes getServiceID() override { return SERVICE_ID_CAN; }
-  virtual byte getServiceVersionID() override { return 2; }
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_CAN; }
+  virtual byte getServiceVersionID() const override { return 2; }
 
   virtual void process(const Action * action) override;
 
