@@ -46,7 +46,7 @@ There is no need to bump up the version number for minor changes and bug fixes.
 
 process
 : This method that be called regularly. 
-It has a pointer to a Action that needs to be processed or a null pointer if there is
+It has a pointer to an Action that needs to be processed or a null pointer if there is
 no Action to be processed.
 Use this for any processing that needs to be performed now and then such as polling for
 changes of input pins.

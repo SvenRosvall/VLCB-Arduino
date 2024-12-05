@@ -14,7 +14,7 @@ via a storage object and a set of service objects.
 Services implement various groups of functionality within VLCB such as events or DCC control.
 The user sketch can select the set of services needed to provide the necessary functionality
 for the VLCB module that is created.
-There are also services for user interfaces and communication over different transports such as CAN, Wifi and BLE.
+There are also services for user interfaces and communication over different transports such as CAN, Wi-Fi and BLE.
 Currently only a CAN transport using the CAN2515 chip is included in the library.
 
 The library supports storage for node variables and event variables in EEPROM or Flash memory.
@@ -47,7 +47,7 @@ The ```EventConsumerService``` may react to consumed events by calling a user re
 the user sketch can act on this event for example to turn on an LED or move a servo.
 
 The user sketch may produce events that are managed by the ```EventProducerService``` object which then passes
-the event as a Action via the Controller to the transport object.
+the event as an Action via the Controller to the transport object.
 
 ### Dataflow
 Most of the VLCB functionality uses a message object ```VlcbMessage``` that passes incoming and
@@ -70,7 +70,7 @@ The Configuration object stores node variables (NV) and event variables(EV) and 
 that is required. It makes use of a storage object that has different implementations for different
 storage types. Not all Arduino modules have EEPROM or enough EEPROM, in which case external EEPROM or
 Flash memory can be used.
-See furter details in [Persistent Storage](PersistentStorage.md) documentation.
+See further details in [Persistent Storage](PersistentStorage.md) documentation.
 
 The configuration support is divided into a Configuration object that manages NVs and EVs.
 It provides functions that deal with these NVs and EVs. 
