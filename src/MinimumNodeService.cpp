@@ -262,57 +262,61 @@ void MinimumNodeService::handleRequestNodeParameters()
   // DEBUG_SERIAL << F("> RQNP -- request for node params during Normal transition for NN = ") << nn << endl;
 
   // only respond if we are in transition to Normal mode
-  if (instantMode == MODE_SETUP)
+  if (instantMode != MODE_SETUP)
   {
-    // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
-
-    // respond with PARAMS message
-    VlcbMessage response;
-    response.len = 8;
-    response.data[0] = OPC_PARAMS;    // opcode
-    response.data[1] = controller->getParam(PAR_MANU);     // manf code -- MERG
-    response.data[2] = controller->getParam(PAR_MINVER);     // minor code ver
-    response.data[3] = controller->getParam(PAR_MTYP);     // module ident
-    response.data[4] = controller->getParam(PAR_EVTNUM);     // number of events
-    response.data[5] = controller->getParam(PAR_EVNUM);     // events vars per event
-    response.data[6] = controller->getParam(PAR_NVNUM);     // number of NVs
-    response.data[7] = controller->getParam(PAR_MAJVER);     // major code ver
-
-    controller->sendMessage(&response);
+    return;
   }
+
+  // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
+
+  // respond with PARAMS message
+  VlcbMessage response;
+  response.len = 8;
+  response.data[0] = OPC_PARAMS;    // opcode
+  response.data[1] = controller->getParam(PAR_MANU);     // manf code -- MERG
+  response.data[2] = controller->getParam(PAR_MINVER);     // minor code ver
+  response.data[3] = controller->getParam(PAR_MTYP);     // module ident
+  response.data[4] = controller->getParam(PAR_EVTNUM);     // number of events
+  response.data[5] = controller->getParam(PAR_EVNUM);     // events vars per event
+  response.data[6] = controller->getParam(PAR_NVNUM);     // number of NVs
+  response.data[7] = controller->getParam(PAR_MAJVER);     // major code ver
+
+  controller->sendMessage(&response);
 }
 
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 4)
+    return;
+  }
+
+  if (msg->len < 4)
+  {
+    controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_CMD);
+  }
+  else
+  {
+    byte paran = msg->data[3];
+
+    //DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
+
+    if (paran == 0)
     {
-      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_CMD);
+      for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
+      {
+        controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
+      }
+    }
+    else if (paran <= controller->getParam(PAR_NUM))
+    {
+      controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
     }
     else
     {
-      byte paran = msg->data[3];
-
-      //DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
-
-      if (paran == 0)
-      {
-        for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
-        {
-          controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
-        }
-      }
-      else if (paran <= controller->getParam(PAR_NUM))
-      {
-        controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
-      }
-      else
-      {
-        // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
-        controller->sendCMDERR(CMDERR_INV_PARAM_IDX);
-        controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
-      }
+      // DEBUG_SERIAL << F("> RQNPN - param #") << paran << F(" is out of range !") << endl;
+      controller->sendCMDERR(CMDERR_INV_PARAM_IDX);
+      controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
     }
   }
 }
@@ -320,27 +324,28 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
 void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
 {      // DEBUG_SERIAL << F("> received SNN with NN = ") << nn << endl;
 
-  if (instantMode == MODE_SETUP)
+  if (instantMode != MODE_SETUP)
   {
-    if (msg->len < 3)
-    {
-      controller->sendGRSP(OPC_SNN, getServiceID(), CMDERR_INV_CMD);
-    }
-    else
-    {
-      // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
-
-      // we are now in Normal mode - update the configuration
-      setNormal(nn);
-      // DEBUG_SERIAL << F("> current mode = ") << controller->getModuleConfig()->currentMode << F(", node number = ") << controller->getModuleConfig()->nodeNum << F(", CANID = ") << controller->getModuleConfig()->CANID << endl;
-
-      // respond with NNACK
-      controller->sendMessageWithNN(OPC_NNACK);
-      // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->getModuleConfig()->nodeNum << endl;
-      
-      ++diagNodeNumberChanges;
-    }
+    return;
   }
+
+  if (msg->len < 3)
+  {
+    controller->sendGRSP(OPC_SNN, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
+
+  // DEBUG_SERIAL << F("> buf[1] = ") << msg->data[1] << ", buf[2] = " << msg->data[2] << endl;
+
+  // we are now in Normal mode - update the configuration
+  setNormal(nn);
+  // DEBUG_SERIAL << F("> current mode = ") << controller->getModuleConfig()->currentMode << F(", node number = ") << controller->getModuleConfig()->nodeNum << F(", CANID = ") << controller->getModuleConfig()->CANID << endl;
+
+  // respond with NNACK
+  controller->sendMessageWithNN(OPC_NNACK);
+  // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->getModuleConfig()->nodeNum << endl;
+  
+  ++diagNodeNumberChanges;
 }
 
 static int countServices(const VLCB::ArrayHolder<Service *> &services)
@@ -358,52 +363,54 @@ static int countServices(const VLCB::ArrayHolder<Service *> &services)
 
 void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    if (msg->len < 4)
-    {
-      controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_CMD);
-      return;
-    }
+    return;
+  }
 
-    byte serviceIndex = msg->data[3];
-    if (serviceIndex == 0)
-    {
-      // Request for summary of services. First a service count
-      int serviceCount = countServices(controller->getServices());
-      controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
+  if (msg->len < 4)
+  {
+    controller->sendGRSP(OPC_RQSD, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
 
-      // and then details of each service.
-      byte svcIndex = 0;
-      for (auto svc: controller->getServices())
+  byte serviceIndex = msg->data[3];
+  if (serviceIndex == 0)
+  {
+    // Request for summary of services. First a service count
+    int serviceCount = countServices(controller->getServices());
+    controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
+
+    // and then details of each service.
+    byte svcIndex = 0;
+    for (auto svc: controller->getServices())
+    {
+      ++svcIndex;
+      if (svc->getServiceID() > 0)
       {
-        ++svcIndex;
-        if (svc->getServiceID() > 0)
-        {
-          // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
-          controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
-        }
+        // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
+        controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
       }
     }
-    else if (serviceIndex <= controller->getServices().size())
+  }
+  else if (serviceIndex <= controller->getServices().size())
+  {
+    // Request for details of a single service.
+    Service *theService = controller->getServices()[serviceIndex - 1];
+    if (theService->getServiceID() == 0)
     {
-      // Request for details of a single service.
-      Service *theService = controller->getServices()[serviceIndex - 1];
-      if (theService->getServiceID() == 0)
-      {
-        controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
-      }
-      else
-      {
-        controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
-      }
+      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
     }
     else
     {
-      Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
-      // Couldn't find the service.
-      controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
     }
+  }
+  else
+  {
+    Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
+    // Couldn't find the service.
+    controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
   }
 }
 
