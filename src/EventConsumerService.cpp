@@ -34,6 +34,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
     if (eventhandler != nullptr)
     {
       ++diagEventsConsumed;
+      controller->messageActedOn();
       (void)(*eventhandler)(index, msg);
     }
   }
