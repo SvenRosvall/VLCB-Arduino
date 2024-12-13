@@ -196,7 +196,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       {
         instantMode = module_config->currentMode;
         controller->indicateMode(module_config->currentMode);
-        messageActedOn();
+        controller->messageActedOn();
       }
       break;
 
@@ -208,7 +208,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       {
         // DEBUG_SERIAL << ("> responding with PNN message") << endl;
         controller->sendMessageWithNN(OPC_PNN, controller->getParam(PAR_MANU), controller->getParam(PAR_MTYP), controller->getParam(PAR_FLAGS));
-        messageActedOn();
+        controller->messageActedOn();
       }
       break;
 
@@ -227,7 +227,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
         response.data[0] = OPC_NAME;
         memcpy(response.data + 1, controller->getModuleName(), 7);
         controller->sendMessage(&response);
-        messageActedOn();
+        controller->messageActedOn();
       }
       break;
 
@@ -247,7 +247,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       {        
         controller->sendMessageWithNN(OPC_NNREL);  // release node number first
         module_config->resetModule();
-        messageActedOn();
+        controller->messageActedOn();
       }
       break;
       
@@ -256,7 +256,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       if (isThisNodeNumber(nn))
       {
         module_config->reboot();
-        messageActedOn();
+        controller->messageActedOn();
       }
       break;
   }
@@ -287,7 +287,7 @@ void MinimumNodeService::handleRequestNodeParameters()
   response.data[7] = controller->getParam(PAR_MAJVER);     // major code ver
 
   controller->sendMessage(&response);
-  messageActedOn();
+  controller->messageActedOn();
 }
 
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
@@ -325,7 +325,7 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
       controller->sendGRSP(OPC_RQNPN, getServiceID(), CMDERR_INV_PARAM_IDX);
     }
   }
-  messageActedOn();
+  controller->messageActedOn();
 }
 
 void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn)
@@ -353,7 +353,7 @@ void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned in
   // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->getModuleConfig()->nodeNum << endl;
   
   ++diagNodeNumberChanges;
-  messageActedOn();
+  controller->messageActedOn();
 }
 
 static int countServices(const VLCB::ArrayHolder<Service *> &services)
@@ -420,7 +420,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     // Couldn't find the service.
     controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
   }
-  messageActedOn();
+  controller->messageActedOn();
 }
 
 void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int nn)
@@ -507,7 +507,7 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
       }
       break;
   }
-  messageActedOn();
+  controller->messageActedOn();
 }
 
 void MinimumNodeService::setSetupMode()

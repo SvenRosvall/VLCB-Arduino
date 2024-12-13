@@ -114,10 +114,12 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
     case 0x05: // Node Number changes
       controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
       break;
-    case 0x06: // Received messages acted on -- TODO: not implemented
-      // TODO: Need to increment diagMsgsActed in appropriate places.
+    case 0x06: // Received messages acted on 
+    {
+      unsigned int diagMsgsActed = controller->getMessagesActedOn();
       controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
       break;
+    }
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
       return;

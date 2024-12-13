@@ -100,6 +100,9 @@ public:
   void putAction(ACTION action);
   bool pendingAction();
 
+  void messageActedOn() { ++diagMsgsActed; }
+  unsigned int getMessagesActedOn() { return diagMsgsActed; }
+
 private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
@@ -111,6 +114,9 @@ private:
 
   bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(VlcbOpCodes opc, int len, ...);
+
+  // Really an MNS diagnostic but placed here as its data is collected across all services.
+  unsigned int diagMsgsActed = 0;
 };
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc)
