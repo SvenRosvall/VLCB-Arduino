@@ -417,7 +417,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   }
   
   byte index = module_config->findExistingEvent(nn, en);
-    
+  
   // Is this a produced event that we know about?
   // Search the events table by evnum = 1 for a value match with evval.
   if ((evnum == 1) && (evval > 0))
@@ -425,10 +425,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     byte indexEV1 = module_config->findExistingEventByEv(evnum, evval);
     if (indexEV1 < module_config->EE_MAX_EVENTS)
     {
-      // Ensure that we won't create multiple events for the evval
-      // Search for this NN, EN
-      byte index = module_config->findExistingEvent(nn, en);
-      if (index != index)
+      if (index != indexEV1)
       {
         // respond with error
         controller->sendCMDERR(CMDERR_INV_EV_VALUE);
