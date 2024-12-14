@@ -415,23 +415,23 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return;
   }
+  
+  byte index = module_config->findExistingEvent(nn, en);
+    
   // Is this a produced event that we know about?
   // Search the events table by evnum = 1 for a value match with evval.
   if ((evnum == 1) && (evval > 0))
   {
-    byte index = module_config->findExistingEventByEv(evnum, evval);
-    if (index < module_config->EE_MAX_EVENTS)
+    byte indexEV1 = module_config->findExistingEventByEv(evnum, evval);
+    if (indexEV1 < module_config->EE_MAX_EVENTS)
     {
       // Ensure that we won't create multiple events for the evval
       // Search for this NN, EN
-      byte indexNE = module_config->findExistingEvent(nn, en);
-      if (indexNE != index)
+      byte index = module_config->findExistingEvent(nn, en);
+      if (index != index)
       {
         // respond with error
-        controller->sendCMDERR(CMDERR_INV_EV_VALUE);  // Deprecated in favour of GRSP_OK
-        // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
-
-        // Note that the op-code spec only lists WRACK as successful response.
+        controller->sendCMDERR(CMDERR_INV_EV_VALUE);
         controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_VALUE);
         return;        
       }
@@ -440,8 +440,6 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
       
   // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
-  byte index = module_config->findExistingEvent(nn, en);
-
   // not found - it's a new event
   if (index >= module_config->EE_MAX_EVENTS)
   {
