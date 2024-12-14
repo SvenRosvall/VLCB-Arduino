@@ -427,7 +427,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
       byte indexNE = module_config->findExistingEvent(nn, en);
       if (indexNE != index)
       {
-        // respond with WRACK
+        // respond with error
         controller->sendCMDERR(CMDERR_INV_EV_VALUE);  // Deprecated in favour of GRSP_OK
         // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
 
