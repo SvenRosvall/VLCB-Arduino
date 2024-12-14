@@ -422,19 +422,19 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     byte index = module_config->findExistingEventByEv(evnum, evval);
     if (index < module_config->EE_MAX_EVENTS)
     {
-      module_config->writeEvent(index, &msg->data[1]);
-      // no need to write eventEV as, by definition, it hasn't changed
-      // recreate event hash table entry
-      module_config->updateEvHashEntry(index);
-      
-      // respond with WRACK
-      controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-      // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
+      // Ensure that we won't create multiple events for the evval
+      // Search for this NN, EN
+      byte indexNE = module_config->findExistingEvent(nn, en);
+      if (indexNE != index)
+      {
+        // respond with WRACK
+        controller->sendCMDERR(CMDERR_INV_EV_VALUE);  // Deprecated in favour of GRSP_OK
+        // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
 
-      // Note that the op-code spec only lists WRACK as successful response.
-      controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
-      ++diagEventsTaught;
-      return;
+        // Note that the op-code spec only lists WRACK as successful response.
+        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_VALUE);
+        return;        
+      }
     }
   }     
       
