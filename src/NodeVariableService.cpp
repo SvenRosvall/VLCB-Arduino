@@ -62,8 +62,10 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
   {
     controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_NV_IDX);
     controller->sendCMDERR(CMDERR_INV_NV_IDX);
+    return;
   }
-  else if (nvindex == 0)
+
+  if (nvindex == 0)
   {
     controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->EE_NUM_NVS);
 
@@ -129,16 +131,15 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
   {
     controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_NV_IDX);
     controller->sendCMDERR(CMDERR_INV_NV_IDX);
+    return;
   }
-  else
-  {
-    // update EEPROM for this NV -- NVs are indexed from 1, not zero
-    module_config->writeNV(msg->data[3], msg->data[4]);
 
-    // respond with NVANS
-    controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
-    // DEBUG_SERIAL << F("> set NV ok") << endl;
-  }
+  // update EEPROM for this NV -- NVs are indexed from 1, not zero
+  module_config->writeNV(msg->data[3], msg->data[4]);
+
+  // respond with NVANS
+  controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->readNV(nvindex));
+  // DEBUG_SERIAL << F("> set NV ok") << endl;
 }
 
 }

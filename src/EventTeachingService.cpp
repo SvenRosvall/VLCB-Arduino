@@ -151,61 +151,65 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
   // DEBUG_SERIAL << F("ets> EVULN for nn = ") << nn << F(", en = ") << en << endl;
 
   // we must be in learn mode
-  if (bLearn)
+  if (!bLearn)
   {
-    if (msg->len < 5)
-    {
-      controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_CMD);
-    }
-    else
-    {
-      // DEBUG_SERIAL << F("ets> searching for existing event to unlearn") << endl;
+    return;
+  }
 
-      // search for this NN and EN pair
-      Configuration *module_config = controller->getModuleConfig();
-      byte index = module_config->findExistingEvent(nn, en);
+  if (msg->len < 5)
+  {
+    controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
 
-      if (index < module_config->EE_MAX_EVENTS)
-      {
-        // DEBUG_SERIAL << F("ets> deleting event at index = ") << index << F(", evs ") << endl;
-        module_config->cleareventEEPROM(index);
+  // DEBUG_SERIAL << F("ets> searching for existing event to unlearn") << endl;
 
-        // update hash table
-        module_config->updateEvHashEntry(index);
+  // search for this NN and EN pair
+  Configuration *module_config = controller->getModuleConfig();
+  byte index = module_config->findExistingEvent(nn, en);
 
-        // respond with WRACK
-        controller->sendWRACK();
-        controller->sendGRSP(OPC_EVULN, getServiceID(), GRSP_OK);
-      }
-      else
-      {
-        // DEBUG_SERIAL << F("ets> did not find event to unlearn") << endl;
-        // respond with CMDERR
-        controller->sendCMDERR(CMDERR_INVALID_EVENT);
-        controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INVALID_EVENT);
-      }
-    }
-  }  // if in learn mode
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    // DEBUG_SERIAL << F("ets> did not find event to unlearn") << endl;
+    // respond with CMDERR
+    controller->sendCMDERR(CMDERR_INVALID_EVENT);
+    controller->sendGRSP(OPC_EVULN, getServiceID(), CMDERR_INVALID_EVENT);
+    return;
+  }
+
+  // DEBUG_SERIAL << F("ets> deleting event at index = ") << index << F(", evs ") << endl;
+  module_config->cleareventEEPROM(index);
+
+  // update hash table
+  module_config->updateEvHashEntry(index);
+
+  // respond with WRACK
+  controller->sendWRACK();
+  controller->sendGRSP(OPC_EVULN, getServiceID(), GRSP_OK);
 }
 
 void EventTeachingService::handleUnlearn(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NNULN for nn = ") << nn << endl;
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    inhibitLearn();
+    return;
   }
+
+  inhibitLearn();
 }
 
 void EventTeachingService::handleRequestEventCount(unsigned int nn)
 {
   // DEBUG_SERIAL << F("ets> RQEVN -- number of stored events for nn = ") << nn << endl;
 
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    // respond with 0x74 NUMEV
-    controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
+    return;
   }
+
+  // respond with 0x74 NUMEV
+  controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
 }
 
 void EventTeachingService::handleReadEvents(unsigned int nn)
@@ -254,23 +258,22 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
   {
     controller->sendCMDERR(CMDERR_INV_EN_IDX);
     controller->sendGRSP(OPC_NENRD, getServiceID(), CMDERR_INV_EN_IDX);
+    return;
   }
-  else
-  {
-    // it's a valid stored event
-    // read the event data from EEPROM
-    // construct and send a ENRSP message
-    VlcbMessage response;
-    response.len = 8;
-    response.data[0] = OPC_ENRSP;     // response opcode
-    response.data[1] = highByte(nn);  // my NN hi
-    response.data[2] = lowByte(nn);   // my NN lo
-    module_config->readEvent(eventIndex, &response.data[3]);
-    response.data[7] = eventIndex;  // event table index
 
-    // DEBUG_SERIAL << F("ets> sending ENRSP reply for event index = ") << eventIndex << endl;
-    controller->sendMessage(&response);
-  }
+  // it's a valid stored event
+  // read the event data from EEPROM
+  // construct and send a ENRSP message
+  VlcbMessage response;
+  response.len = 8;
+  response.data[0] = OPC_ENRSP;     // response opcode
+  response.data[1] = highByte(nn);  // my NN hi
+  response.data[2] = lowByte(nn);   // my NN lo
+  module_config->readEvent(eventIndex, &response.data[3]);
+  response.data[7] = eventIndex;  // event table index
+
+  // DEBUG_SERIAL << F("ets> sending ENRSP reply for event index = ") << eventIndex << endl;
+  controller->sendMessage(&response);
 }
 
 void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
@@ -337,34 +340,33 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
   {
     return;
   }
-  
-  if (bLearn)
-  {
-    // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 
-    Configuration *module_config = controller->getModuleConfig();
-    for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++)
-    {
-      module_config->cleareventEEPROM(e);
-    }
-
-    // recreate the hash table
-    module_config->clearEvHashTable();
-    // DEBUG_SERIAL << F("ets> cleared all events") << endl;
-    
-    if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
-    {
-      module_config->setResetFlag();
-    }
-
-    controller->sendWRACK();
-    controller->sendGRSP(OPC_NNCLR, getServiceID(), GRSP_OK);
-  }
-  else
+  if (!bLearn)
   {
     controller->sendCMDERR(CMDERR_NOT_LRN);
     controller->sendGRSP(OPC_NNCLR, getServiceID(), CMDERR_NOT_LRN);
+    return;
   }
+
+  // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
+
+  Configuration *module_config = controller->getModuleConfig();
+  for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++)
+  {
+    module_config->cleareventEEPROM(e);
+  }
+
+  // recreate the hash table
+  module_config->clearEvHashTable();
+  // DEBUG_SERIAL << F("ets> cleared all events") << endl;
+  
+  if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
+  {
+    module_config->setResetFlag();
+  }
+
+  controller->sendWRACK();
+  controller->sendGRSP(OPC_NNCLR, getServiceID(), GRSP_OK);
 }
 
 void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
@@ -498,57 +500,59 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
   //DEBUG_SERIAL << endl << F("ets> EVLRNI for source nn = ") << nn << endl;
 
   // we must be in learn mode
-  if (bLearn)
+  if (!bLearn)
   {
-    if (msg->len < 8)
-    {
-      controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_CMD);
-    }
-    else
-    {
-      byte index = msg->data[5];
-      byte evIndex = msg->data[6];
-      byte evVal = msg->data[7];
-
-      // invalid index
-      Configuration *module_config = controller->getModuleConfig();
-      if (index >= module_config->EE_MAX_EVENTS)
-      {
-        //DEBUG_SERIAL << F("> invalid index") << endl;
-        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EN_IDX);
-      }
-      else if ((evIndex == 0) || (evIndex > module_config->EE_NUM_EVS))  // Not a valid evIndex
-      {
-        controller->sendCMDERR(CMDERR_INV_EV_IDX);
-        controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
-      }
-      else
-      {
-        // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-        //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
-
-        // Writes the first four bytes NN & EN only if they have changed.
-        byte eventTableNNEN[4];
-        module_config->readEvent(index, eventTableNNEN);
-        if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
-        {
-          module_config->writeEvent(index, &msg->data[1]);
-          //DEBUG_SERIAL << F("ets> Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
-        }
-
-        module_config->writeEventEV(index, evIndex, evVal);
-
-        // recreate event hash table entry
-        //DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
-        module_config->updateEvHashEntry(index);
-
-        // respond with WRACK
-        controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-        controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
-        ++diagEventsTaught;
-      }
-    }
+    return;
   }
+
+  if (msg->len < 8)
+  {
+    controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_CMD);
+    return;
+  }
+
+  byte index = msg->data[5];
+  byte evIndex = msg->data[6];
+  byte evVal = msg->data[7];
+
+  // invalid index
+  Configuration *module_config = controller->getModuleConfig();
+  if (index >= module_config->EE_MAX_EVENTS)
+  {
+    //DEBUG_SERIAL << F("> invalid index") << endl;
+    controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EN_IDX);
+    return;
+  }
+  
+  if ((evIndex == 0) || (evIndex > module_config->EE_NUM_EVS))  // Not a valid evIndex
+  {
+    controller->sendCMDERR(CMDERR_INV_EV_IDX);
+    controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
+    return;
+  }
+
+  // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
+  //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
+
+  // Writes the first four bytes NN & EN only if they have changed.
+  byte eventTableNNEN[4];
+  module_config->readEvent(index, eventTableNNEN);
+  if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
+  {
+    module_config->writeEvent(index, &msg->data[1]);
+    //DEBUG_SERIAL << F("ets> Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
+  }
+
+  module_config->writeEventEV(index, evIndex, evVal);
+
+  // recreate event hash table entry
+  //DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
+  module_config->updateEvHashEntry(index);
+
+  // respond with WRACK
+  controller->sendWRACK();  // Deprecated in favour of GRSP_OK
+  controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
+  ++diagEventsTaught;
 }
 
 void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en)
