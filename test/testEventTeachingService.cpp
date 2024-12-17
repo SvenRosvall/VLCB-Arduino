@@ -785,7 +785,60 @@ void testUpdateProducedEventNNEN()
   assertEquals(OPC_EVLRN, mockTransportService->sent_messages[1].data[3]);
   assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[1].data[4]);
   assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[1].data[5]);
+}
 
+void testUpdateProducedEventNNENToExistingEvent()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Send NNLRN
+  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // Teach an event
+  // Data: OP, NN, EN, EV#, EV Value
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  // Teach a second event
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x09, 1, 43}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  // Update the NNEN of the first event but will clash with the second
+  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x09, 1, 42}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EV_VALUE, mockTransportService->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(OPC_EVLRN, mockTransportService->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EV_VALUE, mockTransportService->sent_messages[1].data[5]);
 }
 
 void testEnterLearnModeOldOtherNode()
@@ -1336,6 +1389,7 @@ void testEventTeachingService()
   testTeachEventIndexedAndClear();
   testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
   testUpdateProducedEventNNEN();
+  testUpdateProducedEventNNENToExistingEvent();
 
   // test error conditions.
   testEnterLearnModeOldOtherNode();
