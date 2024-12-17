@@ -415,33 +415,43 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
     return;
   }
+  
+  byte index = module_config->findExistingEvent(nn, en);
+  //DEBUG_SERIAL << F("> IndexNNEN: ") << index << endl;
+  
   // Is this a produced event that we know about?
   // Search the events table by evnum = 1 for a value match with evval.
   if ((evnum == 1) && (evval > 0))
   {
-    byte index = module_config->findExistingEventByEv(evnum, evval);
-    if (index < module_config->EE_MAX_EVENTS)
+    byte indexEV1 = module_config->findExistingEventByEv(evnum, evval);
+    //DEBUG_SERIAL << F("> IndexEV1: ") << indexEV1 << F(" EV1 value: ") << module_config->getEventEVval(indexEV1, 1) << endl;
+    
+    if (indexEV1 < module_config->EE_MAX_EVENTS)
     {
-      module_config->writeEvent(index, &msg->data[1]);
-      // no need to write eventEV as, by definition, it hasn't changed
-      // recreate event hash table entry
-      module_config->updateEvHashEntry(index);
-      
-      // respond with WRACK
-      controller->sendWRACK();  // Deprecated in favour of GRSP_OK
-      // DEBUG_SERIAL <<F("ets> WRACK sent") << endl;
-
-      // Note that the op-code spec only lists WRACK as successful response.
-      controller->sendGRSP(OPC_EVLRN, getServiceID(), GRSP_OK);
-      ++diagEventsTaught;
-      return;
+      if (index >= module_config->EE_MAX_EVENTS)
+      {
+        // respond with error.  Changing NN/EN not allowed
+        controller->sendCMDERR(CMDERR_INV_CMD);
+        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
+        return;
+      }
+      else
+      {
+        if (index != indexEV1)
+        {
+          // respond with error. Producer EV value assigned to another NN/EN
+          controller->sendCMDERR(CMDERR_INV_EV_VALUE);
+          controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_VALUE);
+          return;
+        }
+        //else valid learn so proceed
+      }
     }
+    //producer event value does not exist so proceed
   }     
       
   // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
-  byte index = module_config->findExistingEvent(nn, en);
-
   // not found - it's a new event
   if (index >= module_config->EE_MAX_EVENTS)
   {
