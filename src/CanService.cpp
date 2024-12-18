@@ -84,13 +84,12 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
   {
     controller->sendCMDERR(CMDERR_INV_EN_IDX);
     controller->sendGRSP(OPC_CANID, getServiceID(), CMDERR_INV_EN_IDX);
+    return;
   }
-  else
-  {
-    controller->getModuleConfig()->setCANID(newCANID);
-    controller->sendWRACK();
-    controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
-  }
+
+  controller->getModuleConfig()->setCANID(newCANID);
+  controller->sendWRACK();
+  controller->sendGRSP(OPC_CANID, getServiceID(), GRSP_OK);
 }
 
 void CanService::handleEnumeration(unsigned int nn)
@@ -98,11 +97,13 @@ void CanService::handleEnumeration(unsigned int nn)
   // DEBUG_SERIAL << F("> ENUM message for nn = ") << nn << F(" from CANID = ") << remoteCANID << endl;
   // DEBUG_SERIAL << F("> my nn = ") << controller->getModuleConfig()->nodeNum << endl;
 
-  if (isThisNodeNumber(nn))
+  if (!isThisNodeNumber(nn))
   {
-    // DEBUG_SERIAL << F("> initiating enumeration") << endl;
-    startCANenumeration(true);
+    return;
   }
+
+  // DEBUG_SERIAL << F("> initiating enumeration") << endl;
+  startCANenumeration(true);
 }
 
 //
@@ -123,8 +124,8 @@ void CanService::startCANenumeration(bool fromENUM)
     // already enumerating.
     return;
   }
-  // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
 
+  // initiate CAN bus enumeration cycle, either due to ENUM opcode, ID clash, or user button press
   // DEBUG_SERIAL << F("> beginning self-enumeration cycle") << endl;
 
   // set global variables
