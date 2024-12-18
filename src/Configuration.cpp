@@ -79,6 +79,19 @@ void Configuration::setModuleUninitializedMode()
 
 void Configuration::setModuleNormalMode(unsigned int nodeNumber)
 {
+  currentMode = (VlcbModeParams) (storage->read(LOCATION_MODE)); 
+  if (currentMode == VlcbModeParams::MODE_UNINITIALISED)  // Ensure that NVs and EVs are cleared
+  {
+    for (byte i = 1; i <= EE_NUM_NVS; i++)
+    {
+      writeNV(i, 0xff);
+    }
+    for (byte j = 0; j < EE_MAX_EVENTS; j++)
+    {
+      cleareventEEPROM(j);
+    }
+  }
+  
   setModuleMode(MODE_NORMAL);
   setNodeNum(nodeNumber);
 }
@@ -414,6 +427,10 @@ void Configuration::writeEvent(byte index, const byte data[EE_HASH_BYTES])
 void Configuration::cleareventEEPROM(byte index)
 {
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
+  for (byte ev = 1; ev <= EE_NUM_EVS; ev++)
+  {
+    writeEventEV(index, ev, 0xff);
+  }
   writeEvent(index, unused_entry);
 }
 
