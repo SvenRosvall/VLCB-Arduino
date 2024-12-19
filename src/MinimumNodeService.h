@@ -51,10 +51,9 @@ private:
   void handleSetNodeNumber(const VlcbMessage *msg, unsigned int nn);
   void handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn);
   void handleModeMessage(const VlcbMessage *msg, unsigned int nn);
-
+  
 protected:
   virtual void handleMessage(const VlcbMessage *msg);
-  unsigned int diagMsgsActed = 0;
   unsigned int diagNodeNumberChanges = 0;
 };
 
