@@ -114,6 +114,9 @@ void EventTeachingService::handleMessage(const VlcbMessage *msg)
 void EventTeachingService::handleLearnMode(const VlcbMessage *msg)
 {
   //DEBUG_SERIAL << F("ets> MODE -- request op-code received for NN = ") << nn << endl;
+
+  controller->messageActedOn();
+
   byte requestedMode = msg->data[3];
   switch (requestedMode)
   {
@@ -136,12 +139,14 @@ void EventTeachingService::handleLearn(unsigned int nn)
   if (isThisNodeNumber(nn))
   {
     enableLearn();
+    controller->messageActedOn();
   }
   else  //if we are learning and another node is put in learn mode, stop learn.
   {
     if (bLearn)
     {
       inhibitLearn();
+      controller->messageActedOn();
     }
   }
 }
@@ -155,6 +160,8 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
   {
     return;
   }
+
+  controller->messageActedOn();
 
   if (msg->len < 5)
   {
@@ -196,6 +203,8 @@ void EventTeachingService::handleUnlearn(unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   inhibitLearn();
 }
 
@@ -207,6 +216,8 @@ void EventTeachingService::handleRequestEventCount(unsigned int nn)
   {
     return;
   }
+
+  controller->messageActedOn();
 
   // respond with 0x74 NUMEV
   controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
@@ -220,6 +231,8 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
   {
     return;
   }
+
+  controller->messageActedOn();
 
   VlcbMessage msg;
   msg.len = 8;
@@ -253,6 +266,8 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
     return;
   }
 
+  controller->messageActedOn();
+
   Configuration *module_config = controller->getModuleConfig();
   if ((eventIndex >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(eventIndex) == 0))
   {
@@ -282,6 +297,8 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   {
     return;
   }
+
+  controller->messageActedOn();
 
   if (msg->len < 5)
   {
@@ -341,6 +358,8 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   if (!bLearn)
   {
     controller->sendCMDERR(CMDERR_NOT_LRN);
@@ -376,6 +395,8 @@ void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   byte free_slots = 0;
 
   // count free slots using the event hash table
@@ -401,6 +422,8 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   {
     return;
   }
+
+  controller->messageActedOn();
 
   if (msg->len < 7)
   {
@@ -505,6 +528,8 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
     return;
   }
 
+  controller->messageActedOn();
+
   if (msg->len < 8)
   {
     controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_CMD);
@@ -561,6 +586,8 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   {
     return;
   }
+
+  controller->messageActedOn();
 
   if (msg->len < 6)
   {

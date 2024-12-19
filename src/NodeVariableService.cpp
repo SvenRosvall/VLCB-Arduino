@@ -50,6 +50,8 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   if (msg->len < 4)
   {
     controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_CMD);
@@ -88,6 +90,8 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   // DEBUG_SERIAL << F("> received NVSET for nn = ") << nn << endl;
   if (msg->len < 5)
   {
@@ -117,6 +121,8 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
   {
     return;
   }
+
+  controller->messageActedOn();
 
   // DEBUG_SERIAL << F("> received NVSETRD for nn = ") << nn << endl;
   if (msg->len < 5)

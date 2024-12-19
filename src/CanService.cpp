@@ -78,6 +78,8 @@ void CanService::handleSetCANID(const VlcbMessage *msg, unsigned int nn)
     return;
   }
 
+  controller->messageActedOn();
+
   // DEBUG_SERIAL << F("> setting my CANID to ") << msg->data[3] << endl;
   byte newCANID = msg->data[3];
   if (newCANID < 1 || newCANID > 99)
@@ -101,6 +103,8 @@ void CanService::handleEnumeration(unsigned int nn)
   {
     return;
   }
+
+  controller->messageActedOn();
 
   // DEBUG_SERIAL << F("> initiating enumeration") << endl;
   startCANenumeration(true);
