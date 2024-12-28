@@ -62,6 +62,7 @@ public:
   void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
   void resetModule();
+  void commitToEEPROM();
 
   void setCANID(byte canid);
   void setModuleUninitializedMode();

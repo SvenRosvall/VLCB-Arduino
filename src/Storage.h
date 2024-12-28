@@ -21,6 +21,7 @@ public:
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) = 0;
   virtual void writeBytes(unsigned int eeaddress, const byte src[], byte numbytes) = 0;
   virtual void reset() = 0;
+  virtual void commitWriteEEPROM() {}
 };
 
 extern Storage * createDefaultStorageForPlatform();

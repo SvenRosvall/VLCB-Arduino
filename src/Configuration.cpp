@@ -427,11 +427,16 @@ void Configuration::writeEvent(byte index, const byte data[EE_HASH_BYTES])
 void Configuration::cleareventEEPROM(byte index)
 {
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
+  writeEvent(index, unused_entry);
   for (byte ev = 1; ev <= EE_NUM_EVS; ev++)
   {
     writeEventEV(index, ev, 0xff);
   }
-  writeEvent(index, unused_entry);
+}
+
+void Configuration::commitToEEPROM()
+{
+  storage->commitWriteEEPROM();
 }
 
 //

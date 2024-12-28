@@ -161,6 +161,8 @@ void Controller::process()
   {
     service->process(pAction);
   }
+  
+  module_config->commitToEEPROM();
 }
 
 bool Controller::sendMessage(const VlcbMessage *msg)
