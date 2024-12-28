@@ -75,15 +75,10 @@ void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 //
 void EepromInternalStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
-  #ifdef __SAM3X8E__
-  // Shouldn't use this for the Due.
-  #else
   for (byte i = 0; i < numbytes; i++)
   {
-    EEPROM.write(eeaddress + i, src[i]);
+    setChipEEPROMVal(eeaddress + i, src[i]);
   }
-
-  #endif
 }
 
 //

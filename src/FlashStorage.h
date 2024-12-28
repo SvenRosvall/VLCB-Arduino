@@ -47,6 +47,7 @@ public:
   virtual void write(unsigned int eeaddress, byte data) override;
   virtual void writeBytes(unsigned int eeaddress, const byte src[], byte numbytes) override;
   virtual void reset() override;
+  virtual void commitWriteEEPROM() override;
 
 };
 
