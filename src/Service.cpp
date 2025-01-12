@@ -23,7 +23,7 @@ void Service::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
 void Service::reportAllDiagnostics(byte serviceIndex)
 {
   // Default implementation is to not support diagnostics.
-  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 0);
+  controller->sendDGN(serviceIndex, 0, 0);
 }
 
 }

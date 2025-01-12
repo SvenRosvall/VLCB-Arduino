@@ -94,32 +94,23 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
       reportAllDiagnostics(serviceIndex);
       break;
     case 0x01: // Status code -- TODO: not implemented, always good
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x02: // Uptime upper word
-    {
-      unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 24) & 0xFF , (now >> 16) & 0xFF);
+      controller->sendDGN(serviceIndex, diagnosticsCode, ((millis() / 1000) >> 16) & 0xFFFF);
       break;
-    }
     case 0x03: // Uptime lower word
-    {
-      unsigned long now = millis() / 1000;
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, (now >> 8) & 0xFF , now & 0xFF);
+      controller->sendDGN(serviceIndex, diagnosticsCode, (millis() / 1000) & 0xFFFF);
       break;
-    }
     case 0x04: // Memory error count -- TODO: not implemented
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x05: // Node Number changes
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagNodeNumberChanges), lowByte(diagNodeNumberChanges));
+      controller->sendDGN(serviceIndex, diagnosticsCode, diagNodeNumberChanges);
       break;
     case 0x06: // Received messages acted on 
-    {
-      unsigned int diagMsgsActed = controller->getMessagesActedOn();
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagMsgsActed), lowByte(diagMsgsActed));
+      controller->sendDGN(serviceIndex, diagnosticsCode, controller->getMessagesActedOn());
       break;
-    }
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
       return;
@@ -128,7 +119,7 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
 
 void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
 {
-  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, 6);
+  controller->sendDGN(serviceIndex, 0, 6);
   for (byte i = 1; i <= 0x06 ; ++i)
   {
     reportDiagnostics(serviceIndex, i);

@@ -18,63 +18,58 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
       reportAllDiagnostics(serviceIndex);
       break;
     case 0x01: // CAN RX error counter
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode,
-                                    highByte(canTransport->receiveErrorCounter()), lowByte(canTransport->receiveErrorCounter()));
+      controller->sendDGN(serviceIndex, diagnosticsCode, canTransport->receiveErrorCounter());
       break;
     case 0x02: // CAN TX error counter
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode,
-                                    highByte(canTransport->transmitErrorCounter()), lowByte(canTransport->transmitErrorCounter()));
+      controller->sendDGN(serviceIndex, diagnosticsCode, canTransport->transmitErrorCounter());
       break;
     case 0x03: // CAN status byte, this is hardware dependent. The meaning of each bitfield must be documented.
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode,
-                                    highByte(canTransport->errorStatus()), lowByte(canTransport->errorStatus()));
+      controller->sendDGN(serviceIndex, diagnosticsCode, canTransport->errorStatus());
       break;
     case 0x04: // Tx buffer current usage count
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x05: // Tx buffer overrun count
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x06: // TX message count
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode,
-                                    highByte(canTransport->transmitCounter()), lowByte(canTransport->transmitCounter()));
+      controller->sendDGN(serviceIndex, diagnosticsCode, canTransport->transmitCounter());
       break;
     case 0x07: // RX buffer current usage count
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x08: // RX buffer overrun count
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x09: // RX message counter
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode,
-                                    highByte(canTransport->receiveCounter()), lowByte(canTransport->receiveCounter()));
+      controller->sendDGN(serviceIndex, diagnosticsCode, canTransport->receiveCounter());
       break;
     case 0x0A: // CAN error frames detected
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x0B: // CAN error frames generated (both active and passive ?)
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x0C: // number of times CAN arbitration was lost
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x0D: // number of CANID enumerations
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x0E: // number of CANID conflicts detected
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x0F: // the number of CANID changes
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x10: // the number of CANID enumeration failures
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x11: // Transmit buffers used high watermark - Added in service version 2
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
     case 0x12: // Receive buffers used high watermark - Added in service version 2
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, 0, 0);
+      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
       break;
 
     default:
@@ -86,7 +81,7 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
 void CanServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
 {
   byte diagCount = 18;
-  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, diagCount);
+  controller->sendDGN(serviceIndex, 0, diagCount);
   for (byte i = 1; i <= diagCount ; ++i)
   {
     reportDiagnostics(serviceIndex, i);

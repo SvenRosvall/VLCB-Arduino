@@ -16,7 +16,7 @@ void EventConsumerServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
       reportAllDiagnostics(serviceIndex);
       break;
     case 0x01: 
-      controller->sendMessageWithNN(OPC_DGN, serviceIndex, diagnosticsCode, highByte(diagEventsConsumed), lowByte(diagEventsConsumed));
+      controller->sendDGN(serviceIndex, diagnosticsCode, diagEventsConsumed);
       break;
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
@@ -27,7 +27,7 @@ void EventConsumerServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
 void EventConsumerServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
 {
   byte diagCount = 1;
-  controller->sendMessageWithNN(OPC_DGN, serviceIndex, 0, 0, diagCount);
+  controller->sendDGN(serviceIndex, 0, diagCount);
   for (byte i = 1; i <= diagCount ; ++i)
   {
     reportDiagnostics(serviceIndex, i);

@@ -90,6 +90,7 @@ public:
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
   void sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode);
+  void sendDGN(byte serviceIndex, byte diagCode, unsigned int counter);
 
   byte getModuleCANID() const { return module_config->CANID; }
   void process();
