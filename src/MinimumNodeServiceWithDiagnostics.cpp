@@ -88,33 +88,37 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
 
 void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
 {
+  unsigned int diagnosticsValue;
   switch (diagnosticsCode)
   {
     case 0x00:
       reportAllDiagnostics(serviceIndex);
-      break;
-    case 0x01: // Status code -- TODO: not implemented, always good
-      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
-      break;
+      return;
     case 0x02: // Uptime upper word
-      controller->sendDGN(serviceIndex, diagnosticsCode, ((millis() / 1000) >> 16) & 0xFFFF);
+      diagnosticsValue = ((millis() / 1000) >> 16) & 0xFFFF;
       break;
     case 0x03: // Uptime lower word
-      controller->sendDGN(serviceIndex, diagnosticsCode, (millis() / 1000) & 0xFFFF);
-      break;
-    case 0x04: // Memory error count -- TODO: not implemented
-      controller->sendDGN(serviceIndex, diagnosticsCode, 0);
+      diagnosticsValue = (millis() / 1000) & 0xFFFF;
       break;
     case 0x05: // Node Number changes
-      controller->sendDGN(serviceIndex, diagnosticsCode, diagNodeNumberChanges);
+      diagnosticsValue = diagNodeNumberChanges;
       break;
     case 0x06: // Received messages acted on 
-      controller->sendDGN(serviceIndex, diagnosticsCode, controller->getMessagesActedOn());
+      diagnosticsValue = controller->getMessagesActedOn();
       break;
+
+    // Diagnostics codes not yet implemented
+    case 0x01: // Status code -- TODO: not implemented, always good
+    case 0x04: // Memory error count -- TODO: not implemented
+      diagnosticsValue = 0;
+      break;
+
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
       return;
   }
+  
+  controller->sendDGN(serviceIndex, diagnosticsCode, diagnosticsValue);
 }
 
 void MinimumNodeServiceWithDiagnostics::diagNodeNumberChanged()
