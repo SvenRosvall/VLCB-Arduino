@@ -117,6 +117,11 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
   }
 }
 
+void MinimumNodeServiceWithDiagnostics::diagNodeNumberChanged()
+{
+  ++diagNodeNumberChanges;
+}
+
 void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
 {
   controller->sendDGN(serviceIndex, 0, 6);

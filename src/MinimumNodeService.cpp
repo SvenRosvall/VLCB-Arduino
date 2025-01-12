@@ -352,7 +352,7 @@ void MinimumNodeService::handleSetNodeNumber(const VlcbMessage *msg, unsigned in
   controller->sendMessageWithNN(OPC_NNACK);
   // DEBUG_SERIAL << F("> sent NNACK for NN = ") << controller->getModuleConfig()->nodeNum << endl;
   
-  ++diagNodeNumberChanges;
+  diagNodeNumberChanged();
   controller->messageActedOn();
 }
 
