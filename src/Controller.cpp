@@ -211,6 +211,11 @@ void Controller::sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode)
   sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
 }
 
+void Controller::sendDGN(byte serviceIndex, byte diagCode, unsigned int counter)
+{
+  sendMessageWithNN(OPC_DGN, serviceIndex, diagCode, highByte(counter), lowByte(counter));
+}
+
 void Controller::putAction(const Action &action)
 {
   // Serial << F("C>put action with type=") << action.actionType << endl;

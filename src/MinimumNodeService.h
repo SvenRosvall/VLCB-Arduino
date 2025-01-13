@@ -54,7 +54,8 @@ private:
   
 protected:
   virtual void handleMessage(const VlcbMessage *msg);
-  unsigned int diagNodeNumberChanges = 0;
+  
+  virtual void diagNodeNumberChanged() {};
 };
 
 }

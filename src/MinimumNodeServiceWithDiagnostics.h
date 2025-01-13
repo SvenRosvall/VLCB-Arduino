@@ -21,9 +21,12 @@ public:
 
 protected:
   virtual void handleMessage(const VlcbMessage *msg) override; 
+  virtual void diagNodeNumberChanged() override;
 
 private:
   void handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn);
+
+  unsigned int diagNodeNumberChanges = 0;
 };
 
 }
