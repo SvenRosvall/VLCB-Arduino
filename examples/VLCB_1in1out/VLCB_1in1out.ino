@@ -101,7 +101,7 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
 
   // configure and start CAN bus and VLCB message processing
-  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
+  can2515.setNumBuffers(4, 4);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
   can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
   if (!can2515.begin())
