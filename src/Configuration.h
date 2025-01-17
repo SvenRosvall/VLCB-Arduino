@@ -46,7 +46,7 @@ public:
   byte findExistingEvent(unsigned int nn, unsigned int en) const;
   byte findEventSpace() const;
   byte findExistingEventByEv(byte evnum, byte evval) const;
-
+  
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex) const;
   byte numEvents() const;
@@ -82,6 +82,8 @@ public:
   byte EE_NUM_EVS = 0;
   byte EE_PRODUCED_EVENTS = 0;
   byte EE_BYTES_PER_EVENT; // Value calculated in begin()
+  unsigned int EE_FREE_BASE; // Value calculated in begin()
+  unsigned int EE_USER_BYTES = 0; // Specified by user in setup for ESP processors.
 
   bool heartbeat;
   bool eventAck;

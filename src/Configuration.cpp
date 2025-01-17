@@ -68,6 +68,8 @@ void Configuration::begin()
   }
 
   makeEvHashTable();
+  
+  EE_FREE_BASE = EE_EVENTS_START + (EE_BYTES_PER_EVENT * EE_MAX_EVENTS);
 }
 
 void Configuration::setModuleUninitializedMode()
