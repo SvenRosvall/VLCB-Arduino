@@ -46,6 +46,8 @@ public:
   byte findExistingEvent(unsigned int nn, unsigned int en) const;
   byte findEventSpace() const;
   byte findExistingEventByEv(byte evnum, byte evval) const;
+  
+  unsigned int getFreeEEbase();
 
   void printEvHashTable(bool raw);
   byte getEvTableEntry(byte tindex) const;
@@ -82,6 +84,7 @@ public:
   byte EE_NUM_EVS = 0;
   byte EE_PRODUCED_EVENTS = 0;
   byte EE_BYTES_PER_EVENT; // Value calculated in begin()
+  unsigned int EE_VLCB_END; // Value calculated in begin()
 
   bool heartbeat;
   bool eventAck;

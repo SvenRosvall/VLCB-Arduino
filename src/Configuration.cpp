@@ -68,6 +68,8 @@ void Configuration::begin()
   }
 
   makeEvHashTable();
+  
+  EE_VLCB_END = EE_EVENTS_START + (EE_BYTES_PER_EVENT * EE_MAX_EVENTS);
 }
 
 void Configuration::setModuleUninitializedMode()
@@ -135,6 +137,14 @@ void Configuration::setNodeNum(unsigned int nn)
   nodeNum = nn;
   storage->write(LOCATION_NODE_NUMBER_HIGH, highByte(nodeNum));
   storage->write(LOCATION_NODE_NUMBER_LOW, lowByte(nodeNum));
+}
+
+//
+/// return start address of unused EEPROM
+//
+unsigned int Configuration::getFreeEEbase()
+{
+  return EE_VLCB_END;
 }
 
 //
