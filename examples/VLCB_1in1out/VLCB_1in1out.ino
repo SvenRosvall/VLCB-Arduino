@@ -16,6 +16,7 @@
 // VLCB library header files
 #include <Controller.h>                   // Controller class
 #include <CAN2515.h>               // CAN controller
+#include "CAN2515Diagnostics.h"
 #include <Switch.h>             // pushbutton switch
 #include <LED.h>                // VLCB LEDs
 #include <Configuration.h>             // module configuration
@@ -45,10 +46,13 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 // Controller objects
 VLCB::Configuration modconfig;               // configuration object
 VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::CAN2515Diagnostics can2515Diag(&can2515);
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::SerialUserInterface serialUserInterface(&can2515);
+//VLCB::MinimumNodeService mnService;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
-VLCB::CanServiceWithDiagnostics canService(&can2515);
+//VLCB::CanService canService(&can2515);
+VLCB::CanServiceWithDiagnostics canService(&can2515, &can2515Diag);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "CanService.h"
+#include "TransportDiagnostics.h"
 
 namespace VLCB
 {
@@ -13,10 +14,16 @@ namespace VLCB
 class CanServiceWithDiagnostics : public CanService
 {
 public:
-  CanServiceWithDiagnostics(CanTransport * tpt) : CanService(tpt) {}
+  CanServiceWithDiagnostics(CanTransport * tpt, TransportDiagnostics * td) 
+    : CanService(tpt)
+    , tptDiag(td)
+  {}
 
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
   virtual void reportAllDiagnostics(byte serviceIndex) override;
+
+private:
+  TransportDiagnostics * tptDiag;
 };
 
 } // VLCB

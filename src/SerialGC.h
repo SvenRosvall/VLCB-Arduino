@@ -35,15 +35,15 @@ namespace VLCB
     bool sendCanFrame(CANFrame *frame) override;
     void reset() override;
 
-    virtual unsigned int receiveCounter() override { return receivedCount; }
-    virtual unsigned int transmitCounter() override { return transmitCount; }
-    virtual unsigned int receiveErrorCounter() override { return receiveErrorCount; }
-    virtual unsigned int transmitErrorCounter() override { return transmitErrorCount; }
-    virtual unsigned int receiveBufferUsage() override { return 0; };
-    virtual unsigned int transmitBufferUsage() override { return 0; };
-    virtual unsigned int receiveBufferPeak() override { return 0; };
-    virtual unsigned int transmitBufferPeak() override { return 0; };
-    virtual unsigned int errorStatus() override { return 0; }
+//    virtual unsigned int receiveCounter() override { return receivedCount; }
+//    virtual unsigned int transmitCounter() override { return transmitCount; }
+//    virtual unsigned int receiveErrorCounter() override { return receiveErrorCount; }
+//    virtual unsigned int transmitErrorCounter() override { return transmitErrorCount; }
+//    virtual unsigned int receiveBufferUsage() override { return 0; };
+//    virtual unsigned int transmitBufferUsage() override { return 0; };
+//    virtual unsigned int receiveBufferPeak() override { return 0; };
+//    virtual unsigned int transmitBufferPeak() override { return 0; };
+//    virtual unsigned int errorStatus() override { return 0; }
 
   private:
     typeof(Serial)& serial;

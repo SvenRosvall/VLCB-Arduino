@@ -12,9 +12,10 @@
 #include "Transport.h"
 #include "Controller.h"
 #include "CanTransport.h"
+#include "TransportDiagnostics.h"
 
 // This is to replace the hardware layer. It uses the CanTransport class for CAN processing.
-class MockCanTransport : public VLCB::CanTransport
+class MockCanTransport : public VLCB::CanTransport, public VLCB::TransportDiagnostics
 {
 public:
   virtual bool available() override;

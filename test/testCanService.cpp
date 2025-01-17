@@ -31,7 +31,7 @@ VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
   mockCanTransport.reset(new MockCanTransport);
 
   static std::unique_ptr<VLCB::CanServiceWithDiagnostics> canService;
-  canService.reset(new VLCB::CanServiceWithDiagnostics(mockCanTransport.get()));
+  canService.reset(new VLCB::CanServiceWithDiagnostics(mockCanTransport.get(), mockCanTransport.get()));
 
   VLCB::Controller controller = ::createController(startupMode, {minimumNodeService.get(), canService.get()});
   controller.begin();

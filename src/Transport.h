@@ -13,16 +13,6 @@ class Transport
 {
 public:
   virtual void reset() = 0;
-
-  virtual unsigned int receiveCounter() = 0;
-  virtual unsigned int transmitCounter() = 0;
-  virtual unsigned int receiveErrorCounter() = 0;
-  virtual unsigned int transmitErrorCounter() = 0;
-  virtual unsigned int receiveBufferUsage() = 0;
-  virtual unsigned int transmitBufferUsage() = 0;
-  virtual unsigned int receiveBufferPeak() = 0;
-  virtual unsigned int transmitBufferPeak() = 0;
-  virtual unsigned int errorStatus() = 0;
 };
 
 }

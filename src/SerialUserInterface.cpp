@@ -124,12 +124,12 @@ void SerialUserInterface::processSerialInput()
 
         // CAN bus status
       case 'c':
-        Serial << F(" messages received = ") << transport->receiveCounter()
-               << F(", sent = ") << transport->transmitCounter()
-               << F(", receive errors = ") << transport->receiveErrorCounter()
-               << F(", transmit errors = ") << transport->transmitErrorCounter()
-               << F(", error status = ") << transport->errorStatus()
-        << endl;
+//        Serial << F(" messages received = ") << transport->receiveCounter()
+//               << F(", sent = ") << transport->transmitCounter()
+//               << F(", receive errors = ") << transport->receiveErrorCounter()
+//               << F(", transmit errors = ") << transport->transmitErrorCounter()
+//               << F(", error status = ") << transport->errorStatus()
+//        << endl;
         break;
 
       case 'h':

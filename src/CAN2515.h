@@ -58,16 +58,6 @@ public:
   void setPins(byte cs_pin, byte int_pin);
 #endif
 
-  virtual unsigned int receiveCounter() override { return _numMsgsRcvd; }
-  virtual unsigned int transmitCounter() override { return _numMsgsSent; }
-  virtual unsigned int receiveErrorCounter() override { return canp->receiveErrorCounter(); }
-  virtual unsigned int transmitErrorCounter() override { return canp->transmitErrorCounter(); }
-  virtual unsigned int receiveBufferUsage() override { return canp->receiveBufferCount(); };
-  virtual unsigned int transmitBufferUsage() override { return canp->transmitBufferCount(0); };
-  virtual unsigned int receiveBufferPeak() override { return canp->receiveBufferPeakCount(); };
-  virtual unsigned int transmitBufferPeak() override { return canp->transmitBufferPeakCount(0); };
-  virtual unsigned int errorStatus() override { return canp->errorFlagRegister(); }
-
   ACAN2515 *canp;   // pointer to CAN object so user code can access its members
 
 private:
@@ -80,6 +70,8 @@ private:
 #ifdef ARDUINO_ARCH_RP2040
   byte _mosi_pin, _miso_pin, _sck_pin;
 #endif
+
+  friend class CAN2515Diagnostics;    
 };
 
 }
