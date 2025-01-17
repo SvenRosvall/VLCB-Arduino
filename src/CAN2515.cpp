@@ -155,7 +155,7 @@ bool CAN2515::sendCanFrame(CANFrame *frame)
   _numMsgsSent += ret;
 
   // Simple workaround for sending many messages. Let the underlying hardware some time to send this message before next.
-  // TODO: Replace this with monitoring of the transmit queue.
+  // Without this delay we need a transmit buffer size of at least 15 or outgoing messages will be dropped.
   delay(1);
 
   return ret;
