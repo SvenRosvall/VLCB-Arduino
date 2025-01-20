@@ -63,9 +63,9 @@ class Service;
 class Controller
 {
 public:
-  Controller();
+//  Controller();
   Controller(Configuration *conf);
-  Controller(std::initializer_list<Service *> services);
+//  Controller(std::initializer_list<Service *> services);
   Controller(Configuration *conf, std::initializer_list<Service *> services);
   
   void setServices(std::initializer_list<Service *> services);
@@ -77,10 +77,10 @@ public:
 
   const ArrayHolder<Service *> & getServices() { return services; }
 
-  void setParams(VLCB::Parameters & params) { setParams( params.getParams()); }
-  void setParams(unsigned char *mparams);
+  void updateParamFlags();
   void setParamFlag(VlcbParamFlags flag, bool set);
-  unsigned char getParam(unsigned int param) const { return _mparams[param]; }
+  Parameters getParams() { return _mparams; }
+  unsigned char getParam(unsigned int param) const { return _mparams.getParams()[param]; }
 
   bool sendMessage(const VlcbMessage *msg);
 
@@ -112,7 +112,7 @@ private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
 
-  unsigned char *_mparams;
+  Parameters _mparams;
   const char *_mname;
   
   CircularBuffer<Action> actionQueue;

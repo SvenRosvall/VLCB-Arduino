@@ -76,6 +76,7 @@ add_library(core_library OBJECT
         src/GridConnect.h
         src/CircularBuffer.h
         src/VLCB.h
+        src/VLCB.cpp
 )
 
 target_link_libraries(core_library PUBLIC)

@@ -52,13 +52,11 @@ VLCB::Controller createController(VlcbModeParams startupMode, const std::initial
   {
     configuration->setModuleNormalMode(0x0104);
   }
-  static std::unique_ptr<VLCB::Parameters> params;
-  params.reset(new VLCB::Parameters(*configuration));
-  params->setVersion(1, 1, 'a');
-  params->setModuleId(MODULE_ID);
+  controller.getParams().setVersion(1, 1, 'a');
+  controller.getParams().setModuleId(MODULE_ID);
 
   // assign to Controller
-  controller.setParams(params->getParams());
+  controller.updateParamFlags();
   controller.setName(moduleName);
   return controller;
 }

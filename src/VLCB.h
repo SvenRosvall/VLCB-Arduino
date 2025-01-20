@@ -24,5 +24,22 @@
 
 namespace VLCB
 {
+void setServices(std::initializer_list<Service *> services);
+void setVersion(char maj, char min, char beta);
+void setModuleId(byte manu, byte moduleId);
+void setName(char *mname);
+void setNumNodeVariables(byte n);
+void setMaxEvents(byte n);
+void setNumProducedEvents(byte n);
+void setNumEventVariables(byte n);
 
+VlcbModeParams getCurrentMode();
+byte getCANID();
+unsigned int getNodeNum();
+byte readNV(byte nv);
+byte getEventEVval(byte idx, byte evnum);
+void resetModule();
+
+void begin();
+void process();
 }

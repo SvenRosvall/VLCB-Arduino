@@ -59,6 +59,11 @@ public:
     memcpy(params + PAR_CPUMID, name, 4);   // 15-18 processor version
   }
 
+  unsigned char * getParams() const
+  {
+    return params;
+  }
+
   unsigned char * getParams()
   {
     return params;
@@ -68,7 +73,7 @@ private:
   // Initializes processor specific parameters based on pre-defined macros in Arduino IDE.
   static void initProcessorParams();
 
-  // Memory for the params is allocated on global memory and handed over to Controller.setParams().
+  // Memory for the params is allocated on global memory and handed over to Controller.updateParamFlags().
   static unsigned char params[21];
 };
 
