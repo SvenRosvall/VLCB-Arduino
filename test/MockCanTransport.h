@@ -27,6 +27,10 @@ public:
   virtual unsigned int transmitCounter() override { return 42; }
   virtual unsigned int receiveErrorCounter() override { return 0; }
   virtual unsigned int transmitErrorCounter() override { return 0; }
+  virtual unsigned int receiveBufferUsage() override { return 0; };
+  virtual unsigned int transmitBufferUsage() override { return 0; };
+  virtual unsigned int receiveBufferPeak() override { return 0; };
+  virtual unsigned int transmitBufferPeak() override { return 0; };
   virtual unsigned int errorStatus() override { return 0; }
 
   void setNextMessage(VLCB::CANFrame frame);

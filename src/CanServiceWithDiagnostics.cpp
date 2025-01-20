@@ -27,17 +27,27 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
     case 0x03: // CAN status byte, this is hardware dependent. The meaning of each bitfield must be documented.
       diagnosticsValue = canTransport->errorStatus();
       break;
+    case 0x04: // Tx buffer current usage count
+      diagnosticsValue = canTransport->transmitBufferUsage();
+      break;
     case 0x06: // TX message count
       diagnosticsValue = canTransport->transmitCounter();
+      break;
+    case 0x07: // RX buffer current usage count
+      diagnosticsValue = canTransport->receiveBufferUsage();
       break;
     case 0x09: // RX message counter
       diagnosticsValue = canTransport->receiveCounter();
       break;
+    case 0x11: // Transmit buffers used high watermark - Added in service version 2
+      diagnosticsValue = canTransport->transmitBufferPeak();
+      break;
+    case 0x12: // Receive buffers used high watermark - Added in service version 2
+      diagnosticsValue = canTransport->receiveBufferPeak();
+      break;
 
     // Diagnostics codes not yet implemented
-    case 0x04: // Tx buffer current usage count
     case 0x05: // Tx buffer overrun count
-    case 0x07: // RX buffer current usage count
     case 0x08: // RX buffer overrun count
     case 0x0A: // CAN error frames detected
     case 0x0B: // CAN error frames generated (both active and passive ?)
@@ -46,8 +56,6 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
     case 0x0E: // number of CANID conflicts detected
     case 0x0F: // the number of CANID changes
     case 0x10: // the number of CANID enumeration failures
-    case 0x11: // Transmit buffers used high watermark - Added in service version 2
-    case 0x12: // Receive buffers used high watermark - Added in service version 2
       diagnosticsValue = 0;
       break;
 
