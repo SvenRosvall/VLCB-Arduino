@@ -55,7 +55,7 @@ VLCB::Switch moduleSwitch(5);            // an example switch as input
 VLCB::LED moduleLED(6);                  // an example LED as output
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
+char mname[] = "1IN1OUT";
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
