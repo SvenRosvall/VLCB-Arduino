@@ -48,20 +48,8 @@
 #include <Bounce2.h>
 
 // VLCB library header files
-#include <Controller.h>                   // Controller class
-#include <CAN2515.h>               // CAN controller
-#include <Configuration.h>             // module configuration
-#include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-#include "CanService.h"
-#include "NodeVariableService.h"
-#include "EventConsumerService.h"
-#include "EventProducerService.h"
-#include "ConsumeOwnEventsService.h"
-#include "EventTeachingService.h"
-#include "SerialUserInterface.h"
+#include <VLCB.h>
+#include <CAN2515.h>               // Chosen CAN controller
 
 #include "LEDControl.h"
 
