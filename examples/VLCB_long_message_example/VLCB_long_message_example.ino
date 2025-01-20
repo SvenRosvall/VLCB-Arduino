@@ -14,19 +14,8 @@
 #include <Streaming.h>
 
 // VLCB library header files
-#include <Controller.h>                   // Controller class
-#include <CAN2515.h>               // CAN controller
-#include <Configuration.h>             // module configuration
-#include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-#include <LongMessageService.h>
-#include "CanService.h"
-#include "NodeVariableService.h"
-#include "EventConsumerService.h"
-#include "EventProducerService.h"
-#include "EventTeachingService.h"
+#include <VLCB.h>                   // Controller class
+#include <CAN2515.h>               // Chosen CAN controller
 
 // constants
 const byte VER_MAJ = 1;             // code major version
