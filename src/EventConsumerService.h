@@ -34,6 +34,7 @@ private:
   
 protected:
   unsigned int diagEventsConsumed = 0;
+  unsigned int diagEventsAcknowledged = 0;
 
 };
 

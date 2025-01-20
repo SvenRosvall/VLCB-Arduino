@@ -36,6 +36,11 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
       ++diagEventsConsumed;
       controller->messageActedOn();
       (void)(*eventhandler)(index, msg);
+      if (controller->getModuleConfig()->eventAck)
+      {
+        controller->sendMessageWithNN(OPC_ENACK, highByte(nn), lowByte(nn), highByte(en), lowByte(en));
+        ++diagEventsAcknowledged;
+      }
     }
   }
 }
@@ -111,6 +116,25 @@ void EventConsumerService::handleConsumedMessage(const VlcbMessage *msg)
         processAccessoryEvent(msg, 0, en);
       }
       break;
+      
+    case OPC_MODE:
+    // 76 - Set Operating Mode
+    //DEBUG_SERIAL << F("ets> MODE -- request op-code received for NN = ") << nn << endl;
+
+    controller->messageActedOn();
+
+    switch (msg->data[3])
+    {
+      case MODE_EVENT_ACK_ON:
+        // Turn on Event Acknowledge Mode
+        controller->getModuleConfig()->setEventAck(true);
+        break;
+
+      case MODE_EVENT_ACK_OFF:
+        // Turn off Event Acknowledge Mode
+        controller->getModuleConfig()->setEventAck(false);
+        break;
+    }
 
     default:
       // unknown or unhandled OPC
