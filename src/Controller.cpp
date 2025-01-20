@@ -27,6 +27,22 @@ namespace VLCB
 // be sent through the transport without requiring this buffering. 
 const int ACTION_QUEUE_SIZE = 30;
 
+
+Controller::Controller()
+  : services()
+  , actionQueue(ACTION_QUEUE_SIZE)
+{
+  extern Configuration config;
+  module_config = &config;
+}
+
+Controller::Controller(Configuration *conf)
+  : module_config(conf)
+  , services()
+  , actionQueue(ACTION_QUEUE_SIZE)
+{
+}
+
 Controller::Controller(std::initializer_list<Service *> services)
   : services(services)
   , actionQueue(ACTION_QUEUE_SIZE)
@@ -49,6 +65,16 @@ Controller::Controller(Configuration *conf, std::initializer_list<Service *> ser
   , services(services)
   , actionQueue(ACTION_QUEUE_SIZE)
 {
+  for (Service * service : services)
+  {
+    service->setController(this);
+  }
+}
+
+void Controller::setServices(std::initializer_list<Service *> svc)
+{
+  services = svc;
+
   for (Service * service : services)
   {
     service->setController(this);

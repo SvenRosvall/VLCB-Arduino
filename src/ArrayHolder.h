@@ -16,8 +16,11 @@ template<typename E>
 class ArrayHolder
 {
 public:
+  ArrayHolder();
   ArrayHolder(const std::initializer_list<E> & il);
   ~ArrayHolder();
+  
+  ArrayHolder & operator=(const std::initializer_list<E> & il);
 
   // Number of elements.
   constexpr size_t
@@ -42,6 +45,12 @@ private:
 };
 
 template<typename E>
+ArrayHolder<E>::ArrayHolder()
+  : array(nullptr)
+  , len(0)
+{ }
+
+template<typename E>
 ArrayHolder<E>::ArrayHolder(const std::initializer_list<E> &il)
   : array(copyArray(il.begin(), il.size()))
   , len(il.size())
@@ -50,10 +59,19 @@ ArrayHolder<E>::ArrayHolder(const std::initializer_list<E> &il)
 template<typename E>
 ArrayHolder<E>::~ArrayHolder()
 {
-  delete[] array;
-  array = 0;
-  len = 0;
+  if (array != nullptr)
+  {
+    delete[] array;
+  }
 }
+
+template<typename E>
+ArrayHolder<E> & ArrayHolder<E>::operator=(const std::initializer_list<E> & il)
+{
+  array = copyArray(il.begin(), il.size());
+  len = il.size();
+  return *this;
+}        
 
 template<typename E>
 E* ArrayHolder<E>::copyArray(const E * a, size_t len)
