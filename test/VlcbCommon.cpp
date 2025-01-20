@@ -46,7 +46,8 @@ VLCB::Controller createController(VlcbModeParams startupMode, const std::initial
 
   configuration.reset(createConfiguration());
 
-  VLCB::Controller controller(configuration.get(), services);
+  VLCB::Controller controller(configuration.get());
+  controller.setServices(services);
   if (startupMode == MODE_NORMAL)
   {
     configuration->setModuleNormalMode(0x0104);

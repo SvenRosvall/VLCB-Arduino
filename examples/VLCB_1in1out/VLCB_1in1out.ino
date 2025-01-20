@@ -40,8 +40,7 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&modconfig, 
-                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
+VLCB::Controller controller(&modconfig); // Controller object
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -60,6 +59,8 @@ void processModuleSwitchChange();
 //
 void setupVLCB()
 {
+  controller.setServices(
+          {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService});
   // set config layout parameters
   modconfig.EE_NUM_NVS = 10;
   modconfig.EE_MAX_EVENTS = 32;

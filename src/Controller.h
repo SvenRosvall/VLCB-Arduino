@@ -63,8 +63,12 @@ class Service;
 class Controller
 {
 public:
+  Controller();
+  Controller(Configuration *conf);
   Controller(std::initializer_list<Service *> services);
   Controller(Configuration *conf, std::initializer_list<Service *> services);
+  
+  void setServices(std::initializer_list<Service *> services);
 
   Configuration * getModuleConfig() const { return module_config; }
 
