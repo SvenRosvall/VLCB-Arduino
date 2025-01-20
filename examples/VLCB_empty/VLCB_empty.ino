@@ -39,7 +39,7 @@ VLCB::Controller controller(&modconfig,
                             {&mnService, &ledUserInterface, &serialUserInterface, &canService}); // Controller object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
+char mname[] = "EMPTY";
 
 // forward function declarations
 void printConfig();

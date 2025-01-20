@@ -68,8 +68,8 @@ public:
 
   Configuration * getModuleConfig() const { return module_config; }
 
-  void setName(const unsigned char *mname);
-  const unsigned char *getModuleName() const { return _mname; }
+  void setName(const char *mname);
+  const char *getModuleName() const { return _mname; }
 
   const ArrayHolder<Service *> & getServices() { return services; }
 
@@ -109,7 +109,7 @@ private:
   ArrayHolder<Service *> services;
 
   unsigned char *_mparams;
-  const unsigned char *_mname;
+  const char *_mname;
   
   CircularBuffer<Action> actionQueue;
 

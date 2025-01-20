@@ -104,7 +104,7 @@ void Controller::setParams(unsigned char *mparams)
 //
 /// assign the module name
 //
-void Controller::setName(const unsigned char *mname)
+void Controller::setName(const char *mname)
 {
   _mname = mname;
 }

@@ -11,6 +11,24 @@
 namespace VLCB
 {
 
+void copyName(uint8_t *dest, const char *name)
+{
+  int i = 0;
+  for (; i < 7 ; ++i)
+  {
+    if (name[i] == '\0')
+    {
+      // If the string is shorter than 7 chars, then don't copy the null and continue below to pad with spaces. 
+      break;
+    }
+    dest[i] = name[i];
+  }
+  for (; i < 7 ; ++i)
+  {
+    dest[i] = ' ';
+  }
+}
+
 void MinimumNodeService::begin()
 {
   //Initialise instantMode
@@ -225,7 +243,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
         VlcbMessage response;
         response.len = 8;
         response.data[0] = OPC_NAME;
-        memcpy(response.data + 1, controller->getModuleName(), 7);
+        copyName(response.data + 1, controller->getModuleName());
         controller->sendMessage(&response);
         controller->messageActedOn();
       }

@@ -80,7 +80,7 @@ VLCB::Controller controller(&modconfig,
                             {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
+char mname[] = "4IN4OUT";
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor

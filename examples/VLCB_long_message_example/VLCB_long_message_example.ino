@@ -42,7 +42,7 @@ VLCB::Controller controller(&modconfig,
                             {&mnService, &userInterface, &canService, &nvService, &lmsg, &ecService, &epService, &etService}); // Controller object
 
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { 'L', 'M', 'S', 'G', 'E', 'X', ' ' };
+char mname[] = "LMSGEX";
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);

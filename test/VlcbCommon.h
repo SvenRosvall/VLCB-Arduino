@@ -16,7 +16,7 @@ class Transport;
 }
 
 const int MODULE_ID = 253;
-const unsigned char moduleName[] = {'t', 'e', 's', 't', 'i', 'n', 'g', '\0'};
+const char moduleName[] = "testing";
 
 extern std::unique_ptr<MockUserInterface> mockUserInterface;
 extern std::unique_ptr<VLCB::Configuration> configuration;
