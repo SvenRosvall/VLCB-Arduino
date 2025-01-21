@@ -77,6 +77,8 @@ add_library(core_library OBJECT
         src/CircularBuffer.h
         src/VLCB.h
         src/VLCB.cpp
+        src/ServiceFactory.cpp
+        src/ServiceFactory.h
 )
 
 target_link_libraries(core_library PUBLIC)

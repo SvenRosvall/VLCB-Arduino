@@ -24,6 +24,9 @@
 
 namespace VLCB
 {
+void enableDiagnostics();
+Service * createCanService(CanTransport *tpt);
+Service * createMinimumNodeService();
 void setServices(std::initializer_list<Service *> services);
 void setVersion(char maj, char min, char beta);
 void setModuleId(byte manu, byte moduleId);

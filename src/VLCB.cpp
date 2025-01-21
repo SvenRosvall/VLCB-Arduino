@@ -4,14 +4,31 @@
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
 #include "VLCB.h"
+#include "ServiceFactory.h"
 
 namespace VLCB
 {
+ServiceFactory * svcFactory = new ServiceFactoryNoDiagnostics;
+
 Configuration modconfig;               // configuration object
 Controller controller(&modconfig); // Controller object
-//MinimumNodeServiceWithDiagnostics mnService;
 
-VLCB::Parameters params(modconfig);
+Parameters params(modconfig);
+
+void enableDiagnostics()
+{
+  svcFactory = new ServiceFactoryWithDiagnostics;
+}
+
+Service * createCanService(CanTransport *tpt)
+{
+  return svcFactory->createCanService(tpt);
+}
+
+Service * createMinimumNodeService()
+{
+  return svcFactory->createMinimumNodeService();
+}
 
 void setServices(std::initializer_list<Service *> services)
 {
