@@ -32,8 +32,6 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::SerialUserInterface serialUserInterface(&can2515);
-VLCB::MinimumNodeServiceWithDiagnostics mnService;
-VLCB::CanServiceWithDiagnostics canService(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
@@ -57,8 +55,18 @@ void processModuleSwitchChange();
 //
 void setupVLCB()
 {
-  VLCB::setServices(
-          {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService});
+  VLCB::enableDiagnostics();
+  VLCB::setServices({
+    VLCB::createMinimumNodeService(),
+    &ledUserInterface, 
+    &serialUserInterface,
+    VLCB::createCanService(&can2515),
+    &nvService,
+    &ecService,
+    &epService,
+    &etService,
+    &coeService});
+
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
