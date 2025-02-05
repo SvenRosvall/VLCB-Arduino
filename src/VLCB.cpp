@@ -17,15 +17,16 @@ Parameters params(modconfig);
 
 void enableDiagnostics()
 {
+  delete svcFactory;
   svcFactory = new ServiceFactoryWithDiagnostics;
 }
 
-Service * createCanService(CanTransport *tpt)
+CanService * createCanService(CanTransport *tpt)
 {
   return svcFactory->createCanService(tpt);
 }
 
-Service * createMinimumNodeService()
+MinimumNodeService * createMinimumNodeService()
 {
   return svcFactory->createMinimumNodeService();
 }
