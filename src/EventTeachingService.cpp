@@ -45,7 +45,7 @@ void EventTeachingService::handleMessage(const VlcbMessage *msg)
   {
   case OPC_MODE:
     // 76 - Set Operating Mode
-    handleLearnMode(msg);
+    handleLearnMode(msg, nn);
     break;
 
   case OPC_NNLRN:
@@ -114,7 +114,10 @@ void EventTeachingService::handleMessage(const VlcbMessage *msg)
 void EventTeachingService::handleLearnMode(const VlcbMessage *msg)
 {
   //DEBUG_SERIAL << F("ets> MODE -- request op-code received for NN = ") << nn << endl;
-
+  if (!isThisNodeNumber(nn))
+  {
+    return;
+  }
   controller->messageActedOn();
 
   byte requestedMode = msg->data[3];

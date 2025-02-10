@@ -120,7 +120,11 @@ void EventConsumerService::handleConsumedMessage(const VlcbMessage *msg)
     case OPC_MODE:
     // 76 - Set Operating Mode
     //DEBUG_SERIAL << F("ets> MODE -- request op-code received for NN = ") << nn << endl;
-
+    if (!isThisNodeNumber(nn))
+        {
+          // Not for this module.
+          return;
+        }
     controller->messageActedOn();
 
     switch (msg->data[3])
