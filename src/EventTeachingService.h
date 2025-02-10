@@ -28,7 +28,7 @@ private:
   bool bLearn = false;
 
   void handleMessage(const VlcbMessage *msg);
-  void handleLearnMode(const VlcbMessage *msg);
+  void handleLearnMode(const VlcbMessage *msg, unsigned int nn);
   void handleLearn(unsigned int nn);
   void handleUnlearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
   void handleUnlearn(unsigned int nn);
