@@ -38,7 +38,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
       (void)(*eventhandler)(index, msg);
       if (controller->getModuleConfig()->eventAck)
       {
-        controller->sendMessageWithNN(OPC_ENACK, highByte(nn), lowByte(nn), highByte(en), lowByte(en));
+        controller->sendMessageWithNN(OPC_ENACK, msg->data[0], highByte(nn), lowByte(nn), highByte(en), lowByte(en));
         ++diagEventsAcknowledged;
       }
     }
