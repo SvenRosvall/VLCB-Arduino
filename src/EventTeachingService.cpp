@@ -111,14 +111,13 @@ void EventTeachingService::handleMessage(const VlcbMessage *msg)
   }
 }
 
-void EventTeachingService::handleLearnMode(const VlcbMessage *msg)
+void EventTeachingService::handleLearnMode(const VlcbMessage *msg, unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> MODE -- request op-code received for NN = ") << nn << endl;
   if (!isThisNodeNumber(nn))
   {
     return;
   }
-  controller->messageActedOn();
 
   byte requestedMode = msg->data[3];
   switch (requestedMode)
@@ -132,7 +131,11 @@ void EventTeachingService::handleLearnMode(const VlcbMessage *msg)
       // Turn off Learn Mode
       inhibitLearn();
       break;
+      
+    default:
+      return;
   }
+  controller->messageActedOn();
 }
 
 void EventTeachingService::handleLearn(unsigned int nn)
