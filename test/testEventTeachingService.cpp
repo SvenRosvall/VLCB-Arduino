@@ -257,6 +257,33 @@ void testEnterLearnModeViaMode()
   mockTransportService->clearMessages();
 }
 
+void testEnterLearnModeForOtherNode()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x05, MODE_LEARN_ON}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  // Verify parameter learn set.
+  // Send QNN - PNN response contains bit 5 as learn mode.
+  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_PNN, mockTransportService->sent_messages[0].data[0]);
+  // Learn flag shall not be set.
+  assertEquals(0, mockTransportService->sent_messages[0].data[5] & PF_LRN);
+}
+
 void testTeachEvent()
 {
   test();
@@ -1385,6 +1412,7 @@ void testEventTeachingService()
   testEventsStoredAtStart();
   testEnterLearnModeOld();
   testEnterLearnModeViaMode();
+  testEnterLearnModeForOtherNode();
   testTeachEvent();
   testTeachEventIndexedAndClear();
   testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
