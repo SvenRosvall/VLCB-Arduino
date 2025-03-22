@@ -30,8 +30,6 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
 VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&can2515);
 VLCB::NodeVariableService nvService;
 VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
@@ -55,11 +53,14 @@ void processModuleSwitchChange();
 //
 void setupVLCB()
 {
+  // Keep a handle on the LED user interface as it is used to check for resetting the module.
+  VLCB::LEDUserInterface *ledUserInterface = VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0);
+
   VLCB::enableDiagnostics();
   VLCB::setServices({
     VLCB::createMinimumNodeService(),
-    &ledUserInterface, 
-    &serialUserInterface,
+    ledUserInterface, 
+    VLCB::createSerialUserInterface(&can2515),
     VLCB::createCanService(&can2515),
     &nvService,
     &ecService,
@@ -81,7 +82,7 @@ void setupVLCB()
   VLCB::setName(mname);
 
   // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
+  if (ledUserInterface->isButtonPressed())
   {
     Serial << F("> switch was pressed at startup") << endl;
     VLCB::resetModule();

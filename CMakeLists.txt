@@ -17,10 +17,6 @@ include_directories(Arduino)
 add_library(hardware_library OBJECT
         src/CAN2515.cpp
         src/CAN2515.h
-        src/LED.cpp
-        src/LED.h
-        src/Switch.cpp
-        src/Switch.h
         src/CreateDefaultStorageForPlatform.cpp
         src/DueEepromEmulationStorage.cpp
         src/DueEepromEmulationStorage.h
@@ -30,13 +26,21 @@ add_library(hardware_library OBJECT
         src/EepromInternalStorage.h
         src/FlashStorage.cpp
         src/FlashStorage.h
-        src/LEDUserInterface.cpp
-        src/LEDUserInterface.h
-        src/SerialUserInterface.cpp
-        src/SerialUserInterface.h
         src/SerialGC.h
         src/SerialGC.cpp
         )
+
+# The LED_UI_library was added as a workaround for building test code.
+# It uses hardware and thus cannot be tested properly like the core_library.
+# But LEDUserInterface is used by the ServiceFactory so must be built for tests.
+add_library(LED_UI_library OBJECT
+        src/LED.cpp
+        src/LED.h
+        src/Switch.cpp
+        src/Switch.h
+        src/LEDUserInterface.cpp
+        src/LEDUserInterface.h
+)
 
 add_library(core_library OBJECT
 
@@ -57,6 +61,8 @@ add_library(core_library OBJECT
         src/MinimumNodeService.h
         src/MinimumNodeServiceWithDiagnostics.h
         src/MinimumNodeServiceWithDiagnostics.cpp
+        src/SerialUserInterface.cpp
+        src/SerialUserInterface.h
         src/CanService.cpp
         src/CanService.h
         src/CanServiceWithDiagnostics.cpp
@@ -85,6 +91,7 @@ target_link_libraries(core_library PUBLIC)
 
 add_executable(VLCB_Arduino
         $<TARGET_OBJECTS:core_library>
+        $<TARGET_OBJECTS:LED_UI_library>
         $<TARGET_OBJECTS:hardware_library>
 
         Arduino/Arduino.h
@@ -99,6 +106,7 @@ add_executable(VLCB_Arduino
         examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino)
 
 add_executable(testAll
+        $<TARGET_OBJECTS:LED_UI_library>
         $<TARGET_OBJECTS:core_library>
         
         test/ArduinoMock.cpp
