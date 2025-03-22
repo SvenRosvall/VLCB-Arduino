@@ -21,14 +21,24 @@ void enableDiagnostics()
   svcFactory = new ServiceFactoryWithDiagnostics;
 }
 
+MinimumNodeService * createMinimumNodeService()
+{
+  return svcFactory->createMinimumNodeService();
+}
+
 CanService * createCanService(CanTransport *tpt)
 {
   return svcFactory->createCanService(tpt);
 }
 
-MinimumNodeService * createMinimumNodeService()
+SerialUserInterface * createSerialUserInterface(CanTransport *tpt)
 {
-  return svcFactory->createMinimumNodeService();
+  return svcFactory->createSerialUserInterface(tpt);
+}
+
+LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
+{
+  return svcFactory->createLEDUserInterface(greenLedPin, yellowLedPin, pushButtonPin);
 }
 
 void setServices(std::initializer_list<Service *> services)

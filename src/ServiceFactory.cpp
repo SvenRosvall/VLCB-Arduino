@@ -7,6 +7,8 @@
 #include "CanService.h"
 #include "MinimumNodeServiceWithDiagnostics.h"
 #include "CanServiceWithDiagnostics.h"
+#include "SerialUserInterface.h"
+#include "LEDUserInterface.h"
 
 namespace VLCB
 {
@@ -29,6 +31,16 @@ CanService *ServiceFactoryNoDiagnostics::createCanService(CanTransport *tpt)
 CanService *ServiceFactoryWithDiagnostics::createCanService(CanTransport *tpt)
 {
   return new CanServiceWithDiagnostics(tpt);
+}
+
+SerialUserInterface *ServiceFactory::createSerialUserInterface(CanTransport *tpt)
+{
+  return new SerialUserInterface(tpt);
+}
+
+LEDUserInterface * ServiceFactory::createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
+{
+  return new LEDUserInterface(greenLedPin, yellowLedPin, pushButtonPin);
 }
 
 }

@@ -12,12 +12,16 @@ namespace VLCB
 class CanTransport;
 class MinimumNodeService;
 class CanService;
+class SerialUserInterface;
+class LEDUserInterface;
 
 class ServiceFactory
 {
 public:
   virtual MinimumNodeService * createMinimumNodeService() = 0;
   virtual CanService * createCanService(CanTransport *tpt) = 0;
+  SerialUserInterface *createSerialUserInterface(CanTransport *tpt);
+  LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 };
 
 class ServiceFactoryNoDiagnostics : public ServiceFactory
