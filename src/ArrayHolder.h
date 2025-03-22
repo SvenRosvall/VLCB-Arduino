@@ -39,6 +39,7 @@ public:
 
 private:
   static E* copyArray(const E * a, size_t len);
+  void freeArray();
 
   const E* array;
   size_t len;
@@ -59,19 +60,18 @@ ArrayHolder<E>::ArrayHolder(const std::initializer_list<E> &il)
 template<typename E>
 ArrayHolder<E>::~ArrayHolder()
 {
-  if (array != nullptr)
-  {
-    delete[] array;
-  }
+  freeArray();
 }
 
 template<typename E>
 ArrayHolder<E> & ArrayHolder<E>::operator=(const std::initializer_list<E> & il)
 {
+  freeArray();
+
   array = copyArray(il.begin(), il.size());
   len = il.size();
   return *this;
-}        
+}
 
 template<typename E>
 E* ArrayHolder<E>::copyArray(const E * a, size_t len)
@@ -82,6 +82,15 @@ E* ArrayHolder<E>::copyArray(const E * a, size_t len)
     array[i] = a[i];
   }
   return array;
+}
+
+template<typename E>
+void ArrayHolder<E>::freeArray()
+{
+  if (this->array != nullptr)
+  {
+    delete[] this->array;
+  }
 }
 
 }
