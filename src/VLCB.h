@@ -24,6 +24,7 @@
 
 namespace VLCB
 {
+void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 void enableDiagnostics();
 MinimumNodeService * createMinimumNodeService();
 CanService * createCanService(CanTransport *tpt);

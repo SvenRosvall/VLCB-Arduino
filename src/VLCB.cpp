@@ -15,6 +15,20 @@ Controller controller(&modconfig); // Controller object
 
 Parameters params(modconfig);
 
+void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
+{
+  // Called at the startup of the module. Check if the push button is pressed
+  // at startup and check for a sequence of presses for actions.
+  // TODO: See how this is described in VLCB Tech Intro doc.
+  // Might return a value for actions the application may take such as enter test mode.
+
+  // For now, we just do a factory reset if switch is depressed at startup
+  if (digitalRead(pushButtonPin))
+  {
+    VLCB::resetModule();
+  }
+}
+
 void enableDiagnostics()
 {
   delete svcFactory;
