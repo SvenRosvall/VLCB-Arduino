@@ -53,13 +53,12 @@ void processModuleSwitchChange();
 //
 void setupVLCB()
 {
-  // Keep a handle on the LED user interface as it is used to check for resetting the module.
-  VLCB::LEDUserInterface *ledUserInterface = VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0);
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
 
   VLCB::enableDiagnostics();
   VLCB::setServices({
     VLCB::createMinimumNodeService(),
-    ledUserInterface, 
+    VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0), 
     VLCB::createSerialUserInterface(&can2515),
     VLCB::createCanService(&can2515),
     &nvService,
@@ -80,13 +79,6 @@ void setupVLCB()
 
   // set module name
   VLCB::setName(mname);
-
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface->isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    VLCB::resetModule();
-  }
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
