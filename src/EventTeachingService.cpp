@@ -507,13 +507,13 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   if (evnum <= 1)
   {
     module_config->writeEvent(index, &msg->data[1]);
+
+    // recreate event hash table entry
+    // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
+    module_config->updateEvHashEntry(index);
   }
 
   module_config->writeEventEV(index, evnum, evval);
-
-  // recreate event hash table entry
-  // DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
-  module_config->updateEvHashEntry(index);
 
   // respond with WRACK
   controller->sendWRACK();  // Deprecated in favour of GRSP_OK
@@ -572,13 +572,13 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
   {
     module_config->writeEvent(index, &msg->data[1]);
     //DEBUG_SERIAL << F("ets> Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
+
+    // recreate event hash table entry
+    //DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
+    module_config->updateEvHashEntry(index);
   }
 
   module_config->writeEventEV(index, evIndex, evVal);
-
-  // recreate event hash table entry
-  //DEBUG_SERIAL << F("ets> updating hash table entry for idx = ") << index << endl;
-  module_config->updateEvHashEntry(index);
 
   // respond with WRACK
   controller->sendWRACK();  // Deprecated in favour of GRSP_OK
