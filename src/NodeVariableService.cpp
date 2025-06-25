@@ -70,7 +70,7 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
   if (nvindex == 0)
   {
     controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->EE_NUM_NVS);
-    if (!controller->getModuleConfig()->fcuCompatible)
+    if (!module_config->fcuCompatible)
     {
       for (int i = 1; i <= module_config->EE_NUM_NVS; ++i)
       {
