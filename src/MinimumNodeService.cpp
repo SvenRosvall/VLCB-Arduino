@@ -307,7 +307,7 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
 
     //DEBUG_SERIAL << F("> RQNPN request for parameter # ") << paran << F(", from nn = ") << nn << endl;
 
-    if (paran == 0)
+    if ((paran == 0) && notFcuCompatible)
     {
       for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
       {
@@ -499,6 +499,11 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
       noHeartbeat = (requestedMode == MODE_HEARTBEAT_OFF);
       controller->getModuleConfig()->setHeartbeat(!noHeartbeat);
       break;
+      
+    case MODE_FCU_COMPATABILITY_ON:
+    case MODE_FCU_COMPATABILITY_OFF:
+      notFcuCompatible = (requestedMode == MODE_FCU_COMPATABILITY_OFF);
+      controller->getModuleConfig()->setFcuCompatability(!notFcuCompatible);
       
     default:
       if (instantMode != MODE_NORMAL)

@@ -28,6 +28,7 @@ private:
   void handleReadNV(const VlcbMessage *msg, unsigned int nn);
   void handleSetNV(const VlcbMessage *msg, unsigned int nn);
   void handleSetAndReadNV(const VlcbMessage *msg, unsigned int nn);
+  
 };
 
 }
