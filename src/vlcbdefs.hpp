@@ -577,6 +577,9 @@ enum VlcbModeParams : unsigned char
   MODE_HEARTBEAT_OFF = 0x0D, // Turn off heartbeat
   // Boot modes
   MODE_BOOT = 0x0E, // PIC Boot loader mode
+  //FCU Compatability
+  MODE_FCU_COMPATABILITY_ON = 0X10, // Turn on FCU compatability
+  MODE_FCU_COMPATABILITY_OFF = 0X11, // Turn off FCU compatability
 };
 
 enum VlcbBusTypes : unsigned char
