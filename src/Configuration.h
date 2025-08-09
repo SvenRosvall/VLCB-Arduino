@@ -30,6 +30,7 @@ enum EepromLocations {
 enum FlagBits {
   HEARTBEAT_BIT = 0,
   EVENT_ACK_BIT = 1,
+  FCU_COMPATIBLE_BIT = 2
 };
 
 //
@@ -70,6 +71,7 @@ public:
   void setHeartbeat(bool beat);
   void setNodeNum(unsigned int nn);
   void setEventAck(bool ea);
+  void setFcuCompatability(bool fcu);
 
   void setResetFlag();
   void clearResetFlag();
@@ -87,6 +89,7 @@ public:
 
   bool heartbeat;
   bool eventAck;
+  bool fcuCompatible;
   byte CANID;
   VlcbModeParams currentMode;
   unsigned int nodeNum;

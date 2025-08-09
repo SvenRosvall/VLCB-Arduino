@@ -344,10 +344,13 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   {
     // Return number of EVs. This may be dynamic in other implementations.
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->EE_NUM_EVS);
-    for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+    if (!module_config->fcuCompatible)
     {
-      byte value = module_config->getEventEVval(eventIndex, i);
-      controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
+      for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+      {
+        byte value = module_config->getEventEVval(eventIndex, i);
+        controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
+      }
     }
   }
   else
@@ -632,11 +635,14 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     response.data[5] = 0;
     response.data[6] = module_config->EE_NUM_EVS;
     controller->sendMessage(&response);
-    for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+    if (!module_config->fcuCompatible)
     {
-      response.data[5] = i;
-      response.data[6] = module_config->getEventEVval(index, i);
-      controller->sendMessage(&response);
+      for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+      {
+        response.data[5] = i;
+        response.data[6] = module_config->getEventEVval(index, i);
+        controller->sendMessage(&response);
+      }
     }
   }
   else

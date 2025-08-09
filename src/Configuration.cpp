@@ -120,6 +120,14 @@ void Configuration::setEventAck(bool ea)
   storage->write(LOCATION_FLAGS, servicePersist);
 }
 
+void Configuration::setFcuCompatability(bool fcu)
+{
+  fcuCompatible = fcu;
+  byte mode = storage->read(LOCATION_FLAGS);
+  bitWrite(mode, FCU_COMPATIBLE_BIT, fcu);
+  storage->write(LOCATION_FLAGS, mode);
+}
+
 //
 /// store the CANID
 //
@@ -592,6 +600,7 @@ void Configuration::loadNVs()
   byte flags = storage->read(LOCATION_FLAGS);
   heartbeat = flags & (1 << HEARTBEAT_BIT);
   eventAck = flags & (1 << EVENT_ACK_BIT);
+  fcuCompatible = flags & (1 << FCU_COMPATIBLE_BIT);
   // DEBUG_SERIAL << "Configuration::loadNVs() mode=" << currentMode << ", CANID=" << CANID << ", nodeNum=" << nodeNum << ", flags=" << _HEX(flags) << endl;
 }
 

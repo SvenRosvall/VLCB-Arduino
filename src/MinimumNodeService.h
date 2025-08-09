@@ -45,6 +45,7 @@ private:
   byte heartbeatSequence = 0;
   bool noHeartbeat = false;
   unsigned int heartRate = 5000;
+  bool notFcuCompatible = false;  //Compatible is default
 
   void handleRequestNodeParameters();
   void handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
