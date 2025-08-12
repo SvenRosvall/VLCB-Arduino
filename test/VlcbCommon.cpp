@@ -23,7 +23,6 @@ VLCB::Configuration * createConfiguration()
   configuration->EE_MAX_EVENTS = 20;
   configuration->EE_PRODUCED_EVENTS = 1;
   configuration->EE_NUM_EVS = 2;
-  configuration->setFcuCompatability(false);
   configuration->begin();
   return configuration;
 }
