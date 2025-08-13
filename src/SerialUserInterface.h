@@ -15,17 +15,12 @@ namespace VLCB
 class SerialUserInterface : public Service
 {
 public:
-  SerialUserInterface(Transport *transport);
-
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_HIDDEN; };
   virtual byte getServiceVersionID() const override { return 1; };
 
   virtual void process(const Action *action) override;
 
 private:
-  Transport * transport;
-  bool isResetRequested = false;
-
   void handleAction(const Action *action);
   void processSerialInput();
   void indicateMode(VlcbModeParams i);

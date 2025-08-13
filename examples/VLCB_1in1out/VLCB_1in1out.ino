@@ -58,8 +58,8 @@ void setupVLCB()
   VLCB::enableDiagnostics();
   VLCB::setServices({
     VLCB::createMinimumNodeService(),
-    VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0), 
-    VLCB::createSerialUserInterface(&can2515),
+    VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0),
+    VLCB::createSerialUserInterface(),
     VLCB::createCanService(&can2515),
     &nvService,
     &ecService,

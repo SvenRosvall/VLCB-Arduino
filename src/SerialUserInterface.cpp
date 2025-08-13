@@ -12,11 +12,6 @@ extern void printConfig();
 namespace VLCB
 {
 
-SerialUserInterface::SerialUserInterface(Transport *transport)
-  : transport(transport)
-{
-}
-
 void SerialUserInterface::process(const Action *action)
 {
   handleAction(action);
@@ -122,24 +117,9 @@ void SerialUserInterface::processSerialInput()
 
         break;
 
-        // CAN bus status
-      case 'c':
-        Serial << F(" messages received = ") << transport->receiveCounter()
-               << F(", sent = ") << transport->transmitCounter()
-               << F(", receive errors = ") << transport->receiveErrorCounter()
-               << F(", transmit errors = ") << transport->transmitErrorCounter()
-               << F(", error status = ") << transport->errorStatus()
-        << endl;
-        break;
-
       case 'h':
         // event hash table
         modconfig->printEvHashTable(false);
-        break;
-
-      case 'y':
-        // reset CAN bus and VLCB message processing
-        transport->reset();
         break;
 
       case '*':

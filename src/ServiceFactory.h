@@ -20,7 +20,7 @@ class ServiceFactory
 public:
   virtual MinimumNodeService * createMinimumNodeService() = 0;
   virtual CanService * createCanService(CanTransport *tpt) = 0;
-  SerialUserInterface *createSerialUserInterface(CanTransport *tpt);
+  SerialUserInterface *createSerialUserInterface();
   LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 };
 

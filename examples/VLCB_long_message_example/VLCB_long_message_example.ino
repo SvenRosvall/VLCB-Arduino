@@ -30,7 +30,7 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 // Controller objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::SerialUserInterface serialUserInterface(&can2515);
+VLCB::SerialUserInterface serialUserInterface();
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;

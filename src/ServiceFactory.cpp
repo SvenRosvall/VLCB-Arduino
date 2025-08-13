@@ -33,9 +33,9 @@ CanService *ServiceFactoryWithDiagnostics::createCanService(CanTransport *tpt)
   return new CanServiceWithDiagnostics(tpt);
 }
 
-SerialUserInterface *ServiceFactory::createSerialUserInterface(CanTransport *tpt)
+SerialUserInterface *ServiceFactory::createSerialUserInterface()
 {
-  return new SerialUserInterface(tpt);
+  return new SerialUserInterface();
 }
 
 LEDUserInterface * ServiceFactory::createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)

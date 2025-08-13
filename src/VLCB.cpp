@@ -45,9 +45,9 @@ CanService * createCanService(CanTransport *tpt)
   return svcFactory->createCanService(tpt);
 }
 
-SerialUserInterface * createSerialUserInterface(CanTransport *tpt)
+SerialUserInterface *createSerialUserInterface()
 {
-  return svcFactory->createSerialUserInterface(tpt);
+  return svcFactory->createSerialUserInterface();
 }
 
 LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
