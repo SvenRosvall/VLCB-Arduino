@@ -36,6 +36,8 @@ void MinimumNodeService::begin()
   noHeartbeat = !controller->getModuleConfig()->heartbeat;
   controller->indicateMode(instantMode);
   //DEBUG_SERIAL << F("> instant MODE initialise as: ") << instantMode << endl;
+  
+  notFcuCompatible = !controller->getModuleConfig()->fcuCompatible;
 }
 
 //
