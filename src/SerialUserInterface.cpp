@@ -61,7 +61,7 @@ void SerialUserInterface::processSerialInput()
 
         for (byte j = 0; j < (modconfig->EE_NUM_EVS); j++)
         {
-          Serial << _FMT("EV% | ", _WIDTHZ(j + 1, 3));
+          Serial << _FMT(F("EV% | "), _WIDTHZ(j + 1, 3));
         }
 
         Serial << F("Hash |") << endl;
@@ -72,18 +72,18 @@ void SerialUserInterface::processSerialInput()
         {
           if (modconfig->getEvTableEntry(j) != 0)
           {
-            Serial << _FMT("  %  | ", _WIDTHZ(j, 3));
+            Serial << _FMT(F("  %  | "), _WIDTHZ(j, 3));
 
             // for each data byte of this event
             byte evarray[4];
             modconfig->readEvent(j, evarray);
             for (byte e = 0; e < 4; e++)
             {
-              Serial << _FMT(" 0x% | ", _WIDTHZ(_HEX(evarray[e]), 2));
+              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(evarray[e]), 2));
             }
             for (byte ev = 1; ev <= modconfig->EE_NUM_EVS; ev++)
             {
-              Serial << _FMT(" 0x% | ", _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
+              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
             }
 
             Serial << _FMT("%", _WIDTH(modconfig->getEvTableEntry(j), 4)) << endl;
@@ -97,14 +97,14 @@ void SerialUserInterface::processSerialInput()
         // NVs
       case 'v':
         // note NVs number from 1, not 0
-        Serial << "> Node variables" << endl;
+        Serial << F("> Node variables") << endl;
         Serial << F("   NV   Val") << endl;
         Serial << F("  --------------------") << endl;
 
         for (byte j = 1; j <= modconfig->EE_NUM_NVS; j++)
         {
           byte v = modconfig->readNV(j);
-          Serial << _FMT(" - % : % | 0x%", _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;
+          Serial << _FMT(F(" - % : % | 0x%"), _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;
         }
 
         Serial << endl << endl;

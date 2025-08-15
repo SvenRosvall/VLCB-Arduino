@@ -436,7 +436,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
   }
   else
   {
-    Serial << "RQSD wrong svcIx=" << serviceIndex << endl;
+    // DEBUG_SERIAL << "RQSD wrong svcIx=" << serviceIndex << endl;
     // Couldn't find the service.
     controller->sendGRSP(OPC_RQSD, getServiceID(), GRSP_INVALID_SERVICE);
   }
