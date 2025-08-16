@@ -23,7 +23,8 @@ void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
   // Might return a value for actions the application may take such as enter test mode.
 
   // For now, we just do a factory reset if switch is depressed at startup
-  if (digitalRead(pushButtonPin))
+  pinMode(pushButtonPin, INPUT_PULLUP);
+  if (digitalRead(pushButtonPin) == LOW)
   {
     VLCB::resetModule();
   }
