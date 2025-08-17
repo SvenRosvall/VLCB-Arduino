@@ -6,6 +6,11 @@
 #pragma once
 
 #include <Service.h>
+#include "ConsumeOwnEventsService.h"
+#include "NodeVariableService.h"
+#include "EventConsumerService.h"
+#include "EventTeachingService.h"
+#include "EventProducerService.h"
 
 namespace VLCB
 {
@@ -20,6 +25,11 @@ class ServiceFactory
 public:
   virtual MinimumNodeService * createMinimumNodeService() = 0;
   virtual CanService * createCanService(CanTransport *tpt) = 0;
+  NodeVariableService *createNodeVariableService();
+  EventConsumerService *createEventConsumerService(void (*eventHandler)(byte, const VlcbMessage *));
+  EventTeachingService *createEventTeachingService();
+  EventProducerService *createEventProducerService();
+  ConsumeOwnEventsService *createConsumeOwnEventsService();
   SerialUserInterface *createSerialUserInterface();
   LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 };

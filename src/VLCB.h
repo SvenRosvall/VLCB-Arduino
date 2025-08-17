@@ -28,6 +28,11 @@ void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
 void enableDiagnostics();
 MinimumNodeService * createMinimumNodeService();
 CanService * createCanService(CanTransport *tpt);
+NodeVariableService * createNodeVariableService();
+ConsumeOwnEventsService * createConsumeOwnEventsService();
+EventConsumerService * createEventConsumerService(void (*param)(byte, const VlcbMessage *));
+EventTeachingService * createEventTeachingService();
+EventProducerService * createEventProducerService();
 SerialUserInterface *createSerialUserInterface();
 LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 void setServices(std::initializer_list<Service *> services);
@@ -48,4 +53,5 @@ void resetModule();
 
 void begin();
 void process();
+void sendEvent(bool state, byte channel);
 }

@@ -33,6 +33,33 @@ CanService *ServiceFactoryWithDiagnostics::createCanService(CanTransport *tpt)
   return new CanServiceWithDiagnostics(tpt);
 }
 
+NodeVariableService *ServiceFactory::createNodeVariableService()
+{
+  return new NodeVariableService;
+}
+
+EventConsumerService *ServiceFactory::createEventConsumerService(void (*eventHandler)(byte, const VlcbMessage *))
+{
+  auto svc = new EventConsumerService;
+  svc->setEventHandler(eventHandler);
+  return svc;
+}
+
+EventTeachingService *ServiceFactory::createEventTeachingService()
+{
+  return new EventTeachingService;
+}
+
+EventProducerService *ServiceFactory::createEventProducerService()
+{
+  return new EventProducerService;
+}
+
+ConsumeOwnEventsService *ServiceFactory::createConsumeOwnEventsService()
+{
+  return new ConsumeOwnEventsService;
+}
+
 SerialUserInterface *ServiceFactory::createSerialUserInterface()
 {
   return new SerialUserInterface();

@@ -30,11 +30,6 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
 VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::NodeVariableService nvService;
-VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService;
-VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService;
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -61,11 +56,11 @@ void setupVLCB()
     VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0),
     VLCB::createSerialUserInterface(),
     VLCB::createCanService(&can2515),
-    &nvService,
-    &ecService,
-    &epService,
-    &etService,
-    &coeService});
+    VLCB::createNodeVariableService(),
+    VLCB::createConsumeOwnEventsService(),
+    VLCB::createEventConsumerService(eventhandler),
+    VLCB::createEventTeachingService(),
+    VLCB::createEventProducerService()});
 
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
@@ -79,9 +74,6 @@ void setupVLCB()
 
   // set module name
   VLCB::setName(mname);
-
-  // register our VLCB event handler, to receive event messages of learned events
-  ecService.setEventHandler(eventhandler);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(2, 2);      // more buffers = more memory used, fewer = less
@@ -176,7 +168,7 @@ void processModuleSwitchChange()
   {
     bool state = moduleSwitch.isPressed();
     byte inputChannel = 1;  
-    epService.sendEvent(state, inputChannel);
+    VLCB::sendEvent(state, inputChannel);
   }
 }
 

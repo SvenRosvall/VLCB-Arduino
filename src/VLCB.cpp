@@ -8,12 +8,16 @@
 
 namespace VLCB
 {
-ServiceFactory * svcFactory = new ServiceFactoryNoDiagnostics;
-
-Configuration modconfig;               // configuration object
-Controller controller(&modconfig); // Controller object
-
-Parameters params(modconfig);
+namespace
+{
+  ServiceFactory *svcFactory = new ServiceFactoryNoDiagnostics;
+  
+  Configuration modconfig;               // configuration object
+  Controller controller(&modconfig); // Controller object
+  
+  Parameters params(modconfig);
+  EventProducerService *epService;
+}
 
 void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
 {
@@ -44,6 +48,33 @@ MinimumNodeService * createMinimumNodeService()
 CanService * createCanService(CanTransport *tpt)
 {
   return svcFactory->createCanService(tpt);
+}
+
+NodeVariableService * createNodeVariableService()
+{
+  return svcFactory->createNodeVariableService();
+}
+
+ConsumeOwnEventsService * createConsumeOwnEventsService()
+{
+  return svcFactory->createConsumeOwnEventsService();
+}
+
+EventConsumerService * createEventConsumerService(void (*eventHandler)(byte, const VlcbMessage *))
+{
+  return svcFactory->createEventConsumerService(eventHandler);
+}
+
+EventTeachingService * createEventTeachingService()
+{
+  return svcFactory->createEventTeachingService();
+}
+
+EventProducerService * createEventProducerService()
+{
+  auto svc = svcFactory->createEventProducerService();
+  epService = svc;
+  return svc;
 }
 
 SerialUserInterface *createSerialUserInterface()
@@ -136,6 +167,14 @@ void begin()
 void process()
 {
   controller.process();
+}
+
+void sendEvent(bool state, byte channel)
+{
+  if (epService != nullptr)
+  {
+    epService->sendEvent(state, channel);
+  }
 }
 
 }
