@@ -37,6 +37,16 @@ Split this class in two:
   1. all the other stuff a developer would want, such as transport statistics and
      resetting the module.
 
+## Introduce MemoryService
+If SerialUserInterface is not included in the service list then there is no
+way to check free memory.
+A dedicated MemoryService could provide free memory amount as a diagnostic value.
+
+What other internal information would be useful for this service?
+
+Is this a service that should be included in the VLCB specifications?
+Or should it be treated as a user defined service?
+
 ## Move CAN2515 to its own package/repo
 Now that we are getting more CAN transport implementations it is time to move CAN2515 
 away into its own library. 

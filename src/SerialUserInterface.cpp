@@ -42,14 +42,18 @@ void SerialUserInterface::processSerialInput()
 
         // node identity
         Serial << F("> VLCB node configuration") << endl;
-        Serial << F("> mode = ") << Configuration::modeString(modconfig->currentMode) << F(", CANID = ") << modconfig->CANID << F(", node number = ") << modconfig->nodeNum << endl;
+        Serial << F("> mode = ") << Configuration::modeString(modconfig->currentMode)
+               << F(", CANID = ") << modconfig->CANID
+               << F(", node number = ") << modconfig->nodeNum << endl;
         Serial << endl;
         break;
 
       case 'e':
         // EEPROM learned event data table
         Serial << F("> stored events ") << endl;
-        Serial << F("  max events = ") << modconfig->EE_MAX_EVENTS << F(" EVs per event = ") << modconfig->EE_NUM_EVS << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
+        Serial << F("  max events = ") << modconfig->EE_MAX_EVENTS
+               << F(" EVs per event = ") << modconfig->EE_NUM_EVS 
+               << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
 
         for (byte j = 0; j < modconfig->EE_MAX_EVENTS; j++)
         {
@@ -195,7 +199,6 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
 {
   switch (mode) 
   {
-
     case MODE_NORMAL:
       Serial << "Module in NORMAL mode" << endl;
       break;
