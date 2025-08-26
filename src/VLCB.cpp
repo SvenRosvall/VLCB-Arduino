@@ -15,7 +15,6 @@ namespace
   Configuration modconfig;               // configuration object
   Controller controller(&modconfig); // Controller object
   
-  Parameters params(modconfig);
   EventProducerService *epService;
 }
 
@@ -99,13 +98,13 @@ void setName(char *mname)
 
 void setVersion(char maj, char min, char beta)
 {
-  params.setVersion(maj, min, beta);
+  controller.getParams().setVersion(maj, min, beta);
 }
 
 void setModuleId(byte manu, byte moduleId)
 {
-  params.setManufacturer(manu);
-  params.setModuleId(moduleId);
+  controller.getParams().setManufacturer(manu);
+  controller.getParams().setModuleId(moduleId);
 }
 
 void setNumNodeVariables(byte n)

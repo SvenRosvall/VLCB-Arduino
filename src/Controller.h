@@ -79,7 +79,7 @@ public:
 
   void updateParamFlags();
   void setParamFlag(VlcbParamFlags flag, bool set);
-  Parameters getParams() { return _mparams; }
+  Parameters & getParams() { return _mparams; }
   unsigned char getParam(unsigned int param) const { return _mparams.getParams()[param]; }
 
   bool sendMessage(const VlcbMessage *msg);
