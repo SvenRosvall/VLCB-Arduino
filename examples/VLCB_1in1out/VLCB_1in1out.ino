@@ -30,6 +30,15 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
 VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface;
+VLCB::MinimumNodeServiceWithDiagnostics mnService;
+VLCB::CanServiceWithDiagnostics canService(&can2515);
+VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
+VLCB::EventConsumerService ecService;
+VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 
 // module objects
 VLCB::Switch moduleSwitch(5);            // an example switch as input
@@ -50,17 +59,9 @@ void setupVLCB()
 {
   VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
 
-  VLCB::enableDiagnostics();
   VLCB::setServices({
-    VLCB::createMinimumNodeService(),
-    VLCB::createLEDUserInterface(LED_GRN, LED_YLW, SWITCH0),
-    VLCB::createSerialUserInterface(),
-    VLCB::createCanService(&can2515),
-    VLCB::createNodeVariableService(),
-    VLCB::createConsumeOwnEventsService(),
-    VLCB::createEventConsumerService(eventhandler),
-    VLCB::createEventTeachingService(),
-    VLCB::createEventProducerService()});
+    &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
+    &ecService, &epService, &etService, &coeService});
 
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
@@ -168,7 +169,7 @@ void processModuleSwitchChange()
   {
     bool state = moduleSwitch.isPressed();
     byte inputChannel = 1;  
-    VLCB::sendEvent(state, inputChannel);
+    epService.sendEvent(state, inputChannel);
   }
 }
 

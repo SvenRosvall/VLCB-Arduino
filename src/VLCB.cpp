@@ -10,12 +10,8 @@ namespace VLCB
 {
 namespace
 {
-  ServiceFactory *svcFactory = new ServiceFactoryNoDiagnostics;
-  
   Configuration modconfig;               // configuration object
   Controller controller(&modconfig); // Controller object
-  
-  EventProducerService *epService;
 }
 
 void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
@@ -31,59 +27,6 @@ void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
   {
     VLCB::resetModule();
   }
-}
-
-void enableDiagnostics()
-{
-  delete svcFactory;
-  svcFactory = new ServiceFactoryWithDiagnostics;
-}
-
-MinimumNodeService * createMinimumNodeService()
-{
-  return svcFactory->createMinimumNodeService();
-}
-
-CanService * createCanService(CanTransport *tpt)
-{
-  return svcFactory->createCanService(tpt);
-}
-
-NodeVariableService * createNodeVariableService()
-{
-  return svcFactory->createNodeVariableService();
-}
-
-ConsumeOwnEventsService * createConsumeOwnEventsService()
-{
-  return svcFactory->createConsumeOwnEventsService();
-}
-
-EventConsumerService * createEventConsumerService(void (*eventHandler)(byte, const VlcbMessage *))
-{
-  return svcFactory->createEventConsumerService(eventHandler);
-}
-
-EventTeachingService * createEventTeachingService()
-{
-  return svcFactory->createEventTeachingService();
-}
-
-EventProducerService * createEventProducerService()
-{
-  auto svc = svcFactory->createEventProducerService();
-  epService = svc;
-  return svc;
-}
-
-SerialUserInterface *createSerialUserInterface()
-{
-  return svcFactory->createSerialUserInterface();
-}
-
-LEDUserInterface * createLEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
-{
-  return svcFactory->createLEDUserInterface(greenLedPin, yellowLedPin, pushButtonPin);
 }
 
 void setServices(std::initializer_list<Service *> services)
@@ -166,14 +109,6 @@ void begin()
 void process()
 {
   controller.process();
-}
-
-void sendEvent(bool state, byte channel)
-{
-  if (epService != nullptr)
-  {
-    epService->sendEvent(state, channel);
-  }
 }
 
 }
