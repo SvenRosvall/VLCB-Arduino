@@ -31,7 +31,7 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 // Controller objects
 VLCB::CAN2515 can2515;                  // CAN transport object
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface();
+VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
 VLCB::CanServiceWithDiagnostics canService(&can2515);
 
@@ -46,8 +46,10 @@ void printConfig();
 //
 void setupVLCB()
 {
-  VLCB::setServices(
-          {&mnService, &ledUserInterface, &serialUserInterface, &canService});
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
+
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &serialUserInterface, &canService});
 
   // set module parameters
   VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
@@ -55,13 +57,6 @@ void setupVLCB()
 
   // set module name
   VLCB::setName(mname);
-
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    VLCB::resetModule();
-  }
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less

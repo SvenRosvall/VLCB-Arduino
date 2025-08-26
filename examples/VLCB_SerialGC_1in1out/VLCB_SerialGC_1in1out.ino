@@ -64,8 +64,12 @@ void processModuleSwitchChange();
 //
 void setupVLCB()
 {
-  VLCB::setServices(
-          {&mnService, &ledUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService});
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
+
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &canService, &nvService,
+    &ecService, &epService, &etService, &coeService});
+
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
@@ -78,13 +82,6 @@ void setupVLCB()
 
   // set module name
   VLCB::setName(mname);
-
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    VLCB::resetModule();
-  }
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);

@@ -10,7 +10,6 @@
 #include <memory>
 #include "TestTools.hpp"
 #include "Controller.h"
-#include "ServiceFactory.h"
 #include "MinimumNodeServiceWithDiagnostics.h"
 #include "CanServiceWithDiagnostics.h"
 #include "VlcbCommon.h"
@@ -23,16 +22,15 @@ std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 // Use MockCanTransport to test CanTransport class.
 std::unique_ptr<MockCanTransport> mockCanTransport;
-VLCB::ServiceFactoryWithDiagnostics factory;
 
 VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
 {
-  minimumNodeService.reset(factory.createMinimumNodeService());
+  minimumNodeService.reset(new VLCB::MinimumNodeServiceWithDiagnostics);
 
   mockCanTransport.reset(new MockCanTransport);
 
   static std::unique_ptr<VLCB::CanService> canService;
-  canService.reset(factory.createCanService(mockCanTransport.get()));
+  canService.reset(new VLCB::CanServiceWithDiagnostics(mockCanTransport.get()));
 
   VLCB::Controller controller = ::createController(startupMode, {minimumNodeService.get(), canService.get()});
   controller.begin();

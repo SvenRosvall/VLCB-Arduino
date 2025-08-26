@@ -14,7 +14,7 @@
 #include <Streaming.h>
 
 // VLCB library header files
-#include <VLCB.h>                   // Controller class
+#include <VLCB.h>
 #include <CAN2515.h>               // Chosen CAN controller
 
 // constants
@@ -28,9 +28,9 @@ const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // Controller objects
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::SerialUserInterface serialUserInterface();
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&can2515);
 VLCB::NodeVariableService nvService;
@@ -56,8 +56,11 @@ char lmsg_out[32], lmsg_in[32];     // message buffers
 //
 void setupVLCB()
 {
-  VLCB::setServices(
-          {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &lmsg, &ecService, &epService, &etService});
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
+
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &lmsg,
+    &ecService, &epService, &etService});
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
@@ -70,13 +73,6 @@ void setupVLCB()
 
   // set module name
   VLCB::setName(mname);
-
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    VLCB::resetModule();
-  }
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);

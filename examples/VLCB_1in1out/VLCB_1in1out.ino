@@ -76,6 +76,9 @@ void setupVLCB()
   // set module name
   VLCB::setName(mname);
 
+  // register our VLCB event handler, to receive event messages of learned events
+  ecService.setEventHandler(eventhandler);
+
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(2, 2);      // more buffers = more memory used, fewer = less
   can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module

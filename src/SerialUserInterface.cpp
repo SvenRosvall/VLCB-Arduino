@@ -169,7 +169,6 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
 {
   switch (mode) 
   {
-
     case MODE_NORMAL:
       Serial << "Module in NORMAL mode" << endl;
       break;
