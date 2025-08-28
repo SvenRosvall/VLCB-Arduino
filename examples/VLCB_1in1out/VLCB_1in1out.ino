@@ -17,6 +17,11 @@
 #include <VLCB.h>
 #include <CAN2515.h>               // Chosen CAN controller
 
+// forward function declarations
+void eventhandler(byte, const VLCB::VlcbMessage *);
+void printConfig();
+void processModuleSwitchChange();
+
 // constants
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
@@ -28,8 +33,16 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// Controller objects
+// module objects
+VLCB::Switch moduleSwitch(5);            // an example switch as input
+VLCB::LED moduleLED(6);                  // an example LED as output
+
+// module name, must be 7 characters, space padded.
+char mname[] = "1IN1OUT";
+
 VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
@@ -39,18 +52,6 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-
-// module objects
-VLCB::Switch moduleSwitch(5);            // an example switch as input
-VLCB::LED moduleLED(6);                  // an example LED as output
-
-// module name, must be 7 characters, space padded.
-char mname[] = "1IN1OUT";
-
-// forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
-void printConfig();
-void processModuleSwitchChange();
 
 //
 /// setup VLCB - runs once at power on from setup()

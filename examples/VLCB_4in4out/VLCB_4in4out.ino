@@ -53,6 +53,11 @@
 
 #include "LEDControl.h"
 
+// forward function declarations
+void eventhandler(byte, const VLCB::VlcbMessage *);
+void printConfig();
+void processSwitches();
+
 // constants
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
@@ -63,18 +68,6 @@ const byte MODULE_ID = 82;          // VLCB module type
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
-
-// Controller objects
-VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface;
-VLCB::MinimumNodeService mnService;
-VLCB::CanService canService(&can2515);
-VLCB::NodeVariableService nvService;
-VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService;
-VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService;
 
 // module name, must be 7 characters, space padded.
 char mname[] = "4IN4OUT";
@@ -91,10 +84,18 @@ Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
 LEDControl moduleLED[NUM_LEDS];     //  LED as output
 bool state[NUM_SWITCHES];
 
-// forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
-void printConfig();
-void processSwitches();
+VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface;
+VLCB::MinimumNodeService mnService;
+VLCB::CanService canService(&can2515);
+VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
+VLCB::EventConsumerService ecService;
+VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 
 //
 /// setup VLCB - runs once at power on from setup()

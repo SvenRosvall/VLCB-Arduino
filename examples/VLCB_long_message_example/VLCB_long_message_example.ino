@@ -17,6 +17,11 @@
 #include <VLCB.h>
 #include <CAN2515.h>               // Chosen CAN controller
 
+// forward function declarations
+void eventhandler(byte, const VLCB::VlcbMessage *);
+void printConfig();
+void longmessagehandler(void *, const unsigned int, const byte, const byte);
+
 // constants
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
@@ -27,8 +32,16 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// Controller objects
+// module name, must be 7 characters, space padded.
+char mname[] = "LMSGEX";
+
+// long message variables
+byte streams[] = {1, 2, 3};         // streams to subscribe to
+char lmsg_out[32], lmsg_in[32];     // message buffers
+
 VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeService mnService;
@@ -38,18 +51,6 @@ VLCB::LongMessageService lmsg;        // Controller RFC0005 long message object
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-
-// module name, must be 7 characters, space padded.
-char mname[] = "LMSGEX";
-
-// forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
-void printConfig();
-void longmessagehandler(void *, const unsigned int, const byte, const byte);
-
-// long message variables
-byte streams[] = {1, 2, 3};         // streams to subscribe to
-char lmsg_out[32], lmsg_in[32];     // message buffers
 
 //
 /// setup VLCB - runs once at power on from setup()
