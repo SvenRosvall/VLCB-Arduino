@@ -153,16 +153,81 @@ The setup code may look like:
 VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
 VLCB::CAN2515 can2515(interruptPin, csPin); 
 VLCB::CanService canService(&can2515);
-VLCB::EepromInternalStorage eepromStorage;
 VLCB::MnsService mnsService;
 VLCB::EventConsumerService eventConsumerService(myActionCallback);
-VLCB::Controller moduleController(eepromStorage, {mnsService, userInterface, canService, eventConsumerService});
+VLCB::Configuration config;
+VLCB::Controller moduleController(&config, {mnsService, userInterface, canService, eventConsumerService});
 
 setup()
 {
-  canTransport.setNumBuffers(2);
-  canTransport.setOscFreq(OSC_FREQ);
-  canTransport.begin();
+  // set config layout parameters
+  modconfig.EE_NUM_NVS = 10;
+  modconfig.EE_MAX_EVENTS = 32;
+  modconfig.EE_PRODUCED_EVENTS = 1;
+  modconfig.EE_NUM_EVS = 2;
+
+  // set module parameters
+  VLCB::Parameters params(modconfig);
+  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  params.setManufacturer(MANUFACTURER);
+  params.setModuleId(MODULE_ID);  
+ 
+  // assign to Controller
+  controller.setParams(params.getParams());
+  controller.setName(mname);
+
+  can2515.setNumBuffers(2);
+  can2515.setOscFreq(OSC_FREQ);
+  can2515.begin();
+  
+  controller.begin();
 }
 ```
 See also the example sketches how to use the VLCB library.
+
+### Convenience functions
+A set of convenience functions have been introduced to remove some
+complexity.
+```
+VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface;
+VLCB::MinimumNodeServiceWithDiagnostics mnService;
+VLCB::CanServiceWithDiagnostics canService(&can2515);
+VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
+VLCB::EventConsumerService ecService;
+VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
+
+//
+/// setup VLCB - runs once at power on from setup()
+//
+void setupVLCB()
+{
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
+    &ecService, &epService, &etService, &coeService});
+
+  // set config layout parameters
+  VLCB::setNumNodeVariables(10);
+  VLCB::setMaxEvents(32);
+  VLCB::setNumProducedEvents(1);
+  VLCB::setNumEventVariables(2); // EV1: Produced event ; EV2: LED1
+
+  // set module parameters
+  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  VLCB::setModuleId(MANUFACTURER, MODULE_ID);
+
+  // set module name
+  VLCB::setName(mname);
+
+  can2515.setNumBuffers(2);
+  can2515.setOscFreq(OSC_FREQ);
+  can2515.begin();
+  
+  VLCB::begin();
+}
+```

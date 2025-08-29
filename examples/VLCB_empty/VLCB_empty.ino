@@ -14,15 +14,11 @@
 #include <Streaming.h>
 
 // VLCB library header files
-#include <Controller.h>                   // Controller class
-#include <CAN2515.h>               // CAN controller
-#include <Configuration.h>             // module configuration
-#include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeServiceWithDiagnostics.h"
-#include "CanServiceWithDiagnostics.h"
-#include "SerialUserInterface.h"
+#include <VLCB.h>
+#include <CAN2515.h>               // Chosen CAN controller
+
+// forward function declarations
+void printConfig();
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -35,43 +31,33 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// Controller objects
-VLCB::Configuration modconfig;               // configuration object
+// module name, must be 7 characters, space padded.
+char mname[] = "EMPTY";
+
 VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&can2515);
+VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
 VLCB::CanServiceWithDiagnostics canService(&can2515);
-VLCB::Controller controller(&modconfig,
-                            {&mnService, &ledUserInterface, &serialUserInterface, &canService}); // Controller object
-
-// module name, must be 7 characters, space padded.
-unsigned char mname[7] = { 'E', 'M', 'P', 'T', 'Y', ' ', ' ' };
-
-// forward function declarations
-void printConfig();
 
 //
 /// setup VLCB - runs once at power on from setup()
 //
 void setupVLCB()
 {
-  // set module parameters
-  VLCB::Parameters params(modconfig);
-  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANUFACTURER);
-  params.setModuleId(MODULE_ID);  
- 
-  // assign to Controller
-  controller.setParams(params);
-  controller.setName(mname);
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
 
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    modconfig.resetModule();
-  }
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &serialUserInterface, &canService});
+
+  // set module parameters
+  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  VLCB::setModuleId(MANUFACTURER, MODULE_ID);
+
+  // set module name
+  VLCB::setName(mname);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
@@ -83,14 +69,13 @@ void setupVLCB()
   }
 
   // initialise and load configuration
-  controller.begin();
+  VLCB::begin();
 
-  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+  Serial << F("> mode = ") << VLCB::Configuration::modeString(VLCB::getCurrentMode()) << F(", CANID = ") << VLCB::getCANID();
+  Serial << F(", NN = ") << VLCB::getNodeNum() << endl;
 
   // show code version and copyright notice
   printConfig();
-
 }
 
 //
@@ -115,7 +100,7 @@ void loop()
   //
   /// do VLCB message, switch and LED processing
   //
-  controller.process();
+  VLCB::process();
 
   //
   /// check CAN message buffers
@@ -152,6 +137,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
+  Serial << F("> © Sven Rosvall (MERG 3777) 2025") << endl;
 }
-

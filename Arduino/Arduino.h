@@ -22,7 +22,7 @@ byte lowByte(unsigned int);
 #define bitToggle(value, bit) ((value) ^= (1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) ((bitvalue) ? bitSet(value, bit) : bitClear(value, bit))
 void pinMode(int, PinMode);
-void digitalWrite(int, int);
+void digitalWrite(int, PinState);
 byte digitalRead(int);
 
 struct Serial_T

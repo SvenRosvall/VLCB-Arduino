@@ -88,7 +88,7 @@ void LED::run()
 void LED::_write(byte pin, bool state)
 {
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(pin, state);
+  digitalWrite(pin, state ? HIGH : LOW);
 }
 
 }

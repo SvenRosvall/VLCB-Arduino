@@ -12,11 +12,6 @@ extern void printConfig();
 namespace VLCB
 {
 
-SerialUserInterface::SerialUserInterface(Transport *transport)
-  : transport(transport)
-{
-}
-
 void SerialUserInterface::process(const Action *action)
 {
   handleAction(action);
@@ -26,9 +21,6 @@ void SerialUserInterface::process(const Action *action)
 
 void SerialUserInterface::processSerialInput()
 {
-  byte uev = 0;
-  char msgstr[32], dstr[32];
-
   if (Serial.available())
   {
     Configuration *modconfig = controller->getModuleConfig();
@@ -55,23 +47,25 @@ void SerialUserInterface::processSerialInput()
                << F(" EVs per event = ") << modconfig->EE_NUM_EVS 
                << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
 
-        for (byte j = 0; j < modconfig->EE_MAX_EVENTS; j++)
         {
-          if (modconfig->getEvTableEntry(j) != 0)
+          byte uev = 0;
+          for (byte j = 0; j < modconfig->EE_MAX_EVENTS; j++)
           {
-            ++uev;
+            if (modconfig->getEvTableEntry(j) != 0)
+            {
+              ++uev;
+            }
           }
+
+          Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->EE_MAX_EVENTS - uev) << endl;
+          Serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ")
+                 << (modconfig->EE_MAX_EVENTS * modconfig->EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
         }
-
-        Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->EE_MAX_EVENTS - uev) << endl;
-        Serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ") << (modconfig->EE_MAX_EVENTS * modconfig->EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
-
         Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
 
         for (byte j = 0; j < (modconfig->EE_NUM_EVS); j++)
         {
-          sprintf(dstr, "EV%03d | ", j + 1);
-          Serial << dstr;
+          Serial << _FMT(F("EV% | "), _WIDTHZ(j + 1, 3));
         }
 
         Serial << F("Hash |") << endl;
@@ -82,25 +76,21 @@ void SerialUserInterface::processSerialInput()
         {
           if (modconfig->getEvTableEntry(j) != 0)
           {
-            sprintf(dstr, "  %03d  | ", j);
-            Serial << dstr;
+            Serial << _FMT(F("  %  | "), _WIDTHZ(j, 3));
 
             // for each data byte of this event
             byte evarray[4];
             modconfig->readEvent(j, evarray);
             for (byte e = 0; e < 4; e++)
             {
-              sprintf(dstr, " 0x%02hx | ", evarray[e]);
-              Serial << dstr;
+              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(evarray[e]), 2));
             }
             for (byte ev = 1; ev <= modconfig->EE_NUM_EVS; ev++)
             {
-              sprintf(dstr, " 0x%02hx | ", modconfig->getEventEVval(j, ev));
-              Serial << dstr;
+              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
             }
 
-            sprintf(dstr, "%4d |", modconfig->getEvTableEntry(j));
-            Serial << dstr << endl;
+            Serial << _FMT("%", _WIDTH(modconfig->getEvTableEntry(j), 4)) << endl;
           }
         }
 
@@ -111,39 +101,23 @@ void SerialUserInterface::processSerialInput()
         // NVs
       case 'v':
         // note NVs number from 1, not 0
-        Serial << "> Node variables" << endl;
+        Serial << F("> Node variables") << endl;
         Serial << F("   NV   Val") << endl;
         Serial << F("  --------------------") << endl;
 
         for (byte j = 1; j <= modconfig->EE_NUM_NVS; j++)
         {
           byte v = modconfig->readNV(j);
-          sprintf(msgstr, " - %02d : %3hd | 0x%02hx", j, v, v);
-          Serial << msgstr << endl;
+          Serial << _FMT(F(" - % : % | 0x%"), _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;
         }
 
         Serial << endl << endl;
 
         break;
 
-        // CAN bus status
-      case 'c':
-        Serial << F(" messages received = ") << transport->receiveCounter()
-               << F(", sent = ") << transport->transmitCounter()
-               << F(", receive errors = ") << transport->receiveErrorCounter()
-               << F(", transmit errors = ") << transport->transmitErrorCounter()
-               << F(", error status = ") << transport->errorStatus()
-        << endl;
-        break;
-
       case 'h':
         // event hash table
         modconfig->printEvHashTable(false);
-        break;
-
-      case 'y':
-        // reset CAN bus and VLCB message processing
-        transport->reset();
         break;
 
       case '*':
@@ -155,7 +129,7 @@ void SerialUserInterface::processSerialInput()
         // free memory
         Serial << F("> free SRAM = ") << modconfig->freeSRAM() << F(" bytes") << endl;
         break;
-        
+
       case 's': // "s" == "setup"
         //Serial << F("SUI> Requesting mode change") << endl; Serial.flush();
         controller->putAction(ACT_CHANGE_MODE);

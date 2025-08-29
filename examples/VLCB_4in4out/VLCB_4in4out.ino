@@ -48,22 +48,15 @@
 #include <Bounce2.h>
 
 // VLCB library header files
-#include <Controller.h>                   // Controller class
-#include <CAN2515.h>               // CAN controller
-#include <Configuration.h>             // module configuration
-#include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-#include "CanService.h"
-#include "NodeVariableService.h"
-#include "EventConsumerService.h"
-#include "EventProducerService.h"
-#include "ConsumeOwnEventsService.h"
-#include "EventTeachingService.h"
-#include "SerialUserInterface.h"
+#include <VLCB.h>
+#include <CAN2515.h>               // Chosen CAN controller
 
 #include "LEDControl.h"
+
+// forward function declarations
+void eventhandler(byte, const VLCB::VlcbMessage *);
+void printConfig();
+void processSwitches();
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -76,23 +69,8 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// Controller objects
-VLCB::Configuration modconfig;               // configuration object
-VLCB::CAN2515 can2515;                  // CAN transport object
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface(&can2515);
-VLCB::MinimumNodeService mnService;
-VLCB::CanService canService(&can2515);
-VLCB::NodeVariableService nvService;
-VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService;
-VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService;
-VLCB::Controller controller(&modconfig,
-                            {&mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
-
 // module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '4', 'I', 'N', '4', 'O', 'U', 'T' };
+char mname[] = "4IN4OUT";
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -106,47 +84,46 @@ Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
 LEDControl moduleLED[NUM_LEDS];     //  LED as output
 bool state[NUM_SWITCHES];
 
-// forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
-void printConfig();
-void processSwitches();
+VLCB::CAN2515 can2515;                  // CAN transport object
+
+// Service objects
+VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
+VLCB::SerialUserInterface serialUserInterface;
+VLCB::MinimumNodeService mnService;
+VLCB::CanService canService(&can2515);
+VLCB::NodeVariableService nvService;
+VLCB::ConsumeOwnEventsService coeService;
+VLCB::EventConsumerService ecService;
+VLCB::EventTeachingService etService;
+VLCB::EventProducerService epService;
 
 //
 /// setup VLCB - runs once at power on from setup()
 //
 void setupVLCB()
 {
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
+
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
+    &ecService, &epService, &etService, &coeService});
   // set config layout parameters
-  modconfig.EE_NUM_NVS = NUM_SWITCHES;
-  modconfig.EE_EVENTS_START = 50;
-  modconfig.EE_MAX_EVENTS = 64;
-  modconfig.EE_PRODUCED_EVENTS = NUM_SWITCHES;
-  modconfig.EE_NUM_EVS = 1 + NUM_LEDS;
+  VLCB::setNumNodeVariables(NUM_SWITCHES);
+  VLCB::setMaxEvents(64);
+  VLCB::setNumProducedEvents(NUM_SWITCHES);
+  VLCB::setNumEventVariables(1 + NUM_LEDS);
 
   // set module parameters
-  VLCB::Parameters params(modconfig);
-  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANUFACTURER);
-  params.setModuleId(MODULE_ID);
+  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  VLCB::setModuleId(MANUFACTURER, MODULE_ID);
 
-  // assign to Controller
-  controller.setParams(params.getParams());
-  controller.setName(mname);
+  // set module name
+  VLCB::setName(mname);
 
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    modconfig.resetModule();
-  }
-  
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
-
-  // set Controller LEDs to indicate the current mode
-  controller.indicateMode(modconfig.currentMode);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(6, 1);      // more buffers = more memory used, fewer = less
@@ -158,10 +135,11 @@ void setupVLCB()
   }
 
   // initialise and load configuration
-  controller.begin();
+  VLCB::begin();
 
-  Serial << F("> mode = ") << VLCB::Configuration::modeString(modconfig.currentMode) << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+  Serial << F("> mode = (") << _HEX(VLCB::getCurrentMode()) << ") " << VLCB::Configuration::modeString(VLCB::getCurrentMode());
+  Serial << F(", CANID = ") << VLCB::getCANID();
+  Serial << F(", NN = ") << VLCB::getNodeNum() << endl;
 
   // show code version and copyright notice
   printConfig();
@@ -209,7 +187,7 @@ void loop()
   //
   /// do VLCB message, switch and LED processing
   //
-  controller.process();
+  VLCB::process();
 
   // Run the LED code
   for (int i = 0; i < NUM_LEDS; i++)
@@ -231,7 +209,7 @@ void processSwitches(void)
     if (moduleSwitch[i].changed())
     {
       byte nv = i + 1;
-      byte nvval = modconfig.readNV(nv);
+      byte nvval = VLCB::readNV(nv);
       byte swNum = i + 1;
 
       // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
@@ -305,7 +283,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
-        byte evval = modconfig.getEventEVval(index, ev);
+        byte evval = VLCB::getEventEVval(index, ev);
         //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
         switch (evval) 
@@ -334,7 +312,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
-        byte evval = modconfig.getEventEVval(index, ev);
+        byte evval = VLCB::getEventEVval(index, ev);
 
         if (evval > 0)
         {
@@ -345,7 +323,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       
     case OPC_AREQ:
     case OPC_ASRQ:
-      byte evval = modconfig.getEventEVval(index, 1) - 1;
+      byte evval = VLCB::getEventEVval(index, 1) - 1;
       DEBUG_PRINT(F("> Handling request op =  ") << _HEX(opc) << F(", request input = ") << evval << F(", state = ") << state[evval]);
       epService.sendEventResponse(state[evval], index);
   }

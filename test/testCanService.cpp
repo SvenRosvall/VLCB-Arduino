@@ -12,14 +12,13 @@
 #include "Controller.h"
 #include "MinimumNodeServiceWithDiagnostics.h"
 #include "CanServiceWithDiagnostics.h"
-#include "Parameters.h"
 #include "VlcbCommon.h"
 #include "ArduinoMock.hpp"
 #include "MockCanTransport.h"
 
 namespace
 {
-std::unique_ptr<VLCB::MinimumNodeServiceWithDiagnostics> minimumNodeService;
+std::unique_ptr<VLCB::MinimumNodeService> minimumNodeService;
 
 // Use MockCanTransport to test CanTransport class.
 std::unique_ptr<MockCanTransport> mockCanTransport;
@@ -30,7 +29,7 @@ VLCB::Controller createController(VlcbModeParams startupMode = MODE_NORMAL)
 
   mockCanTransport.reset(new MockCanTransport);
 
-  static std::unique_ptr<VLCB::CanServiceWithDiagnostics> canService;
+  static std::unique_ptr<VLCB::CanService> canService;
   canService.reset(new VLCB::CanServiceWithDiagnostics(mockCanTransport.get()));
 
   VLCB::Controller controller = ::createController(startupMode, {minimumNodeService.get(), canService.get()});

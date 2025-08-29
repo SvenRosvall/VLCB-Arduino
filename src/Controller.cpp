@@ -27,18 +27,35 @@ namespace VLCB
 // be sent through the transport without requiring this buffering. 
 const int ACTION_QUEUE_SIZE = 30;
 
-Controller::Controller(std::initializer_list<Service *> services)
-  : services(services)
-  , actionQueue(ACTION_QUEUE_SIZE)
-{
-  extern Configuration config;
-  module_config = &config;
 
-  for (Service * service : services)
-  {
-    service->setController(this);
-  }
+//Controller::Controller()
+//  : services()
+//  , actionQueue(ACTION_QUEUE_SIZE)
+//{
+//  extern Configuration config;
+//  module_config = &config;
+//}
+
+Controller::Controller(Configuration *conf)
+  : module_config(conf)
+  , services()
+  , actionQueue(ACTION_QUEUE_SIZE)
+  , _mparams(*conf)
+{
 }
+
+//Controller::Controller(std::initializer_list<Service *> services)
+//  : services(services)
+//  , actionQueue(ACTION_QUEUE_SIZE)
+//{
+//  extern Configuration config;
+//  module_config = &config;
+//
+//  for (Service * service : services)
+//  {
+//    service->setController(this);
+//  }
+//}
 
 //
 /// construct a Controller object with a Configuration object that the user provides.
@@ -48,7 +65,18 @@ Controller::Controller(Configuration *conf, std::initializer_list<Service *> ser
   : module_config(conf)
   , services(services)
   , actionQueue(ACTION_QUEUE_SIZE)
+  , _mparams(*conf)
 {
+  for (Service * service : services)
+  {
+    service->setController(this);
+  }
+}
+
+void Controller::setServices(std::initializer_list<Service *> svc)
+{
+  services = svc;
+
   for (Service * service : services)
   {
     service->setController(this);
@@ -71,9 +99,8 @@ void Controller::begin()
 //
 /// assign the module parameter set
 //
-void Controller::setParams(unsigned char *mparams)
+void Controller::updateParamFlags()
 {
-  _mparams = mparams;
   byte flags = 0;
   
   for (Service * svc : services)
@@ -98,13 +125,13 @@ void Controller::setParams(unsigned char *mparams)
   {
     flags |= PF_NORMAL; 
   }
-  _mparams[PAR_FLAGS] = flags;
+  _mparams.getParams()[PAR_FLAGS] = flags;
 }
 
 //
 /// assign the module name
 //
-void Controller::setName(const unsigned char *mname)
+void Controller::setName(const char *mname)
 {
   _mname = mname;
 }
@@ -127,11 +154,11 @@ void Controller::setParamFlag(VlcbParamFlags flag, bool set)
 { 
   if (set)
   {
-    _mparams[PAR_FLAGS] |= flag;
+    _mparams.getParams()[PAR_FLAGS] |= flag;
   }
   else
   {
-    _mparams[PAR_FLAGS] &= ~flag;
+    _mparams.getParams()[PAR_FLAGS] &= ~flag;
   }
 }
 

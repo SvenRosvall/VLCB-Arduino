@@ -22,22 +22,13 @@
 #include <Streaming.h>
 
 // VLCB library header files
-#include <Controller.h>                   // Controller class
+#include <VLCB.h>
 #include <SerialGC.h>               // replaces CAN controller
-#include <Switch.h>             // pushbutton switch
-#include <LED.h>                // VLCB LEDs
-#include <Configuration.h>             // module configuration
-#include <Parameters.h>             // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-#include "CanService.h"
-#include "NodeVariableService.h"
-#include "EventConsumerService.h"
-#include "EventProducerService.h"
-#include "ConsumeOwnEventsService.h"
-#include "EventTeachingService.h"
-#include "SerialUserInterface.h"
+
+// forward function declarations
+void eventhandler(byte, const VLCB::VlcbMessage *);
+void printConfig();
+void processModuleSwitchChange();
 
 // constants
 const byte VER_MAJ = 1;             // code major version
@@ -50,9 +41,16 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// Controller objects
-VLCB::Configuration modconfig;               // configuration object
+// module objects
+VLCB::Switch moduleSwitch(5);            // an example switch as input
+VLCB::LED moduleLED(6);                  // an example LED as output
+
+// module name, must be 7 characters, space padded.
+char mname[] = "1IN1OUT";
+
 VLCB::SerialGC serialGC;                  // CAN transport object using serial
+
+// Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::MinimumNodeService mnService;
 VLCB::CanService canService(&serialGC);
@@ -61,58 +59,40 @@ VLCB::ConsumeOwnEventsService coeService;
 VLCB::EventConsumerService ecService;
 VLCB::EventTeachingService etService;
 VLCB::EventProducerService epService;
-VLCB::Controller controller(&modconfig, 
-                            {&mnService, &ledUserInterface, &canService, &nvService, &ecService, &epService, &etService, &coeService}); // Controller object
-
-// module objects
-VLCB::Switch moduleSwitch(5);            // an example switch as input
-VLCB::LED moduleLED(6);                  // an example LED as output
-
-// module name, must be 7 characters, space padded.
-unsigned char mname[7] = { '1', 'I', 'N', '1', 'O', 'U', 'T' };
-
-// forward function declarations
-void eventhandler(byte, const VLCB::VlcbMessage *);
-void printConfig();
-void processModuleSwitchChange();
 
 //
 /// setup VLCB - runs once at power on from setup()
 //
 void setupVLCB()
 {
-  // set config layout parameters
-  modconfig.EE_NUM_NVS = 10;
-  modconfig.EE_MAX_EVENTS = 32;
-  modconfig.EE_PRODUCED_EVENTS = 1;
-  modconfig.EE_NUM_EVS = 2; // EV1: Produced event ; EV2: LED1
- 
-  // set module parameters
-  VLCB::Parameters params(modconfig);
-  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANUFACTURER);
-  params.setModuleId(MODULE_ID);  
- 
-  // assign to Controller
-  controller.setParams(params.getParams());
-  controller.setName(mname);
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
 
-  // module reset - if switch is depressed at startup
-  if (ledUserInterface.isButtonPressed())
-  {
-    Serial << F("> switch was pressed at startup") << endl;
-    modconfig.resetModule();
-  }
+  VLCB::setServices({
+    &mnService, &ledUserInterface, &canService, &nvService,
+    &ecService, &epService, &etService, &coeService});
+
+  // set config layout parameters
+  VLCB::setNumNodeVariables(10);
+  VLCB::setMaxEvents(32);
+  VLCB::setNumProducedEvents(1);
+  VLCB::setNumEventVariables(2); // EV1: Produced event ; EV2: LED1
+
+  // set module parameters
+  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  VLCB::setModuleId(MANUFACTURER, MODULE_ID);
+
+  // set module name
+  VLCB::setName(mname);
 
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
   // initialise and load configuration
-  controller.begin();
+  VLCB::begin();
 
-  Serial << F("> mode = (") << _HEX(modconfig.currentMode) << ") " << VLCB::Configuration::modeString(modconfig.currentMode);
-  Serial << F(", CANID = ") << modconfig.CANID;
-  Serial << F(", NN = ") << modconfig.nodeNum << endl;
+  Serial << F("> mode = (") << _HEX(VLCB::getCurrentMode()) << ") " << VLCB::Configuration::modeString(VLCB::getCurrentMode());
+  Serial << F(", CANID = ") << VLCB::getCANID();
+  Serial << F(", NN = ") << VLCB::getNodeNum() << endl;
 
   // show code version and copyright notice
   printConfig();
@@ -140,7 +120,7 @@ void loop()
   //
   /// do VLCB message, switch and LED processing
   //
-  controller.process();
+  VLCB::process();
 
   //
   /// give the switch and LED code some time to run
@@ -182,7 +162,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   // as an example, control an LED
 
-  byte evval = modconfig.getEventEVval(index, 2);  //read ev2 because ev1 defines producer.
+  byte evval = VLCB::getEventEVval(index, 2);  //read ev2 because ev1 defines producer.
   // Event Off op-codes have odd numbers.
   bool ison = (msg->data[0] & 0x01) == 0;
 
@@ -226,5 +206,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Duncan Greenwood (MERG M5767) 2019") << endl;
+  Serial << F("> © David Harris  2024") << endl;
 }
