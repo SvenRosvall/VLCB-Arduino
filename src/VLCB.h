@@ -30,6 +30,7 @@ void setVersion(char maj, char min, char beta);
 void setModuleId(byte manu, byte moduleId);
 void setName(char *mname);
 void setNumNodeVariables(byte n);
+void setEventsStart(byte n);
 void setMaxEvents(byte n);
 void setNumProducedEvents(byte n);
 void setNumEventVariables(byte n);
