@@ -60,6 +60,11 @@ void setMaxEvents(byte n)
   modconfig.EE_MAX_EVENTS = n;
 }
 
+void setEventsStart(byte n)
+{
+  modconfig.EE_EVENTS_START = n;
+}
+
 void setNumProducedEvents(byte n)
 {
   modconfig.EE_PRODUCED_EVENTS = n;
