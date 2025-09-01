@@ -95,9 +95,19 @@ byte readNV(byte nv)
   return modconfig.readNV(nv);
 }
 
+void writeNV(byte nv, byte val)
+{
+  modconfig.writeNV(nv, val);
+}
+
 byte getEventEVval(byte idx, byte evnum)
 {
   return modconfig.getEventEVval(idx, evnum);
+}
+
+unsigned int getFreeEEPROMbase()
+{
+  return modconfig.EE_FREE_BASE;
 }
 
 void resetModule()

@@ -38,8 +38,11 @@ void setNumEventVariables(byte n);
 VlcbModeParams getCurrentMode();
 byte getCANID();
 unsigned int getNodeNum();
+unsigned int getFreeEEPROMbase();
 byte readNV(byte nv);
+void writeNV(byte nv, byte val);
 byte getEventEVval(byte idx, byte evnum);
+
 void resetModule();
 
 void begin();
