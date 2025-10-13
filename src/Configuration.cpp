@@ -576,6 +576,7 @@ void Configuration::resetModule()
   {
     writeNV(i + 1, 0);
   }
+  commitToEEPROM();
 
   // DEBUG_SERIAL << F("> complete in ") << (millis() - t) << F(", rebooting ... ") << endl;
 
