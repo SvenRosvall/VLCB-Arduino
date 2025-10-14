@@ -10,6 +10,7 @@
 #include "TestTools.hpp"
 
 void testCircularBuffer();
+void testLED();
 void testConfiguration();
 void testMinimumNodeService();
 void testNodeVariableService();
@@ -28,6 +29,7 @@ void testGridConnect();
 std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
         {"CircularBuffer", testCircularBuffer},
+        {"LED", testLED},
         {"Configuration", testConfiguration},
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},

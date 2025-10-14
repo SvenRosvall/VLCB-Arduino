@@ -29,6 +29,7 @@ void LED::on()
 {
   _state = HIGH;
   _blink = false;
+  _pulse = false;
 }
 
 // turn LED state off
@@ -36,6 +37,7 @@ void LED::off()
 {
   _state = LOW;
   _blink = false;
+  _pulse = false;
 }
 
 // toggle LED state from on to off or vv
@@ -48,11 +50,15 @@ void LED::toggle()
 void LED::blink()
 {
   _blink = true;
+  // Start blinking cycle with the LED on.
+  _state = HIGH;
 }
 
 // pulse the LED
 void LED::pulse()
 {
+  _state = LOW; // Cancel previous state.
+  _blink = false;
   _pulse = true;
   _pulseStart = millis();
   run();
