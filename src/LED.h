@@ -28,6 +28,18 @@ const int PULSE_ON_TIME = 10;
 class LED
 {
 public:
+  enum Mode : byte {
+    // Choose values so that lsb indicates if LED is on or off.
+    Off = 0,
+    On = 1,
+    Blinking_Off = 2,
+    Blinking_On = 3,
+    Pulsing = 5,
+    
+    IsOn = 0x01,
+    IsBlinking = 0x02,
+    IsPulsing = 0x04
+  };
   explicit LED(byte pin);
   bool getState();
   void on();
@@ -40,9 +52,7 @@ public:
 
 protected:
   byte _pin;
-  bool _state;
-  bool _blink;
-  bool _pulse;
+  byte _mode;
   unsigned int _interval;
   unsigned long _timer_start;
 

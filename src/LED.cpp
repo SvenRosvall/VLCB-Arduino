@@ -13,7 +13,7 @@ namespace VLCB
 //
 
 LED::LED(byte pin)
-  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _timer_start(0UL)
+  : _pin(pin), _mode(Off), _timer_start(0UL)
 {
   pinMode(_pin, OUTPUT);
 }
@@ -21,48 +21,39 @@ LED::LED(byte pin)
 // return the current state, on or off
 bool LED::getState()
 {
-  return _state;
+  return _mode & IsOn;
 }
 
 // turn LED state on
 void LED::on()
 {
-  _state = HIGH;
-  _blink = false;
-  _pulse = false;
+  _mode = On;
 }
 
 // turn LED state off
 void LED::off()
 {
-  _state = LOW;
-  _blink = false;
-  _pulse = false;
+  _mode = Off;
 }
 
-// toggle LED state from on to off or vv
+// toggle LED state from on to off or vv while blinking
 void LED::toggle()
 {
-  _state = !_state;
+  _mode ^= IsOn;
 }
 
 // blink the LED
 void LED::blink(unsigned int rate)
 {
-  _blink = true;
-  // Start blinking cycle with the LED on.
-  _state = HIGH;
-  _pulse = false;
+  _mode = Blinking_On;
   _interval = rate;
-  _timer_start = 0;    // timer will expire immediately and illumiate LED
+  _timer_start = millis();
 }
 
 // pulse the LED
 void LED::pulse(unsigned int duration)
 {
-  _blink = false;
-  _pulse = true;
-  _state = HIGH;
+  _mode = Pulsing;
   _interval = duration;
   _timer_start = millis();    // the LED will illuminate now and then toggle once the timer expires
 }
@@ -71,7 +62,7 @@ void LED::pulse(unsigned int duration)
 // must be called frequently from loop() if the LED is set to blink or pulse
 void LED::run()
 {
-  if (_blink)
+  if (_mode & IsBlinking)
   {
     // blinking - toggle each time timer expires
     if ((millis() - _timer_start) >= _interval)
@@ -82,12 +73,11 @@ void LED::run()
   }
 
   // single pulse - switch off after timer expires
-  if (_pulse)
+  if (_mode & IsPulsing)
   {
     if (millis() - _timer_start >= _interval)
     {
-      _pulse = false;
-      _state = LOW;
+      _mode = Off;
     }
   }
   _update();
@@ -97,7 +87,7 @@ void LED::run()
 void LED::_update()
 {
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(_pin, _state ? HIGH : LOW);
+  digitalWrite(_pin, getState() ? HIGH : LOW);
 }
 
 }
