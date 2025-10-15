@@ -13,9 +13,9 @@ namespace VLCB
 //
 
 LED::LED(byte pin)
-  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
+  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _timer_start(0UL)
 {
-    pinMode(_pin, OUTPUT);
+  pinMode(_pin, OUTPUT);
 }
 
 // return the current state, on or off
@@ -46,22 +46,25 @@ void LED::toggle()
   _state = !_state;
 }
 
-// blink LED
-void LED::blink()
+// blink the LED
+void LED::blink(unsigned int rate)
 {
   _blink = true;
   // Start blinking cycle with the LED on.
   _state = HIGH;
+  _pulse = false;
+  _blink_rate = rate;
+  _timer_start = 0;    // timer will expire immediately and illumiate LED
 }
 
 // pulse the LED
-void LED::pulse()
+void LED::pulse(unsigned int duration)
 {
-  _state = LOW; // Cancel previous state.
   _blink = false;
   _pulse = true;
-  _pulseStart = millis();
-  run();
+  _state = HIGH;
+  _pulse_duration = duration;
+  _timer_start = millis();    // the LED will illuminate now and then toggle once the timer expires
 }
 
 // actually operate the LED dependent upon its current state
@@ -70,31 +73,31 @@ void LED::run()
 {
   if (_blink)
   {
-    // blinking
-    if ((millis() - _lastTime) >= BLINK_RATE)
+    // blinking - toggle each time timer expires
+    if ((millis() - _timer_start) >= _blink_rate)
     {
       toggle();
-      _lastTime = millis();
+      _timer_start = millis();
     }
   }
 
-  // single pulse
+  // single pulse - switch off after timer expires
   if (_pulse)
   {
-    if (millis() - _pulseStart >= PULSE_ON_TIME)
+    if (millis() - _timer_start >= _pulse_duration)
     {
       _pulse = false;
+      _state = LOW;
     }
   }
-
-  _write(_pin, _pulse || _state);
+  _update();
 }
 
 // write to the physical pin
-void LED::_write(byte pin, bool state)
+void LED::_update()
 {
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(pin, state ? HIGH : LOW);
+  digitalWrite(_pin, _state ? HIGH : LOW);
 }
 
 }

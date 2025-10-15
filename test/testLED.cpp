@@ -55,14 +55,14 @@ void testPulse()
 //  assertEquals(true, led.getState());
   assertEquals(HIGH, getDigitalWrite(7));
 
-  addMillis(6);
+  addMillis(11);
   led.run();
 
   assertEquals(false, led.getState());
   assertEquals(LOW, getDigitalWrite(7));
 
   // Ensure it stays low
-  addMillis(6);
+  addMillis(11);
   led.run();
 
   assertEquals(false, led.getState());

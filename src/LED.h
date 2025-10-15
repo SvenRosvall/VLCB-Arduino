@@ -20,7 +20,7 @@ namespace VLCB
 {
 
 const int BLINK_RATE = 500;    // flash at 1Hz, 500mS on, 500mS off
-const int PULSE_ON_TIME = 5;
+const int PULSE_ON_TIME = 10;
 
 //
 /// class to encapsulate a non-blocking LED
@@ -33,17 +33,20 @@ public:
   void on();
   void off();
   void toggle();
-  void blink();
+  void blink(unsigned int rate = BLINK_RATE);
+  void pulse(unsigned int duration = PULSE_ON_TIME);
+
   virtual void run();
-  void pulse();
 
 protected:
   byte _pin;
   bool _state;
   bool _blink;
   bool _pulse;
-  unsigned long _lastTime, _pulseStart;
-  virtual void _write(byte pin, bool state);
+  unsigned int _blink_rate, _pulse_duration;
+  unsigned long _timer_start;
+
+  virtual void _update();
 };
 
 }
