@@ -43,7 +43,7 @@ protected:
   bool _state;
   bool _blink;
   bool _pulse;
-  unsigned int _blink_rate, _pulse_duration;
+  unsigned int _interval;
   unsigned long _timer_start;
 
   virtual void _update();

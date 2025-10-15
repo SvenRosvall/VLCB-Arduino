@@ -53,7 +53,7 @@ void LED::blink(unsigned int rate)
   // Start blinking cycle with the LED on.
   _state = HIGH;
   _pulse = false;
-  _blink_rate = rate;
+  _interval = rate;
   _timer_start = 0;    // timer will expire immediately and illumiate LED
 }
 
@@ -63,7 +63,7 @@ void LED::pulse(unsigned int duration)
   _blink = false;
   _pulse = true;
   _state = HIGH;
-  _pulse_duration = duration;
+  _interval = duration;
   _timer_start = millis();    // the LED will illuminate now and then toggle once the timer expires
 }
 
@@ -74,7 +74,7 @@ void LED::run()
   if (_blink)
   {
     // blinking - toggle each time timer expires
-    if ((millis() - _timer_start) >= _blink_rate)
+    if ((millis() - _timer_start) >= _interval)
     {
       toggle();
       _timer_start = millis();
@@ -84,7 +84,7 @@ void LED::run()
   // single pulse - switch off after timer expires
   if (_pulse)
   {
-    if (millis() - _timer_start >= _pulse_duration)
+    if (millis() - _timer_start >= _interval)
     {
       _pulse = false;
       _state = LOW;
