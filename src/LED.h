@@ -48,7 +48,7 @@ public:
   void blink(unsigned int rate = BLINK_RATE);
   void pulse(unsigned int duration = PULSE_ON_TIME);
 
-  virtual void run();
+  void run();
 
 protected:
   byte _pin;
@@ -56,7 +56,7 @@ protected:
   unsigned int _interval;
   unsigned long _timer_start;
 
-  virtual void _update();
+  void _update();
 };
 
 }
