@@ -53,9 +53,21 @@ void LED::blink(unsigned int rate)
 // pulse the LED
 void LED::pulse(unsigned int duration)
 {
-  _mode = Pulsing;
-  _interval = duration;
-  _timer_start = millis();    // the LED will illuminate now and then toggle once the timer expires
+  unsigned long now = millis();
+  // Set the interval to the max of remainder of current pulse and new pulse.
+  if (_mode == Pulsing && _timer_start + _interval > now + duration)
+  {
+    // Current pulse is still in effect and the current pulse will last longer than the new pulse
+    // Keep it.
+  }
+  else
+  {
+    // Start pulsing
+    _interval = duration;
+    _mode = Pulsing;
+    _timer_start = now;
+  }
+  // the LED will illuminate now and then toggle once the timer expires
 }
 
 // actually operate the LED dependent upon its current state

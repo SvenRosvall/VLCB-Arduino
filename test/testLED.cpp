@@ -282,6 +282,59 @@ void testPulseThenBlink()
   assertEquals(HIGH, getDigitalWrite(7));
 }
 
+void testLongPulseThenShortPulse()
+{
+  test();
+  VLCB::LED led(7);
+
+  led.pulse(500);
+  led.run();
+
+  addMillis(2);
+  led.pulse(10);
+  led.run();
+
+  assertEquals(true, led.getState());
+  assertEquals(HIGH, getDigitalWrite(7));
+
+  // Ensure the long pulse is still in effect
+  addMillis(12);
+  led.run();
+
+  assertEquals(true, led.getState());
+  assertEquals(HIGH, getDigitalWrite(7));
+}
+
+void testShortPulseThenLongPulse()
+{
+  test();
+  VLCB::LED led(7);
+
+  led.pulse(10);
+  led.run();
+
+  addMillis(2);
+  led.pulse(500);
+  led.run();
+
+  assertEquals(true, led.getState());
+  assertEquals(HIGH, getDigitalWrite(7));
+
+  // Ensure the long pulse is still in effect
+  addMillis(12);
+  led.run();
+
+  assertEquals(true, led.getState());
+  assertEquals(HIGH, getDigitalWrite(7));
+
+  addMillis(490);
+  led.run();
+
+  // Long pulse has ended.
+  assertEquals(false, led.getState());
+  assertEquals(LOW, getDigitalWrite(7));
+}
+
 }
 
 void testLED()
@@ -299,4 +352,6 @@ void testLED()
   testBlinkThenOn();
   testBlinkThenPulse();
   testPulseThenBlink();
+  testLongPulseThenShortPulse();
+  testShortPulseThenLongPulse();
 }
