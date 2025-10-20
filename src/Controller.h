@@ -40,6 +40,7 @@ enum ACTION : byte
   ACT_CHANGE_MODE,
   ACT_RENEGOTIATE,
   ACT_INDICATE_ACTIVITY,
+  ACT_INDICATE_WORK,
   ACT_INDICATE_MODE,
   // ...
 };
@@ -105,7 +106,7 @@ public:
   void putAction(ACTION action);
   bool pendingAction();
 
-  void messageActedOn() { ++diagMsgsActed; }
+  void messageActedOn();
   unsigned int getMessagesActedOn() { return diagMsgsActed; }
 
 private:

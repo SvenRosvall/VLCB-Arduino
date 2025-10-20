@@ -160,6 +160,10 @@ void SerialUserInterface::handleAction(const Action *action)
       // Don't indicate this. Too noisy.
       break;
 
+    case ACT_INDICATE_WORK:
+      // Don't indicate this. Too noisy.
+      break;
+
     case ACT_INDICATE_MODE:
       indicateMode(action->mode);
       break;

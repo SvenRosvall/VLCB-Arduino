@@ -10,6 +10,10 @@
 namespace VLCB
 {
 
+// These intervals are defined in VLCB Technical Introduction chapter 6 - Module User Interface
+const int PULSE_ACTIVITY = 20;
+const int PULSE_WORK = 500;
+
 LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
   : greenLed(greenLedPin), yellowLed(yellowLedPin), pushButton(pushButtonPin)
 {
@@ -48,7 +52,11 @@ void LEDUserInterface::handleAction(const Action *action)
   switch (action->actionType)
   {
     case ACT_INDICATE_ACTIVITY:
-      indicateActivity();
+      greenLed.pulse(PULSE_ACTIVITY);
+      break;
+      
+    case ACT_INDICATE_WORK:
+      greenLed.pulse(PULSE_WORK);
       break;
 
     case ACT_INDICATE_MODE:
@@ -58,11 +66,6 @@ void LEDUserInterface::handleAction(const Action *action)
     default:
       break;
   }
-}
-
-void LEDUserInterface::indicateActivity()
-{
-  greenLed.pulse();
 }
 
 bool LEDUserInterface::resetRequested()
