@@ -12,7 +12,7 @@ namespace VLCB
 
 // These intervals are defined in VLCB Technical Introduction chapter 6 - Module User Interface
 const int PULSE_ACTIVITY = 20;
-const int PULSE_WORK = 500;
+const int PULSE_WORK = 250;
 
 LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)
   : greenLed(greenLedPin), yellowLed(yellowLedPin), pushButton(pushButtonPin)
