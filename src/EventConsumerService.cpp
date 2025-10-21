@@ -29,7 +29,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
 
   // call any registered event handler
 
-  if (index < controller->getModuleConfig()->EE_MAX_EVENTS)
+  if (index < controller->getModuleConfig()->getNumEvents())
   {
     if (eventhandler != nullptr)
     {
@@ -55,7 +55,7 @@ void EventConsumerService::process(const Action *action)
   switch (action->actionType)
   {
     case ACT_MESSAGE_OUT:
-      if (!(controller->getParam(PAR_FLAGS) & PF_COE))
+      if (!controller->getModuleConfig()->getFlag(PF_COE))
       {
         break;
       }

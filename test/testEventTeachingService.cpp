@@ -1312,7 +1312,7 @@ void testLearnErrors()
   mockTransportService->clearMessages();
 
   // Event table full
-  for (byte i = 1 ; i <= configuration->EE_MAX_EVENTS ; ++i)
+  for (byte i = 1 ; i <= configuration->getNumEvents() ; ++i)
   {
     msg = {7, {OPC_EVLRN, 0x05, 0x06, 0, i, 1, i}};
     mockTransportService->setNextMessage(msg);

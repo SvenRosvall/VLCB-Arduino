@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <Configuration.h>
+#include <Arduino.h>                // for definition of byte datatype
+
 #include <vlcbdefs.hpp>               // MERG Controller constants
 
 namespace VLCB
@@ -14,13 +15,14 @@ namespace VLCB
 class Parameters
 {
 public:
-  explicit Parameters(Configuration const & config)
+  explicit Parameters()
   {
     params[PAR_NUM] = 20;                     //  0 num params = 20
     params[PAR_MANU] = MANU_MERG_VLCB;              //  1 manf = MERG, 165
-    params[PAR_EVTNUM] = config.EE_MAX_EVENTS;   //  4 num events
-    params[PAR_EVNUM] = config.EE_NUM_EVS;      //  5 num evs per event
-    params[PAR_NVNUM] = config.EE_NUM_NVS;      //  6 num NVs
+    params[PAR_EVTNUM] = 0;   //  4 num events
+    params[PAR_EVNUM] = 0;      //  5 num evs per event
+    params[PAR_NVNUM] = 0;      //  6 num NVs
+    params[PAR_FLAGS] = 0;
     params[PAR_BUSTYPE] = PB_CAN;                // CAN implementation of Controller
     params[PAR_LOAD] = 0x00;
     params[PAR_LOAD+1] = 0x00;
@@ -57,6 +59,11 @@ public:
     params[PAR_CPUID] = id;                  //  9 processor id
     params[PAR_CPUMAN] = manufacturer;       // 19 processor manufacturer
     memcpy(params + PAR_CPUMID, name, 4);   // 15-18 processor version
+  }
+
+  unsigned char getParam(VlcbParams p) const
+  {
+    return params[p];
   }
 
   unsigned char * getParams() const

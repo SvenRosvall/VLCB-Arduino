@@ -40,7 +40,6 @@ Controller::Controller(Configuration *conf)
   : module_config(conf)
   , services()
   , actionQueue(ACTION_QUEUE_SIZE)
-  , _mparams(*conf)
 {
 }
 
@@ -65,7 +64,6 @@ Controller::Controller(Configuration *conf, std::initializer_list<Service *> ser
   : module_config(conf)
   , services(services)
   , actionQueue(ACTION_QUEUE_SIZE)
-  , _mparams(*conf)
 {
   for (Service * service : services)
   {
@@ -101,39 +99,28 @@ void Controller::begin()
 //
 void Controller::updateParamFlags()
 {
-  byte flags = 0;
-  
   for (Service * svc : services)
   {
     switch (svc->getServiceID())
     {
       case SERVICE_ID_MNS:
-        flags |= PF_VLCB;
+        module_config->setFlag(PF_VLCB);
         break;
       case SERVICE_ID_PRODUCER:
-        flags |= PF_PRODUCER;
+        module_config->setFlag(PF_PRODUCER);
         break;
       case SERVICE_ID_CONSUMER:
-        flags |= PF_CONSUMER;
+        module_config->setFlag(PF_CONSUMER);
         break;
       case SERVICE_ID_CONSUME_OWN_EVENTS:
-        flags |= PF_COE;
+        module_config->setFlag(PF_COE);
         break;
     }
   }
   if (module_config->currentMode == MODE_NORMAL)
   {
-    flags |= PF_NORMAL; 
+    module_config->setFlag(PF_NORMAL); 
   }
-  _mparams.getParams()[PAR_FLAGS] = flags;
-}
-
-//
-/// assign the module name
-//
-void Controller::setName(const char *mname)
-{
-  _mname = mname;
 }
 
 //
@@ -154,11 +141,11 @@ void Controller::setParamFlag(VlcbParamFlags flag, bool set)
 { 
   if (set)
   {
-    _mparams.getParams()[PAR_FLAGS] |= flag;
+    module_config->setFlag(flag);
   }
   else
   {
-    _mparams.getParams()[PAR_FLAGS] &= ~flag;
+    module_config->clearFlag(flag);
   }
 }
 

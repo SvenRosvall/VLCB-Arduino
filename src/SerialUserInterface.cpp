@@ -43,13 +43,13 @@ void SerialUserInterface::processSerialInput()
       case 'e':
         // EEPROM learned event data table
         Serial << F("> stored events ") << endl;
-        Serial << F("  max events = ") << modconfig->EE_MAX_EVENTS
-               << F(" EVs per event = ") << modconfig->EE_NUM_EVS 
+        Serial << F("  max events = ") << modconfig->getNumEvents()
+               << F(" EVs per event = ") << modconfig->getNumEVs() 
                << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
 
         {
           byte uev = 0;
-          for (byte j = 0; j < modconfig->EE_MAX_EVENTS; j++)
+          for (byte j = 0; j < modconfig->getNumEvents(); j++)
           {
             if (modconfig->getEvTableEntry(j) != 0)
             {
@@ -57,13 +57,13 @@ void SerialUserInterface::processSerialInput()
             }
           }
 
-          Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->EE_MAX_EVENTS - uev) << endl;
+          Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->getNumEvents() - uev) << endl;
           Serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ")
-                 << (modconfig->EE_MAX_EVENTS * modconfig->EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
+                 << (modconfig->getNumEvents() * modconfig->EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
         }
         Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
 
-        for (byte j = 0; j < (modconfig->EE_NUM_EVS); j++)
+        for (byte j = 0; j < (modconfig->getNumEVs()); j++)
         {
           Serial << _FMT(F("EV% | "), _WIDTHZ(j + 1, 3));
         }
@@ -72,7 +72,7 @@ void SerialUserInterface::processSerialInput()
         Serial << F(" --------------------------------------------------------------") << endl;
 
         // for each event data line
-        for (byte j = 0; j < modconfig->EE_MAX_EVENTS; j++)
+        for (byte j = 0; j < modconfig->getNumEvents(); j++)
         {
           if (modconfig->getEvTableEntry(j) != 0)
           {
@@ -85,7 +85,7 @@ void SerialUserInterface::processSerialInput()
             {
               Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(evarray[e]), 2));
             }
-            for (byte ev = 1; ev <= modconfig->EE_NUM_EVS; ev++)
+            for (byte ev = 1; ev <= modconfig->getNumEVs(); ev++)
             {
               Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
             }
@@ -105,7 +105,7 @@ void SerialUserInterface::processSerialInput()
         Serial << F("   NV   Val") << endl;
         Serial << F("  --------------------") << endl;
 
-        for (byte j = 1; j <= modconfig->EE_NUM_NVS; j++)
+        for (byte j = 1; j <= modconfig->getNumNodeVariables(); j++)
         {
           byte v = modconfig->readNV(j);
           Serial << _FMT(F(" - % : % | 0x%"), _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;

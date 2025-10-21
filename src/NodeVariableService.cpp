@@ -60,7 +60,7 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 
   byte nvindex = msg->data[3];
   Configuration *module_config = controller->getModuleConfig();
-  if (nvindex > module_config->EE_NUM_NVS)
+  if (nvindex > module_config->getNumNodeVariables())
   {
     controller->sendGRSP(OPC_NVRD, getServiceID(), CMDERR_INV_NV_IDX);
     controller->sendCMDERR(CMDERR_INV_NV_IDX);
@@ -69,10 +69,10 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 
   if (nvindex == 0)
   {
-    controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->EE_NUM_NVS);
+    controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->getNumNodeVariables());
     if (!module_config->fcuCompatible)
     {
-      for (int i = 1; i <= module_config->EE_NUM_NVS; ++i)
+      for (int i = 1; i <= module_config->getNumNodeVariables(); ++i)
       {
         controller->sendMessageWithNN(OPC_NVANS, i, module_config->readNV(i));
       }
@@ -102,7 +102,7 @@ void NodeVariableService::handleSetNV(const VlcbMessage *msg, unsigned int nn)
   }
 
   Configuration *module_config = controller->getModuleConfig();
-  if (msg->data[3] > module_config->EE_NUM_NVS)
+  if (msg->data[3] > module_config->getNumNodeVariables())
   {
     controller->sendGRSP(OPC_NVSET, getServiceID(), CMDERR_INV_NV_IDX);
     controller->sendCMDERR(CMDERR_INV_NV_IDX);
@@ -135,7 +135,7 @@ void NodeVariableService::handleSetAndReadNV(const VlcbMessage *msg, unsigned in
 
   byte nvindex = msg->data[3];
   Configuration *module_config = controller->getModuleConfig();
-  if (nvindex > module_config->EE_NUM_NVS)
+  if (nvindex > module_config->getNumNodeVariables())
   {
     controller->sendGRSP(OPC_NVSETRD, getServiceID(), CMDERR_INV_NV_IDX);
     controller->sendCMDERR(CMDERR_INV_NV_IDX);

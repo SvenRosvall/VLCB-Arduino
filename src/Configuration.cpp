@@ -48,10 +48,10 @@ Configuration::Configuration(Storage * theStorage)
 //
 void Configuration::begin()
 {
-  EE_BYTES_PER_EVENT = EE_HASH_BYTES + EE_NUM_EVS;
+  EE_BYTES_PER_EVENT = EE_HASH_BYTES + getNumEVs();
   if (EE_EVENTS_START == 0)
   {
-    EE_EVENTS_START = EE_NVS_START + EE_NUM_NVS;
+    EE_EVENTS_START = EE_NVS_START + getNumNodeVariables();
     // Note: The formula above does not allow for upgrades to user app where NVs are added 
     // as this would move the location for stored events. 
   }
@@ -69,7 +69,7 @@ void Configuration::begin()
 
   makeEvHashTable();
   
-  EE_FREE_BASE = EE_EVENTS_START + (EE_BYTES_PER_EVENT * EE_MAX_EVENTS);
+  EE_FREE_BASE = EE_EVENTS_START + (EE_BYTES_PER_EVENT * getNumEvents());
 }
 
 void Configuration::setModuleUninitializedMode()
@@ -84,11 +84,11 @@ void Configuration::setModuleNormalMode(unsigned int nodeNumber)
   currentMode = (VlcbModeParams) (storage->read(LOCATION_MODE)); 
   if (currentMode == VlcbModeParams::MODE_UNINITIALISED)  // Ensure that NVs and EVs are cleared
   {
-    for (byte i = 1; i <= EE_NUM_NVS; i++)
+    for (byte i = 1; i <= getNumNodeVariables(); i++)
     {
       writeNV(i, 0xff);
     }
-    for (byte j = 0; j < EE_MAX_EVENTS; j++)
+    for (byte j = 0; j < getNumEvents(); j++)
     {
       cleareventEEPROM(j);
     }
@@ -163,7 +163,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
   byte tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < getNumEvents(); i++)
   {
     if (evhashtbl[i] == tmphash)
     {
@@ -177,7 +177,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
   }
 
   // DEBUG_SERIAL << F("> unable to find matching event") << endl;
-  return EE_MAX_EVENTS;
+  return getNumEvents();
 }
 
 //
@@ -188,7 +188,7 @@ byte Configuration::findEventSpace() const
 {
   byte evidx;
 
-  for (evidx = 0; evidx < EE_MAX_EVENTS; evidx++)
+  for (evidx = 0; evidx < getNumEvents(); evidx++)
   {
     if (evhashtbl[evidx] == 0)
     {
@@ -203,7 +203,7 @@ byte Configuration::findEventSpace() const
 byte Configuration::findExistingEventByEv(byte evnum, byte evval) const
 {
   byte i;
-  for (i = 0; i < EE_MAX_EVENTS; i++)
+  for (i = 0; i < getNumEvents(); i++)
   {
     if (getEventEVval(i, evnum) == evval)
     {
@@ -280,9 +280,9 @@ void Configuration::makeEvHashTable()
   // DEBUG_SERIAL << F("> creating event hash table") << endl;
 
   // TODO: Check for null return. Don't call updateEvHashEntry in that case.
-  evhashtbl = (byte *)malloc(EE_MAX_EVENTS * sizeof(byte));
+  evhashtbl = (byte *)malloc(getNumEvents() * sizeof(byte));
 
-  for (byte idx = 0; idx < EE_MAX_EVENTS; idx++)
+  for (byte idx = 0; idx < getNumEvents(); idx++)
   {
     updateEvHashEntry(idx);
   }
@@ -331,7 +331,7 @@ void Configuration::clearEvHashTable()
   // zero in the hash table indicates that the corresponding event slot is free
   // DEBUG_SERIAL << F("> clearEvHashTable - clearing hash table") << endl;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < getNumEvents(); i++)
   {
     evhashtbl[i] = 0;
   }
@@ -349,7 +349,7 @@ void Configuration::printEvHashTable(bool raw)
   /*
     DEBUG_SERIAL << F("> Event hash table - ") << endl;
 
-    for (byte i = 0; i < EE_MAX_EVENTS; i++) 
+    for (byte i = 0; i < getNumEvents(); i++) 
     {
       if (evhashtbl[i] > 0)
       {
@@ -371,7 +371,7 @@ byte Configuration::numEvents() const
 {
   byte numevents = 0;
 
-  for (byte i = 0; i < EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < getNumEvents(); i++)
   {
     if (evhashtbl[i] != 0)
     {
@@ -387,7 +387,7 @@ byte Configuration::numEvents() const
 //
 byte Configuration::getEvTableEntry(byte tindex) const
 {
-  if (tindex < EE_MAX_EVENTS)
+  if (tindex < getNumEvents())
   {
     return evhashtbl[tindex];
   }
@@ -438,7 +438,7 @@ void Configuration::cleareventEEPROM(byte index)
 {
   // DEBUG_SERIAL << F("> clearing event at index = ") << index << endl;
   writeEvent(index, unused_entry);
-  for (byte ev = 1; ev <= EE_NUM_EVS; ev++)
+  for (byte ev = 1; ev <= getNumEVs(); ev++)
   {
     writeEventEV(index, ev, 0xff);
   }
@@ -572,7 +572,7 @@ void Configuration::resetModule()
   setResetFlag();        // set reset indicator
 
   // zero NVs (NVs number from one, not zero)
-  for (byte i = 0; i < EE_NUM_NVS; i++)
+  for (byte i = 0; i < getNumNodeVariables(); i++)
   {
     writeNV(i + 1, 0);
   }
@@ -625,6 +625,11 @@ bool Configuration::isResetFlagSet()
   return (storage->read(LOCATION_RESET_FLAG) == 99);
 }
 
+void Configuration::setName(const char *mname)
+{
+  _mname = mname;
+}
+
 void Configuration::setTwoBytes(byte *target, unsigned int value)
 {
   target[0] = highByte(value);
@@ -640,5 +645,74 @@ bool Configuration::nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_
 {
   return memcmp(rhs, lhs, EE_HASH_BYTES) == 0;
 }
+
+int Configuration::getNumNodeVariables() const
+{
+  return _mparams.getParam(PAR_NVNUM);
+}
+
+int Configuration::getNumEvents() const
+{
+  return _mparams.getParam(PAR_EVTNUM);
+}
+
+int Configuration::getNumEVs() const
+{
+  return _mparams.getParam(PAR_EVNUM);
+}
+
+void Configuration::setNumNodeVariables(int n)
+{
+  _mparams.getParams()[PAR_NVNUM] = n;
+
+}
+
+void Configuration::setNumEvents(int n)
+{
+  _mparams.getParams()[PAR_EVTNUM] = n;
+}
+
+void Configuration::setNumEVs(int n)
+{
+  _mparams.getParams()[PAR_EVNUM] = n;
+}
+
+void Configuration::setFlag(VlcbParamFlags flag)
+{
+  _mparams.getParams()[PAR_FLAGS] |= flag;
+}
+
+void Configuration::clearFlag(VlcbParamFlags flag)
+{
+  _mparams.getParams()[PAR_FLAGS] &= ~flag;
+}
+
+bool Configuration::getFlag(VlcbParamFlags flag)
+{
+  return _mparams.getParam(PAR_FLAGS) & flag;
+}
+
+unsigned char Configuration::getParam(VlcbParams p)
+{
+  return _mparams.getParam(p);
+}
+
+Parameters &Configuration::getParams()
+{
+  return _mparams;
+}
+
+void Configuration::setVersion(char maj, char min, char beta)
+{   
+  _mparams.setVersion(maj, min, beta);
+}
+
+void Configuration::setModuleId(byte manu, byte moduleId)
+{
+  _mparams.setManufacturer(manu);
+  _mparams.setModuleId(moduleId);
+
+}
+
 
 }

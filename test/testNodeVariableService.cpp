@@ -41,7 +41,7 @@ void testNumNVs()
   VLCB::Controller controller = createController();
 
   // read parameter 6 which stores number of NVs.
-  VLCB::VlcbMessage msg = {4, {OPC_RQNPN, 0x01, 0x04, 6}};
+  VLCB::VlcbMessage msg = {4, {OPC_RQNPN, 0x01, 0x04, PAR_NVNUM}};
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -50,7 +50,7 @@ void testNumNVs()
   assertEquals(1, mockTransportService->sent_messages.size());
 
   assertEquals(OPC_PARAN, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(6, mockTransportService->sent_messages[0].data[3]); // parameter index
+  assertEquals(PAR_NVNUM, mockTransportService->sent_messages[0].data[3]); // parameter index
   assertEquals(4, mockTransportService->sent_messages[0].data[4]); // parameter value
 }
 
@@ -202,7 +202,7 @@ void testReadNVAll()
   test();
 
   VLCB::Controller controller = createController();
-  for (int i = 1 ; i <= configuration->EE_NUM_NVS ; ++i)
+  for (int i = 1 ; i <= configuration->getNumNodeVariables() ; ++i)
   {
     configuration->writeNV(i, 20 + i);
   }
@@ -214,15 +214,15 @@ void testReadNVAll()
   process(controller);
 
   // Verify sent messages.
-  assertEquals(1 + configuration->EE_NUM_NVS, mockTransportService->sent_messages.size());
+  assertEquals(1 + configuration->getNumNodeVariables(), mockTransportService->sent_messages.size());
 
   // First response shall contain the number of NVs
   assertEquals(OPC_NVANS, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0, mockTransportService->sent_messages[0].data[3]); // NV index
-  assertEquals(configuration->EE_NUM_NVS, mockTransportService->sent_messages[0].data[4]); // NV value
+  assertEquals(configuration->getNumNodeVariables(), mockTransportService->sent_messages[0].data[4]); // NV value
 
   // The following are all the NVs
-  for (int i = 1 ; i <= configuration->EE_NUM_NVS ; ++i)
+  for (int i = 1 ; i <= configuration->getNumNodeVariables() ; ++i)
   {
     assertEquals(OPC_NVANS, mockTransportService->sent_messages[i].data[0]);
     assertEquals(i, mockTransportService->sent_messages[i].data[3]); // NV index
