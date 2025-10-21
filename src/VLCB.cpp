@@ -41,13 +41,12 @@ void setName(char *mname)
 
 void setVersion(char maj, char min, char beta)
 {
-  modconfig.getParams().setVersion(maj, min, beta);
+  modconfig.setVersion(maj, min, beta);
 }
 
 void setModuleId(byte manu, byte moduleId)
 {
-  modconfig.getParams().setManufacturer(manu);
-  modconfig.getParams().setModuleId(moduleId);
+  modconfig.setModuleId(manu, moduleId);
 }
 
 void setNumNodeVariables(byte n)

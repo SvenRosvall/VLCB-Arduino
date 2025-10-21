@@ -702,5 +702,17 @@ Parameters &Configuration::getParams()
   return _mparams;
 }
 
+void Configuration::setVersion(char maj, char min, char beta)
+{   
+  _mparams.setVersion(maj, min, beta);
+}
+
+void Configuration::setModuleId(byte manu, byte moduleId)
+{
+  _mparams.setManufacturer(manu);
+  _mparams.setModuleId(moduleId);
+
+}
+
 
 }

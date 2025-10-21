@@ -72,6 +72,9 @@ public:
   void setEventAck(bool ea);
   void setFcuCompatability(bool fcu);
 
+  void setModuleId(byte manu, byte moduleId);
+  void setVersion(char maj, char min, char beta);
+
   void setResetFlag();
   void clearResetFlag();
   bool isResetFlagSet();

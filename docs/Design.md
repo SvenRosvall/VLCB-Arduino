@@ -165,9 +165,8 @@ setup()
   modconfig.setNumEVs(2);
 
   // set module parameters
-  modconfig.getParams().setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  modconfig.getParams().setManufacturer(MANUFACTURER);
-  modconfig.getParams().setModuleId(MODULE_ID);  
+  modconfig.setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  modconfig.setModuleId(MANUFACTURER, MODULE_ID);  
   modconfig.setName(mname);
 
   can2515.setNumBuffers(2);
