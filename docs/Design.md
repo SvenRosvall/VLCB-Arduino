@@ -5,8 +5,6 @@ This document describes the main components within the VLCB library and how they
 This VLCB library is based on Duncan Greenwood's [CBUS library](https://github.com/MERG-DEV/CBUS)
 and extended with VLCB specific features.
 
-This library is still work in progress.
-
 ## High Level Architecture
 The code is organised as a central controller object that controls functionality
 via a storage object and a set of service objects.
@@ -161,20 +159,16 @@ VLCB::Controller moduleController(&config, {mnsService, userInterface, canServic
 setup()
 {
   // set config layout parameters
-  modconfig.EE_NUM_NVS = 10;
-  modconfig.EE_MAX_EVENTS = 32;
+  modconfig.setNumNodeVariables(10);
+  modconfig.setNumEvents(32);
   modconfig.EE_PRODUCED_EVENTS = 1;
-  modconfig.EE_NUM_EVS = 2;
+  modconfig.setNumEVs(2);
 
   // set module parameters
-  VLCB::Parameters params(modconfig);
-  params.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  params.setManufacturer(MANUFACTURER);
-  params.setModuleId(MODULE_ID);  
- 
-  // assign to Controller
-  controller.setParams(params.getParams());
-  controller.setName(mname);
+  modconfig.getParams().setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  modconfig.getParams().setManufacturer(MANUFACTURER);
+  modconfig.getParams().setModuleId(MODULE_ID);  
+  modconfig.setName(mname);
 
   can2515.setNumBuffers(2);
   can2515.setOscFreq(OSC_FREQ);
@@ -193,7 +187,6 @@ VLCB::CAN2515 can2515;                  // CAN transport object
 
 // Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
 VLCB::CanServiceWithDiagnostics canService(&can2515);
 VLCB::NodeVariableService nvService;
@@ -207,15 +200,17 @@ VLCB::EventProducerService epService;
 //
 void setupVLCB()
 {
+  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
+
   VLCB::setServices({
-    &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
+    &mnService, &ledUserInterface, &canService, &nvService,
     &ecService, &epService, &etService, &coeService});
 
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
   VLCB::setNumProducedEvents(1);
-  VLCB::setNumEventVariables(2); // EV1: Produced event ; EV2: LED1
+  VLCB::setNumEventVariables(2);
 
   // set module parameters
   VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
