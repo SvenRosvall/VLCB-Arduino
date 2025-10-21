@@ -36,28 +36,28 @@ void setServices(std::initializer_list<Service *> services)
 
 void setName(char *mname)
 {
-  controller.setName(mname);
+  modconfig.setName(mname);
 }
 
 void setVersion(char maj, char min, char beta)
 {
-  controller.getParams().setVersion(maj, min, beta);
+  modconfig.getParams().setVersion(maj, min, beta);
 }
 
 void setModuleId(byte manu, byte moduleId)
 {
-  controller.getParams().setManufacturer(manu);
-  controller.getParams().setModuleId(moduleId);
+  modconfig.getParams().setManufacturer(manu);
+  modconfig.getParams().setModuleId(moduleId);
 }
 
 void setNumNodeVariables(byte n)
 {
-  modconfig.EE_NUM_NVS = n;
+  modconfig.setNumNodeVariables(n);
 }
 
 void setMaxEvents(byte n)
 {
-  modconfig.EE_MAX_EVENTS = n;
+  modconfig.setNumEvents(n);
 }
 
 void setEventsStart(byte n)
@@ -72,7 +72,7 @@ void setNumProducedEvents(byte n)
 
 void setNumEventVariables(byte n)
 {
-  modconfig.EE_NUM_EVS = n;
+  modconfig.setNumNodeVariables(n);
 }
 
 VlcbModeParams getCurrentMode()

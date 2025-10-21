@@ -181,7 +181,7 @@ void EventTeachingService::handleUnlearnEvent(const VlcbMessage *msg, unsigned i
   Configuration *module_config = controller->getModuleConfig();
   byte index = module_config->findExistingEvent(nn, en);
 
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     // DEBUG_SERIAL << F("ets> did not find event to unlearn") << endl;
     // respond with CMDERR
@@ -247,7 +247,7 @@ void EventTeachingService::handleReadEvents(unsigned int nn)
   msg.data[2] = lowByte(nn);   // my NN lo
 
   Configuration *module_config = controller->getModuleConfig();
-  for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < module_config->getNumEvents(); i++)
   {
     if (module_config->getEvTableEntry(i) != 0)
     {
@@ -275,7 +275,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
   controller->messageActedOn();
 
   Configuration *module_config = controller->getModuleConfig();
-  if ((eventIndex >= module_config->EE_MAX_EVENTS) && (module_config->getEvTableEntry(eventIndex) == 0))
+  if ((eventIndex >= module_config->getNumEvents()) && (module_config->getEvTableEntry(eventIndex) == 0))
   {
     controller->sendCMDERR(CMDERR_INV_EN_IDX);
     controller->sendGRSP(OPC_NENRD, getServiceID(), CMDERR_INV_EN_IDX);
@@ -316,7 +316,7 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   uint8_t evnum = msg->data[4];
 
   Configuration *module_config = controller->getModuleConfig();
-  if (eventIndex >= module_config->EE_MAX_EVENTS)
+  if (eventIndex >= module_config->getNumEvents())
   {
     // DEBUG_SERIAL << F("ets> request for invalid event index") << endl;
     controller->sendCMDERR(CMDERR_INV_EN_IDX);
@@ -332,7 +332,7 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
     return;
   }
   
-  if (evnum > module_config->EE_NUM_EVS)
+  if (evnum > module_config->getNumEVs())
   {
     // DEBUG_SERIAL << F("ets> request for invalid event variable") << endl;
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
@@ -343,10 +343,10 @@ void EventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsig
   if (evnum == 0)
   {
     // Return number of EVs. This may be dynamic in other implementations.
-    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->EE_NUM_EVS);
+    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->getNumEVs());
     if (!module_config->fcuCompatible)
     {
-      for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+      for (byte i = 1; i <= module_config->getNumEVs(); i++)
       {
         byte value = module_config->getEventEVval(eventIndex, i);
         controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
@@ -379,7 +379,7 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
   // DEBUG_SERIAL << F("ets> NNCLR -- clear all events") << endl;
 
   Configuration *module_config = controller->getModuleConfig();
-  for (byte e = 0; e < module_config->EE_MAX_EVENTS; e++)
+  for (byte e = 0; e < module_config->getNumEvents(); e++)
   {
     module_config->cleareventEEPROM(e);
   }
@@ -388,7 +388,7 @@ void EventTeachingService::handleClearEvents(unsigned int nn)
   module_config->clearEvHashTable();
   // DEBUG_SERIAL << F("ets> cleared all events") << endl;
   
-  if (controller->getParam(PAR_FLAGS) & PF_PRODUCER)
+  if (module_config->getFlag(PF_PRODUCER))
   {
     module_config->setResetFlag();
   }
@@ -410,7 +410,7 @@ void EventTeachingService::handleGetFreeEventSlots(unsigned int nn)
 
   // count free slots using the event hash table
   Configuration *module_config = controller->getModuleConfig();
-  for (byte i = 0; i < module_config->EE_MAX_EVENTS; i++)
+  for (byte i = 0; i < module_config->getNumEvents(); i++)
   {
     if (module_config->getEvTableEntry(i) == 0)
     {
@@ -443,7 +443,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   byte evnum = msg->data[5];
   byte evval = msg->data[6];
   Configuration *module_config = controller->getModuleConfig();
-  if ((evnum == 0) || (evnum > module_config->EE_NUM_EVS))
+  if ((evnum == 0) || (evnum > module_config->getNumEVs()))
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_IDX);
@@ -460,9 +460,9 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     byte indexEV1 = module_config->findExistingEventByEv(evnum, evval);
     //DEBUG_SERIAL << F("> IndexEV1: ") << indexEV1 << F(" EV1 value: ") << module_config->getEventEVval(indexEV1, 1) << endl;
     
-    if (indexEV1 < module_config->EE_MAX_EVENTS)
+    if (indexEV1 < module_config->getNumEvents())
     {
-      if (index >= module_config->EE_MAX_EVENTS)
+      if (index >= module_config->getNumEvents())
       {
         // respond with error.  Changing NN/EN not allowed
         controller->sendCMDERR(CMDERR_INV_CMD);
@@ -487,14 +487,14 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
   // not found - it's a new event
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     // DEBUG_SERIAL << F("ets> existing event not found - creating a new one if space available") << endl;
     index = module_config->findEventSpace();
   }
 
   // if existing or new event space found, write the event data
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     // DEBUG_SERIAL << F("ets> no free event storage, index = ") << index << endl;
     // respond with CMDERR & GRSP
@@ -551,14 +551,14 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
 
   // invalid index
   Configuration *module_config = controller->getModuleConfig();
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     //DEBUG_SERIAL << F("> invalid index") << endl;
     controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EN_IDX);
     return;
   }
   
-  if ((evIndex == 0) || (evIndex > module_config->EE_NUM_EVS))  // Not a valid evIndex
+  if ((evIndex == 0) || (evIndex > module_config->getNumEVs()))  // Not a valid evIndex
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
@@ -608,7 +608,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   byte index = module_config->findExistingEvent(nn, en);
   byte evnum = msg->data[5];
 
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     //DEBUG_SERIAL << F("ets> event not found") << endl;
     controller->sendCMDERR(CMDERR_INVALID_EVENT);
@@ -616,7 +616,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     return;
   }
 
-  if (evnum > module_config->EE_NUM_EVS)
+  if (evnum > module_config->getNumEVs())
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_REQEV, getServiceID(), CMDERR_INV_EV_IDX);
@@ -633,11 +633,11 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     //send all event variables one after the other starting with the number of variables
     // Reuse the incoming message as it contains the event NN/EN and event index.
     response.data[5] = 0;
-    response.data[6] = module_config->EE_NUM_EVS;
+    response.data[6] = module_config->getNumEVs();
     controller->sendMessage(&response);
     if (!module_config->fcuCompatible)
     {
-      for (byte i = 1; i <= module_config->EE_NUM_EVS; i++)
+      for (byte i = 1; i <= module_config->getNumEVs(); i++)
       {
         response.data[5] = i;
         response.data[6] = module_config->getEventEVval(index, i);

@@ -50,9 +50,9 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   
   // Find next available event number.
   unsigned int eventNum;
-  for (eventNum = 1; eventNum <= module_config->EE_MAX_EVENTS; eventNum++)
+  for (eventNum = 1; eventNum <= module_config->getNumEvents(); eventNum++)
   {
-    if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->EE_MAX_EVENTS)
+    if (module_config->findExistingEvent(nodeNum, eventNum) == module_config->getNumEvents())
     {
       break;
     }
@@ -67,7 +67,7 @@ byte EventProducerService::createDefaultEvent(byte evValue)
   module_config->writeEvent(index, nn_en);
   module_config->writeEventEV(index, 1, evValue);
   
-  for (byte i = 2; i <= module_config->EE_NUM_EVS; i++)
+  for (byte i = 2; i <= module_config->getNumEVs(); i++)
   {
     module_config->writeEventEV(index, i, 0);
   }
@@ -96,7 +96,7 @@ void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byt
 {
   Configuration *module_config = controller->getModuleConfig();
   byte index = module_config->findExistingEventByEv(evIndex, evValue);
-  if (index >= module_config->EE_MAX_EVENTS)
+  if (index >= module_config->getNumEvents())
   {
     index = createDefaultEvent(evValue);
   }
@@ -246,7 +246,7 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
     Configuration *module_config = controller->getModuleConfig();
     byte index = module_config->findExistingEvent(nn, en);
  
-    if (index < module_config->EE_MAX_EVENTS)
+    if (index < module_config->getNumEvents())
     {
       if (module_config->getEventEVval(index, 1) != 0)
       {

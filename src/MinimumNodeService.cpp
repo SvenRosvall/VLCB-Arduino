@@ -245,7 +245,7 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
         VlcbMessage response;
         response.len = 8;
         response.data[0] = OPC_NAME;
-        copyName(response.data + 1, controller->getModuleName());
+        copyName(response.data + 1, module_config->getModuleName());
         controller->sendMessage(&response);
         controller->messageActedOn();
       }
@@ -331,12 +331,12 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
     {
       for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
       {
-        controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam(i));
+        controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam((VlcbParams) i));
       }
     }
     else if (paran <= controller->getParam(PAR_NUM))
     {
-      controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam(paran));
+      controller->sendMessageWithNN(OPC_PARAN, paran, controller->getParam((VlcbParams) paran));
     }
     else
     {

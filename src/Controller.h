@@ -15,13 +15,10 @@
 #include "initializer_list.h"
 #include "ArrayHolder.h"
 #include "CircularBuffer.h"
-#include "Parameters.h"
+#include "Configuration.h"
 
 namespace VLCB
 {
-
-class Configuration;
-
 //
 /// CAN/Controller message type
 //
@@ -73,15 +70,14 @@ public:
 
   Configuration * getModuleConfig() const { return module_config; }
 
-  void setName(const char *mname);
-  const char *getModuleName() const { return _mname; }
+  void setName(const char *mname) { module_config->setName(mname); }
 
   const ArrayHolder<Service *> & getServices() { return services; }
 
   void updateParamFlags();
   void setParamFlag(VlcbParamFlags flag, bool set);
-  Parameters & getParams() { return _mparams; }
-  unsigned char getParam(unsigned int param) const { return _mparams.getParams()[param]; }
+  Parameters & getParams() { return module_config->getParams(); }
+  unsigned char getParam(VlcbParams param) const { return module_config->getParam(param); }
 
   bool sendMessage(const VlcbMessage *msg);
 
@@ -113,9 +109,6 @@ private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
 
-  Parameters _mparams;
-  const char *_mname;
-  
   CircularBuffer<Action> actionQueue;
 
   bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }

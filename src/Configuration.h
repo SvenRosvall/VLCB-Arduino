@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <Arduino.h>                // for definition of byte datatype
-
 #include "Storage.h"
+#include "Parameters.h"
 #include "vlcbdefs.hpp"
 
 namespace VLCB
@@ -77,11 +76,26 @@ public:
   void clearResetFlag();
   bool isResetFlagSet();
 
+  void setName(const char *mname);
+  const char *getModuleName() const { return _mname; }
+
+  int getNumNodeVariables() const;
+  int getNumEvents() const;
+  int getNumEVs() const;
+  
+  void setNumNodeVariables(int n);
+  void setNumEvents(int n);
+  void setNumEVs(int n);
+
+  bool getFlag(VlcbParamFlags flag);
+  void setFlag(VlcbParamFlags flag);
+  void clearFlag(VlcbParamFlags flag);
+
+  unsigned char getParam(VlcbParams p);
+  Parameters &getParams();
+
   unsigned int EE_NVS_START = LOCATION_RESERVED_SIZE;
-  byte EE_NUM_NVS = 0;
   unsigned int EE_EVENTS_START = 0; // Value calculated in begin() unless set by user.
-  byte EE_MAX_EVENTS = 0;
-  byte EE_NUM_EVS = 0;
   byte EE_PRODUCED_EVENTS = 0;
   byte EE_BYTES_PER_EVENT; // Value calculated in begin()
   unsigned int EE_FREE_BASE; // Value calculated in begin()
@@ -105,6 +119,8 @@ public:
 
 private:
   Storage * storage;
+  const char *_mname;
+  Parameters _mparams;
 
   void setModuleMode(VlcbModeParams m);
   byte makeHash(byte tarr[EE_HASH_BYTES]) const;
