@@ -259,4 +259,10 @@ bool Controller::pendingAction()
   return actionQueue.available();
 }
 
+void Controller::messageActedOn()
+{
+  putAction(ACT_INDICATE_WORK);
+  ++diagMsgsActed;
+}
+
 }

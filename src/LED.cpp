@@ -13,82 +13,93 @@ namespace VLCB
 //
 
 LED::LED(byte pin)
-  : _pin(pin), _state(LOW), _blink(false), _pulse(false), _lastTime(0UL)
+  : _pin(pin), _mode(Off), _timer_start(0UL)
 {
-    pinMode(_pin, OUTPUT);
+  pinMode(_pin, OUTPUT);
 }
 
 // return the current state, on or off
 bool LED::getState()
 {
-  return _state;
+  return _mode & IsOn;
 }
 
 // turn LED state on
 void LED::on()
 {
-  _state = HIGH;
-  _blink = false;
+  _mode = On;
 }
 
 // turn LED state off
 void LED::off()
 {
-  _state = LOW;
-  _blink = false;
+  _mode = Off;
 }
 
-// toggle LED state from on to off or vv
+// toggle LED state from on to off or vv while blinking
 void LED::toggle()
 {
-  _state = !_state;
+  _mode ^= IsOn;
 }
 
-// blink LED
-void LED::blink()
+// blink the LED
+void LED::blink(unsigned int rate)
 {
-  _blink = true;
+  _mode = Blinking_On;
+  _interval = rate;
+  _timer_start = millis();
 }
 
 // pulse the LED
-void LED::pulse()
+void LED::pulse(unsigned int duration)
 {
-  _pulse = true;
-  _pulseStart = millis();
-  run();
+  unsigned long now = millis();
+  // Set the interval to the max of remainder of current pulse and new pulse.
+  if (_mode == Pulsing && _timer_start + _interval > now + duration)
+  {
+    // Current pulse is still in effect and the current pulse will last longer than the new pulse
+    // Keep it.
+  }
+  else
+  {
+    // Start pulsing
+    _interval = duration;
+    _mode = Pulsing;
+    _timer_start = now;
+  }
+  // the LED will illuminate now and then toggle once the timer expires
 }
 
 // actually operate the LED dependent upon its current state
 // must be called frequently from loop() if the LED is set to blink or pulse
 void LED::run()
 {
-  if (_blink)
+  if (_mode & IsBlinking)
   {
-    // blinking
-    if ((millis() - _lastTime) >= BLINK_RATE)
+    // blinking - toggle each time timer expires
+    if ((millis() - _timer_start) >= _interval)
     {
       toggle();
-      _lastTime = millis();
+      _timer_start = millis();
     }
   }
 
-  // single pulse
-  if (_pulse)
+  // single pulse - switch off after timer expires
+  if (_mode & IsPulsing)
   {
-    if (millis() - _pulseStart >= PULSE_ON_TIME)
+    if (millis() - _timer_start >= _interval)
     {
-      _pulse = false;
+      _mode = Off;
     }
   }
-
-  _write(_pin, _pulse || _state);
+  _update();
 }
 
 // write to the physical pin
-void LED::_write(byte pin, bool state)
+void LED::_update()
 {
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(pin, state ? HIGH : LOW);
+  digitalWrite(_pin, getState() ? HIGH : LOW);
 }
 
 }

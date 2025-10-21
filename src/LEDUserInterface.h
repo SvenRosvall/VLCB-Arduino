@@ -34,7 +34,7 @@ private:
   bool resetRequested();
   void handleAction(const Action *action);
   void checkRequestedAction();
-  void indicateActivity();
+
   void indicateMode(VlcbModeParams mode);
 };
 
