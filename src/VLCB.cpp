@@ -71,7 +71,7 @@ void setNumProducedEvents(byte n)
 
 void setNumEventVariables(byte n)
 {
-  modconfig.setNumNodeVariables(n);
+  modconfig.setNumEVs(n);
 }
 
 VlcbModeParams getCurrentMode()
