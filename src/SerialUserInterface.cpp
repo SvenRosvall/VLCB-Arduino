@@ -79,7 +79,7 @@ void SerialUserInterface::processSerialInput()
             Serial << _FMT(F("  %  | "), _WIDTHZ(j, 3));
 
             // for each data byte of this event
-            byte evarray[4];
+            byte evarray[EE_HASH_BYTES];
             modconfig->readEvent(j, evarray);
             for (byte e = 0; e < 4; e++)
             {

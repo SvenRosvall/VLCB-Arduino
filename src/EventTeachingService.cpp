@@ -569,7 +569,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
   //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
 
   // Writes the first four bytes NN & EN only if they have changed.
-  byte eventTableNNEN[4];
+  byte eventTableNNEN[EE_HASH_BYTES];
   module_config->readEvent(index, eventTableNNEN);
   if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
   {

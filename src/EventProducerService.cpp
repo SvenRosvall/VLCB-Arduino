@@ -92,7 +92,7 @@ void EventProducerService::process(const Action * action)
   }
 }
 
-void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byte nn_en[4])
+void EventProducerService::findOrCreateEventByEv(byte evIndex, byte evValue, byte nn_en[EE_HASH_BYTES])
 {
   Configuration *module_config = controller->getModuleConfig();
   byte index = module_config->findExistingEventByEv(evIndex, evValue);
@@ -124,7 +124,7 @@ void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte
 
 void EventProducerService::sendEvent(bool state, byte evValue)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
@@ -146,7 +146,7 @@ void EventProducerService::sendEvent(bool state, byte evValue)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
@@ -169,7 +169,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1)
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
@@ -193,7 +193,7 @@ void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte 
 
 void EventProducerService::sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   findOrCreateEventByEv(1, evValue, nn_en);
 
   byte opCode;
@@ -258,7 +258,7 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
 
 void EventProducerService::sendEventResponse(bool state, byte index)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(index, nn_en);
   //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
   
@@ -280,7 +280,7 @@ void EventProducerService::sendEventResponse(bool state, byte index)
 
 void EventProducerService::sendEventResponse(bool state, byte index, byte data1)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(index, nn_en);
   //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
   
@@ -303,7 +303,7 @@ void EventProducerService::sendEventResponse(bool state, byte index, byte data1)
 
 void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(index, nn_en);
   //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
   
@@ -327,7 +327,7 @@ void EventProducerService::sendEventResponse(bool state, byte index, byte data1,
 
 void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2, byte data3)
 {
-  byte nn_en[4];
+  byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(index, nn_en);
   //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
   
