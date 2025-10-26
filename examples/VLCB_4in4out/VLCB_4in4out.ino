@@ -10,6 +10,7 @@
 
   Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
   ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
+  Bounce2  -- library for switch debounce.
 */
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +110,7 @@ void setupVLCB()
     &ecService, &epService, &etService, &coeService});
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
+  VLCB::setEventsStart(50);
   VLCB::setMaxEvents(64);
   VLCB::setNumProducedEvents(NUM_SWITCHES);
   VLCB::setNumEventVariables(1 + NUM_LEDS);
@@ -219,7 +221,7 @@ void processSwitches(void)
         case 1:
           // ON and OFF
           state[i] = (moduleSwitch[i].fell());
-          DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+          //DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
           epService.sendEvent(state[i], swNum);
           break;
 
@@ -228,7 +230,7 @@ void processSwitches(void)
           if (moduleSwitch[i].fell()) 
           {
             state[i] = true;
-            DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
             epService.sendEvent(state[i], swNum);
           }
           break;
@@ -238,7 +240,7 @@ void processSwitches(void)
           if (moduleSwitch[i].fell())
           {
             state[i] = false;
-            DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
+            //DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
             epService.sendEvent(state[i], swNum);
           }
           break;
@@ -248,13 +250,13 @@ void processSwitches(void)
           if (moduleSwitch[i].fell())
           {
             state[i] = !state[i];
-            DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+            //DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
             epService.sendEvent(state[i], swNum);
           }
           break;
 
         default:
-          DEBUG_PRINT(F("sk> Button ") << i << F(" do nothing."));
+          //DEBUG_PRINT(F("sk> Button ") << i << F(" do nothing."));
           break;
       }
     }
@@ -268,23 +270,23 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 
-  DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
+  //DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
 
   unsigned int node_number = (msg->data[1] << 8) + msg->data[2];
   unsigned int event_number = (msg->data[3] << 8) + msg->data[4];
-  DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
-  DEBUG_PRINT(F("sk> op_code = ") << opc);
+  //DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
+  //DEBUG_PRINT(F("sk> op_code = ") << opc);
 
   switch (opc) 
   {
     case OPC_ACON:
     case OPC_ASON:
-      DEBUG_PRINT(F("sk> case is opCode ON"));
+      //DEBUG_PRINT(F("sk> case is opCode ON"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
         byte evval = VLCB::getEventEVval(index, ev);
-        DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
+        //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
         switch (evval) 
         {
@@ -308,7 +310,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 
     case OPC_ACOF:
     case OPC_ASOF:
-    DEBUG_PRINT(F("sk> case is opCode OFF"));
+    //DEBUG_PRINT(F("sk> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
