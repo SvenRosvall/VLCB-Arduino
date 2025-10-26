@@ -269,7 +269,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 
-  //DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
+  DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
 
   unsigned int node_number = (msg->data[1] << 8) + msg->data[2];
   unsigned int event_number = (msg->data[3] << 8) + msg->data[4];
@@ -285,7 +285,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       {
         byte ev = i + 2;
         byte evval = VLCB::getEventEVval(index, ev);
-        //DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
+        DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
         switch (evval) 
         {
