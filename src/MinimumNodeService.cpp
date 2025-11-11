@@ -524,6 +524,7 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
     case MODE_FCU_COMPATABILITY_OFF:
       notFcuCompatible = (requestedMode == MODE_FCU_COMPATABILITY_OFF);
       controller->getModuleConfig()->setFcuCompatability(!notFcuCompatible);
+      break;
       
     default:
       if (instantMode != MODE_NORMAL)
