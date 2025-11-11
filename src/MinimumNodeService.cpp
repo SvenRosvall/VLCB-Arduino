@@ -178,10 +178,6 @@ void MinimumNodeService::process(const Action *action)
   heartbeat();
 }
 
-// TODO: This list is used while implementing MNS. Remove once done.
-// MNS shall implement these opcodes in incoming requests
-// * RDGN - Request Diagnostic Data (0x87)
-
 void MinimumNodeService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
