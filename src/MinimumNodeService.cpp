@@ -178,10 +178,6 @@ void MinimumNodeService::process(const Action *action)
   heartbeat();
 }
 
-// TODO: This list is used while implementing MNS. Remove once done.
-// MNS shall implement these opcodes in incoming requests
-// * RDGN - Request Diagnostic Data (0x87)
-
 void MinimumNodeService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];
@@ -524,6 +520,7 @@ void MinimumNodeService::handleModeMessage(const VlcbMessage *msg, unsigned int 
     case MODE_FCU_COMPATABILITY_OFF:
       notFcuCompatible = (requestedMode == MODE_FCU_COMPATABILITY_OFF);
       controller->getModuleConfig()->setFcuCompatability(!notFcuCompatible);
+      break;
       
     default:
       if (instantMode != MODE_NORMAL)

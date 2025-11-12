@@ -19,11 +19,11 @@ namespace VLCB
 /// constructor
 //
 CAN2515::CAN2515()
-  : _num_rx_buffers(NUM_RX_BUFFS)
-  , _num_tx_buffers(NUM_TX_BUFFS)
+  : _osc_freq(OSCFREQ)
   , _csPin(MCP2515_CS)
   , _intPin(MCP2515_INT)
-  , _osc_freq(OSCFREQ)
+  , _num_rx_buffers(NUM_RX_BUFFS)
+  , _num_tx_buffers(NUM_TX_BUFFS)
 {
 }
 
