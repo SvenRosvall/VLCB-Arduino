@@ -40,7 +40,9 @@ public:
     IsBlinking = 0x02,
     IsPulsing = 0x04
   };
+  LED();
   explicit LED(byte pin);
+  void setPin(byte pin, bool active = HIGH);
   bool getState();
   void on();
   void off();
@@ -53,6 +55,8 @@ public:
 protected:
   byte _pin;
   byte _mode;
+  bool _active;
+  bool _state;
   unsigned int _interval;
   unsigned long _timer_start;
 

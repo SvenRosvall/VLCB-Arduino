@@ -20,6 +20,8 @@ class Switch
 {
 public:
   explicit Switch(byte pin, byte pressedState = LOW);
+  Switch();
+  void setPin(byte pin, byte mode);
   void run();
   void reset();
   bool stateChanged();
@@ -33,6 +35,7 @@ public:
 protected:
   byte readPin();
   byte _pin;
+  byte _mode;
   byte _pressedState;
   byte _currentState;
   byte _lastState;

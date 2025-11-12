@@ -12,6 +12,9 @@ namespace VLCB
 //
 /// a class to encapsulate a physical pushbutton switch, with non-blocking processing
 //
+Switch::Switch()
+{
+}
 
 Switch::Switch(byte pin, byte pressedState)
   : _pin(pin), _pressedState(pressedState)
@@ -21,6 +24,21 @@ Switch::Switch(byte pin, byte pressedState)
     pinMode(_pin, INPUT_PULLUP);
   }
 
+  reset();
+  _currentState = readPin();
+}
+
+void Switch::setPin(byte pin, byte mode)
+{
+  _pin = pin;
+  _mode = mode;
+  _pressedState = HIGH;
+  pinMode(_pin, _mode);
+  if (_mode == INPUT_PULLUP)
+  {
+  _pressedState == LOW;
+  }
+ 
   reset();
   _currentState = readPin();
 }
