@@ -57,8 +57,8 @@ void printConfig();
 void processSwitches();
 
 // constants
-const byte VER_MAJ = 2;             // code major version
-const char VER_MIN = 'a';           // code minor version
+const byte VER_MAJ = 1;             // code major version
+const char VER_MIN = 'b';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 82;          // VLCB module type
