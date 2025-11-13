@@ -110,7 +110,7 @@ void LED::run()
 // write to the physical pin
 void LED::_update()
 {
-  _state = getState();
+  bool _state = getState();
   if (_active == LOW)
   {
     _state = !_state;

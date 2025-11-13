@@ -35,7 +35,6 @@ public:
 protected:
   byte readPin();
   byte _pin;
-  byte _mode;
   byte _pressedState;
   byte _currentState;
   byte _lastState;

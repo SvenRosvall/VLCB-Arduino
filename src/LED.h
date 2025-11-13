@@ -56,7 +56,6 @@ protected:
   byte _pin;
   byte _mode;
   bool _active;
-  bool _state;
   unsigned int _interval;
   unsigned long _timer_start;
 

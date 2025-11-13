@@ -108,7 +108,6 @@ void setupVLCB()
     &ecService, &epService, &etService, &coeService});
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
-  VLCB::setEventsStart(50);
   VLCB::setMaxEvents(64);
   VLCB::setNumProducedEvents(NUM_SWITCHES);
   VLCB::setNumEventVariables(1 + NUM_LEDS);
@@ -157,7 +156,7 @@ void setupModule()
   // configure the module LEDs
   for (byte i = 0; i < NUM_LEDS; i++)
   {
-    moduleLED[i].setPin(LED[i], LOW);  //Second arguement active low or active high. Default if no second arguement is active low.
+    moduleLED[i].setPin(LED[i], LOW);  //Second arguement active low or active high. Default if no second arguement is active high.
   }
 
   Serial << "> Module has " << NUM_LEDS << " LEDs and " << NUM_SWITCHES << " switches." << endl;

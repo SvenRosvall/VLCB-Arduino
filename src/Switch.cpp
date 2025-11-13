@@ -31,12 +31,11 @@ Switch::Switch(byte pin, byte pressedState)
 void Switch::setPin(byte pin, byte mode)
 {
   _pin = pin;
-  _mode = mode;
   _pressedState = HIGH;
-  pinMode(_pin, _mode);
-  if (_mode == INPUT_PULLUP)
+  pinMode(_pin, mode);
+  if (mode == INPUT_PULLUP)
   {
-  _pressedState == LOW;
+    _pressedState == LOW;
   }
  
   reset();
