@@ -46,13 +46,10 @@
 
 // 3rd party libraries
 #include <Streaming.h>
-#include <Bounce2.h>
 
 // VLCB library header files
 #include <VLCB.h>
 #include <CAN2515.h>               // Chosen CAN controller
-
-#include "LEDControl.h"
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
@@ -61,7 +58,7 @@ void processSwitches();
 
 // constants
 const byte VER_MAJ = 1;             // code major version
-const char VER_MIN = 'a';           // code minor version
+const char VER_MIN = 'b';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 82;          // VLCB module type
@@ -80,9 +77,10 @@ const byte SWITCH[] = {A0, A1, A2, A3}; // Module Switch takes input to 0V.
 const byte NUM_LEDS = sizeof(LED) / sizeof(LED[0]);
 const byte NUM_SWITCHES = sizeof(SWITCH) / sizeof(SWITCH[0]);
 
-// module objects
-Bounce moduleSwitch[NUM_SWITCHES];  //  switch as input
-LEDControl moduleLED[NUM_LEDS];     //  LED as output
+
+// instantiate module objects
+VLCB::Switch moduleSwitch[NUM_SWITCHES];  //  switch as input
+VLCB::LED moduleLED[NUM_LEDS];     //  LED as output
 bool state[NUM_SWITCHES];
 
 VLCB::CAN2515 can2515;                  // CAN transport object
@@ -151,15 +149,14 @@ void setupModule()
   // configure the module switches, active low
   for (byte i = 0; i < NUM_SWITCHES; i++)
   {
-    moduleSwitch[i].attach(SWITCH[i], INPUT_PULLUP);
-    moduleSwitch[i].interval(5);
+    moduleSwitch[i].setPin(SWITCH[i], INPUT_PULLUP);
     state[i] = false;
   }
 
   // configure the module LEDs
   for (byte i = 0; i < NUM_LEDS; i++)
   {
-    moduleLED[i].setPin(LED[i]);
+    moduleLED[i].setPin(LED[i], LOW);  //Second arguement active low or active high. Default if no second arguement is active high.
   }
 
   Serial << "> Module has " << NUM_LEDS << " LEDs and " << NUM_SWITCHES << " switches." << endl;
@@ -206,27 +203,27 @@ void processSwitches(void)
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
   {
-    moduleSwitch[i].update();
-    if (moduleSwitch[i].changed())
+    moduleSwitch[i].run();
+    if (moduleSwitch[i].stateChanged())
     {
       byte nv = i + 1;
       byte nvval = VLCB::readNV(nv);
       byte swNum = i + 1;
 
-      // DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
+      DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
       switch (nvval)
       {
         case 1:
           // ON and OFF
-          state[i] = (moduleSwitch[i].fell());
+          state[i] = (moduleSwitch[i].getState());
           DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
           epService.sendEvent(state[i], swNum);
           break;
 
         case 2:
           // Only ON
-          if (moduleSwitch[i].fell()) 
+          if (moduleSwitch[i].isPressed()) 
           {
             state[i] = true;
             DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
@@ -236,7 +233,7 @@ void processSwitches(void)
 
         case 3:
           // Only OFF
-          if (moduleSwitch[i].fell())
+          if (moduleSwitch[i].isPressed())
           {
             state[i] = false;
             DEBUG_PRINT(F("sk> Button ") << i << F(" pressed, send state: ") << state[i]);
@@ -246,7 +243,7 @@ void processSwitches(void)
 
         case 4:
           // Toggle button
-          if (moduleSwitch[i].fell())
+          if (moduleSwitch[i].isPressed())
           {
             state[i] = !state[i];
             DEBUG_PRINT(F("sk> Button ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
@@ -294,11 +291,11 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
             break;
 
           case 2:
-            moduleLED[i].flash(500);
+            moduleLED[i].blink(500);
             break;
 
           case 3:
-            moduleLED[i].flash(250);
+            moduleLED[i].blink(250);
             break;
 
           default:

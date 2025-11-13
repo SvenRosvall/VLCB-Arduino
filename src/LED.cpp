@@ -12,10 +12,22 @@ namespace VLCB
 /// class for individual LED with non-blocking control
 //
 
+LED::LED()
+{
+}
+
 LED::LED(byte pin)
   : _pin(pin), _mode(Off), _timer_start(0UL)
 {
   pinMode(_pin, OUTPUT);
+}
+
+void LED::setPin(byte pin, bool active)
+{
+  _pin = pin;
+  pinMode(_pin, OUTPUT);
+  _mode = Off;
+  _active = active;
 }
 
 // return the current state, on or off
@@ -98,8 +110,13 @@ void LED::run()
 // write to the physical pin
 void LED::_update()
 {
+  bool _state = getState();
+  if (_active == LOW)
+  {
+    _state = !_state;
+  }
   // DEBUG_SERIAL << F("> mcu pin = ") << pin << F(", state = ") << state << endl;
-  digitalWrite(_pin, getState() ? HIGH : LOW);
+  digitalWrite(_pin, _state ? HIGH : LOW);
 }
 
 }
