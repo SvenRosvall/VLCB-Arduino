@@ -13,11 +13,12 @@ namespace VLCB
 //
 
 LED::LED()
+  : _timer_start(0UL)
 {
 }
 
-LED::LED(byte pin)
-  : _pin(pin), _mode(Off), _timer_start(0UL)
+LED::LED(byte pin, bool active)
+  : _pin(pin), _mode(Off), _active(active), _timer_start(0UL)
 {
   pinMode(_pin, OUTPUT);
 }
@@ -25,9 +26,9 @@ LED::LED(byte pin)
 void LED::setPin(byte pin, bool active)
 {
   _pin = pin;
-  pinMode(_pin, OUTPUT);
   _mode = Off;
   _active = active;
+  pinMode(_pin, OUTPUT);
 }
 
 // return the current state, on or off

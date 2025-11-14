@@ -21,6 +21,7 @@ byte lowByte(unsigned int);
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitToggle(value, bit) ((value) ^= (1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) ((bitvalue) ? bitSet(value, bit) : bitClear(value, bit))
+void pinMode(int, int);
 void pinMode(int, PinMode);
 void digitalWrite(int, PinState);
 byte digitalRead(int);

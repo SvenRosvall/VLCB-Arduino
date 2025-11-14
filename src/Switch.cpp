@@ -35,7 +35,7 @@ void Switch::setPin(byte pin, byte mode)
   pinMode(_pin, mode);
   if (mode == INPUT_PULLUP)
   {
-    _pressedState == LOW;
+    _pressedState = LOW;
   }
  
   reset();
