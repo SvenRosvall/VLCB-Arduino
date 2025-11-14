@@ -115,6 +115,8 @@ void Controller::updateParamFlags()
       case SERVICE_ID_CONSUME_OWN_EVENTS:
         module_config->setFlag(PF_COE);
         break;
+      default:
+        break;
     }
   }
   if (module_config->currentMode == MODE_NORMAL)

@@ -69,6 +69,9 @@ byte digitalRead(int pin)
 {
         return digitalReadValues[pin];
 }
+void pinMode(int pin, int mode)
+{
+}
 void pinMode(int pin, PinMode mode)
 {
 }

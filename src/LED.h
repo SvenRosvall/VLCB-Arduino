@@ -41,7 +41,7 @@ public:
     IsPulsing = 0x04
   };
   LED();
-  explicit LED(byte pin);
+  explicit LED(byte pin, bool active = HIGH);
   void setPin(byte pin, bool active = HIGH);
   bool getState();
   void on();
