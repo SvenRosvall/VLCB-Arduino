@@ -558,7 +558,7 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
     return;
   }
   
-  if ((evIndex == 0) || (evIndex > module_config->getNumEVs()))  // Not a valid evIndex
+  if (evIndex > module_config->getNumEVs())  // Not a valid evIndex
   {
     controller->sendCMDERR(CMDERR_INV_EV_IDX);
     controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
@@ -571,7 +571,10 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
   // Writes the first four bytes NN & EN only if they have changed.
   byte eventTableNNEN[EE_HASH_BYTES];
   module_config->readEvent(index, eventTableNNEN);
-  if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1]))
+
+  static const byte zero_entry[EE_HASH_BYTES] = { 0, 0, 0, 0};
+  if (!Configuration::nnenEquals(eventTableNNEN, &msg->data[1])
+      && !Configuration::nnenEquals(zero_entry, &msg->data[1]))
   {
     module_config->writeEvent(index, &msg->data[1]);
     //DEBUG_SERIAL << F("ets> Writing EV Index = ") << index << F(" Node Number ") << (msg->data[1] << 8) + msg->data[2] << F(" Event Number ") << (msg->data[3] << 8) + msg->data[4] <<endl;
@@ -581,7 +584,10 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
     module_config->updateEvHashEntry(index);
   }
 
-  module_config->writeEventEV(index, evIndex, evVal);
+  if ( evIndex != 0 )
+  {
+    module_config->writeEventEV(index, evIndex, evVal);
+  }
 
   // respond with WRACK
   controller->sendWRACK();  // Deprecated in favour of GRSP_OK
