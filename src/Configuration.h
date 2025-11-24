@@ -59,6 +59,7 @@ public:
   void writeNV(byte idx, byte val);
 
   void readEvent(byte idx, byte tarr[EE_HASH_BYTES]) const;
+  void writeEvent(byte eventIndex, unsigned int nn, unsigned int en);
   void writeEvent(byte index, const byte data[EE_HASH_BYTES]);
   void cleareventEEPROM(byte index);
   void resetModule();
@@ -99,7 +100,6 @@ public:
 
   unsigned int EE_NVS_START = LOCATION_RESERVED_SIZE;
   unsigned int EE_EVENTS_START = 0; // Value calculated in begin() unless set by user.
-  byte EE_PRODUCED_EVENTS = 0;
   byte EE_BYTES_PER_EVENT; // Value calculated in begin()
   unsigned int EE_FREE_BASE; // Value calculated in begin()
   unsigned int EE_USER_BYTES = 0; // Specified by user in setup for ESP processors.

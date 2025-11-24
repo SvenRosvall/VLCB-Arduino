@@ -74,7 +74,6 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
-  VLCB::setNumProducedEvents(1);
   VLCB::setNumEventVariables(2); // EV1: Produced event ; EV2: LED1
 
   // set module parameters
@@ -136,6 +135,36 @@ void loop()
   // bottom of loop()
 }
 
+byte createEvent(unsigned int nn, byte preferredEN)
+{
+  byte eventIndex = VLCB::findExistingEvent(nn, preferredEN);
+  if (VLCB::doesEventIndexExist(eventIndex))
+  {
+    // Find an unused EN
+    for (unsigned int en = 1 ; en < 65535 ; ++en)
+    {
+      eventIndex = VLCB::findExistingEvent(nn, preferredEN);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        VLCB::createEventAtIndex(eventIndex, nn, en);
+        return eventIndex;
+      }
+    }
+  }
+  else
+  {
+    // Find an empty slot to create an event.
+    eventIndex = VLCB::findEmptyEventSpace();
+    if (!VLCB::doesEventIndexExist(eventIndex))
+    {
+      VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
+      return eventIndex;
+    }
+  }
+
+  return 0xFF;
+}
+
 //
 /// test for switch input
 /// as an example, it must be have been pressed or released for at least half a second
@@ -148,8 +177,20 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte inputChannel = 1;  
-    epService.sendEvent(state, inputChannel);
+    byte inputChannel = 1;
+    byte eventIndex = VLCB::findExistingEventByEv(1, inputChannel);
+    if (!VLCB::doesEventIndexExist(eventIndex))
+    {
+      eventIndex = createEvent(VLCB::getNodeNum(), inputChannel);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        // Could not create default event. Ignore it and don't send an event.
+        return;
+      }
+      VLCB::writeEventVariable(eventIndex, 1, inputChannel);
+    }
+    
+    epService.sendEventIndex(state, eventIndex);
   }
 }
 

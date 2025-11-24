@@ -423,6 +423,15 @@ void Configuration::writeNV(byte idx, byte val)
 /// write (or clear) an event to EEPROM
 /// just the first four bytes -- NN and EN
 //
+void Configuration::writeEvent(byte eventIndex, unsigned int nn, unsigned int en)
+{
+  unsigned int eeaddress = EE_EVENTS_START + (eventIndex * EE_BYTES_PER_EVENT);
+  storage->write(eeaddress, highByte(nn));
+  storage->write(eeaddress+1, lowByte(nn));
+  storage->write(eeaddress+2, highByte(en));
+  storage->write(eeaddress+3, lowByte(en));
+}
+
 void Configuration::writeEvent(byte index, const byte data[EE_HASH_BYTES])
 {
   unsigned int eeaddress = EE_EVENTS_START + (index * EE_BYTES_PER_EVENT);

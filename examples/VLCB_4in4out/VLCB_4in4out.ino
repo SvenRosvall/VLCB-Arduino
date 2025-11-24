@@ -109,7 +109,6 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
   VLCB::setMaxEvents(64);
-  VLCB::setNumProducedEvents(NUM_SWITCHES);
   VLCB::setNumEventVariables(1 + NUM_LEDS);
 
   // set module parameters
@@ -199,6 +198,36 @@ void loop()
   // bottom of loop()
 }
 
+byte createEvent(unsigned int nn, byte preferredEN)
+{
+  byte eventIndex = VLCB::findExistingEvent(nn, preferredEN);
+  if (VLCB::doesEventIndexExist(eventIndex))
+  {
+    // Find an unused EN
+    for (unsigned int en = 1 ; en < 65535 ; ++en)
+    {
+      eventIndex = VLCB::findExistingEvent(nn, preferredEN);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        VLCB::createEventAtIndex(eventIndex, nn, en);
+        return eventIndex;
+      }
+    }
+  }
+  else
+  {
+    // Find an empty slot to create an event.
+    eventIndex = VLCB::findEmptyEventSpace();
+    if (!VLCB::doesEventIndexExist(eventIndex))
+    {
+      VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
+      return eventIndex;
+    }
+  }
+
+  return 0xFF;
+}
+
 void processSwitches(void) 
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
@@ -209,6 +238,17 @@ void processSwitches(void)
       byte nv = i + 1;
       byte nvval = VLCB::readNV(nv);
       byte swNum = i + 1;
+      byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        eventIndex = createEvent(VLCB::getNodeNum(), swNum);
+        if (!VLCB::doesEventIndexExist(eventIndex))
+        {
+          // Could not create default event. Ignore it and don't send an event.
+          return;
+        }
+        VLCB::writeEventVariable(eventIndex, 1, swNum);
+      }
 
       DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
 
@@ -218,7 +258,7 @@ void processSwitches(void)
           // ON and OFF
           state[i] = (moduleSwitch[i].isPressed());
           DEBUG_PRINT(F("sk> Button calling case 1: ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-          epService.sendEvent(state[i], swNum);
+          epService.sendEventIndex(state[i], eventIndex);
           break;
 
         case 2:
@@ -227,7 +267,7 @@ void processSwitches(void)
           {
             state[i] = true;
             DEBUG_PRINT(F("sk> Button calling case 2: ") << i << F(" pressed, send state: ") << state[i]);
-            epService.sendEvent(state[i], swNum);
+            epService.sendEventIndex(state[i], eventIndex);
           }
           break;
 
@@ -237,7 +277,7 @@ void processSwitches(void)
           {
             state[i] = false;
             DEBUG_PRINT(F("sk> Button calling case 3: ") << i << F(" pressed, send state: ") << state[i]);
-            epService.sendEvent(state[i], swNum);
+            epService.sendEventIndex(state[i], eventIndex);
           }
           break;
 
@@ -247,7 +287,7 @@ void processSwitches(void)
           {
             state[i] = !state[i];
             DEBUG_PRINT(F("sk> Button calling case 4: ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-            epService.sendEvent(state[i], swNum);
+            epService.sendEventIndex(state[i], eventIndex);
           }
           break;
 

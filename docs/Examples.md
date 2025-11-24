@@ -59,6 +59,12 @@ Create an event with EV#1 set to 1 to react to the moduleSwitch.
 Set EV#2 to make moduleLED change.
 Now the LED will react when the switch is changed.
 
+If the moduleSwitch is changed but there is no stored event with EV#1 == 1
+then a default event is created with EV#1 set to 1. 
+The event is created with node number of this node and an event number of 1,
+or if that is already taken by another event the lowest available event number
+is used.
+
 This sketch uses services with diagnostics enabled to demonstrate them.
 
 ## [VLCB_4in4out](../examples/VLCB_4in4out/VLCB_4in4out.ino)

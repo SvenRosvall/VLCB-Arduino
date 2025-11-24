@@ -28,7 +28,6 @@ void testDefaultEepromValues()
   assertEquals(0, configuration->getNumNodeVariables());
   assertEquals(VLCB::LOCATION_RESERVED_SIZE, configuration->EE_EVENTS_START);
   assertEquals(0, configuration->getNumEvents());
-  assertEquals(0, configuration->EE_PRODUCED_EVENTS);
   assertEquals(0, configuration->getNumEVs());
   assertEquals(VLCB::EE_HASH_BYTES, configuration->EE_BYTES_PER_EVENT);
 }
@@ -42,7 +41,6 @@ void testCalculatedEepromValues()
   VLCB::Configuration * configuration = createConfiguration(mockStorage.get());
   configuration->setNumNodeVariables(3);
   configuration->setNumEvents(7);
-  configuration->EE_PRODUCED_EVENTS = 1;
   configuration->setNumEVs(2);
   configuration->begin();
 
@@ -50,7 +48,6 @@ void testCalculatedEepromValues()
   assertEquals(3, configuration->getNumNodeVariables());
   assertEquals(VLCB::LOCATION_RESERVED_SIZE + 3, configuration->EE_EVENTS_START);
   assertEquals(7, configuration->getNumEvents());
-  assertEquals(1, configuration->EE_PRODUCED_EVENTS);
   assertEquals(2, configuration->getNumEVs());
   assertEquals(VLCB::EE_HASH_BYTES + 2, configuration->EE_BYTES_PER_EVENT);
 }
