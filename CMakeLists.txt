@@ -132,5 +132,6 @@ add_executable(testAll
         test/testConfiguration.cpp
         test/testCircularBuffer.cpp
         test/testLED.cpp
+        test/testSwitch.cpp
         test/MockUserInterface.h
 )

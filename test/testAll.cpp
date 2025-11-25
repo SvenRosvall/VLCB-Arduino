@@ -11,6 +11,7 @@
 
 void testCircularBuffer();
 void testLED();
+void testSwitch();
 void testConfiguration();
 void testMinimumNodeService();
 void testNodeVariableService();
@@ -30,6 +31,7 @@ std::map<std::string, void (*)()> suites = {
         {"Arduino", testArduino},
         {"CircularBuffer", testCircularBuffer},
         {"LED", testLED},
+        {"Switch", testSwitch},
         {"Configuration", testConfiguration},
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},
