@@ -25,7 +25,6 @@ public:
   {
     return 1;
   }
-  void begin() override;
   void sendEventIndex(bool state, byte evIndex);
   void sendEventIndex(bool state, byte evIndex, byte data1);
   void sendEventIndex(bool state, byte evIndex, byte data1, byte data2);

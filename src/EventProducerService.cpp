@@ -23,10 +23,6 @@ void EventProducerService::setRequestEventHandler(void (*fptr)(byte index, const
   requesteventhandler = fptr;
 }
 
-void EventProducerService::begin()
-{
-}
-
 void EventProducerService::process(const Action * action)
 {
   if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
