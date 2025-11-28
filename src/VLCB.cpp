@@ -122,11 +122,16 @@ byte findEmptyEventSpace()
 void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en)
 {
   modconfig.writeEvent(eventIndex, nn, en);
+  modconfig.updateEvHashEntry(eventIndex);
+  for (byte i = 1; i <= modconfig.getNumEVs(); i++)
+  {
+    modconfig.writeEventEV(eventIndex, i, 0);
+  }
 }
 
 void writeEventVariable(byte eventIndex, byte evIndex, byte value)
 {
-  modconfig.writeEventEV(eventIndex, eventIndex, value);
+  modconfig.writeEventEV(eventIndex, evIndex, value);
 }
 
 unsigned int getFreeEEPROMbase()

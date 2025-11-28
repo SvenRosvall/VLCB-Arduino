@@ -205,7 +205,7 @@ byte Configuration::findExistingEventByEv(byte evnum, byte evval) const
   byte i;
   for (i = 0; i < getNumEvents(); i++)
   {
-    if (getEventEVval(i, evnum) == evval)
+    if (evhashtbl[i] != 0 && getEventEVval(i, evnum) == evval)
     {
       break;
     }
