@@ -240,9 +240,15 @@ byte createEvent(unsigned int nn, byte preferredEN)
           //DEBUG_PRINT(F("sk> Created event at index=") << eventIndex);
           return eventIndex;
         }
+        else
+        {
+          //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
+          return 0xFF;
+        }
       }
     }
     //DEBUG_PRINT(F("sk> No free event number"));
+    return 0xFF;
   }
   else
   {
@@ -255,10 +261,12 @@ byte createEvent(unsigned int nn, byte preferredEN)
       VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
       return eventIndex;
     }
-    //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
+    else
+    {
+      //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
+      return 0xFF;
+    }
   }
-
-  return 0xFF;
 }
 
 void processSwitches(void) 
