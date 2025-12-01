@@ -82,7 +82,7 @@ The arguments provided to the handler function are:
 
 ### EventProducerService
 Facilitates sending events. 
-Call the ```sendEvent()``` from the application code.
+Call the ```sendEventAtIndex()``` from the application code.
 The parameters should be
 * ```state``` : A flag to say if the event is an on or off event.
 * ```index``` : An index for the produced event that relates to the event table entry.

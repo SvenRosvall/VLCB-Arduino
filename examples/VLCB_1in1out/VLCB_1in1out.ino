@@ -227,7 +227,7 @@ void processModuleSwitchChange()
       VLCB::writeEventVariable(eventIndex, 1, inputChannel);
     }
     
-    epService.sendEventIndex(state, eventIndex);
+    epService.sendEventToIndex(state, eventIndex);
   }
 }
 

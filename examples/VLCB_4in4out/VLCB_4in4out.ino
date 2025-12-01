@@ -276,7 +276,7 @@ void processSwitches(void)
           // ON and OFF
           state[i] = (moduleSwitch[i].isPressed());
           DEBUG_PRINT(F("sk> Button calling case 1: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-          epService.sendEventIndex(state[i], eventIndex);
+          epService.sendEventToIndex(state[i], eventIndex);
           break;
 
         case 2:
@@ -285,7 +285,7 @@ void processSwitches(void)
           {
             state[i] = true;
             DEBUG_PRINT(F("sk> Button calling case 2: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventIndex(state[i], eventIndex);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 
@@ -295,7 +295,7 @@ void processSwitches(void)
           {
             state[i] = false;
             DEBUG_PRINT(F("sk> Button calling case 3: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventIndex(state[i], eventIndex);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 
@@ -305,7 +305,7 @@ void processSwitches(void)
           {
             state[i] = !state[i];
             DEBUG_PRINT(F("sk> Button calling case 4: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-            epService.sendEventIndex(state[i], eventIndex);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 

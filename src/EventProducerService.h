@@ -25,10 +25,10 @@ public:
   {
     return 1;
   }
-  void sendEventIndex(bool state, byte evIndex);
-  void sendEventIndex(bool state, byte evIndex, byte data1);
-  void sendEventIndex(bool state, byte evIndex, byte data1, byte data2);
-  void sendEventIndex(bool state, byte evIndex, byte data1, byte data2, byte data3);
+  void sendEventToIndex(bool state, byte evIndex);
+  void sendEventToIndex(bool state, byte evIndex, byte data1);
+  void sendEventToIndex(bool state, byte evIndex, byte data1, byte data2);
+  void sendEventToIndex(bool state, byte evIndex, byte data1, byte data2, byte data3);
   void sendEventResponse(bool state, byte index);
   void sendEventResponse(bool state, byte index, byte data1);
   void sendEventResponse(bool state, byte index, byte data1, byte data2);
