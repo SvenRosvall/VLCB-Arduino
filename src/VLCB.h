@@ -52,5 +52,4 @@ void resetModule();
 
 void begin();
 void process();
-void sendEvent(bool state, byte channel);
 }
