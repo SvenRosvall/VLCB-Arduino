@@ -43,7 +43,7 @@ public:
   Configuration(Storage * theStorage);
   void begin();
 
-  byte findExistingEvent(unsigned int nn, unsigned int en) const;
+  byte findExistingEvent(unsigned int nn, unsigned int en, byte startIndex = 0) const;
   byte findEventSpace() const;
   byte findExistingEventByEv(byte evnum, byte evval) const;
   

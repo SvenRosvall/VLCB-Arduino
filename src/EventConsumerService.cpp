@@ -24,23 +24,26 @@ void EventConsumerService::setEventHandler(void (*fptr)(byte index, const VlcbMe
 //
 void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en) 
 {
-  // try to find a matching stored event -- match on nn, en
-  byte index = controller->getModuleConfig()->findExistingEvent(nn, en);
-
-  // call any registered event handler
-
-  if (index < controller->getModuleConfig()->getNumEvents())
+  if (eventhandler == nullptr)
   {
-    if (eventhandler != nullptr)
+    // Nothing to do.
+    return;
+  }
+
+  // Find each matching stored event -- match on nn, en
+  Configuration *modconfig = controller->getModuleConfig();
+  for (byte index = modconfig->findExistingEvent(nn, en, 0);
+       index < modconfig->getNumEvents();
+       index = modconfig->findExistingEvent(nn, en, index + 1))
+  {
+    // call any registered event handler
+    ++diagEventsConsumed;
+    controller->messageActedOn();
+    (void)(*eventhandler)(index, msg);
+    if (modconfig->eventAck)
     {
-      ++diagEventsConsumed;
-      controller->messageActedOn();
-      (void)(*eventhandler)(index, msg);
-      if (controller->getModuleConfig()->eventAck)
-      {
-        controller->sendMessageWithNN(OPC_ENACK, msg->data[0], highByte(nn), lowByte(nn), highByte(en), lowByte(en));
-        ++diagEventsAcknowledged;
-      }
+      controller->sendMessageWithNN(OPC_ENACK, msg->data[0], highByte(nn), lowByte(nn), highByte(en), lowByte(en));
+      ++diagEventsAcknowledged;
     }
   }
 }
