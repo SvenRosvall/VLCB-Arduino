@@ -128,8 +128,7 @@ void testConsumeOwnEvent()
   eventConsumerService->setEventHandler(eventHandler);
 
   // Add some long events
-  byte eventData[] = {0x01, 0x04, 0x03, 0x02};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 260, 770);
   configuration->writeEventEV(0, 1, 1);
   configuration->updateEvHashEntry(0);
 

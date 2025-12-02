@@ -91,8 +91,7 @@ void testSendOn()
   controller.begin();
 
   // Initialize a produced event
-  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
-  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEvent(0, 260, 1);
   controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
   eventProducerService->sendEventIndex(true, 0);
@@ -116,8 +115,7 @@ void testSend1Off()
   controller.begin();
 
   // Initialize a produced event
-  byte nnen[] = { 0x01, 0x04, 0x00, 0x01};
-  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEvent(0, 260, 1);
   controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
   eventProducerService->sendEventIndex(false, 0, 42);
@@ -142,8 +140,7 @@ void testSendShort2On()
   controller.begin();
 
   // Initialize a produced event
-  byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
-  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEvent(0, 0, 5);
   controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
   eventProducerService->sendEventIndex(true, 0, 42, 17);
@@ -169,8 +166,7 @@ void testSendShort3Off()
   controller.begin();
 
   // Initialize a produced event
-  byte nnen[] = { 0x00, 0x00, 0x00, 0x05};
-  controller.getModuleConfig()->writeEvent(0, nnen);
+  controller.getModuleConfig()->writeEvent(0, 0, 5);
   controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
   eventProducerService->sendEventIndex(false, 0, 42, 17, 234);
@@ -224,12 +220,10 @@ void testLongRequestStatus()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x01, 0x04, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 260, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 260, 1);
   configuration->updateEvHashEntry(1);
 
   VLCB::VlcbMessage msg = {5, {OPC_AREQ, 0x01, 0x04, 0, 1}};
@@ -254,12 +248,10 @@ void testShortRequestStatusWithNN()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 0, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
   VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x04, 0, 1}};
@@ -284,12 +276,10 @@ void testShortRequestStatusWithoutNN()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 0, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
   VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0, 0, 0, 1}};
@@ -314,12 +304,10 @@ void testShortRequestStatusWithDifferentNN()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 0, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
   VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x05, 0, 1}};
@@ -342,12 +330,10 @@ void testLongSendEventResponse()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x01, 0x04, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 260, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 260, 1);
   configuration->updateEvHashEntry(1);
 
   eventProducerService->sendEventResponse(true, 1);
@@ -375,12 +361,10 @@ void testShortSendEventResponse()
   controller.begin();
 
   // Add some long events
-  byte eventData[] = {0x00, 0x00, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 0, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
   eventProducerService->sendEventResponse(false, 1);
