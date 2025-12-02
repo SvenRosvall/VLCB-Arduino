@@ -150,7 +150,7 @@ void Configuration::setNodeNum(unsigned int nn)
 //
 /// lookup an event by node number and event number, using the hash table
 //
-byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
+byte Configuration::findExistingEvent(unsigned int nn, unsigned int en, byte startIndex) const
 {
   byte tarray[EE_HASH_BYTES];
 
@@ -163,7 +163,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
   byte tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (byte i = 0; i < getNumEvents(); i++)
+  for (byte i = startIndex; i < getNumEvents(); i++)
   {
     if (evhashtbl[i] == tmphash)
     {

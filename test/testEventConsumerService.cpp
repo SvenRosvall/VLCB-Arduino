@@ -81,19 +81,30 @@ void testServiceDiscoveryEventProdSvc()
   // Not testing service data bytes.
 }
 
-byte capturedIndex;
+int captureCount = 0;
+byte capturedIndex[3];
 VLCB::VlcbMessage capturedMessage;
+
+void resetCaptureData()
+{
+  captureCount = 0;
+  for (int i = 0 ; i < 3 ; ++i)
+  {
+    capturedIndex[i] = 0xFF;
+  }
+}
 
 void eventHandler(byte index, const VLCB::VlcbMessage *msg)
 {
-  capturedIndex = index;
+  capturedIndex[captureCount] = index;
   capturedMessage = *msg;
+  ++captureCount;
 }
 
 void testEventHandlerOff()
 {
   test();
-  capturedIndex = 0xFF;
+  resetCaptureData();
 
   VLCB::Controller controller = createController();
   eventConsumerService->setEventHandler(eventHandler);
@@ -113,7 +124,8 @@ void testEventHandlerOff()
   // No responses expected.
   assertEquals(0, mockTransportService->sent_messages.size());
 
-  assertEquals(1, capturedIndex);
+  assertEquals(1, captureCount);
+  assertEquals(1, capturedIndex[0]);
   assertEquals(5, capturedMessage.len);
   assertEquals(OPC_ACOF, capturedMessage.data[0]);
 }
@@ -121,7 +133,7 @@ void testEventHandlerOff()
 void testEventHandlerShortOn()
 {
   test();
-  capturedIndex = 0xFF;
+  resetCaptureData();
 
   VLCB::Controller controller = createController();
   eventConsumerService->setEventHandler(eventHandler);
@@ -143,9 +155,44 @@ void testEventHandlerShortOn()
   // No responses expected.
   assertEquals(0, mockTransportService->sent_messages.size());
 
-  assertEquals(1, capturedIndex);
+  assertEquals(1, captureCount);
+  assertEquals(1, capturedIndex[0]);
   assertEquals(5, capturedMessage.len);
   assertEquals(OPC_ASON, capturedMessage.data[0]);
+}
+
+void testEventHandlerMultipleEvents()
+{
+  test();
+  resetCaptureData();
+
+  VLCB::Controller controller = createController();
+  eventConsumerService->setEventHandler(eventHandler);
+
+  // Add some short events
+  configuration->writeEvent(0, 0, 1);
+  configuration->updateEvHashEntry(0);
+  configuration->writeEventEV(0, 1, 17);
+
+  configuration->writeEvent(1, 0, 2);
+  configuration->updateEvHashEntry(1);
+  configuration->writeEventEV(1, 1, 42);
+
+  configuration->writeEvent(2, 0, 1);
+  configuration->updateEvHashEntry(2);
+  configuration->writeEventEV(2, 1, 18);
+
+  VLCB::VlcbMessage msg = {5, {OPC_ASON, 0x01, 0x04, 0, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  // No responses expected.
+  assertEquals(0, mockTransportService->sent_messages.size());
+
+  assertEquals(2, captureCount);
+  assertEquals(0, capturedIndex[0]);
+  assertEquals(2, capturedIndex[1]);
 }
 
 }
@@ -156,4 +203,5 @@ void testEventConsumerService()
   testServiceDiscoveryEventProdSvc();
   testEventHandlerOff();
   testEventHandlerShortOn();
+  testEventHandlerMultipleEvents();
 }
