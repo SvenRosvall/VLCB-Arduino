@@ -53,6 +53,7 @@
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
+byte eventValidator(int nn, int en, byte evNum, byte evValue);
 void printConfig();
 void processSwitches();
 
@@ -122,6 +123,8 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
+  
+  etService.setEventValidator(eventValidator);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(6, 1);      // more buffers = more memory used, fewer = less
@@ -196,6 +199,23 @@ void loop()
   processSwitches();
 
   // bottom of loop()
+}
+
+byte eventValidator(int nn, int en, byte evNum, byte evValue)
+{
+  // EV#1 is for produced events. It specifies which switch triggers this event.
+  // There can only be one event with EV#1 set to a specific switch.
+  if (evNum == 1)
+  {
+    // Search for an event where EV#1 has the same value.
+    byte index = VLCB::findExistingEventByEv(evNum, evValue);
+    if (VLCB::doesEventIndexExist(index))
+    {
+      // Yes, one such event does exist.
+      return CMDERR_INV_EV_VALUE;
+    }
+  }
+  return GRSP_OK;
 }
 
 byte createEvent(unsigned int nn, byte preferredEN)

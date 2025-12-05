@@ -450,6 +450,18 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     return;
   }
   
+  if (validatorFunc != nullptr)
+  {
+    byte errorCode = validatorFunc(nn, en, evnum, evval);
+    if (errorCode != GRSP_OK)
+    {
+      // User defined validation failed.
+      controller->sendCMDERR(errorCode);
+      controller->sendGRSP(OPC_EVLRN, getServiceID(), errorCode);
+      return;
+    }
+  }
+  
   byte index = module_config->findExistingEvent(nn, en);
   //DEBUG_SERIAL << F("> IndexNNEN: ") << index << endl;
 
