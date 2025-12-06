@@ -138,7 +138,7 @@ lowest available event number will be used.
 ### Consume Own Events
 
 If the Produced Events Service and the Consume Events Service are both applied,
-the Consume Own Events Service must also be enabled.  This service provides a 
+the Consume Own Events Service can also be enabled.  This service provides a 
 buffer that will pass the produced event back to the Consumed Event Service.
 A Consume Own Event still only has one entry in the Event Table.  If the Event
 Variables 2 onwards are left as 0 or any undefined value, then the
