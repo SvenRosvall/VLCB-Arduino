@@ -21,7 +21,6 @@ VLCB::Configuration * createConfiguration()
   configuration->setNumNodeVariables(4);
   configuration->EE_EVENTS_START = 20;
   configuration->setNumEvents(20);
-  configuration->EE_PRODUCED_EVENTS = 1;
   configuration->setNumEVs(2);
   configuration->begin();
   return configuration;

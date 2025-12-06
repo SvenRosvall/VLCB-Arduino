@@ -53,6 +53,7 @@
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
+byte eventValidator(int nn, int en, byte evNum, byte evValue);
 void printConfig();
 void processSwitches();
 
@@ -109,7 +110,6 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
   VLCB::setMaxEvents(64);
-  VLCB::setNumProducedEvents(NUM_SWITCHES);
   VLCB::setNumEventVariables(1 + NUM_LEDS);
 
   // set module parameters
@@ -123,6 +123,8 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
+  
+  etService.setEventValidator(eventValidator);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(6, 1);      // more buffers = more memory used, fewer = less
@@ -199,6 +201,74 @@ void loop()
   // bottom of loop()
 }
 
+byte eventValidator(int nn, int en, byte evNum, byte evValue)
+{
+  // EV#1 is for produced events. It specifies which switch triggers this event.
+  // There can only be one event with EV#1 set to a specific switch.
+  if (evNum == 1)
+  {
+    // Search for an event where EV#1 has the same value.
+    byte index = VLCB::findExistingEventByEv(evNum, evValue);
+    if (VLCB::doesEventIndexExist(index))
+    {
+      // Yes, one such event does exist.
+      return CMDERR_INV_EV_VALUE;
+    }
+  }
+  return GRSP_OK;
+}
+
+byte createEvent(unsigned int nn, byte preferredEN)
+{
+  //DEBUG_PRINT(F("sk> Will create event nn=") << nn << " en=" << preferredEN);
+  byte eventIndex = VLCB::findExistingEvent(nn, preferredEN);
+  if (VLCB::doesEventIndexExist(eventIndex))
+  {
+    //DEBUG_PRINT(F("sk> Preferred event already exists. Try to find a free event number"));
+    // Find an unused EN
+    for (unsigned int en = 1 ; en < 65535 ; ++en)
+    {
+      //DEBUG_PRINT(F("sk> Trying en=") << en);
+      eventIndex = VLCB::findExistingEvent(nn, en);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        //DEBUG_PRINT(F("sk> is free, create it."));
+        eventIndex = VLCB::findEmptyEventSpace();
+        if (VLCB::doesEventIndexExist(eventIndex))
+        {
+          VLCB::createEventAtIndex(eventIndex, nn, en);
+          //DEBUG_PRINT(F("sk> Created event at index=") << eventIndex);
+          return eventIndex;
+        }
+        else
+        {
+          //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
+          return 0xFF;
+        }
+      }
+    }
+    //DEBUG_PRINT(F("sk> No free event number"));
+    return 0xFF;
+  }
+  else
+  {
+    //DEBUG_PRINT(F("sk> Preferred event does not exist."));
+    // Find an empty slot to create an event.
+    eventIndex = VLCB::findEmptyEventSpace();
+    if (VLCB::doesEventIndexExist(eventIndex))
+    {
+      //DEBUG_PRINT(F("sk> Creating preferred event"));
+      VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
+      return eventIndex;
+    }
+    else
+    {
+      //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
+      return 0xFF;
+    }
+  }
+}
+
 void processSwitches(void) 
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
@@ -209,16 +279,32 @@ void processSwitches(void)
       byte nv = i + 1;
       byte nvval = VLCB::readNV(nv);
       byte swNum = i + 1;
+      DEBUG_PRINT(F("sk> Button ") << swNum << F(" state change detected. NV Value = ") << nvval);
 
-      DEBUG_PRINT(F("sk> Button ") << i << F(" state change detected. NV Value = ") << nvval);
+      byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
+      if (!VLCB::doesEventIndexExist(eventIndex))
+      {
+        //DEBUG_PRINT(F("sk> No event for this button."));
+        eventIndex = createEvent(VLCB::getNodeNum(), swNum);
+        if (!VLCB::doesEventIndexExist(eventIndex))
+        {
+          //DEBUG_PRINT(F("sk> Could not create default event"));
+          // Could not create default event. Ignore it and don't send an event.
+          break;
+        }
+        VLCB::writeEventVariable(eventIndex, 1, swNum);
+        //DEBUG_PRINT(F("sk> Wrote event variable 1 value=") << swNum);
+      }
+      
+      DEBUG_PRINT(F("sk> Using event at index=") << eventIndex);
 
       switch (nvval)
       {
         case 1:
           // ON and OFF
           state[i] = (moduleSwitch[i].isPressed());
-          DEBUG_PRINT(F("sk> Button calling case 1: ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-          epService.sendEvent(state[i], swNum);
+          DEBUG_PRINT(F("sk> Button calling case 1: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+          epService.sendEventToIndex(state[i], eventIndex);
           break;
 
         case 2:
@@ -226,8 +312,8 @@ void processSwitches(void)
           if (moduleSwitch[i].isPressed()) 
           {
             state[i] = true;
-            DEBUG_PRINT(F("sk> Button calling case 2: ") << i << F(" pressed, send state: ") << state[i]);
-            epService.sendEvent(state[i], swNum);
+            DEBUG_PRINT(F("sk> Button calling case 2: ") << swNum << F(" pressed, send state: ") << state[i]);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 
@@ -236,8 +322,8 @@ void processSwitches(void)
           if (moduleSwitch[i].isPressed())
           {
             state[i] = false;
-            DEBUG_PRINT(F("sk> Button calling case 3: ") << i << F(" pressed, send state: ") << state[i]);
-            epService.sendEvent(state[i], swNum);
+            DEBUG_PRINT(F("sk> Button calling case 3: ") << swNum << F(" pressed, send state: ") << state[i]);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 
@@ -246,13 +332,13 @@ void processSwitches(void)
           if (moduleSwitch[i].isPressed())
           {
             state[i] = !state[i];
-            DEBUG_PRINT(F("sk> Button calling case 4: ") << i << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-            epService.sendEvent(state[i], swNum);
+            DEBUG_PRINT(F("sk> Button calling case 4: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
+            epService.sendEventToIndex(state[i], eventIndex);
           }
           break;
 
         default:
-          DEBUG_PRINT(F("sk> Button ") << i << F(" do nothing."));
+          DEBUG_PRINT(F("sk> Button ") << swNum << F(" do nothing."));
           break;
       }
     }

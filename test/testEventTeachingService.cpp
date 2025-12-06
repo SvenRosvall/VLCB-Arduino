@@ -911,21 +911,15 @@ void testUpdateProducedEventNNEN()
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
   mockTransportService->clearMessages();
 
-  // Update this event
+  // Add another event with same EV#1 value. This is OK in library version 2.xx.
   msg = {7, {OPC_EVLRN, 0x01, 0x06, 0x01, 0x08, 1, 42}};
   mockTransportService->setNextMessage(msg);
 
   process(controller);
 
   assertEquals(2, mockTransportService->sent_messages.size());
-
-  assertEquals(OPC_CMDERR, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[0].data[3]);
-
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(OPC_EVLRN, mockTransportService->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[1].data[4]);
-  assertEquals(CMDERR_INV_CMD, mockTransportService->sent_messages[1].data[5]);
 }
 
 void testUpdateProducedEventNNENToExistingEvent()
@@ -965,21 +959,15 @@ void testUpdateProducedEventNNENToExistingEvent()
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
   mockTransportService->clearMessages();
 
-  // Update the NNEN of the first event but will clash with the second
+  // Update the EV#1 of second event to match the first event. This is OK in library version 2.xx.
   msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x09, 1, 42}};
   mockTransportService->setNextMessage(msg);
 
   process(controller);
 
   assertEquals(2, mockTransportService->sent_messages.size());
-
-  assertEquals(OPC_CMDERR, mockTransportService->sent_messages[0].data[0]);
-  assertEquals(CMDERR_INV_EV_VALUE, mockTransportService->sent_messages[0].data[3]);
-
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
-  assertEquals(OPC_EVLRN, mockTransportService->sent_messages[1].data[3]);
-  assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[1].data[4]);
-  assertEquals(CMDERR_INV_EV_VALUE, mockTransportService->sent_messages[1].data[5]);
 }
 
 void testEnterLearnModeOldOtherNode()

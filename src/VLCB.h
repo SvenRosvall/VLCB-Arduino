@@ -32,7 +32,6 @@ void setName(char *mname);
 void setNumNodeVariables(byte n);
 void setEventsStart(byte n);
 void setMaxEvents(byte n);
-void setNumProducedEvents(byte n);
 void setNumEventVariables(byte n);
 
 VlcbModeParams getCurrentMode();
@@ -42,10 +41,15 @@ unsigned int getFreeEEPROMbase();
 byte readNV(byte nv);
 void writeNV(byte nv, byte val);
 byte getEventEVval(byte idx, byte evnum);
+byte findExistingEventByEv(int evIndex, byte value);
+byte findExistingEvent(unsigned int nn, unsigned int en);
+bool doesEventIndexExist(byte eventIndex);
+byte findEmptyEventSpace();
+void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en);
+void writeEventVariable(byte eventIndex, byte evIndex, byte value);
 
 void resetModule();
 
 void begin();
 void process();
-void sendEvent(bool state, byte channel);
 }

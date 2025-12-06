@@ -64,7 +64,7 @@ byte EepromInternalStorage::getChipEEPROMVal(unsigned int eeaddress)
 //
 void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 {
-  // DEBUG_SERIAL << F("> write, addr = ") << eeaddress << F(", data = ") << data << endl;
+  // DEBUG_PRINT(F("> write, addr = ") << eeaddress << F(", data = ") << data);
 
   setChipEEPROMVal(eeaddress, data);
 }
@@ -75,6 +75,7 @@ void EepromInternalStorage::write(unsigned int eeaddress, byte data)
 //
 void EepromInternalStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
+  // DEBUG_PRINT(F("> write, addr = ") << eeaddress << F(", datalen = ") << numbytes);
   for (byte i = 0; i < numbytes; i++)
   {
     setChipEEPROMVal(eeaddress + i, src[i]);

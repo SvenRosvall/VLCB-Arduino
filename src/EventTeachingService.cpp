@@ -450,40 +450,21 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     return;
   }
   
+  if (validatorFunc != nullptr)
+  {
+    byte errorCode = validatorFunc(nn, en, evnum, evval);
+    if (errorCode != GRSP_OK)
+    {
+      // User defined validation failed.
+      controller->sendCMDERR(errorCode);
+      controller->sendGRSP(OPC_EVLRN, getServiceID(), errorCode);
+      return;
+    }
+  }
+  
   byte index = module_config->findExistingEvent(nn, en);
   //DEBUG_SERIAL << F("> IndexNNEN: ") << index << endl;
-  
-  // Is this a produced event that we know about?
-  // Search the events table by evnum = 1 for a value match with evval.
-  if ((evnum == 1) && (evval > 0))
-  {
-    byte indexEV1 = module_config->findExistingEventByEv(evnum, evval);
-    //DEBUG_SERIAL << F("> IndexEV1: ") << indexEV1 << F(" EV1 value: ") << module_config->getEventEVval(indexEV1, 1) << endl;
-    
-    if (indexEV1 < module_config->getNumEvents())
-    {
-      if (index >= module_config->getNumEvents())
-      {
-        // respond with error.  Changing NN/EN not allowed
-        controller->sendCMDERR(CMDERR_INV_CMD);
-        controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_CMD);
-        return;
-      }
-      else
-      {
-        if (index != indexEV1)
-        {
-          // respond with error. Producer EV value assigned to another NN/EN
-          controller->sendCMDERR(CMDERR_INV_EV_VALUE);
-          controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_INV_EV_VALUE);
-          return;
-        }
-        //else valid learn so proceed
-      }
-    }
-    //producer event value does not exist so proceed
-  }     
-      
+
   // search for this NN, EN as we may just be adding an EV to an existing learned event 
   //DEBUG_SERIAL << F("ets> searching for existing event to update") << endl;
   // not found - it's a new event
@@ -491,24 +472,18 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
   {
     // DEBUG_SERIAL << F("ets> existing event not found - creating a new one if space available") << endl;
     index = module_config->findEventSpace();
-  }
 
-  // if existing or new event space found, write the event data
-  if (index >= module_config->getNumEvents())
-  {
-    // DEBUG_SERIAL << F("ets> no free event storage, index = ") << index << endl;
-    // respond with CMDERR & GRSP
-    controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
-    controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
-    return;
-  }
+    // if existing or new event space found, write the event data
+    if (index >= module_config->getNumEvents())
+    {
+      // DEBUG_SERIAL << F("ets> no free event storage, index = ") << index << endl;
+      // respond with CMDERR & GRSP
+      controller->sendCMDERR(CMDERR_TOO_MANY_EVENTS);
+      controller->sendGRSP(OPC_EVLRN, getServiceID(), CMDERR_TOO_MANY_EVENTS);
+      return;
+    }
 
-  // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
-  // DEBUG_SERIAL << F("ets> writing EV = ") << evnum << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
-
-  // don't repeat this for subsequent EVs
-  if (evnum <= 1)
-  {
+    // write the event to EEPROM at this location
     module_config->writeEvent(index, &msg->data[1]);
 
     // recreate event hash table entry
@@ -516,6 +491,7 @@ void EventTeachingService::handleLearnEvent(const VlcbMessage *msg, unsigned int
     module_config->updateEvHashEntry(index);
   }
 
+  // DEBUG_SERIAL << F("ets> writing EV = ") << evnum << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
   module_config->writeEventEV(index, evnum, evval);
 
   // respond with WRACK

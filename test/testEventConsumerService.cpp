@@ -99,12 +99,10 @@ void testEventHandlerOff()
   eventConsumerService->setEventHandler(eventHandler);
 
   // Add some long events
-  byte eventData[] = {0x01, 0x04, 0x00, 0x00};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 260, 0);
   configuration->updateEvHashEntry(0);
 
-  eventData[3] = 0x01;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 260, 1);
   configuration->updateEvHashEntry(1);
 
   VLCB::VlcbMessage msg = {5, {OPC_ACOF, 0x01, 0x04, 0, 1}};
@@ -129,13 +127,11 @@ void testEventHandlerShortOn()
   eventConsumerService->setEventHandler(eventHandler);
 
   // Add some short events
-  byte eventData[] = {0x00, 0x00, 0x00, 0x01};
-  configuration->writeEvent(0, eventData);
+  configuration->writeEvent(0, 0, 1);
   configuration->updateEvHashEntry(0);
   configuration->writeEventEV(0, 1, 17);
 
-  eventData[3] = 0x02;
-  configuration->writeEvent(1, eventData);
+  configuration->writeEvent(1, 0, 2);
   configuration->updateEvHashEntry(1);
   configuration->writeEventEV(1, 1, 42);
 
