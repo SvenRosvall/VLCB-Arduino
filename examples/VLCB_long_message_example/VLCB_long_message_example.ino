@@ -65,7 +65,6 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
-  VLCB::setNumProducedEvents(1);
   VLCB::setNumEventVariables(1);
 
   // set module parameters
@@ -165,7 +164,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
   // as an example, display the opcode and the first EV of this event, which is ev2 as ev1 defines produced event
 
   Serial << F("> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]) << endl;
-  Serial << F("> EV1 = ") << VLCB::getEventEVval(index, 2) << endl;
+  Serial << F("> EV1 = ") << VLCB::getEventEVval(index, 1) << endl;
 }
 
 //

@@ -16,6 +16,8 @@ struct VlcbMessage;
 class EventTeachingService : public Service 
 {
 public:
+  void setEventValidator(byte (*func)(int, int, byte, byte)) { validatorFunc = func; }
+
   virtual void process(const Action * action) override;
 
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }
@@ -26,6 +28,7 @@ public:
 
 private:
   bool bLearn = false;
+  byte (*validatorFunc)(int, int, byte, byte) = nullptr;
 
   void handleMessage(const VlcbMessage *msg);
   void handleLearnMode(const VlcbMessage *msg, unsigned int nn);

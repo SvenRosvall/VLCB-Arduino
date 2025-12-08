@@ -128,10 +128,12 @@ the Node Window.  When the event variable dialogue opens, put the index number o
 the switch to be associated with the event in EV1 and press OK.  The selected
 switch will now generate that short event (but see [FCU Anomalies](#fcu-anomalies) below).
 
-If a switch default has been unlearnt and that switch not been assigned to an
-event by the FCU, operation of the switch will result in a new default event
-being generated as long as its NV Value is set for a function other than
-"Do Nothing" (See Node Variables below).
+If a switch is operated, and its associated NV value is set to an action,
+but there is no event with EV1 value matching the switch number, then a
+default event will be created for that switch.
+This event will have a node number matching the node number of this node and
+an event number that matches the switch number, if available, otherwise the 
+lowest available event number will be used.
 
 ### Consume Own Events
 

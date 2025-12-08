@@ -64,11 +64,6 @@ void setEventsStart(byte n)
   modconfig.EE_EVENTS_START = n;
 }
 
-void setNumProducedEvents(byte n)
-{
-  modconfig.EE_PRODUCED_EVENTS = n;
-}
-
 void setNumEventVariables(byte n)
 {
   modconfig.setNumEVs(n);
@@ -102,6 +97,41 @@ void writeNV(byte nv, byte val)
 byte getEventEVval(byte idx, byte evnum)
 {
   return modconfig.getEventEVval(idx, evnum);
+}
+
+byte findExistingEventByEv(int evIndex, byte value)
+{
+  return modconfig.findExistingEventByEv(evIndex, value);
+}
+
+byte findExistingEvent(unsigned int nn, unsigned int en)
+{
+  return modconfig.findExistingEvent(nn, en);
+}
+
+bool doesEventIndexExist(byte eventIndex)
+{
+  return eventIndex < modconfig.getNumEvents();
+}
+
+byte findEmptyEventSpace()
+{
+  return modconfig.findEventSpace();
+}
+
+void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en)
+{
+  modconfig.writeEvent(eventIndex, nn, en);
+  modconfig.updateEvHashEntry(eventIndex);
+  for (byte i = 1; i <= modconfig.getNumEVs(); i++)
+  {
+    modconfig.writeEventEV(eventIndex, i, 0);
+  }
+}
+
+void writeEventVariable(byte eventIndex, byte evIndex, byte value)
+{
+  modconfig.writeEventEV(eventIndex, evIndex, value);
 }
 
 unsigned int getFreeEEPROMbase()

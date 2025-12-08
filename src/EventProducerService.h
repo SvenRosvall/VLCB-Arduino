@@ -25,11 +25,10 @@ public:
   {
     return 1;
   }
-  void begin() override;
-  void sendEvent(bool state, byte evValue);
-  void sendEvent(bool state, byte evValue, byte data1);
-  void sendEvent(bool state, byte evValue, byte data1, byte data2);
-  void sendEvent(bool state, byte evValue, byte data1, byte data2, byte data3);
+  void sendEventToIndex(bool state, byte evIndex);
+  void sendEventToIndex(bool state, byte evIndex, byte data1);
+  void sendEventToIndex(bool state, byte evIndex, byte data1, byte data2);
+  void sendEventToIndex(bool state, byte evIndex, byte data1, byte data2, byte data3);
   void sendEventResponse(bool state, byte index);
   void sendEventResponse(bool state, byte index, byte data1);
   void sendEventResponse(bool state, byte index, byte data1, byte data2);
@@ -39,14 +38,9 @@ public:
 private:
   void (*requesteventhandler)(byte index, const VlcbMessage *msg);
   void handleProdSvcMessage(const VlcbMessage *msg);
-  
-  void setProducedEvents();
-  byte createDefaultEvent(byte evValue);
-  void findOrCreateEventByEv(byte evIndex, byte evValue, byte tarr[]);
+
   void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
 
-  bool uninit = false;
-  
 protected:
   unsigned int diagEventsProduced = 0;
 

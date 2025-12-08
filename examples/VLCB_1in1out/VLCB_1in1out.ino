@@ -34,7 +34,7 @@ const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
 // module objects
-VLCB::Switch moduleSwitch(5);            // an example switch as input
+VLCB::Switch moduleSwitch(A0);            // an example switch as input
 VLCB::LED moduleLED(6);                  // an example LED as output
 
 // module name, must be 7 characters, space padded.
@@ -67,7 +67,6 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(10);
   VLCB::setMaxEvents(32);
-  VLCB::setNumProducedEvents(1);
   VLCB::setNumEventVariables(2); // EV1: Produced event ; EV2: LED1
 
   // set module parameters
@@ -172,8 +171,9 @@ void processModuleSwitchChange()
   if (moduleSwitch.stateChanged())
   {
     bool state = moduleSwitch.isPressed();
-    byte inputChannel = 1;  
-    epService.sendEvent(state, inputChannel);
+    byte inputChannel = 1;
+    byte eventIndex = VLCB::findExistingEventByEv(1, inputChannel);
+    epService.sendEventToIndex(state, eventIndex);
   }
 }
 
