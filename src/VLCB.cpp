@@ -4,7 +4,6 @@
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
 #include "VLCB.h"
-#include "ServiceFactory.h"
 
 namespace VLCB
 {

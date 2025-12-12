@@ -32,7 +32,6 @@ add_library(hardware_library OBJECT
 
 # The LED_UI_library was added as a workaround for building test code.
 # It uses hardware and thus cannot be tested properly like the core_library.
-# But LEDUserInterface is used by the ServiceFactory so must be built for tests.
 add_library(LED_UI_library OBJECT
         src/LED.cpp
         src/LED.h
@@ -83,8 +82,6 @@ add_library(core_library OBJECT
         src/CircularBuffer.h
         src/VLCB.h
         src/VLCB.cpp
-        src/ServiceFactory.cpp
-        src/ServiceFactory.h
 )
 
 target_link_libraries(core_library PUBLIC)
