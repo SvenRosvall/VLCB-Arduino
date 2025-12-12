@@ -1,0 +1,68 @@
+{
+  "timestamp": "202505290839",
+  "moduleName" : "CAN4I4O_S",
+  "useSlots": true,
+  "nodeVariables": [
+    {
+      "type": "NodeVariableSelect",
+      "nodeVariableIndex": 1,
+      "displayTitle" : "Switch 1",
+      "options": [
+        {"label": "None", "value": 0},
+        {"label": "On/Off", "value": 1},
+        {"label": "On only", "value": 2},
+        {"label": "Off only", "value": 3},
+        {"label": "Toggle", "value": 4}
+      ]
+    },
+    {
+      "type": "NodeVariableSelect",
+      "nodeVariableIndex": 2,
+      "displayTitle" : "Switch 2",
+      "options": [
+        {"label": "None", "value": 0},
+        {"label": "On/Off", "value": 1},
+        {"label": "On only", "value": 2},
+        {"label": "Off only", "value": 3},
+        {"label": "Toggle", "value": 4}
+      ]
+    },
+    {
+      "type": "NodeVariableSelect",
+      "nodeVariableIndex": 3,
+      "displayTitle" : "Switch 3",
+      "options": [
+        {"label": "None", "value": 0},
+        {"label": "On/Off", "value": 1},
+        {"label": "On only", "value": 2},
+        {"label": "Off only", "value": 3},
+        {"label": "Toggle", "value": 4}
+      ]
+    },
+    {
+      "type": "NodeVariableSelect",
+      "nodeVariableIndex": 4,
+      "displayTitle" : "Switch 4",
+      "options": [
+        {"label": "None", "value": 0},
+        {"label": "On/Off", "value": 1},
+        {"label": "On only", "value": 2},
+        {"label": "Off only", "value": 3},
+        {"label": "Toggle", "value": 4}
+      ]
+    }
+  ],
+  "eventVariables":[
+    {
+      "type": "EventVariableSelect",
+      "eventVariableIndex": 1,
+      "displayTitle": "LED Action",
+      "options": [
+        {"label": "No Action", "value": 0},
+        {"label": "Normal", "value": 1},
+        {"label": "Slow Blink", "value": 2},
+        {"label": "Fast Blink", "value": 3}
+      ]
+    }
+  ]
+}
