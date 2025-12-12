@@ -58,6 +58,7 @@ public:
   byte readNV(byte idx) const;
   void writeNV(byte idx, byte val);
 
+  bool isEventSlotInUse(byte eventIndex) const;
   void readEvent(byte idx, byte tarr[EE_HASH_BYTES]) const;
   void writeEvent(byte eventIndex, unsigned int nn, unsigned int en);
   void writeEvent(byte index, const byte data[EE_HASH_BYTES]);

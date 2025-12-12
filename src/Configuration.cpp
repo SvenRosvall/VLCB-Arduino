@@ -12,6 +12,14 @@
 
 #include "Configuration.h"
 
+#define DEBUG 0  // set to 0 for no serial debug
+
+#if DEBUG
+#define DEBUG_PRINT(S) Serial << S << endl
+#else
+#define DEBUG_PRINT(S)
+#endif
+
 #ifdef __AVR__
 extern "C" int __heap_start, *__brkval;
 #endif
@@ -232,6 +240,11 @@ byte Configuration::makeHash(byte tarr[EE_HASH_BYTES]) const
 
   // DEBUG_SERIAL << F("> makeHash - hash of nn = ") << nn << F(", en = ") << en << F(", = ") << hash << endl;
   return hash;
+}
+
+bool Configuration::isEventSlotInUse(byte eventIndex) const
+{
+  return evhashtbl[eventIndex] != 0;
 }
 
 //
@@ -563,7 +576,7 @@ void Configuration::resetModule()
 {
   /// implementation of resetModule() without VLCB Switch or LEDs
   // uint32_t t = millis();
-  // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
+  // DEBUG_PRINT(F("> resetting EEPROM"));
 
   // clear the learned events from storage
   storage->reset();

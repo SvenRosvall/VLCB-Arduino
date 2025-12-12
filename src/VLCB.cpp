@@ -109,9 +109,14 @@ byte findExistingEvent(unsigned int nn, unsigned int en)
   return modconfig.findExistingEvent(nn, en);
 }
 
-bool doesEventIndexExist(byte eventIndex)
+bool isEventIndexValid(byte eventIndex)
 {
   return eventIndex < modconfig.getNumEvents();
+}
+
+bool doesEventExistAtIndex(byte eventIndex)
+{
+  return isEventIndexValid(eventIndex) && modconfig.isEventSlotInUse(eventIndex);
 }
 
 byte findEmptyEventSpace()
