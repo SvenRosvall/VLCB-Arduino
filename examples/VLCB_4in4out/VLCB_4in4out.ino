@@ -209,7 +209,7 @@ byte eventValidator(int nn, int en, byte evNum, byte evValue)
   {
     // Search for an event where EV#1 has the same value.
     byte index = VLCB::findExistingEventByEv(evNum, evValue);
-    if (VLCB::doesEventIndexExist(index))
+    if (VLCB::isEventIndexValid(index))
     {
       // Yes, one such event does exist.
       return CMDERR_INV_EV_VALUE;
@@ -222,7 +222,7 @@ byte createEvent(unsigned int nn, byte preferredEN)
 {
   //DEBUG_PRINT(F("sk> Will create event nn=") << nn << " en=" << preferredEN);
   byte eventIndex = VLCB::findExistingEvent(nn, preferredEN);
-  if (VLCB::doesEventIndexExist(eventIndex))
+  if (VLCB::isEventIndexValid(eventIndex))
   {
     //DEBUG_PRINT(F("sk> Preferred event already exists. Try to find a free event number"));
     // Find an unused EN
@@ -230,11 +230,11 @@ byte createEvent(unsigned int nn, byte preferredEN)
     {
       //DEBUG_PRINT(F("sk> Trying en=") << en);
       eventIndex = VLCB::findExistingEvent(nn, en);
-      if (!VLCB::doesEventIndexExist(eventIndex))
+      if (!VLCB::isEventIndexValid(eventIndex))
       {
         //DEBUG_PRINT(F("sk> is free, create it."));
         eventIndex = VLCB::findEmptyEventSpace();
-        if (VLCB::doesEventIndexExist(eventIndex))
+        if (VLCB::isEventIndexValid(eventIndex))
         {
           VLCB::createEventAtIndex(eventIndex, nn, en);
           //DEBUG_PRINT(F("sk> Created event at index=") << eventIndex);
@@ -255,7 +255,7 @@ byte createEvent(unsigned int nn, byte preferredEN)
     //DEBUG_PRINT(F("sk> Preferred event does not exist."));
     // Find an empty slot to create an event.
     eventIndex = VLCB::findEmptyEventSpace();
-    if (VLCB::doesEventIndexExist(eventIndex))
+    if (VLCB::isEventIndexValid(eventIndex))
     {
       //DEBUG_PRINT(F("sk> Creating preferred event"));
       VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
@@ -282,11 +282,11 @@ void processSwitches(void)
       DEBUG_PRINT(F("sk> Button ") << swNum << F(" state change detected. NV Value = ") << nvval);
 
       byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
-      if (!VLCB::doesEventIndexExist(eventIndex))
+      if (!VLCB::isEventIndexValid(eventIndex))
       {
         //DEBUG_PRINT(F("sk> No event for this button."));
         eventIndex = createEvent(VLCB::getNodeNum(), swNum);
-        if (!VLCB::doesEventIndexExist(eventIndex))
+        if (!VLCB::isEventIndexValid(eventIndex))
         {
           //DEBUG_PRINT(F("sk> Could not create default event"));
           // Could not create default event. Ignore it and don't send an event.

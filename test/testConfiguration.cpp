@@ -69,6 +69,19 @@ void testLoadNVsFromZeroedEEPROM()
   assertEquals(VlcbModeParams::MODE_UNINITIALISED, configuration->currentMode);
 }
 
+void testIsEventSlotInUse()
+{
+  test();
+  
+  VLCB::Configuration * configuration = createConfiguration();
+
+  configuration->writeEvent(3, 6, 8);
+  configuration->updateEvHashEntry(3);
+  
+  assertEquals(false, configuration->isEventSlotInUse(2));
+  assertEquals(true, configuration->isEventSlotInUse(3));
+}
+
 void testFindEventInEmptyTable()
 {
   test();
@@ -225,6 +238,7 @@ void testConfiguration()
   testDefaultEepromValues();
   testCalculatedEepromValues();
   testLoadNVsFromZeroedEEPROM();
+  testIsEventSlotInUse();
   testFindEventInEmptyTable();
   testFindEventFound();
   testFindEventNotFound();
