@@ -540,6 +540,23 @@ void EventTeachingService::handleLearnEventIndex(const VlcbMessage *msg)
     controller->sendGRSP(OPC_EVLRNI, getServiceID(), CMDERR_INV_EV_IDX);
     return;
   }
+  
+  if (evIndex == 0)
+  {
+    if (evVal == 0)
+    {
+      // DEBUG_SERIAL << F("ets> deleting event at index = ") << index << F(", evs ") << endl;
+      module_config->cleareventEEPROM(index);
+
+      // update hash table
+      module_config->updateEvHashEntry(index);
+
+      controller->sendWRACK();
+      controller->sendGRSP(OPC_EVLRNI, getServiceID(), GRSP_OK);
+
+      return;
+    } 
+  }
 
   // write the event to EEPROM at this location -- EVs are indexed from 1 but storage offsets start at zero !!
   //DEBUG_SERIAL << F("ets> writing EV = ") << evIndex << F(", at index = ") << index << F(", offset = ") << (module_config->EE_EVENTS_START + (index * module_config->EE_BYTES_PER_EVENT)) << endl;
