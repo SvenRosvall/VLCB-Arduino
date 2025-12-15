@@ -275,7 +275,7 @@ void EventTeachingService::handleReadEventIndex(unsigned int nn, byte eventIndex
   controller->messageActedOn();
 
   Configuration *module_config = controller->getModuleConfig();
-  if ((eventIndex >= module_config->getNumEvents()) && (module_config->getEvTableEntry(eventIndex) == 0))
+  if ((eventIndex >= module_config->getNumEvents()) || (module_config->getEvTableEntry(eventIndex) == 0))
   {
     controller->sendCMDERR(CMDERR_INV_EN_IDX);
     controller->sendGRSP(OPC_NENRD, getServiceID(), CMDERR_INV_EN_IDX);

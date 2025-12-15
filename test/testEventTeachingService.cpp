@@ -1079,6 +1079,28 @@ void testNenrdWithBadIndex()
   assertEquals(CMDERR_INV_EN_IDX, mockTransportService->sent_messages[1].data[5]);
 }
 
+void testNenrdForEmptyIndex()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  VLCB::VlcbMessage msg = {4, {OPC_NENRD, 0x01, 0x04, 2}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+
+  assertEquals(OPC_CMDERR, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransportService->sent_messages[0].data[3]);
+
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  assertEquals(OPC_NENRD, mockTransportService->sent_messages[1].data[3]);
+  assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[1].data[4]);
+  assertEquals(CMDERR_INV_EN_IDX, mockTransportService->sent_messages[1].data[5]);
+}
+
 void testEvulnErrors()
 {
   test();
@@ -1514,6 +1536,7 @@ void testEventTeachingService()
   testIgnoreUnlearnForOtherNodes();
   testIgnoreIfNotInLearnMode();
   testNenrdWithBadIndex();
+  testNenrdForEmptyIndex();
   testEvulnErrors();
   testReval();
   testRevalErrors();
