@@ -290,7 +290,7 @@ void processSwitches(void)
         {
           //DEBUG_PRINT(F("sk> Could not create default event"));
           // Could not create default event. Ignore it and don't send an event.
-          break;
+          continue;
         }
         VLCB::writeEventVariable(eventIndex, 1, swNum);
         //DEBUG_PRINT(F("sk> Wrote event variable 1 value=") << swNum);

@@ -218,12 +218,18 @@ void processSwitches(void)
       byte nvval = VLCB::readNV(nv);
       byte swNum = i + 1;
       DEBUG_PRINT(F("sk> Button ") << swNum << F(" state change detected. NV Value = ") << nvval);
-      
+
+      if (nvval == 0)
+      {
+        DEBUG_PRINT(F("sk> No action for button."));
+        continue;
+      }
+
       byte eventSlot = swNum;
       if (!VLCB::doesEventExistAtIndex(eventSlot))
       {
-        DEBUG_PRINT(F("sk> No event in this slot. Don't send an event."));
-        continue;
+        DEBUG_PRINT(F("sk> No event in this slot. Create a default event."));
+        VLCB::createEventAtIndex(eventSlot, VLCB::getNodeNum(), swNum);
       }
 
       bool reportState = false;
@@ -269,7 +275,7 @@ void processSwitches(void)
 
         default:
           DEBUG_PRINT(F("sk> Button ") << swNum << F(" do nothing."));
-          return;
+          continue;
       }
 
       if (doReport)
@@ -291,7 +297,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
   byte ledNum = index / 10;
   if (ledNum == 0 || ledNum > NUM_LEDS)
   {
-    DEBUG_PRINT(F("sk> invalid slot index = ") << index);
+    DEBUG_PRINT(F("sk> event handler: Index ") << index << F(" is not for an LED slot."));
     return;
   }
 
