@@ -10,7 +10,6 @@
 
   Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
   ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
-  Bounce2  -- library for switch debounce.
 */
 
 ///////////////////////////////////////////////////////////////////////////////////
