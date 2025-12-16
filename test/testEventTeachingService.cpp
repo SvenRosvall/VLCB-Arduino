@@ -595,6 +595,73 @@ void testTeachEventIndexedWithEV0()
   mockTransportService->clearMessages();
 }
 
+void testLearnEventIndexedDelete()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+
+  // Learn mode
+  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(0, mockTransportService->sent_messages.size());
+  
+  // Teach an event
+  // Data: OP, NN, EN, Event index, EV#, EV Value
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  // Verify the event variable 1
+  // Note: CBUS lib does not implement OPC_REQEV.
+  // Data: OP, NN, EN, EV#
+  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_EVANS, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0x05, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x06, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x07, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(0x08, mockTransportService->sent_messages[0].data[4]);
+  assertEquals(1, mockTransportService->sent_messages[0].data[5]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[6]);
+  mockTransportService->clearMessages();
+  
+  // Delete the event. Do this with EV#==0 and EV value==0
+  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 0, 0}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(2, mockTransportService->sent_messages.size());
+  assertEquals(OPC_WRACK, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
+  mockTransportService->clearMessages();
+
+  // Verify there are no events.
+  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  mockTransportService->setNextMessage(msg);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_NUMEV, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[3]);
+  mockTransportService->clearMessages();
+}
+
 void testEventHashCollisionAndUnlearn()
 {
   test();
@@ -1524,6 +1591,7 @@ void testEventTeachingService()
   testTeachEventIndexedAndClear();
   testTeachEventIndexedWithNullNNEN(); // updates EV for a slot
   testTeachEventIndexedWithEV0(); // Teach event without an EV.
+  testLearnEventIndexedDelete(); // Delete an event slot.
   testEventHashCollisionAndUnlearn(); // tests event lookup in Configuration::findExistingEvent()
   testUpdateProducedEventNNEN();
   testUpdateProducedEventNNENToExistingEvent();
