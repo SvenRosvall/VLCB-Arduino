@@ -76,8 +76,8 @@ This sketch has a similar functionality to ```VLCB_4in4out``` above but
 is implemented using "event slots" instead of relying on specific event variables.
 
 Events in slots 1-4 are produced when switch 1-4 respectively is activated.
-No default events are created. 
-If there is no event for a switch no event is produced.
+If there is no event in the slot for an activated switch then a
+default event is created.
 
 Consumed events in slots 10-19 activate LED 1,
 events in slots 20-29 activate LED 2, etc.
