@@ -21,7 +21,7 @@ each event variable.
 
 * `EventProducerService` method `sendEvent()` used to send an event
 that matched a given EV#1 value. 
-It is replaced by the new method `sendEventToIndex()` which takes an
+It is replaced by the new method `sendEventAtIndex()` which takes an
 event index as parameter. 
 The event at this index will be sent.
 

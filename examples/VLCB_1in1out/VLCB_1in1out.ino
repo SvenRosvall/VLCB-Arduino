@@ -175,7 +175,7 @@ void processModuleSwitchChange()
     byte eventIndex = VLCB::findExistingEventByEv(1, inputChannel);
     if (VLCB::isEventIndexValid(eventIndex))
     {
-      epService.sendEventToIndex(state, eventIndex);
+      epService.sendEventAtIndex(state, eventIndex);
     }
   }
 }

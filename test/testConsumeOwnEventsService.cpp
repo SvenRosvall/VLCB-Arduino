@@ -132,7 +132,7 @@ void testConsumeOwnEvent()
   configuration->writeEventEV(0, 1, 1);
   configuration->updateEvHashEntry(0);
 
-  eventProducerService->sendEventToIndex(true, 0);
+  eventProducerService->sendEventAtIndex(true, 0);
 
   process(controller);
   

@@ -281,7 +281,7 @@ void processSwitches(void)
       if (doReport)
       {
         DEBUG_PRINT(F("sk> Sending event at index=") << eventSlot);
-        epService.sendEventToIndex(reportState, eventSlot);
+        epService.sendEventAtIndex(reportState, eventSlot);
       }
     }
   }

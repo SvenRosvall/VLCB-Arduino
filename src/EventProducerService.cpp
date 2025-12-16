@@ -41,7 +41,7 @@ void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte
   controller->sendMessage(&msg);
 }
 
-void EventProducerService::sendEventToIndex(bool state, byte evIndex)
+void EventProducerService::sendEventAtIndex(bool state, byte evIndex)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
@@ -63,7 +63,7 @@ void EventProducerService::sendEventToIndex(bool state, byte evIndex)
   ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventToIndex(bool state, byte evIndex, byte data1)
+void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
@@ -86,7 +86,7 @@ void EventProducerService::sendEventToIndex(bool state, byte evIndex, byte data1
   ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventToIndex(bool state, byte evIndex, byte data1, byte data2)
+void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
@@ -110,7 +110,7 @@ void EventProducerService::sendEventToIndex(bool state, byte evIndex, byte data1
   ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventToIndex(bool state, byte evIndex, byte data1, byte data2, byte data3)
+void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
