@@ -12,6 +12,14 @@
 
 #include "Configuration.h"
 
+#define DEBUG 0  // set to 0 for no serial debug
+
+#if DEBUG
+#define DEBUG_PRINT(S) Serial << S << endl
+#else
+#define DEBUG_PRINT(S)
+#endif
+
 #ifdef __AVR__
 extern "C" int __heap_start, *__brkval;
 #endif
@@ -150,7 +158,7 @@ void Configuration::setNodeNum(unsigned int nn)
 //
 /// lookup an event by node number and event number, using the hash table
 //
-byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
+byte Configuration::findExistingEvent(unsigned int nn, unsigned int en, byte startIndex) const
 {
   byte tarray[EE_HASH_BYTES];
 
@@ -163,7 +171,7 @@ byte Configuration::findExistingEvent(unsigned int nn, unsigned int en) const
   byte tmphash = makeHash(tarray);
   // DEBUG_SERIAL << F("> event hash = ") << tmphash << endl;
 
-  for (byte i = 0; i < getNumEvents(); i++)
+  for (byte i = startIndex; i < getNumEvents(); i++)
   {
     if (evhashtbl[i] == tmphash)
     {
@@ -232,6 +240,11 @@ byte Configuration::makeHash(byte tarr[EE_HASH_BYTES]) const
 
   // DEBUG_SERIAL << F("> makeHash - hash of nn = ") << nn << F(", en = ") << en << F(", = ") << hash << endl;
   return hash;
+}
+
+bool Configuration::isEventSlotInUse(byte eventIndex) const
+{
+  return evhashtbl[eventIndex] != 0;
 }
 
 //
@@ -563,7 +576,7 @@ void Configuration::resetModule()
 {
   /// implementation of resetModule() without VLCB Switch or LEDs
   // uint32_t t = millis();
-  // DEBUG_SERIAL << F("> resetting EEPROM") << endl;
+  // DEBUG_PRINT(F("> resetting EEPROM"));
 
   // clear the learned events from storage
   storage->reset();

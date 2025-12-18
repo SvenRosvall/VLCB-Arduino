@@ -173,7 +173,10 @@ void processModuleSwitchChange()
     bool state = moduleSwitch.isPressed();
     byte inputChannel = 1;
     byte eventIndex = VLCB::findExistingEventByEv(1, inputChannel);
-    epService.sendEventToIndex(state, eventIndex);
+    if (VLCB::isEventIndexValid(eventIndex))
+    {
+      epService.sendEventAtIndex(state, eventIndex);
+    }
   }
 }
 

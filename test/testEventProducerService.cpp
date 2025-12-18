@@ -94,7 +94,7 @@ void testSendOn()
   controller.getModuleConfig()->writeEvent(0, 260, 1);
   controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEventToIndex(true, 0);
+  eventProducerService->sendEventAtIndex(true, 0);
 
   process(controller);
 
@@ -118,7 +118,7 @@ void testSend1Off()
   controller.getModuleConfig()->writeEvent(0, 260, 1);
   controller.getModuleConfig()->writeEventEV(0, 1, 1);
 
-  eventProducerService->sendEventToIndex(false, 0, 42);
+  eventProducerService->sendEventAtIndex(false, 0, 42);
 
   process(controller);
 
@@ -143,7 +143,7 @@ void testSendShort2On()
   controller.getModuleConfig()->writeEvent(0, 0, 5);
   controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEventToIndex(true, 0, 42, 17);
+  eventProducerService->sendEventAtIndex(true, 0, 42, 17);
 
   process(controller);
   
@@ -169,7 +169,7 @@ void testSendShort3Off()
   controller.getModuleConfig()->writeEvent(0, 0, 5);
   controller.getModuleConfig()->writeEventEV(0, 1, 7);
 
-  eventProducerService->sendEventToIndex(false, 0, 42, 17, 234);
+  eventProducerService->sendEventAtIndex(false, 0, 42, 17, 234);
 
   process(controller);
   

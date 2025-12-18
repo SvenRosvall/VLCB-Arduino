@@ -61,7 +61,6 @@ libraries are required:
 Library | Purpose
 ---------------|-----------------
 Streaming.h  |*C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)*
-Bounce2.h    |*Debounce of switch inputs*
 ACAN2515.h   |*library to support the MCP2515/25625 CAN controller IC*
 
 ### Application Configuration

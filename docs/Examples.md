@@ -71,6 +71,17 @@ See full documentation for this sketch in its own [README](../docs/VLCB4in4out_R
 This sketch does not enable diagnostics to save memory on small processors
 and also to demonstrate that diagnostics is optional.
 
+## [VLCB_4in4out_slot](../examples/VLCB_4in4out_slot/VLCB_4in4out_slot.ino)
+This sketch has a similar functionality to ```VLCB_4in4out``` above but
+is implemented using "event slots" instead of relying on specific event variables.
+
+Events in slots 1-4 are produced when switch 1-4 respectively is activated.
+If there is no event in the slot for an activated switch then a
+default event is created.
+
+Consumed events in slots 10-19 activate LED 1,
+events in slots 20-29 activate LED 2, etc.
+
 ## [VLCB_long_message_example](../examples/VLCB_long_message_example/VLCB_long_message_example.ino)
 This is an example sketch that makes use of long messages.
 

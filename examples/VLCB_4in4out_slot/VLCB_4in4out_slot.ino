@@ -1,11 +1,11 @@
-// VLCB_4in4out
+//  Copyright (C) Sven Rosvall (sven@rosvall.ie)
+//  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
+//  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+//  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
+//
+//
 
 /*
-  Copyright (C) 2023 Martin Da Costa
-  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
-  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
-  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
-
   3rd party libraries needed for compilation: (not for binary-only distributions)
 
   Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
@@ -35,6 +35,16 @@
 // Digital / Analog pin 5     Not Used
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+// This module uses slots, i.e. event indices, for determining actions.
+// The following slots are used:
+// 1-4: When switch N is pressed/released send event in slot N.
+// 10-49: When receiving an event that is stored in one of the slots N*10 ... N*10+9, trigger action for LED N.
+//        There are 10 slots per LED so that there can be many events that activate the same LED.
+
+// There are 4 node variables, one for each switch.
+// There is only one event variable. It is used for consumed events to control the action for the LED.
+
 #define DEBUG 1  // set to 0 for no serial debug
 
 #if DEBUG
@@ -52,7 +62,6 @@
 
 // forward function declarations
 void eventhandler(byte, const VLCB::VlcbMessage *);
-byte eventValidator(int nn, int en, byte evNum, byte evValue);
 void printConfig();
 void processSwitches();
 
@@ -61,14 +70,14 @@ const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'b';           // code minor version
 const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
-const byte MODULE_ID = 82;          // VLCB module type
+const byte MODULE_ID = 83;          // One higher than CAN4IN4OUT
 
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// module name, must be 7 characters, space padded.
-char mname[] = "4IN4OUT";
+// module name, must be at most 7 characters
+char mname[] = "4I4O_S";
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -109,7 +118,7 @@ void setupVLCB()
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
   VLCB::setMaxEvents(64);
-  VLCB::setNumEventVariables(1 + NUM_LEDS);
+  VLCB::setNumEventVariables(1);
 
   // set module parameters
   VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
@@ -122,8 +131,6 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
-  
-  etService.setEventValidator(eventValidator);
 
   // configure and start CAN bus and VLCB message processing
   can2515.setNumBuffers(6, 1);      // more buffers = more memory used, fewer = less
@@ -157,7 +164,7 @@ void setupModule()
   // configure the module LEDs
   for (byte i = 0; i < NUM_LEDS; i++)
   {
-    moduleLED[i].setPin(LED[i], LOW);  //Second arguement active low or active high. Default if no second arguement is active high.
+    moduleLED[i].setPin(LED[i]);
   }
 
   Serial << "> Module has " << NUM_LEDS << " LEDs and " << NUM_SWITCHES << " switches." << endl;
@@ -200,74 +207,6 @@ void loop()
   // bottom of loop()
 }
 
-byte eventValidator(int nn, int en, byte evNum, byte evValue)
-{
-  // EV#1 is for produced events. It specifies which switch triggers this event.
-  // There can only be one event with EV#1 set to a specific switch.
-  if (evNum == 1)
-  {
-    // Search for an event where EV#1 has the same value.
-    byte index = VLCB::findExistingEventByEv(evNum, evValue);
-    if (VLCB::isEventIndexValid(index))
-    {
-      // Yes, one such event does exist.
-      return CMDERR_INV_EV_VALUE;
-    }
-  }
-  return GRSP_OK;
-}
-
-byte createEvent(unsigned int nn, byte preferredEN)
-{
-  //DEBUG_PRINT(F("sk> Will create event nn=") << nn << " en=" << preferredEN);
-  byte eventIndex = VLCB::findExistingEvent(nn, preferredEN);
-  if (VLCB::isEventIndexValid(eventIndex))
-  {
-    //DEBUG_PRINT(F("sk> Preferred event already exists. Try to find a free event number"));
-    // Find an unused EN
-    for (unsigned int en = 1 ; en < 65535 ; ++en)
-    {
-      //DEBUG_PRINT(F("sk> Trying en=") << en);
-      eventIndex = VLCB::findExistingEvent(nn, en);
-      if (!VLCB::isEventIndexValid(eventIndex))
-      {
-        //DEBUG_PRINT(F("sk> is free, create it."));
-        eventIndex = VLCB::findEmptyEventSpace();
-        if (VLCB::isEventIndexValid(eventIndex))
-        {
-          VLCB::createEventAtIndex(eventIndex, nn, en);
-          //DEBUG_PRINT(F("sk> Created event at index=") << eventIndex);
-          return eventIndex;
-        }
-        else
-        {
-          //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
-          return 0xFF;
-        }
-      }
-    }
-    //DEBUG_PRINT(F("sk> No free event number"));
-    return 0xFF;
-  }
-  else
-  {
-    //DEBUG_PRINT(F("sk> Preferred event does not exist."));
-    // Find an empty slot to create an event.
-    eventIndex = VLCB::findEmptyEventSpace();
-    if (VLCB::isEventIndexValid(eventIndex))
-    {
-      //DEBUG_PRINT(F("sk> Creating preferred event"));
-      VLCB::createEventAtIndex(eventIndex, nn, preferredEN);
-      return eventIndex;
-    }
-    else
-    {
-      //DEBUG_PRINT(F("sk> No empty space for event. index=") << eventIndex);
-      return 0xFF;
-    }
-  }
-}
-
 void processSwitches(void) 
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
@@ -280,39 +219,37 @@ void processSwitches(void)
       byte swNum = i + 1;
       DEBUG_PRINT(F("sk> Button ") << swNum << F(" state change detected. NV Value = ") << nvval);
 
-      byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
-      if (!VLCB::isEventIndexValid(eventIndex))
+      if (nvval == 0)
       {
-        //DEBUG_PRINT(F("sk> No event for this button."));
-        eventIndex = createEvent(VLCB::getNodeNum(), swNum);
-        if (!VLCB::isEventIndexValid(eventIndex))
-        {
-          //DEBUG_PRINT(F("sk> Could not create default event"));
-          // Could not create default event. Ignore it and don't send an event.
-          continue;
-        }
-        VLCB::writeEventVariable(eventIndex, 1, swNum);
-        //DEBUG_PRINT(F("sk> Wrote event variable 1 value=") << swNum);
+        DEBUG_PRINT(F("sk> No action for button."));
+        continue;
       }
-      
-      DEBUG_PRINT(F("sk> Using event at index=") << eventIndex);
 
+      byte eventSlot = swNum;
+      if (!VLCB::doesEventExistAtIndex(eventSlot))
+      {
+        DEBUG_PRINT(F("sk> No event in this slot. Create a default event."));
+        VLCB::createEventAtIndex(eventSlot, VLCB::getNodeNum(), swNum);
+      }
+
+      bool reportState = false;
+      bool doReport = false;
       switch (nvval)
       {
         case 1:
           // ON and OFF
-          state[i] = (moduleSwitch[i].isPressed());
+          reportState = state[i] = (moduleSwitch[i].isPressed());
+          doReport = true;
           DEBUG_PRINT(F("sk> Button calling case 1: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-          epService.sendEventAtIndex(state[i], eventIndex);
           break;
 
         case 2:
           // Only ON
           if (moduleSwitch[i].isPressed()) 
           {
-            state[i] = true;
+            reportState = state[i] = true;
+            doReport = true;
             DEBUG_PRINT(F("sk> Button calling case 2: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(state[i], eventIndex);
           }
           break;
 
@@ -320,9 +257,9 @@ void processSwitches(void)
           // Only OFF
           if (moduleSwitch[i].isPressed())
           {
-            state[i] = false;
+            reportState = state[i] = false;
+            doReport = true;
             DEBUG_PRINT(F("sk> Button calling case 3: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(state[i], eventIndex);
           }
           break;
 
@@ -330,15 +267,21 @@ void processSwitches(void)
           // Toggle button
           if (moduleSwitch[i].isPressed())
           {
-            state[i] = !state[i];
+            reportState = state[i] = !state[i];
+            doReport = true;
             DEBUG_PRINT(F("sk> Button calling case 4: ") << swNum << (state[i] ? F(" pressed, send state: ") : F(" released, send state: ")) << state[i]);
-            epService.sendEventAtIndex(state[i], eventIndex);
           }
           break;
 
         default:
           DEBUG_PRINT(F("sk> Button ") << swNum << F(" do nothing."));
-          break;
+          continue;
+      }
+
+      if (doReport)
+      {
+        DEBUG_PRINT(F("sk> Sending event at index=") << eventSlot);
+        epService.sendEventAtIndex(reportState, eventSlot);
       }
     }
   }
@@ -351,64 +294,57 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 {
   byte opc = msg->data[0];
 
-  DEBUG_PRINT(F("sk> event handler: index = ") << index << F(", opcode = 0x") << _HEX(msg->data[0]));
+  byte ledNum = index / 10;
+  if (ledNum == 0 || ledNum > NUM_LEDS)
+  {
+    DEBUG_PRINT(F("sk> event handler: Index ") << index << F(" is not for an LED slot."));
+    return;
+  }
 
-  unsigned int node_number = (msg->data[1] << 8) + msg->data[2];
-  unsigned int event_number = (msg->data[3] << 8) + msg->data[4];
-  DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
-  DEBUG_PRINT(F("sk> op_code = ") << opc);
+  byte evval = VLCB::getEventEVval(index, 1);
+  DEBUG_PRINT(F("sk> event handler: index = ") << index << F(" for LED = ") << ledNum); 
+  DEBUG_PRINT(F("sk> opcode = 0x") << _HEX(msg->data[0]) << F(" = ") << opc);
 
   switch (opc) 
   {
     case OPC_ACON:
     case OPC_ASON:
       DEBUG_PRINT(F("sk> case is opCode ON"));
-      for (byte i = 0; i < NUM_LEDS; i++)
+      DEBUG_PRINT(F("sk> EV1 Value = ") << evval);
+
+      switch (evval) 
       {
-        byte ev = i + 2;
-        byte evval = VLCB::getEventEVval(index, ev);
-        DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
+        case 1:
+          moduleLED[ledNum - 1].on();
+          break;
 
-        switch (evval) 
-        {
-          case 1:
-            moduleLED[i].on();
-            break;
+        case 2:
+          moduleLED[ledNum - 1].blink(500);
+          break;
 
-          case 2:
-            moduleLED[i].blink(500);
-            break;
+        case 3:
+          moduleLED[ledNum - 1].blink(250);
+          break;
 
-          case 3:
-            moduleLED[i].blink(250);
-            break;
-
-          default:
-            break;
-        }
+        default:
+          break;
       }
       break;
 
     case OPC_ACOF:
     case OPC_ASOF:
-    DEBUG_PRINT(F("sk> case is opCode OFF"));
-      for (byte i = 0; i < NUM_LEDS; i++)
+      DEBUG_PRINT(F("sk> case is opCode OFF"));
+      if (evval > 0)
       {
-        byte ev = i + 2;
-        byte evval = VLCB::getEventEVval(index, ev);
-
-        if (evval > 0)
-        {
-          moduleLED[i].off();
-        }
+        moduleLED[ledNum - 1].off();
       }
       break;
       
-    case OPC_AREQ:
-    case OPC_ASRQ:
-      byte evval = VLCB::getEventEVval(index, 1) - 1;
-      DEBUG_PRINT(F("> Handling request op =  ") << _HEX(opc) << F(", request input = ") << evval << F(", state = ") << state[evval]);
-      epService.sendEventResponse(state[evval], index);
+    // case OPC_AREQ:
+    // case OPC_ASRQ:
+    //   byte evval = VLCB::getEventEVval(index, 1);
+    //   DEBUG_PRINT(F("> Handling request op =  ") << _HEX(opc) << F(", request input = ") << evval << F(", state = ") << state[evval]);
+    //   epService.sendEventResponse(state[evval], index);
   }
 }
 
@@ -422,5 +358,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Martin Da Costa (MERG M6237) 2023") << endl;
+  Serial << F("> © Sven Rosvall (MERG 3777) 2025") << endl;
 }
