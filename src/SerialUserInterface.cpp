@@ -48,14 +48,7 @@ void SerialUserInterface::processSerialInput()
                << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
 
         {
-          byte uev = 0;
-          for (byte j = 0; j < modconfig->getNumEvents(); j++)
-          {
-            if (modconfig->getEvTableEntry(j) != 0)
-            {
-              ++uev;
-            }
-          }
+          byte uev = modconfig->numEvents();
 
           Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->getNumEvents() - uev) << endl;
           Serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ")
