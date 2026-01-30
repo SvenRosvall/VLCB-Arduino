@@ -49,6 +49,13 @@ byte findEmptyEventSpace();
 void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en);
 void writeEventVariable(byte eventIndex, byte evIndex, byte value);
 
+bool sendMessageWithNN(VlcbOpCodes opc);
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2);
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3);
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+
 void resetModule();
 
 void begin();
