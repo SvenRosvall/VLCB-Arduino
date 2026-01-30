@@ -12,6 +12,8 @@ typedef unsigned char byte;
 enum PinState {LOW = 0, HIGH = 1};
 enum PinMode {OUTPUT, INPUT, INPUT_PULLUP};
 
+enum AnaloguePins {A0 = 20, A1, A2, A3, A4, A5, A6};
+
 unsigned long millis();
 void delay(unsigned int);
 byte highByte(unsigned int);
