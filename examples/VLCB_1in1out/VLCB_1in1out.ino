@@ -29,6 +29,9 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 99;          // VLCB module type
 
+// module name, must be at most 7 characters
+char mname[] = "1IN1OUT";
+
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
@@ -36,9 +39,6 @@ const byte SWITCH0 = 8;             // VLCB push button switch pin
 // module objects
 VLCB::Switch moduleSwitch(A0);            // an example switch as input
 VLCB::LED moduleLED(6);                  // an example LED as output
-
-// module name, must be 7 characters, space padded.
-char mname[] = "1IN1OUT";
 
 VLCB::CAN2515 can2515;                  // CAN transport object
 

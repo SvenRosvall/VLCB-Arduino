@@ -35,6 +35,15 @@
 // Digital / Analog pin 5     Not Used
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+// 
+// Node variables:
+//  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
+//
+// Event variables:
+//  EV1 - Produce event for switch N where N is EV1 value in the range 1-4. Must be unique.
+//  EV2-5 - Change LED 1-4: 0) No change 1) Normal 2) Slow blink 3) Fast blink
+
 #define DEBUG 1  // set to 0 for no serial debug
 
 #if DEBUG
@@ -63,12 +72,12 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 82;          // VLCB module type
 
+// module name, must be at most 7 characters
+char mname[] = "4IN4OUT";
+
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
-
-// module name, must be 7 characters, space padded.
-char mname[] = "4IN4OUT";
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -79,8 +88,8 @@ const byte NUM_SWITCHES = sizeof(SWITCH) / sizeof(SWITCH[0]);
 
 
 // instantiate module objects
-VLCB::Switch moduleSwitch[NUM_SWITCHES];  //  switch as input
 VLCB::LED moduleLED[NUM_LEDS];     //  LED as output
+VLCB::Switch moduleSwitch[NUM_SWITCHES];  //  switch as input
 bool state[NUM_SWITCHES];
 
 VLCB::CAN2515 can2515;                  // CAN transport object
@@ -123,6 +132,7 @@ void setupVLCB()
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
   
+  // register a validator for taught VLCB events.
   etService.setEventValidator(eventValidator);
 
   // configure and start CAN bus and VLCB message processing
@@ -157,7 +167,7 @@ void setupModule()
   // configure the module LEDs
   for (byte i = 0; i < NUM_LEDS; i++)
   {
-    moduleLED[i].setPin(LED[i], LOW);  //Second arguement active low or active high. Default if no second arguement is active high.
+    moduleLED[i].setPin(LED[i], LOW);  //Second argument active low or active high. Default if no second argument is active high.
   }
 
   Serial << "> Module has " << NUM_LEDS << " LEDs and " << NUM_SWITCHES << " switches." << endl;
@@ -291,6 +301,7 @@ void processSwitches(void)
           // Could not create default event. Ignore it and don't send an event.
           continue;
         }
+        // Created a valid event, now set EV1 to the switch number.
         VLCB::writeEventVariable(eventIndex, 1, swNum);
         //DEBUG_PRINT(F("sk> Wrote event variable 1 value=") << swNum);
       }
@@ -312,7 +323,7 @@ void processSwitches(void)
           {
             state[i] = true;
             DEBUG_PRINT(F("sk> Button calling case 2: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(state[i], eventIndex);
+            epService.sendEventAtIndex(true, eventIndex);
           }
           break;
 
@@ -322,7 +333,7 @@ void processSwitches(void)
           {
             state[i] = false;
             DEBUG_PRINT(F("sk> Button calling case 3: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(state[i], eventIndex);
+            epService.sendEventAtIndex(false, eventIndex);
           }
           break;
 
@@ -376,7 +387,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
             break;
 
           case 2:
-            moduleLED[i].blink(500);
+            moduleLED[i].blink(1000);
             break;
 
           case 3:
@@ -391,7 +402,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
 
     case OPC_ACOF:
     case OPC_ASOF:
-    DEBUG_PRINT(F("sk> case is opCode OFF"));
+      DEBUG_PRINT(F("sk> case is opCode OFF"));
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
