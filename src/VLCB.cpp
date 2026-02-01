@@ -138,6 +138,31 @@ void writeEventVariable(byte eventIndex, byte evIndex, byte value)
   modconfig.writeEventEV(eventIndex, evIndex, value);
 }
 
+bool sendMessageWithNN(VlcbOpCodes opc)
+{
+  return controller.sendMessageWithNN(opc);
+}
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1)
+{
+  return controller.sendMessageWithNN(opc, b1);
+}
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2)
+{
+  return controller.sendMessageWithNN(opc, b1, b2);
+}
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3)
+{
+  return controller.sendMessageWithNN(opc, b1, b2, b3);
+}
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
+{
+  return controller.sendMessageWithNN(opc, b1, b2, b3, b4);
+}
+bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  return controller.sendMessageWithNN(opc, b1, b2, b3, b4, b5);
+}
+
 unsigned int getFreeEEPROMbase()
 {
   return modconfig.EE_FREE_BASE;
