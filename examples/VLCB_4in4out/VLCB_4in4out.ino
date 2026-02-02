@@ -323,7 +323,7 @@ void processSwitches(void)
           {
             state[i] = true;
             DEBUG_PRINT(F("sk> Button calling case 2: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(true, eventIndex);
+            epService.sendEventAtIndex(state[i], eventIndex);
           }
           break;
 
@@ -333,7 +333,7 @@ void processSwitches(void)
           {
             state[i] = false;
             DEBUG_PRINT(F("sk> Button calling case 3: ") << swNum << F(" pressed, send state: ") << state[i]);
-            epService.sendEventAtIndex(false, eventIndex);
+            epService.sendEventAtIndex(state[i], eventIndex);
           }
           break;
 
@@ -387,7 +387,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
             break;
 
           case 2:
-            moduleLED[i].blink(1000);
+            moduleLED[i].blink(500);
             break;
 
           case 3:

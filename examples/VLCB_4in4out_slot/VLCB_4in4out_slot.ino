@@ -320,7 +320,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
           break;
 
         case 2:
-          moduleLED[ledNum - 1].blink(1000);
+          moduleLED[ledNum - 1].blink(500);
           break;
 
         case 3:
