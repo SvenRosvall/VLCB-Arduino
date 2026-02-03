@@ -27,6 +27,8 @@ public:
   virtual bool available() = 0;
   virtual CANFrame getNextCanFrame() = 0;
   virtual bool sendCanFrame(CANFrame *msg) = 0;
+
+  virtual byte getHardwareType() { return 0; };
 };
 
 }

@@ -31,6 +31,9 @@ public:
 
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode);
   virtual void reportAllDiagnostics(byte serviceIndex);
+
+  struct Data { byte data1, data2, data3; };
+  virtual Data getServiceData();
 };
 
 }

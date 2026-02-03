@@ -87,6 +87,7 @@ void testServiceDiscoveryNodeVarSvc()
   test();
 
   VLCB::Controller controller = createController();
+  controller.getModuleConfig()->setNumNodeVariables(7);
 
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
   mockTransportService->setNextMessage(msg);
@@ -98,7 +99,8 @@ void testServiceDiscoveryNodeVarSvc()
   assertEquals(OPC_ESD, mockTransportService->sent_messages[0].data[0]);
   assertEquals(2, mockTransportService->sent_messages[0].data[3]); // index
   assertEquals(SERVICE_ID_NV, mockTransportService->sent_messages[0].data[4]); // service ID
-  // Not testing service data bytes.
+  
+  assertEquals(7, mockTransportService->sent_messages[0].data[5]); // Number of node variables
 }
 
 void testSetAndReadNV()

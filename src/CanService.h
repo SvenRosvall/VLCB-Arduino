@@ -22,6 +22,7 @@ public:
 
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() const override { return 2; }
+  virtual Data getServiceData();
 
   virtual void process(const Action * action) override;
 

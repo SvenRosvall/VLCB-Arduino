@@ -427,7 +427,9 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     }
     else
     {
-      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), 0, 0, 0);
+      // Find service data from the actual service.
+      auto svcData = theService->getServiceData();
+      controller->sendMessageWithNN(OPC_ESD, serviceIndex, theService->getServiceID(), svcData.data1, svcData.data2, svcData.data3);
     }
   }
   else

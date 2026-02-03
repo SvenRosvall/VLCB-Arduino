@@ -20,6 +20,7 @@ public:
   virtual bool available() override;
   virtual VLCB::CANFrame getNextCanFrame() override;
   virtual bool sendCanFrame(VLCB::CANFrame *frame) override;
+  virtual byte getHardwareType() override { return 47; }
   
   virtual void reset() override;
 

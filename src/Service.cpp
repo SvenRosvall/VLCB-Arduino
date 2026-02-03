@@ -26,4 +26,10 @@ void Service::reportAllDiagnostics(byte serviceIndex)
   controller->sendDGN(serviceIndex, 0, 0);
 }
 
+Service::Data Service::getServiceData()
+{
+  // Default implementation is to return 0 for all service data bytes.
+  return {0, 0, 0 };
+}
+
 }

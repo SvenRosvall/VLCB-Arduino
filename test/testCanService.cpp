@@ -82,7 +82,8 @@ void testServiceDiscoveryCanSvc()
   assertEquals(OPC_ESD, mockCanTransport->sent_frames[0].data[0]);
   assertEquals(2, mockCanTransport->sent_frames[0].data[3]); // index
   assertEquals(SERVICE_ID_CAN, mockCanTransport->sent_frames[0].data[4]); // service ID
-  // Not testing service data bytes.
+
+  assertEquals(mockCanTransport->getHardwareType(), mockCanTransport->sent_frames[0].data[5]); // CAN hardware type
 }
 
 void testCanidEnumerationOnUserAction()
