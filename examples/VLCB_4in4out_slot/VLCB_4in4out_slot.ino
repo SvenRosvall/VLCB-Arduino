@@ -43,7 +43,8 @@
 //        There are 10 slots per LED so that there can be many events that activate the same LED.
 
 // There are 4 node variables, one for each switch.
-// There is only one event variable. It is used for consumed events to control the action for the LED.
+// There is only one event variable. It is used for consumed events to control the action
+// for the LED: 0) No change 1) Normal 2) Slow blink 3) Fast blink
 
 #define DEBUG 1  // set to 0 for no serial debug
 
@@ -72,12 +73,12 @@ const byte VER_BETA = 0;            // code beta sub-version
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 83;          // One higher than CAN4IN4OUT
 
+// module name, must be at most 7 characters
+char mname[] = "4I4O_S";
+
 const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
-
-// module name, must be at most 7 characters
-char mname[] = "4I4O_S";
 
 // Module objects
 const byte LED[] = {3, 5, 6, 9};     // LED pin connections through typ. 1K8 resistor
@@ -88,8 +89,8 @@ const byte NUM_SWITCHES = sizeof(SWITCH) / sizeof(SWITCH[0]);
 
 
 // instantiate module objects
-VLCB::Switch moduleSwitch[NUM_SWITCHES];  //  switch as input
 VLCB::LED moduleLED[NUM_LEDS];     //  LED as output
+VLCB::Switch moduleSwitch[NUM_SWITCHES];  //  switch as input
 bool state[NUM_SWITCHES];
 
 VLCB::CAN2515 can2515;                  // CAN transport object
