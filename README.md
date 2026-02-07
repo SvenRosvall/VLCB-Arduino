@@ -50,9 +50,10 @@ Note that this library depends on a number of other libraries which must also be
 
 Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 library.
 
-## Getting help and support
+Support for Raspberry Pi Pico boards is provided by Martin Da Costa
+in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).
 
-At the moment this library is still in early development and thus not fully supported.
+## Getting help and support
 
 If you have any questions or suggestions please contact the library maintainers
 by email to vlcb@rosvall.ie or create an issue in GitHub.
@@ -60,8 +61,8 @@ by email to vlcb@rosvall.ie or create an issue in GitHub.
 ## Credits
 
 * Duncan Greenwood - Created the CBUS library for Arduinos which this VLCB library is based on.
-* Sven Rosvall - Converted the CBUS library into this code base.
-* Martin Da Costa - Contributor
+* Sven Rosvall - Developer. Converted the CBUS library into this code base.
+* Martin Da Costa - Developer
 * John Fletcher - Contributor
 * Chris Andrews - Contributor
 * David Ellis - Contributor

@@ -2,6 +2,11 @@
 
 Releases are listed on GitHub: https://github.com/SvenRosvall/VLCB-Arduino/releases
 
+# 2.1.0 - Example sketch clean-up
+Update example sketches for better readability.
+
+Add VLCB functions for convenient sending messages.
+
 # 2.0.0 - Event Slot support
 Major rework on how events are handled.
 
