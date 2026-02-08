@@ -11,6 +11,11 @@
 #include <vlcbdefs.hpp>
 
 namespace VLCB {
+Service::Data EventTeachingService::getServiceData()
+{
+  Configuration *module_config = controller->getModuleConfig();
+  return { module_config->getNumEvents(), module_config->getNumEVs(), 0 };
+}
 
 void EventTeachingService::enableLearn() 
 {

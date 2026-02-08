@@ -668,17 +668,17 @@ bool Configuration::nnenEquals(const byte lhs[EE_HASH_BYTES], const byte rhs[EE_
   return memcmp(rhs, lhs, EE_HASH_BYTES) == 0;
 }
 
-int Configuration::getNumNodeVariables() const
+byte Configuration::getNumNodeVariables() const
 {
   return _mparams.getParam(PAR_NVNUM);
 }
 
-int Configuration::getNumEvents() const
+byte Configuration::getNumEvents() const
 {
   return _mparams.getParam(PAR_EVTNUM);
 }
 
-int Configuration::getNumEVs() const
+byte Configuration::getNumEVs() const
 {
   return _mparams.getParam(PAR_EVNUM);
 }

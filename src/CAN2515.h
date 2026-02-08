@@ -45,6 +45,7 @@ public:
   CANFrame getNextCanFrame() override;
   bool sendCanFrame(CANFrame *frame) override;
   void reset() override;
+  virtual byte getHardwareType() override { return 4; };
 
   // these methods are specific to this implementation
   // they are not declared or implemented by the Transport interface class

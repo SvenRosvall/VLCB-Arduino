@@ -22,6 +22,8 @@ public:
 
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() const override { return 1; }
+  virtual Data getServiceData() override;
+ 
 
   void enableLearn();
   void inhibitLearn();

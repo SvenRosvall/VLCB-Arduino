@@ -19,6 +19,11 @@ void NodeVariableService::process(const Action *action)
   }
 }
 
+Service::Data NodeVariableService::getServiceData()
+{
+  return {controller->getModuleConfig()->getNumNodeVariables(), 0, 0};
+}
+
 void NodeVariableService::handleMessage(const VlcbMessage *msg)
 {
   unsigned int opc = msg->data[0];

@@ -13,6 +13,12 @@ namespace VLCB
 
 const int DEFAULT_PRIORITY = 0xB;     // default Controller messages priority. 1011 = 2|3 = normal/low
 
+Service::Data CanService::getServiceData()
+{
+  byte canType = canTransport->getHardwareType();
+  return {canType, 0, 0};
+}
+
 void CanService::process(const Action *action)
 {
   checkIncomingCanFrame();

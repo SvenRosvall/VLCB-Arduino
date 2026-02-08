@@ -84,9 +84,9 @@ public:
   void setName(const char *mname);
   const char *getModuleName() const { return _mname; }
 
-  int getNumNodeVariables() const;
-  int getNumEvents() const;
-  int getNumEVs() const;
+  byte getNumNodeVariables() const;
+  byte getNumEvents() const;
+  byte getNumEVs() const;
   
   void setNumNodeVariables(int n);
   void setNumEvents(int n);
