@@ -10,25 +10,15 @@ By sending a single character to the Arduino using the serial send facility in t
 serial monitor of the Arduino IDE (or similar),it is possible to initiate certain operations
 or get information from the Arduino sketch.
 
-#### 'n'
-This character will return the node configuration.
+| Command  | Description                                 |
+|:--------:|---------------------------------------------|
+|    n     | Show the node configuration.                |
+|    e     | Show the learned event table in the EEPROM. |
+|    v     | Show the node variables.                    |
+|    h     | Show the event hash table.                  |
+|    m     | Show the amount of free memory.             | 
+|    *     | Reboot this node.                           |
+|    s     | Enter setup mode.                           |
 
-#### 'e'
-This character will return the learned event table in the EEPROM.
-
-#### 'v'
-This character will return the node variables.
-
-#### 'c'
-This character will return the CAN bus status.
-
-#### 'h'
-This character will return the event hash table.
-
-#### 'm'
-This character will return the amount of free memory. 
-
-#### 'r' (implementation pending)
-This character will cause the module to renegotiate its VLCB status by requesting a node number.
-The FCU will respond as it would for any other unrecognised module.
-
+<!--- | r | (implementation pending) Let the node renegotiate its VLCB status by requesting a node number. The FCU will respond as it would for any other unrecognised module. | --->
+<!--- | c | This character will return the CAN bus status.| -->
