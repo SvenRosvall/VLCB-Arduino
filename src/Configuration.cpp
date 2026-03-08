@@ -100,6 +100,7 @@ void Configuration::setModuleNormalMode(unsigned int nodeNumber)
     {
       cleareventEEPROM(j);
     }
+    clearEvHashTable();
   }
   
   setModuleMode(MODE_NORMAL);
