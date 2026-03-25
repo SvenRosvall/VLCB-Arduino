@@ -47,7 +47,9 @@
 // 10-49: When receiving an event that is stored in one of the slots N*10 ... N*10+9, trigger action for LED N.
 //        There are 10 slots per LED so that there can be many events that activate the same LED.
 
-// There are 4 node variables, one for each switch.
+// Node variables:
+//  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
+
 // There is only one event variable. It is used for consumed events to control the action
 // for the LED: 0) No change 1) Normal 2) Slow blink 3) Fast blink
 
