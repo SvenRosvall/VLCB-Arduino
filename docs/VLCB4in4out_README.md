@@ -16,25 +16,13 @@ The program includes a library that manages the LED functionality.
 NOTE: It can get difficult when using DEBUG to know where the message has come from. Those
 emanating from the sketch are preceded with the letters sk for sketch. 
 
+VLCB4in4out comes in two variants, one using CAN bus with the MCP2515 
+interface that can be used with the MERG 110 CAN Shield and other boards.
+The other variant uses serial communication using the GridConnect protocol.
+
 ## Using VLCB4in4out
 
-The MCP2515 interface requires five Arduino pins to be allocated. Three of these are fixed
-in the architecture of the Arduino processor. One pin must be connected to an interrupt
-capable Arduino pin. You can only use pin 2 or 3 on an Uno. The Chip Select pin can be 
-freely defined. This example is configured for use with an Uno but can easily be adapted
-for use with other Arduino types.
-
-If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
-
-Pin | Description
---- | ---
-Digital pin 2 | Interrupt CAN
-Digital pin 10| (SS)    CS    CAN
-Digital pin 11| (MOSI)  SI    CAN
-Digital pin 12| (MISO)  SO    CAN
-Digital pin 13| (SCK)   Sck   CAN
-
-Using the CAN Shield, the following pins are used for VLCB Initialisation:
+Both versions of VLCB4in4out use the following pins for VLCB Initialisation:
 
 Pin | Description
 --- | ---
@@ -53,6 +41,24 @@ Pins defined as outputs are active high.  They will source current to (say) an L
 important that a suitable current limiting resistor is fitted between the pin and the LED 
 anode.  The LED cathode should be connected to ground.
 
+The CAN bus version using the MCP2515 interface requires five Arduino pins to be allocated.
+Three of these are fixed in the architecture of the Arduino processor. One pin must be
+connected to an interrupt capable Arduino pin. You can only use pin 2 or 3 on an Uno. 
+The Chip Select pin can be freely defined. This example is configured for use with an Uno
+but can easily be adapted for use with other Arduino types.
+
+If the MERG Kit 110 CAN Shield is used, the following pins are connected by default:
+
+Pin | Description
+--- | ---
+Digital pin 2 | Interrupt CAN
+Digital pin 10| (SS)    CS    CAN
+Digital pin 11| (MOSI)  SI    CAN
+Digital pin 12| (MISO)  SO    CAN
+Digital pin 13| (SCK)   Sck   CAN
+
+The serial communication version does not require these or any other additional pins.
+
 ### Library Dependencies
 
 As well as the VLCB Library suite associated with this example, the following third party
@@ -61,11 +67,11 @@ libraries are required:
 Library | Purpose
 ---------------|-----------------
 Streaming.h  |*C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)*
-ACAN2515.h   |*library to support the MCP2515/25625 CAN controller IC*
+ACAN2515.h   |*library to support the MCP2515/25625 CAN controller IC. Not used by the serial communication version*
 
 ### Application Configuration
 
-The example is configured for use with the MERG Kit 110 CAN Shield. This has a crystal
+The CAN bus example is configured for use with the MERG Kit 110 CAN Shield. This has a crystal
 frequency of 16MHz.  If you use another CAN2515 board, the crystal frequency may be 8MHz.
 In this case it will be necessary to change the code at or about line 173 appropriately:
 ```

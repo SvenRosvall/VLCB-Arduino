@@ -106,7 +106,11 @@ add_executable(VLCB_Arduino
         examples/VLCB_4in4out_slot/VLCB_4in4out_slot.ino
         examples/VLCB_empty/VLCB_empty.ino
         examples/VLCB_long_message_example/VLCB_long_message_example.ino
-        examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino)
+        examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino
+        examples/VLCB_SerialGC_4in4out/VLCB_SerialGC_4in4out.ino
+        examples/VLCB_SerialGC_4in4out_slot/VLCB_SerialGC_4in4out_slot.ino
+        examples/VLCB_SerialGC_empty/VLCB_SerialGC_empty.ino
+)
 
 add_executable(testAll
         $<TARGET_OBJECTS:LED_UI_library>

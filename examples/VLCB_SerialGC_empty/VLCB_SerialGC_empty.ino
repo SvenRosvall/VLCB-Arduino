@@ -7,15 +7,23 @@
       3rd party libraries needed for compilation: (not for binary-only distributions)
 
       Streaming   -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      ACAN2515    -- library to support the MCP2515/25625 CAN controller IC
 */
+
+
+//
+// This is a modified version of VLCB_empty
+// It uses the ModifiedGridConnect protocol over serial instead of a CAN interface
+// this allows a single module to connect via a USB cable to a management tool like FCU
+// without a CAN network
+//
+
 
 // 3rd party libraries
 #include <Streaming.h>
 
 // VLCB library header files
 #include <VLCB.h>
-#include <CAN2515.h>               // Chosen CAN controller
+#include <SerialGC.h>               // replaces CAN controller
 
 // forward function declarations
 void printConfig();
@@ -34,11 +42,10 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-VLCB::CAN2515 can2515;                  // CAN transport object
+VLCB::SerialGC serialGC;                  // CAN transport object using serial
 
 // Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::SerialUserInterface serialUserInterface;
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
 VLCB::CanServiceWithDiagnostics canService(&can2515);
 
@@ -50,7 +57,7 @@ void setupVLCB()
   VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
 
   VLCB::setServices({
-    &mnService, &ledUserInterface, &serialUserInterface, &canService});
+    &mnService, &ledUserInterface, &canService});
 
   // set module parameters
   VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
@@ -103,28 +110,6 @@ void loop()
   //
   VLCB::process();
 
-  //
-  /// check CAN message buffers
-  //
-  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize())
-  {
-    Serial << F("> receive buffer overflow") << endl;
-  }
-
-  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0))
-  {
-    Serial << F("> transmit buffer overflow") << endl;
-  }
-
-  //
-  /// check CAN bus state
-  //
-  byte s = can2515.canp->errorFlagRegister();
-  if (s != 0)
-  {
-    // Serial << F("> error flag register is non-zero = ") << s << endl;
-  }
-
   // bottom of loop()
 }
 
@@ -138,5 +123,5 @@ void printConfig()
   Serial << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
 
   // copyright
-  Serial << F("> © Sven Rosvall (MERG 3777) 2025") << endl;
+  Serial << F("> © Sven Rosvall (MERG 3777) 2026") << endl;
 }

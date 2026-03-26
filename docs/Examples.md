@@ -23,6 +23,11 @@ using the MCP2515 transceiver.
 If your module is using another transceiver change the VLCB::CAN2515 for 
 a class that supports that transceiver.
 
+Each example comes in two variants, one using the MCP2515 CAN bus, and one
+using serial communication using the GridConnect protocol.
+Note that the serial examples do not use the SerialUserInterface as it
+would interfere with VLCB message communication.
+
 ## [VLCB_empty](../examples/VLCB_empty/VLCB_empty.ino)
 A bare minimum sketch that only contains the necessary services 
 (```MinimumNodeServiceWithDiagnostics``` and ```CANServiceWithDiagnostics```). 
