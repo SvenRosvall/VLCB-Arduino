@@ -128,12 +128,9 @@ void MinimumNodeService::process(const Action *action)
           initSetupFromUninitialised();
           break;
            
-        case MODE_NORMAL:
-        case MODE_SETUP:
-          setUninitialised();
-          break;
-           
         default:
+          // If in Setup or Normal or any invalid mode, revert back to Uninitialised mode.
+          setUninitialised();
           break;
         }
         break;
