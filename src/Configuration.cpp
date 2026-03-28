@@ -24,11 +24,7 @@
 extern "C" int __heap_start, *__brkval;
 #endif
 
-#ifdef __SAM3X8E__
-extern "C" char* sbrk(int incr);
-#endif
-
-#ifdef ARDUINO_ARCH_RP2040
+#if defined(__SAM3X8E__) || defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_MINIMA) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_NANO_R4)
 extern "C" char* sbrk(int incr);
 #endif
 
@@ -537,8 +533,11 @@ void Configuration::reboot()
 
 // for Raspberry Pi Pico using arduino-pico core
 #ifdef ARDUINO_ARCH_RP2040
-  watchdog_enable(100, 1);      // set watchdog timeout to 100ms and allow to expire
-  while (1);
+  rp2040.reboot();
+#endif
+  
+#if defined(ARDUINO_MINIMA) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_NANO_R4)
+  NVIC_SystemReset();
 #endif
 }
 
@@ -551,14 +550,10 @@ unsigned int Configuration::freeSRAM()
   int v;
   return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
 
-#elif defined ESP32 || defined ESP8266
+#elif defined(ESP32) || defined(ESP8266)
   return ESP.getFreeHeap();
 
-#elif defined __SAM3X8E__
-  char top;
-  return &top - reinterpret_cast<char*>(sbrk(0));
-
-#elif defined ARDUINO_ARCH_RP2040
+#elif defined(__SAM3X8E__) || defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_MINIMA) || defined(ARDUINO_UNOWIFIR4) || defined(ARDUINO_NANO_R4)
   char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
 
