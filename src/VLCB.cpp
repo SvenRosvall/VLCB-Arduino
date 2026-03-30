@@ -38,9 +38,9 @@ void setName(char *mname)
   modconfig.setName(mname);
 }
 
-void setVersion(char maj, char min, char beta)
+void setVersion(char maj, char min, char patch)
 {
-  modconfig.setVersion(maj, min, beta);
+  modconfig.setVersion(maj, min, patch);
 }
 
 void setModuleId(byte manu, byte moduleId)

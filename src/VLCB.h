@@ -27,7 +27,7 @@ namespace VLCB
 {
 void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
 void setServices(std::initializer_list<Service *> services);
-void setVersion(char maj, char min, char beta);
+void setVersion(char maj, char min, char patch);
 void setModuleId(byte manu, byte moduleId);
 void setName(char *mname);
 void setNumNodeVariables(byte n);

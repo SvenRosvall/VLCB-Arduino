@@ -53,6 +53,15 @@ Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 l
 Support for Raspberry Pi Pico boards is provided by Martin Da Costa
 in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).
 
+## Programming a sketch
+There are a set of [example sketches](docs/Examples.md) that show
+complete sketches that makes up VLCB modules.
+This is a good starting point for creating your own module.
+
+The [VLCB API documentation](docs/API.md) describes the functions used
+in these example sketches and other functions that are available to 
+module sketch developers.  
+
 ## Getting help and support
 
 If you have any questions or suggestions please contact the library maintainers
