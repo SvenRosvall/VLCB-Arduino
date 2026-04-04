@@ -23,6 +23,7 @@ Prefix each call with `VLCB::` or add a `using namespace VLCB;`
 directive at the top of your code file.
 
 ### Startup functions
+
 * `void checkStartupAction(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)` \
 This is a helper function that can be called at the beginning of the
 `setup()` function.
@@ -37,14 +38,14 @@ is complete.
 This initialises the internals of the VLCB library.
 
 ### Module configuration
+
 * `void setServices(std::initializer_list<Service *> services)` \
 Set up the services to be used by the module.
 These services must be defined above in the code, outside any functions.
 The used services shall be listed with curly brackets, called an "initializer list".
 A call will look like this:
-```
-    setServices({service1, service2, ...});
-```
+``` setServices({service1, service2, ...}); ```
+
 
 * `void setVersion(char maj, char min, char patch)` \
 Set major, minor and patch versions for the module.
@@ -69,7 +70,6 @@ The name shall be a string of max 7 characters.
 
 * `void setNumNodeVariables(byte n)` \
 Set number of node variables that the module will use.
-@param n number of node variables.
 
 
 * `void setEventsStart(byte n)` \
@@ -85,6 +85,7 @@ Set the number of event variables that are used by each stored event.
 
 
 ### Module configuration access
+
 * `VlcbModeParams getCurrentMode()` \
 * `byte getCANID()` \
 * `unsigned int getNodeNum()` \
@@ -110,6 +111,7 @@ Set the number of event variables that are used by each stored event.
 * `void resetModule()` \
 
 ### Running
+
 * `void process()` \
 Call this in the `loop()`function.
 It lets the VLCB library core execute its tasks such as check for new
