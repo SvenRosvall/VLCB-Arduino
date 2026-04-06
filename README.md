@@ -53,6 +53,25 @@ Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 l
 Support for Raspberry Pi Pico boards is provided by Martin Da Costa
 in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).
 
+## Programming a sketch
+
+This VLCB library is built with an object-oriented architecture
+described in the [design document](Design.md).
+It uses a `Controller` object for the core tasks, a `Configuration`
+object for storing module configurations and a set of [services](Service.md).
+
+The VLCB module code can be written in two different styles.
+One style is to define these objects and calling member functions of these objects.
+
+The other style is to use functions in the VLCB namespace.
+These functions are "free" functions and do not require objects.
+These VLCB namespace functions are provided for convenience and clarity.
+Some are just forwarding calls to these objects while others do more
+work to simplify writing module code.
+These functions are described in [VLCB API documentation](html/_v_l_c_b_8h_source.html)
+
+The example sketches are using the VLCB function style.
+
 ## Getting help and support
 
 If you have any questions or suggestions please contact the library maintainers
