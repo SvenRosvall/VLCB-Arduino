@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['begin_0',['begin',['../namespace_v_l_c_b.html#a9b7733390999c3dfd8e922f7397a3cc2',1,'VLCB']]],
-  ['bl_5ftype_5fianhogg_1',['BL_TYPE_IanHogg',['../vlcbdefs_8hpp.html#ab52cc5e2a30f041a1cf5626e2110a15ba3bccb3d5704efae337e50094d1330451',1,'vlcbdefs.hpp']]],
-  ['bl_5ftype_5fkonradorlowski_2',['BL_TYPE_KonradOrlowski',['../vlcbdefs_8hpp.html#ab52cc5e2a30f041a1cf5626e2110a15baa9e9bebf8bc95f1170969945ff94da45',1,'vlcbdefs.hpp']]],
-  ['bl_5ftype_5fmikebolton_3',['BL_TYPE_MikeBolton',['../vlcbdefs_8hpp.html#ab52cc5e2a30f041a1cf5626e2110a15baa2f59a92a9150ae9dd4eef860141e766',1,'vlcbdefs.hpp']]],
-  ['bl_5ftype_5funknown_4',['BL_TYPE_Unknown',['../vlcbdefs_8hpp.html#ab52cc5e2a30f041a1cf5626e2110a15bae04a21bab1062a9dafc59b0758f16e8a',1,'vlcbdefs.hpp']]]
+  ['api_0',['VLCB API',['../namespace_v_l_c_b.html#autotoc_md0',1,'']]],
+  ['arm1176jzf_5fs_1',['ARM1176JZF_S',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393a5c24e55086cd7e4b70cc38cbd3ef1081',1,'vlcbdefs.hpp']]],
+  ['armcortex_5fa53_2',['ARMCortex_A53',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393aa8bf23dd0df958f2f3bef6ddf304a2be',1,'vlcbdefs.hpp']]],
+  ['armcortex_5fa7_3',['ARMCortex_A7',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393a20c224b717fecc3faf915f8bb3a48bf2',1,'vlcbdefs.hpp']]],
+  ['array_4',['array',['../classstd_1_1initializer__list.html#a11955d17fadf42618d84d011649e1ce3',1,'std::initializer_list']]]
 ];

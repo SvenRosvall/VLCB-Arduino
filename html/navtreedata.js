@@ -32,12 +32,22 @@ var NAVTREE =
         [ "Functions", "namespacemembers_func.html", null ]
       ] ]
     ] ],
+    [ "Classes", "annotated.html", [
+      [ "Class List", "annotated.html", "annotated_dup" ],
+      [ "Class Index", "classes.html", null ],
+      [ "Class Members", "functions.html", [
+        [ "All", "functions.html", null ],
+        [ "Functions", "functions_func.html", null ],
+        [ "Variables", "functions_vars.html", null ]
+      ] ]
+    ] ],
     [ "Files", "files.html", [
       [ "File List", "files.html", "files_dup" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", "globals_dup" ],
         [ "Enumerations", "globals_enum.html", null ],
-        [ "Enumerator", "globals_eval.html", "globals_eval" ]
+        [ "Enumerator", "globals_eval.html", "globals_eval" ],
+        [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
   ] ]
@@ -46,8 +56,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_v_l_c_b_8h.html",
-"vlcbdefs_8hpp.html#a4983e357c3d4a254f114ee06940dc062a99a1d1fb1f19ae3dd8850eed8dade867",
-"vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a75fdfc092bd1a8b4ca9d5f40a5b3e787"
+"vlcbdefs_8hpp.html#a2c81b9e831b56e17c8e4d5d838705280add480e1f4553c25fcb32142edcc69dea",
+"vlcbdefs_8hpp.html#ab0a99f2600a899ad3f05834d22c3c2d5ad52419e87ce49c60206a5b937b720a9b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

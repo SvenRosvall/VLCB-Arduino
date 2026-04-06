@@ -1,5 +1,6 @@
 var namespaces_dup =
 [
+    [ "std", "namespacestd.html", "namespacestd" ],
     [ "VLCB", "namespace_v_l_c_b.html", [
       [ "checkStartupAction", "namespace_v_l_c_b.html#aca9610abdafcfe61167ac97a325bc858", null ],
       [ "begin", "namespace_v_l_c_b.html#a9b7733390999c3dfd8e922f7397a3cc2", null ],

@@ -13,6 +13,7 @@
 
 namespace std
 {
+  /// Convenience class for use with initializer lists, i.e. bracketed list of items: { a, b, ...}
   template<class E>
     class initializer_list
     {
