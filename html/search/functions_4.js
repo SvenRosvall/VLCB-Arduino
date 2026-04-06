@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['seteventsstart_0',['setEventsStart',['../namespace_v_l_c_b.html#a0ae2914047f607ed1a084a2a24c4148e',1,'VLCB']]],
-  ['setmaxevents_1',['setMaxEvents',['../namespace_v_l_c_b.html#a137724f75e6c5f55249b1eb4f743d5a5',1,'VLCB']]],
-  ['setmoduleid_2',['setModuleId',['../namespace_v_l_c_b.html#aa592e5531e8aa0d2d581b55baa32c2e8',1,'VLCB']]],
-  ['setname_3',['setName',['../namespace_v_l_c_b.html#a93a7982792bd6f26b655ca037c5f46b5',1,'VLCB']]],
-  ['setnumeventvariables_4',['setNumEventVariables',['../namespace_v_l_c_b.html#a7ad45be435eae6acef7d4bfe6d910115',1,'VLCB']]],
-  ['setnumnodevariables_5',['setNumNodeVariables',['../namespace_v_l_c_b.html#ad5e105043e448af5ed78835488f819d8',1,'VLCB']]],
-  ['setversion_6',['setVersion',['../namespace_v_l_c_b.html#a1292d2ce2d3c2203e51914a5b12b8f53',1,'VLCB']]]
+  ['getcanid_0',['getCANID',['../namespace_v_l_c_b.html#afdbd716415513eecc98597480bd85daa',1,'VLCB']]],
+  ['getcurrentmode_1',['getCurrentMode',['../namespace_v_l_c_b.html#afc9d9eaacfa65438d13a45e95ad7eb8f',1,'VLCB']]],
+  ['geteventevval_2',['getEventEVval',['../namespace_v_l_c_b.html#af4db790a620d538341751018e3fe7107',1,'VLCB']]],
+  ['getfreeeeprombase_3',['getFreeEEPROMbase',['../namespace_v_l_c_b.html#a5045aa3e373743aef424a957c0489671',1,'VLCB']]],
+  ['getnodenum_4',['getNodeNum',['../namespace_v_l_c_b.html#aecec03956461a72e544cfa0b2a945c3c',1,'VLCB']]]
 ];
