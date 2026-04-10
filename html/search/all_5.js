@@ -8,5 +8,7 @@ var searchData=
   ['err_5floco_5fnot_5ffound_5',['ERR_LOCO_NOT_FOUND',['../vlcbdefs_8hpp.html#af6463b79fbdf36b8f3a940ea3326cc3ba6474a3f3259d44578748f8df2bb3688b',1,'vlcbdefs.hpp']]],
   ['err_5floco_5fstack_5ffull_6',['ERR_LOCO_STACK_FULL',['../vlcbdefs_8hpp.html#af6463b79fbdf36b8f3a940ea3326cc3baee74a5f52fd0fe180882159a59d627f3',1,'vlcbdefs.hpp']]],
   ['err_5fsession_5fcancelled_7',['ERR_SESSION_CANCELLED',['../vlcbdefs_8hpp.html#af6463b79fbdf36b8f3a940ea3326cc3baf0145303a055f2d381b24067e0113c1a',1,'vlcbdefs.hpp']]],
-  ['err_5fsession_5fnot_5fpresent_8',['ERR_SESSION_NOT_PRESENT',['../vlcbdefs_8hpp.html#af6463b79fbdf36b8f3a940ea3326cc3ba19e1f342b5fa5415c03f467c7776dbad',1,'vlcbdefs.hpp']]]
+  ['err_5fsession_5fnot_5fpresent_8',['ERR_SESSION_NOT_PRESENT',['../vlcbdefs_8hpp.html#af6463b79fbdf36b8f3a940ea3326cc3ba19e1f342b5fa5415c03f467c7776dbad',1,'vlcbdefs.hpp']]],
+  ['eventproducerservice_9',['EventProducerService',['../class_v_l_c_b_1_1_event_producer_service.html',1,'VLCB']]],
+  ['eventproducerservice_2eh_10',['EventProducerService.h',['../_event_producer_service_8h.html',1,'']]]
 ];
