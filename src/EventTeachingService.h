@@ -9,9 +9,20 @@
 
 namespace VLCB
 {
-
+/// # Event Teaching Service API
+///
+/// This service allows an Events Table to be created and managed using
+/// the MMC or similar. A full description of events can be found in
+/// the document `VLCB Event Model`.
+/// The Events Table is used by the Producer and Consumer Services.
+/// This Events Teaching Service is only rewuired if one or both of these
+/// other services are present.
+///
+/// There are no user functions in this service.
+///
 class EventTeachingService : public AbstractEventTeachingService
 {
+/// \cond
 public:
   virtual void process(const Action * action) override;
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }
@@ -21,7 +32,7 @@ private:
   void handleMessage(const VlcbMessage *msg);
   void handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en);
   void handleLearnEvent(const VlcbMessage *msg, unsigned int nn, unsigned int en);
-  
+/// \endcond
 };
 
 }  // VLCB

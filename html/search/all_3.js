@@ -30,11 +30,12 @@ var searchData=
   ['cmderr_5fnot_5flrn_27',['CMDERR_NOT_LRN',['../vlcbdefs_8hpp.html#aa74a389f4d295b63995cefda079e118da23b14a127d18574579b0be5559a726ff',1,'vlcbdefs.hpp']]],
   ['cmderr_5fnot_5fsetup_28',['CMDERR_NOT_SETUP',['../vlcbdefs_8hpp.html#aa74a389f4d295b63995cefda079e118da6481965cf00508dba6208ef8889ae58d',1,'vlcbdefs.hpp']]],
   ['cmderr_5ftoo_5fmany_5fevents_29',['CMDERR_TOO_MANY_EVENTS',['../vlcbdefs_8hpp.html#aa74a389f4d295b63995cefda079e118da9f60240de394d3ceea3a624634a3264d',1,'vlcbdefs.hpp']]],
-  ['consumer_5fev_5factions_30',['CONSUMER_EV_ACTIONS',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a0e63649c00c0cbe089c0f258e4a621bb',1,'vlcbdefs.hpp']]],
-  ['consumer_5fev_5fnot_5fspecified_31',['CONSUMER_EV_NOT_SPECIFIED',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a75fdfc092bd1a8b4ca9d5f40a5b3e787',1,'vlcbdefs.hpp']]],
-  ['consumer_5fev_5fslots_32',['CONSUMER_EV_SLOTS',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a8ab7fbf9edec0663dcecddd1343c439f',1,'vlcbdefs.hpp']]],
-  ['cpum_5farm_33',['CPUM_ARM',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112af78260ac550a508a16b007dfdf718098',1,'vlcbdefs.hpp']]],
-  ['cpum_5fatmel_34',['CPUM_ATMEL',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112a2a06f1d1bc6933830d4124ed9e9669b0',1,'vlcbdefs.hpp']]],
-  ['cpum_5fmicrochip_35',['CPUM_MICROCHIP',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112a215b2662f90293711b2b27c020407b3e',1,'vlcbdefs.hpp']]],
-  ['createeventatindex_36',['createEventAtIndex',['../namespace_v_l_c_b.html#a77277b82574203c049b2799a9971c308',1,'VLCB']]]
+  ['consumer_20service_20api_30',['Event Consumer Service API',['../class_v_l_c_b_1_1_event_consumer_service.html#autotoc_md3',1,'']]],
+  ['consumer_5fev_5factions_31',['CONSUMER_EV_ACTIONS',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a0e63649c00c0cbe089c0f258e4a621bb',1,'vlcbdefs.hpp']]],
+  ['consumer_5fev_5fnot_5fspecified_32',['CONSUMER_EV_NOT_SPECIFIED',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a75fdfc092bd1a8b4ca9d5f40a5b3e787',1,'vlcbdefs.hpp']]],
+  ['consumer_5fev_5fslots_33',['CONSUMER_EV_SLOTS',['../vlcbdefs_8hpp.html#ab58c1f595481011073bd82001f154872a8ab7fbf9edec0663dcecddd1343c439f',1,'vlcbdefs.hpp']]],
+  ['cpum_5farm_34',['CPUM_ARM',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112af78260ac550a508a16b007dfdf718098',1,'vlcbdefs.hpp']]],
+  ['cpum_5fatmel_35',['CPUM_ATMEL',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112a2a06f1d1bc6933830d4124ed9e9669b0',1,'vlcbdefs.hpp']]],
+  ['cpum_5fmicrochip_36',['CPUM_MICROCHIP',['../vlcbdefs_8hpp.html#a229a04590fac05e067f21ceae620e112a215b2662f90293711b2b27c020407b3e',1,'vlcbdefs.hpp']]],
+  ['createeventatindex_37',['createEventAtIndex',['../namespace_v_l_c_b.html#a77277b82574203c049b2799a9971c308',1,'VLCB']]]
 ];

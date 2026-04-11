@@ -1,6 +1,8 @@
 var namespace_v_l_c_b =
 [
     [ "EventProducerService", "class_v_l_c_b_1_1_event_producer_service.html", "class_v_l_c_b_1_1_event_producer_service" ],
+    [ "EventConsumerService", "class_v_l_c_b_1_1_event_consumer_service.html", "class_v_l_c_b_1_1_event_consumer_service" ],
+    [ "EventTeachingService", "class_v_l_c_b_1_1_event_teaching_service.html", null ],
     [ "checkStartupAction", "namespace_v_l_c_b.html#aca9610abdafcfe61167ac97a325bc858", null ],
     [ "begin", "namespace_v_l_c_b.html#a9b7733390999c3dfd8e922f7397a3cc2", null ],
     [ "setServices", "namespace_v_l_c_b.html#a0046980bf309ea157503c4f2a0970855", null ],

@@ -11,11 +11,21 @@
 namespace VLCB {
 
 struct VlcbMessage;
-
+/// # Event Consumer Service API
+///
+/// This service provides a means of filtering received VLCB events and
+/// and passing them to an event handler. A full description of events
+/// can be found in the document `VLCB Event Model`.
+/// The events that a module can handle are held in the Events Table.
+/// Specific events are identified by their table index number.
+///
 class EventConsumerService : public Service 
 {
 public:
+  /// Sets the callback function that is called when an event
+  /// opcode that matches an Event Table entry is received.
   void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
+/// \cond
   virtual void process(const Action * action) override;
 
   virtual VlcbServiceTypes getServiceID() const override 
@@ -35,7 +45,7 @@ private:
 protected:
   unsigned int diagEventsConsumed = 0;
   unsigned int diagEventsAcknowledged = 0;
-
+/// \endcond
 };
 
 }  // VLCB
