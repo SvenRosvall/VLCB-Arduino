@@ -14,8 +14,12 @@ namespace VLCB
 class Controller;
 struct Action;
 
+/// Interface class for all VLCB services.
+/// Each VLCB module sketch shall be set up with a list of services that 
+/// define capabilities of the module. 
 class Service
 {
+/// \cond
 protected:
   bool isThisNodeNumber(unsigned int nn);
 
@@ -34,6 +38,7 @@ public:
 
   struct Data { byte data1, data2, data3; };
   virtual Data getServiceData();
+/// \endcond
 };
 
 }

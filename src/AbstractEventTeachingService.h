@@ -12,11 +12,15 @@ namespace VLCB
 
 struct VlcbMessage;
 
+/// 
 class AbstractEventTeachingService : public Service 
 {
 public:
-  void setEventValidator(byte (*func)(int, int, byte, byte)) { validatorFunc = func; }
+  /// Register a callback handler that validates that events taught to this module
+  /// comply with rules for this module.
+  void setEventValidator(byte (*func)(int nn, int en, byte evNum, byte evVal)) { validatorFunc = func; }
 
+  /// \cond
   virtual Data getServiceData() override;
 
   void enableLearn();
@@ -24,10 +28,12 @@ public:
 
 protected:
   bool bLearn = false;
-  byte (*validatorFunc)(int, int, byte, byte) = nullptr;
+  byte (*validatorFunc)(int nn, int en, byte evNum, byte evVal) = nullptr;
   unsigned int diagEventsTaught = 0;
 
   void handleMessage(const VlcbMessage *msg);
+
+  /// \endcond 
   
 private:
   void handleLearnMode(const VlcbMessage *msg, unsigned int nn);

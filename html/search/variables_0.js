@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['array_0',['array',['../classstd_1_1initializer__list.html#a11955d17fadf42618d84d011649e1ce3',1,'std::initializer_list']]]
+  ['blearn_0',['bLearn',['../class_v_l_c_b_1_1_abstract_event_teaching_service.html#ace2db4c0ae0a235abecbc2757303d1e7',1,'VLCB::AbstractEventTeachingService']]]
 ];

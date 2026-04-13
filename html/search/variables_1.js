@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['len_0',['len',['../classstd_1_1initializer__list.html#af02ad9fd9b28c2d9163aa3eedcbc4f10',1,'std::initializer_list']]]
+  ['diageventstaught_0',['diagEventsTaught',['../class_v_l_c_b_1_1_abstract_event_teaching_service.html#a40d46b0921db86295d7bc6f8bbc4293e',1,'VLCB::AbstractEventTeachingService']]]
 ];

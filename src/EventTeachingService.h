@@ -15,7 +15,7 @@ namespace VLCB
 /// the MMC or similar. A full description of events can be found in
 /// the document `VLCB Event Model`.
 /// The Events Table is used by the Producer and Consumer Services.
-/// This Events Teaching Service is only rewuired if one or both of these
+/// This Event Teaching Service is only rewired if one or both of these
 /// other services are present.
 ///
 /// There are no user functions in this service.
