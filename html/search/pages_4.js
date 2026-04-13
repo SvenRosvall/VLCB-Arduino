@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['vlcb_20api_0',['VLCB API',['../namespace_v_l_c_b.html#autotoc_md0',1,'']]],
-  ['vlcb_20functions_1',['VLCB functions',['../namespace_v_l_c_b.html#autotoc_md1',1,'']]]
+  ['producer_20service_20api_0',['Producer Service API',['../class_v_l_c_b_1_1_event_producer_service.html#autotoc_md2',1,'']]]
 ];
