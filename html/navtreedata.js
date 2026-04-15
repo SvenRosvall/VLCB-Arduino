@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "VLCB", "index.html", [
+  [ "Arduino C++ Library for VLCB", "index.html", [
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
       [ "Namespace Members", "namespacemembers.html", [
