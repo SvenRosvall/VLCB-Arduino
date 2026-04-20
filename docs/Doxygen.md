@@ -16,7 +16,7 @@ be changed when the code changes.
 Download and install Doxygen from https://www.doxygen.nl/
 
 Doxygen requires a configuration file.
-This is [Doxygen.conf](../Doxygen.conf) in the root directory.
+This is [Doxygen.conf](../Doxygen.Sketch.conf) in the root directory.
 
 Run Doxygen with this command line in the root directory:
 ```
@@ -30,7 +30,7 @@ These needed to be staged for addition to git.
 
 ## Browsing the generated documentation
 
-Read the generated documentation locally by opening the [index file](../html/index.html)
+Read the generated documentation locally by opening the [index file](../html.sketch/index.html)
 in your browser.
 
 If you brows the index file from Github you will see the raw HTML
