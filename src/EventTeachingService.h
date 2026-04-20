@@ -22,7 +22,7 @@ namespace VLCB
 ///
 class EventTeachingService : public AbstractEventTeachingService
 {
-/// \cond
+/// \cond LIBRARY
 public:
   virtual void process(const Action * action) override;
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }

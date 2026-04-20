@@ -1,0 +1,25 @@
+var class_v_l_c_b_1_1_switch =
+[
+    [ "Switch", "class_v_l_c_b_1_1_switch.html#a8a4eb594eaad2549a657005360354940", null ],
+    [ "Switch", "class_v_l_c_b_1_1_switch.html#a3b9b02349eefffd1570ede0153982d86", null ],
+    [ "setPin", "class_v_l_c_b_1_1_switch.html#a233735b5184f2de85adc59683d3c9515", null ],
+    [ "run", "class_v_l_c_b_1_1_switch.html#a40f8e4c07452abf5d5c5715e383b4c7d", null ],
+    [ "reset", "class_v_l_c_b_1_1_switch.html#af55c7556999da0a0d105a69677119649", null ],
+    [ "stateChanged", "class_v_l_c_b_1_1_switch.html#a064dbac5496be56ff6940e283bc8696b", null ],
+    [ "getState", "class_v_l_c_b_1_1_switch.html#a7bb5d9774ae432377200a1e0e0912b8a", null ],
+    [ "isPressed", "class_v_l_c_b_1_1_switch.html#a699a25d9fa30df20463db382092d93f7", null ],
+    [ "getCurrentStateDuration", "class_v_l_c_b_1_1_switch.html#a1d446cb5f3674731d9bfb5d0e1c89aea", null ],
+    [ "getLastStateDuration", "class_v_l_c_b_1_1_switch.html#ab4097c04b6586b85292171d6a102bd25", null ],
+    [ "getLastStateChangeTime", "class_v_l_c_b_1_1_switch.html#aca0e63aee484d7388d0747a1c30775b5", null ],
+    [ "resetCurrentDuration", "class_v_l_c_b_1_1_switch.html#a665ae4851c3d2b186530c45ad2c15c92", null ],
+    [ "readPin", "class_v_l_c_b_1_1_switch.html#ad3310598c2edc08d52e5673e1dc87dd7", null ],
+    [ "_pin", "class_v_l_c_b_1_1_switch.html#aab513afc7a81af340874fa99c135d82e", null ],
+    [ "_pressedState", "class_v_l_c_b_1_1_switch.html#a445b6376586bbe224e568347fbc69a83", null ],
+    [ "_currentState", "class_v_l_c_b_1_1_switch.html#ab4a114d3114da6ea5e876decb2b0a57f", null ],
+    [ "_lastState", "class_v_l_c_b_1_1_switch.html#a716538f5467d934b147ff7d578f21caf", null ],
+    [ "_stateChanged", "class_v_l_c_b_1_1_switch.html#a9fe3964194ff3e4e3f3896bab1506919", null ],
+    [ "_lastStateChangeTime", "class_v_l_c_b_1_1_switch.html#a15d0cc00b1c72fb44e6b6fab72cecb74", null ],
+    [ "_lastStateDuration", "class_v_l_c_b_1_1_switch.html#a27d940ba51e1de1c1cab9815773a5eb4", null ],
+    [ "_prevReleaseTime", "class_v_l_c_b_1_1_switch.html#ad7bd9c896c4a614432feeb5583775c0a", null ],
+    [ "_prevStateDuration", "class_v_l_c_b_1_1_switch.html#aa9cb881199ee9d84b5b1edcf2311df41", null ]
+];

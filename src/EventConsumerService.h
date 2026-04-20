@@ -25,7 +25,7 @@ public:
   /// Sets the callback function that is called when an event
   /// opcode that matches an Event Table entry is received.
   void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
-/// \cond
+/// \cond LIBRARY
   virtual void process(const Action * action) override;
 
   virtual VlcbServiceTypes getServiceID() const override 

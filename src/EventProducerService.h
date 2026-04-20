@@ -24,7 +24,7 @@ public:
   /// Sets the callback function that is called when an Accessory Request
   /// opcode or Accessory Request Short Event opcode is received.
   void setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
-/// \cond
+/// \cond LIBRARY
   virtual void process(const Action * action) override;
 
   virtual VlcbServiceTypes getServiceID() const override
@@ -84,7 +84,7 @@ private:
   void handleProdSvcMessage(const VlcbMessage *msg);
 
   void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
-/// \cond
+/// \cond LIBRARY
 protected:
   unsigned int diagEventsProduced = 0;
 /// \endcond

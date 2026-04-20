@@ -19,7 +19,7 @@ struct Action;
 /// define capabilities of the module. 
 class Service
 {
-/// \cond
+/// \cond LIBRARY
 protected:
   bool isThisNodeNumber(unsigned int nn);
 

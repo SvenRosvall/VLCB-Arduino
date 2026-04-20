@@ -20,7 +20,7 @@ public:
   /// comply with rules for this module.
   void setEventValidator(byte (*func)(int nn, int en, byte evNum, byte evVal)) { validatorFunc = func; }
 
-  /// \cond
+  /// \cond LIBRARY
   virtual Data getServiceData() override;
 
   void enableLearn();
