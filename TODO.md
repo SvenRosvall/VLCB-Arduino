@@ -37,12 +37,15 @@ Split this class in two:
   1. all the other stuff a developer would want, such as transport statistics and
      resetting the module.
 
-## Introduce MemoryService
+## Introduce InternalDiagnosticsService
 If SerialUserInterface is not included in the service list then there is no
 way to check free memory.
-A dedicated MemoryService could provide free memory amount as a diagnostic value.
+A dedicated service could provide free memory amount as a diagnostic value.
 
-What other internal information would be useful for this service?
+What internal information would be useful for this service?
+* Free memory. (as listed above)
+* Monitor the action queue. Current use, high watermark. (See CanService buffer use for inspiration.)
+* Count of generated actions. 
 
 Is this a service that should be included in the VLCB specifications?
 Or should it be treated as a user defined service?
@@ -63,6 +66,17 @@ within the CAN transport implementation.
 However, the added coding and memory used for virtual functions may negate the benefits 
 of a polymorphic CanFrame class.
 
+The result was that there wasn't much benefit here.
+
+Another approach is to use a template CanFrame.
+Each CAN transport implements an instantiation of CanFrame where each getter/setter
+accesses the elements of the datastructure used for that transport.
+This means there is no conversion between the specific CAN datastructure
+and the VLCB::CanFrame. 
+
+This proved to reduce memory and code size significantly.
+But the code is harder to understand.
+
 ## Documentation
 
 ### Split documentation based on audience
@@ -77,4 +91,3 @@ Describe how to write a sketch with VLCB setup.
 How to create service objects and the controller object.
 How to configure any parameters and service specifics.
 
-This can only be started once we have finalized how VLCB will be set up.
