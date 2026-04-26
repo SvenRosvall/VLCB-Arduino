@@ -60,13 +60,9 @@ in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).
 
 ## Programming a sketch
 
-This VLCB library is built with an object-oriented architecture
-described in the [design document](Design.md).
-It uses a `Controller` object for the core tasks, a `Configuration`
-object for storing module configurations and a set of [services](Service.md).
-
 The VLCB module code can be written in two different styles.
-One style is to define these objects and calling member functions of these objects.
+One style is to use the objects described below and calling member functions of these objects.
+This give you great flexibility and control but makes things a bit complicted.
 
 The other style is to use functions in the VLCB namespace.
 These functions are "free" functions and do not require objects.
@@ -75,7 +71,16 @@ Some are just forwarding calls to these objects while others do more
 work to simplify writing module code.
 These functions are described in [VLCB API documentation](html.sketch/namespace_v_l_c_b.html)
 
-The example sketches are using the VLCB function style.
+The [example sketches](docs/Examples.md) included here are using the VLCB function style.
+
+## Library development
+
+This VLCB library is built with an object-oriented architecture
+described in the [design document](Design.md).
+It uses a `Controller` object for the core tasks, a `Configuration`
+object for storing module configurations and a set of [services](Service.md).
+The [Full API documentation](html.library/index.html) describes all of these 
+objects.
 
 ## Getting help and support
 

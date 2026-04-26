@@ -11,6 +11,10 @@ Having documentation in comments in the source file, near declarations
 makes it more obvious to the editor that the comments also need to 
 be changed when the code changes.
 
+The VLCB-Arduino library has two sets of API documentation, one complete
+set for library developers, and a second restricted set that describes 
+functions and objects that sketch developers need.
+
 ## Using Doxygen in VLCB-Arduino
 
 Download and install Doxygen from https://www.doxygen.nl/
@@ -20,9 +24,11 @@ This is [Doxygen.conf](../Doxygen.Sketch.conf) in the root directory.
 
 Run Doxygen with this command line in the root directory:
 ```
-doxygen Doxygen.conf
+doxygen Doxygen.Sketch.conf
+doxygen Doxygen.Library.conf
 ```
-This updates documentation in the `html` directory.
+This updates documentation in the `html.sketch` directory and 
+`html.library` directory respectively.
 
 Once the documentation is updated, review it and commit to git.
 Note that some new files may have been created. 
@@ -30,10 +36,12 @@ These needed to be staged for addition to git.
 
 ## Browsing the generated documentation
 
-Read the generated documentation locally by opening the [index file](../html.sketch/index.html)
+Read the generated documentation locally by opening one of the
+[Sketch developer index file](../html.sketch/index.html) or
+[Library developer index file](../html.library/index.html)
 in your browser.
 
-If you brows the index file from Github you will see the raw HTML
+If you browse the index file from Github you will see the raw HTML
 source code.
 Github has a feature (called "pages") that renders the HTML pages
 (and Markdown pages).
@@ -47,7 +55,7 @@ The pages will now be available at https:<your-username>.githop.io/VLCB-Arduino.
 (See https://stackoverflow.com/questions/8446218/how-to-see-an-html-page-on-github-as-a-normal-rendered-html-page-to-see-preview)
 
 The main repository will be maintained in https://svenrosvall.github.io/VLCB-Arduino
-The index of the generated documentation is available at https://svenrosvall.github.io/VLCB-Arduino/html/index.html
+The index of the generated documentation is available at https://svenrosvall.github.io/VLCB-Arduino/html.library/index.html
 
 ## What to document
 High level documentation is kept in the `docs` directory.
