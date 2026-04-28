@@ -103,7 +103,7 @@ These functions are "free" functions and do not require objects.
 These VLCB namespace functions are provided for convenience and clarity.
 Some are just forwarding calls to these objects while others do more
 work to simplify writing module code.
-These functions are described in [VLCB API documentation](html.sketch/namespace_v_l_c_b.html)
+These functions are described in [VLCB API documentation](../html.sketch/namespace_v_l_c_b.html)
 
 The [example sketches](docs/Examples.md) included here are using the VLCB function style.
 This is the recommended style.
