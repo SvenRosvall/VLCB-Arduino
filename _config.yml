@@ -1,2 +1,7 @@
+# Jekyll config file. 
+# Jekyll is used in Github pages to render readable HTML files.
+
+# Doxygen generates files with leading underscore for file names with upper case letters.
+# Tell Jekyll to include these files.
 include:
   - "_*.html"
