@@ -105,8 +105,21 @@ Some are just forwarding calls to these objects while others do more
 work to simplify writing module code.
 These functions are described in [VLCB API documentation](../html.sketch/namespace_v_l_c_b.html)
 
-The [example sketches](docs/Examples.md) included here are using the VLCB function style.
+The [example sketches](Examples.md) included here are using the VLCB function style.
 This is the recommended style.
+
+These sketches follow a structure with certain elements in order:
+1. Declaration of constants and global objects that are used in the sketch.
+2. The `setup()` function. This is usually split up into a setupVlcb() where all the
+VLCB specific parameters are set up such as manufacturer and module ID and what
+services will be used.
+The list of services are described [here](../html.sketch/class_v_l_c_b_1_1_service.html).
+The other setup part is the function setupModule() where all module specific
+things are set up such as I/O pins.
+3. The `loop()` function. This is where all the recurring tasks happen such as
+calling `VLCB::process()` which does all the internal processing of VLCB.
+4. Any other supporting functions such as event handlers and checking for
+changes in I/O pin state.
 
 ## Creating a Module Descriptor File.
 
