@@ -41,7 +41,7 @@ void MinimumNodeService::begin()
 }
 
 //
-/// initiate the transition from Uninitialised to Normal mode
+// initiate the transition from Uninitialised to Normal mode
 //
 void MinimumNodeService::initSetupFromUninitialised()
 {
@@ -74,7 +74,7 @@ void MinimumNodeService::setNormal(unsigned int nn)
 }
 
 //
-/// set module to Uninitialised mode
+// set module to Uninitialised mode
 //
 void MinimumNodeService::setUninitialised()
 {
@@ -89,7 +89,7 @@ void MinimumNodeService::setUninitialised()
 }
 
 //
-/// request new node number
+// request new node number
 //
 void MinimumNodeService::initSetupFromNormal()
 {
@@ -112,7 +112,7 @@ void MinimumNodeService::heartbeat()
 }
 
 //
-/// MinimumNode Service processing procedure
+// MinimumNode Service processing procedure
 //
 
 void MinimumNodeService::process(const Action *action)
