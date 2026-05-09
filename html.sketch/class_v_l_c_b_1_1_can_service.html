@@ -92,6 +92,9 @@ $(function(){initNavTree('class_v_l_c_b_1_1_can_service.html','','class_v_l_c_b_
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> for sending and receiving messages on a CAN bus.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_can_service_8h_source.html">CanService.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for VLCB::CanService:</div>
@@ -105,17 +108,12 @@ Inheritance diagram for VLCB::CanService:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a558d311e484d9d00476c2cf7ec4b3109" id="r_a558d311e484d9d00476c2cf7ec4b3109"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a558d311e484d9d00476c2cf7ec4b3109">CanService</a> (CanTransport *tpt)</td></tr>
-<tr class="memitem:af7ed94f438c0dbee724266b4fdc9607c" id="r_af7ed94f438c0dbee724266b4fdc9607c"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#af7ed94f438c0dbee724266b4fdc9607c">getServiceID</a> () const override</td></tr>
-<tr class="memitem:a04ddb3103a0419ce2b16b6f6e1b15123" id="r_a04ddb3103a0419ce2b16b6f6e1b15123"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a04ddb3103a0419ce2b16b6f6e1b15123">getServiceVersionID</a> () const override</td></tr>
-<tr class="memitem:a8e1e9d8d43f114769e0cc42f9102875a" id="r_a8e1e9d8d43f114769e0cc42f9102875a"><td class="memItemLeft">virtual Data&#160;</td><td class="memItemRight"><a class="el" href="#a8e1e9d8d43f114769e0cc42f9102875a">getServiceData</a> ()</td></tr>
-<tr class="memitem:a43cf90be0bb18ccba8958791bf6235b9" id="r_a43cf90be0bb18ccba8958791bf6235b9"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a43cf90be0bb18ccba8958791bf6235b9">process</a> (const Action *action) override</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pro-attribs" class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a8130c2fe65c53f57fa1f596513449ade" id="r_a8130c2fe65c53f57fa1f596513449ade"><td class="memItemLeft">CanTransport *&#160;</td><td class="memItemRight"><a class="el" href="#a8130c2fe65c53f57fa1f596513449ade">canTransport</a></td></tr>
+<tr class="memitem:a558d311e484d9d00476c2cf7ec4b3109" id="r_a558d311e484d9d00476c2cf7ec4b3109"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a558d311e484d9d00476c2cf7ec4b3109">CanService</a> (<a class="el" href="class_v_l_c_b_1_1_can_transport.html">CanTransport</a> *tpt)</td></tr>
 </table>
-<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> for sending and receiving messages on a CAN bus. </p>
+<p>Delegates to a <a class="el" href="class_v_l_c_b_1_1_can_transport.html" title="Interface base class for CAN transport implementations.">CanTransport</a> object to do the actual transmission on the CAN bus. </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a558d311e484d9d00476c2cf7ec4b3109" name="a558d311e484d9d00476c2cf7ec4b3109"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a558d311e484d9d00476c2cf7ec4b3109">&#9670;&#160;</a></span>CanService()</h2>
 
@@ -128,7 +126,7 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">VLCB::CanService::CanService </td>
           <td>(</td>
-          <td class="paramtype">CanTransport *</td>          <td class="paramname"><span class="paramname"><em>tpt</em></span></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_v_l_c_b_1_1_can_transport.html">CanTransport</a> *</td>          <td class="paramname"><span class="paramname"><em>tpt</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -138,130 +136,7 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="af7ed94f438c0dbee724266b4fdc9607c" name="af7ed94f438c0dbee724266b4fdc9607c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af7ed94f438c0dbee724266b4fdc9607c">&#9670;&#160;</a></span>getServiceID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a> VLCB::CanService::getServiceID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a04ddb3103a0419ce2b16b6f6e1b15123" name="a04ddb3103a0419ce2b16b6f6e1b15123"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a04ddb3103a0419ce2b16b6f6e1b15123">&#9670;&#160;</a></span>getServiceVersionID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual byte VLCB::CanService::getServiceVersionID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a8e1e9d8d43f114769e0cc42f9102875a" name="a8e1e9d8d43f114769e0cc42f9102875a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8e1e9d8d43f114769e0cc42f9102875a">&#9670;&#160;</a></span>getServiceData()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual Data VLCB::CanService::getServiceData </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a43cf90be0bb18ccba8958791bf6235b9" name="a43cf90be0bb18ccba8958791bf6235b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43cf90be0bb18ccba8958791bf6235b9">&#9670;&#160;</a></span>process()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void VLCB::CanService::process </td>
-          <td>(</td>
-          <td class="paramtype">const Action *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a name="doc-variable-members" id="doc-variable-members"></a><h2 id="header-doc-variable-members" class="groupheader">Member Data Documentation</h2>
-<a id="a8130c2fe65c53f57fa1f596513449ade" name="a8130c2fe65c53f57fa1f596513449ade"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8130c2fe65c53f57fa1f596513449ade">&#9670;&#160;</a></span>canTransport</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">CanTransport* VLCB::CanService::canTransport</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel protected">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
+<p>Construct a <a class="el" href="class_v_l_c_b_1_1_can_service.html" title="Service for sending and receiving messages on a CAN bus.">CanService</a> with a concrete <a class="el" href="class_v_l_c_b_1_1_can_transport.html" title="Interface base class for CAN transport implementations.">CanTransport</a> object to use for transmission on the CAN bus. </p>
 
 </div>
 </div>

@@ -62,7 +62,7 @@ $(function() {
   </div>
 </div>
 <script type="text/javascript">
-$(function(){initNavTree('class_v_l_c_b_1_1_consume_own_events_service.html','','class_v_l_c_b_1_1_consume_own_events_service-members'); });
+$(function(){initNavTree('class_v_l_c_b_1_1_consume_own_events_service.html','',''); });
 </script>
 <div id="container">
 <div id="doc-content">
@@ -92,6 +92,9 @@ $(function(){initNavTree('class_v_l_c_b_1_1_consume_own_events_service.html','',
 </div><!--header-->
 <div class="contents">
 
+<p><a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> for consuming events that this node has produced.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_consume_own_events_service_8h_source.html">ConsumeOwnEventsService.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for VLCB::ConsumeOwnEventsService:</div>
@@ -102,90 +105,12 @@ Inheritance diagram for VLCB::ConsumeOwnEventsService:</div>
 <area href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services." alt="VLCB::Service" shape="rect" coords="0,0,211,24"/>
   </map>
 </div></div>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a804c3263489bfa0af758b25e670796fa" id="r_a804c3263489bfa0af758b25e670796fa"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#a804c3263489bfa0af758b25e670796fa">getServiceID</a> () const override</td></tr>
-<tr class="memitem:aa3f1d0fe716abe126e4b6d9e8e3cef75" id="r_aa3f1d0fe716abe126e4b6d9e8e3cef75"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#aa3f1d0fe716abe126e4b6d9e8e3cef75">getServiceVersionID</a> () const override</td></tr>
-<tr class="memitem:acc76d43464d25505f8f71d6a0d1f651b" id="r_acc76d43464d25505f8f71d6a0d1f651b"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#acc76d43464d25505f8f71d6a0d1f651b">process</a> (const Action *action) override</td></tr>
-</table>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a804c3263489bfa0af758b25e670796fa" name="a804c3263489bfa0af758b25e670796fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a804c3263489bfa0af758b25e670796fa">&#9670;&#160;</a></span>getServiceID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a> VLCB::ConsumeOwnEventsService::getServiceID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa3f1d0fe716abe126e4b6d9e8e3cef75" name="aa3f1d0fe716abe126e4b6d9e8e3cef75"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3f1d0fe716abe126e4b6d9e8e3cef75">&#9670;&#160;</a></span>getServiceVersionID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual byte VLCB::ConsumeOwnEventsService::getServiceVersionID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acc76d43464d25505f8f71d6a0d1f651b" name="acc76d43464d25505f8f71d6a0d1f651b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc76d43464d25505f8f71d6a0d1f651b">&#9670;&#160;</a></span>process()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void VLCB::ConsumeOwnEventsService::process </td>
-          <td>(</td>
-          <td class="paramtype">const Action *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p><a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> for consuming events that this node has produced. </p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
+Consue Own Events Service API</h1>
+<p>This service is used when a user node wants to act on a produced event as if it was an incoming event. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="_consume_own_events_service_8h_source.html">ConsumeOwnEventsService.h</a></li>
 </ul>
 </div><!-- contents -->

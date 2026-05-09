@@ -92,6 +92,9 @@ $(function(){initNavTree('class_v_l_c_b_1_1_l_e_d_user_interface.html','','class
 </div><!--header-->
 <div class="contents">
 
+<p>User interface "service" that communicates with LEDs and a push button.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_l_e_d_user_interface_8h_source.html">LEDUserInterface.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for VLCB::LEDUserInterface:</div>
@@ -106,12 +109,11 @@ Inheritance diagram for VLCB::LEDUserInterface:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aeba4e2c90b821db53095f5585e9f56f6" id="r_aeba4e2c90b821db53095f5585e9f56f6"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#aeba4e2c90b821db53095f5585e9f56f6">LEDUserInterface</a> (byte greenLedPin, byte yellowLedPin, byte pushButtonPin)</td></tr>
-<tr class="memitem:a681e113def3dd7348daf53cb0d5d6bad" id="r_a681e113def3dd7348daf53cb0d5d6bad"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#a681e113def3dd7348daf53cb0d5d6bad">getServiceID</a> () const override</td></tr>
-<tr class="memitem:afa0bc5e4eb6782ca97e77fe4f15cae64" id="r_afa0bc5e4eb6782ca97e77fe4f15cae64"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#afa0bc5e4eb6782ca97e77fe4f15cae64">getServiceVersionID</a> () const override</td></tr>
-<tr class="memitem:ada988d8f8febcb373a536f05efd2ae2b" id="r_ada988d8f8febcb373a536f05efd2ae2b"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ada988d8f8febcb373a536f05efd2ae2b">isButtonPressed</a> ()</td></tr>
-<tr class="memitem:a4317cd5662cc374009eaaae33acb7dce" id="r_a4317cd5662cc374009eaaae33acb7dce"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a4317cd5662cc374009eaaae33acb7dce">process</a> (const Action *action) override</td></tr>
 </table>
-<a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>User interface "service" that communicates with LEDs and a push button. </p>
+<p>This service manages the green and yellow LEDs and mode push button on a <a class="el" href="namespace_v_l_c_b.html">VLCB</a> module. The LEDs indicate current mode and any activity. The push button allows the user to change mode. See <span class="tt"><a class="el" href="namespace_v_l_c_b.html">VLCB</a> Technical Introduction</span> document for details about how the LEDs and push button are used. </p>
+</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aeba4e2c90b821db53095f5585e9f56f6" name="aeba4e2c90b821db53095f5585e9f56f6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeba4e2c90b821db53095f5585e9f56f6">&#9670;&#160;</a></span>LEDUserInterface()</h2>
 
@@ -134,99 +136,6 @@ Public Member Functions</h2></td></tr>
           <td class="paramtype">byte</td>          <td class="paramname"><span class="paramname"><em>pushButtonPin</em></span>&#160;)</td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a681e113def3dd7348daf53cb0d5d6bad" name="a681e113def3dd7348daf53cb0d5d6bad"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a681e113def3dd7348daf53cb0d5d6bad">&#9670;&#160;</a></span>getServiceID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a> VLCB::LEDUserInterface::getServiceID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afa0bc5e4eb6782ca97e77fe4f15cae64" name="afa0bc5e4eb6782ca97e77fe4f15cae64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa0bc5e4eb6782ca97e77fe4f15cae64">&#9670;&#160;</a></span>getServiceVersionID()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual byte VLCB::LEDUserInterface::getServiceVersionID </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ada988d8f8febcb373a536f05efd2ae2b" name="ada988d8f8febcb373a536f05efd2ae2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada988d8f8febcb373a536f05efd2ae2b">&#9670;&#160;</a></span>isButtonPressed()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool VLCB::LEDUserInterface::isButtonPressed </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4317cd5662cc374009eaaae33acb7dce" name="a4317cd5662cc374009eaaae33acb7dce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4317cd5662cc374009eaaae33acb7dce">&#9670;&#160;</a></span>process()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void VLCB::LEDUserInterface::process </td>
-          <td>(</td>
-          <td class="paramtype">const Action *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>

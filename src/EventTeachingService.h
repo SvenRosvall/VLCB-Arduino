@@ -9,13 +9,13 @@
 
 namespace VLCB
 {
-/// @brief Event Teaching Service
+/// @brief Classic Event Teaching Service
 ///
 /// This service allows an Events Table to be created and managed using
 /// the MMC or similar. A full description of events can be found in
 /// the document `VLCB Event Model`.
 /// The Events Table is used by the Producer and Consumer Services.
-/// This Event Teaching Service is only rewired if one or both of these
+/// This Event Teaching Service is only required if one or both of these
 /// other services are present.
 ///
 /// There are no user functions in this service.

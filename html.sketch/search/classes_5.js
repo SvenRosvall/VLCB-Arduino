@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['minimumnodeservice_0',['MinimumNodeService',['../class_v_l_c_b_1_1_minimum_node_service.html',1,'VLCB']]]
+  ['nodevariableservice_0',['NodeVariableService',['../class_v_l_c_b_1_1_node_variable_service.html',1,'VLCB']]]
 ];

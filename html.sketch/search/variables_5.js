@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['sw_5ftr_5fhold_0',['SW_TR_HOLD',['../namespace_v_l_c_b.html#a1de0a778bf3953dd247aafa01b99a828',1,'VLCB']]]
+  ['rtr_0',['rtr',['../struct_v_l_c_b_1_1_c_a_n_frame.html#ae84bcc150586fe89acfe35e0131789d0',1,'VLCB::CANFrame']]]
 ];

@@ -137,12 +137,12 @@ void loop()
   //
   /// check CAN message buffers
   //
-  if (can2515.canp->receiveBufferPeakCount() > can2515.canp->receiveBufferSize())
+  if (can2515.receiveBufferPeak() > can2515.receiveBufferSize())
   {
     Serial << F("> receive buffer overflow") << endl;
   }
 
-  if (can2515.canp->transmitBufferPeakCount(0) > can2515.canp->transmitBufferSize(0))
+  if (can2515.transmitBufferPeak() > can2515.transmitBufferSize())
   {
     Serial << F("> transmit buffer overflow") << endl;
   }
@@ -150,7 +150,7 @@ void loop()
   //
   /// check CAN bus state
   //
-  byte s = can2515.canp->errorFlagRegister();
+  byte s = can2515.errorStatus();
   if (s != 0)
   {
     Serial << F("> error flag register is non-zero") << endl;

@@ -14,12 +14,26 @@ namespace VLCB
 
 struct VlcbMessage;
 
+/// @brief Service for sending and receiving messages on a CAN bus
+/// 
+/// Delegates to a CanTransport object to do the actual transmission on the CAN bus.
+/// @cond LIBRARY
+/// The CanService class manages the CANID which can be explicitly set or dynamically
+/// allocated via the CANID enumeration process.
+/// 
+/// It also puts incoming CANFrame's on to the ActionQueue as a VlcbMessage,
+/// and gets outgoing VlcbMessage from the ActionQueue and passes it to the CanTransport 
+/// object for transmission on the CAN bus.
+/// @endcond 
 class CanService : public Service
 {
 
 public:
+  /// Construct a CanService with a concrete CanTransport object to use for 
+  /// transmission on the CAN bus.
   CanService(CanTransport * tpt) : canTransport(tpt) {}
 
+  /// @cond LIBRARY
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() const override { return 2; }
   virtual Data getServiceData();
@@ -28,6 +42,7 @@ public:
 
 protected:
   CanTransport * canTransport;
+  /// @endcond 
 
 private:
   void handleCanServiceMessage(const VlcbMessage *msg);

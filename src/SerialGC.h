@@ -19,15 +19,13 @@ namespace VLCB
   // grid connect should be 28 characters maximum
   static const int RXBUFFERSIZE = 30;
 
-  //
-  /// an implementation of the Transport interface class
-  /// to support the gridconnect protocol over serial
-  //
-
+  /// @brief Implementation of the Transport interface class
+  /// to support the gridconnect protocol over serial connection
   class SerialGC : public CanTransport
   {
   public:
     SerialGC(typeof(Serial)& _serial = Serial) : serial(_serial) {}
+    /// @cond LIBRARY
     bool begin();
 
     virtual bool available() override;
@@ -45,6 +43,7 @@ namespace VLCB
     virtual unsigned int receiveBufferPeak() override { return 0; };
     virtual unsigned int transmitBufferPeak() override { return 0; };
     virtual unsigned int errorStatus() override { return 0; }
+    /// @endcond
 
   private:
     typeof(Serial)& serial;

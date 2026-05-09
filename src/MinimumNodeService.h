@@ -12,7 +12,8 @@ namespace VLCB
 {
 
 struct VlcbMessage;
-
+/// @brief Mandatory Service for node
+///
 /// # Minimum Node Service API
 ///
 /// This service is mandatory within the VLCB structure. It manages the setting up 
@@ -25,7 +26,7 @@ class MinimumNodeService : public Service
 {
 
 public:
-/// @cond DEVELOPER
+/// @cond LIBRARY
   virtual void process(const Action *action) override; 
 
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_MNS; }
@@ -34,11 +35,13 @@ public:
   virtual void begin() override;
 
 ///@name Backdoors for testing
-///@{
 /// Access to these functions is provided purely for the purpose of testing VLCB by forcing
 /// specific modes.
 /// Under no circumstances should these functions be called from a normal application sketch.
+///@{
+/// Forces Heartbeat on or off for testing purposes only.
   void setHeartBeat(bool f) { noHeartbeat = !f; }
+/// Forces instantMode to SETUP_MODE for testing purposes only.
   void setSetupMode();
 /// Called when ACT_CHANGE_MODE is seen on the Action bus and the current mode status is
 /// MODE_SETUP or MODE_NORMAL. It will cause the mode to revert to MODE_UNINITIALISED.
@@ -85,11 +88,12 @@ private:
   void handleModeMessage(const VlcbMessage *msg, unsigned int nn);
   
 protected:
-/// Called when ACT_MESSAGE_IN is seen on the Action bus. If the VLCB message is of
-/// relevance to the MNS, it will act upon it before removing it from the Action bus
+/// Called when ACT_MESSAGE_IN is seen in the Action queue. If the VLCB message is of
+/// relevance to the MNS, it will act upon it before removing it from the Action queue
 /// either directly or in a called function.
   virtual void handleMessage(const VlcbMessage *msg);
-  
+/// Called whenever the node number is changed.  Count is recorded and held in
+/// Minimum Node Service With Diagnostics.
   virtual void diagNodeNumberChanged() {};
 };
 /// @endcond

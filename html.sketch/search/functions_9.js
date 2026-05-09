@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['process_0',['process',['../class_v_l_c_b_1_1_can_service.html#a43cf90be0bb18ccba8958791bf6235b9',1,'VLCB::CanService::process()'],['../class_v_l_c_b_1_1_consume_own_events_service.html#acc76d43464d25505f8f71d6a0d1f651b',1,'VLCB::ConsumeOwnEventsService::process()'],['../class_v_l_c_b_1_1_event_slot_teaching_service.html#aa4f3a40fa31079a74b15af1fc0ddf4ab',1,'VLCB::EventSlotTeachingService::process()'],['../class_v_l_c_b_1_1_minimum_node_service.html#aeaeb7eb54480c0e04f939250311fbb90',1,'VLCB::MinimumNodeService::process()'],['../class_v_l_c_b_1_1_node_variable_service.html#a30c38efad8f726705c077660dbe2d53d',1,'VLCB::NodeVariableService::process()'],['../class_v_l_c_b_1_1_l_e_d_user_interface.html#a4317cd5662cc374009eaaae33acb7dce',1,'VLCB::LEDUserInterface::process()'],['../class_v_l_c_b_1_1_serial_user_interface.html#a34de819d76617d2b851b9dfee6e802b4',1,'VLCB::SerialUserInterface::process()'],['../namespace_v_l_c_b.html#af217aaaec8431562509e9df92a3ca6f0',1,'VLCB::process()']]]
+  ['readnv_0',['readNV',['../namespace_v_l_c_b.html#a99d87e91bed12fc7d3ea0ff11883cfc4',1,'VLCB']]],
+  ['resetmodule_1',['resetModule',['../namespace_v_l_c_b.html#a87f488c1538aee38c3b185c78ce33364',1,'VLCB']]]
 ];
