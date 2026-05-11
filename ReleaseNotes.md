@@ -4,6 +4,13 @@ Releases are listed on GitHub: https://github.com/SvenRosvall/VLCB-Arduino/relea
 
 # Current development - pending release
 
+Fixes:
+* Clear event table after manufacturer reset to avoid old events re-appearing.
+* Event Teaching Service updated to service version 3.
+* Provide more example sketches that communicate over serial line.
+* Update reboot method for RP2040.
+* Improve documentation for sketch developers and library developers.
+
 # 2.2.0 - Split EventTeachingService
 
 Provide service data.
