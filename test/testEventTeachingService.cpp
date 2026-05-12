@@ -95,7 +95,7 @@ void testServiceDiscovery()
   assertEquals(OPC_SD, mockTransportService->sent_messages[2].data[0]);
   assertEquals(2, mockTransportService->sent_messages[2].data[3]); // index
   assertEquals(SERVICE_ID_OLD_TEACH, mockTransportService->sent_messages[2].data[4]); // service ID
-  assertEquals(1, mockTransportService->sent_messages[2].data[5]); // version
+  assertEquals(3, mockTransportService->sent_messages[2].data[5]); // version
 }
 
 void testServiceDiscoveryEventProdSvc()
