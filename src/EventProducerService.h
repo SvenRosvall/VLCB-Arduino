@@ -28,7 +28,7 @@ public:
   /// opcode or Accessory Request Short Event opcode is received.
   void setRequestEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
 /// @cond LIBRARY
-  virtual void process(const Action * action) override;
+  virtual void process(const Action & action) override;
 
   virtual VlcbServiceTypes getServiceID() const override
   {

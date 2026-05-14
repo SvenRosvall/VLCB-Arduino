@@ -23,11 +23,11 @@ void EventProducerService::setRequestEventHandler(void (*fptr)(byte index, const
   requesteventhandler = fptr;
 }
 
-void EventProducerService::process(const Action * action)
+void EventProducerService::process(const Action & action)
 {
-  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
+  if (action.actionType == ACT_MESSAGE_IN)
   {
-    handleProdSvcMessage(&action->vlcbMessage);
+    handleProdSvcMessage(&action.vlcbMessage);
   }
 }
 

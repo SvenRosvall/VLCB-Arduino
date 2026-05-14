@@ -48,14 +48,10 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
   }
 }
 
-void EventConsumerService::process(const Action *action)
+void EventConsumerService::process(const Action &action)
 {
-  if (action == nullptr)
-  {
-    return;
-  }
 
-  switch (action->actionType)
+  switch (action.actionType)
   {
     case ACT_MESSAGE_OUT:
       if (!controller->getModuleConfig()->getFlag(PF_COE))
@@ -65,7 +61,7 @@ void EventConsumerService::process(const Action *action)
       // else Fall through: A message sent out should also be picked up by the consumer service.
 
     case ACT_MESSAGE_IN:
-      handleConsumedMessage(&action->vlcbMessage);
+      handleConsumedMessage(&action.vlcbMessage);
       break;
       
     default:

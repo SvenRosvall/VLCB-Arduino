@@ -10,11 +10,11 @@
 namespace VLCB
 {
 
-void EventSlotTeachingService::process(const Action *action)
+void EventSlotTeachingService::process(const Action &action)
 {
-  if (action != nullptr && action->actionType == ACT_MESSAGE_IN)
+  if (action.actionType == ACT_MESSAGE_IN)
   {
-    handleMessage(&action->vlcbMessage);
+    handleMessage(&action.vlcbMessage);
   }
 }
 

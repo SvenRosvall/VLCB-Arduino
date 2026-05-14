@@ -115,33 +115,31 @@ void MinimumNodeService::heartbeat()
 // MinimumNode Service processing procedure
 //
 
-void MinimumNodeService::process(const Action *action)
+void MinimumNodeService::process(const Action &action)
 {
-  if (action != nullptr)
+  switch (action.actionType)
   {
-    switch (action->actionType)
-    {
-      case ACT_CHANGE_MODE:
-        switch (instantMode)
-        {
-        case MODE_UNINITIALISED:
+    case ACT_CHANGE_MODE:
+      switch (instantMode)
+      {
+      case MODE_UNINITIALISED:
           initSetupFromUninitialised();
           break;
            
-        default:
+      default:
           // If in Setup or Normal or any invalid mode, revert back to Uninitialised mode.
           setUninitialised();
           break;
-        }
-        break;
+      }
+      break;
       
-      case ACT_RENEGOTIATE:
-        switch (instantMode)
-        {
-        case MODE_UNINITIALISED:
+    case ACT_RENEGOTIATE:
+      switch (instantMode)
+      {
+      case MODE_UNINITIALISED:
           break;
           
-        case MODE_SETUP:
+      case MODE_SETUP:
           // Cancel setup and revert to previous mode.
           instantMode = controller->getModuleConfig()->currentMode;
           controller->indicateMode(instantMode);
@@ -154,24 +152,26 @@ void MinimumNodeService::process(const Action *action)
             
           break;
            
-        case MODE_NORMAL:
+      case MODE_NORMAL:
           initSetupFromNormal();
           break;
            
-        default:
-          break;
-        }
-        break;
-      
-      case ACT_MESSAGE_IN:
-        handleMessage(&action->vlcbMessage);
-        break;
-
       default:
           break;
-    }
-  }
+      }
+      break;
+      
+    case ACT_MESSAGE_IN:
+      handleMessage(&action.vlcbMessage);
+      break;
 
+    default:
+      break;
+  }
+}
+
+void MinimumNodeService::process()
+{
   heartbeat();
 }
 

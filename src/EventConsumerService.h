@@ -28,7 +28,7 @@ public:
   /// opcode that matches an Event Table entry is received.
   void setEventHandler(void (*fptr)(byte index, const VlcbMessage *msg));
   /// @cond LIBRARY
-  virtual void process(const Action * action) override;
+  virtual void process(const Action &action) override;
 
   virtual VlcbServiceTypes getServiceID() const override 
   {

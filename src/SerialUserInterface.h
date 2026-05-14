@@ -23,11 +23,12 @@ public:
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
   virtual byte getServiceVersionID() const override { return 1; };
 
-  virtual void process(const Action *action) override;
+  virtual void process() override;
+  virtual void process(const Action &action) override;
   /// @endcond
 
 private:
-  void handleAction(const Action *action);
+  void handleAction(const Action &action);
   void processSerialInput();
   void indicateMode(VlcbModeParams i);
 };

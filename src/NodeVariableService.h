@@ -25,7 +25,7 @@ public:
   /// @cond LIBRARY
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NV; }
   virtual byte getServiceVersionID() const override { return 1; }
-  virtual void process(const Action * action) override;
+  virtual void process(const Action &action) override;
   virtual Data getServiceData() override;
   /// @endcond 
 

@@ -12,11 +12,14 @@ extern void printConfig();
 namespace VLCB
 {
 
-void SerialUserInterface::process(const Action *action)
+void SerialUserInterface::process()
+{
+  processSerialInput();
+}
+
+void SerialUserInterface::process(const Action &action)
 {
   handleAction(action);
-  
-  processSerialInput();
 }
 
 void SerialUserInterface::processSerialInput()
@@ -140,14 +143,9 @@ void SerialUserInterface::processSerialInput()
   }
 }
 
-void SerialUserInterface::handleAction(const Action *action)
+void SerialUserInterface::handleAction(const Action &action)
 {
-  if (action == nullptr)
-  {
-    return;
-  }
-
-  switch (action->actionType)
+  switch (action.actionType)
   {
     case ACT_INDICATE_ACTIVITY:
       // Don't indicate this. Too noisy.
@@ -158,7 +156,7 @@ void SerialUserInterface::handleAction(const Action *action)
       break;
 
     case ACT_INDICATE_MODE:
-      indicateMode(action->mode);
+      indicateMode(action.mode);
       break;
 
     default:

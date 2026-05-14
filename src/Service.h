@@ -55,16 +55,19 @@ public:
   /// 
   /// Implementing service classes shall implement this to perform tasks specific to that service
   /// such as polling for changes of input pins.
+  virtual void process() {};
+  
+  /// @brief Called when there is an action available.
   /// 
-  /// It takes a pointer to an Action that needs to be processed or a null pointer if there is
-  /// no Action to be processed.
-  virtual void process(const Action * action) = 0;
+  /// @param action The action that the service may have interest in.
+  virtual void process(const Action & action) {};
 
   /// @brief Report a given diagnostic value
   /// 
   /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
   /// @param diagnosticsCode code for the diagnostic to report. This code is specific to the implemented service.
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode);
+
   /// @brief Report all diagnostics available for a service.
   /// 
   /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
