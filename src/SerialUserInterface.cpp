@@ -169,15 +169,15 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
   switch (mode) 
   {
     case MODE_NORMAL:
-      Serial << "Module in NORMAL mode" << endl;
+      Serial << F("Module in NORMAL mode") << endl;
       break;
 
     case MODE_UNINITIALISED:
-      Serial << "Module in UNINITIALISED mode" << endl;
+      Serial << F("Module in UNINITIALISED mode") << endl;
       break;
 
     case MODE_SETUP:
-      Serial << "Module in SETUP mode" << endl;
+      Serial << F("Module in SETUP mode") << endl;
       break;
 
     default:
