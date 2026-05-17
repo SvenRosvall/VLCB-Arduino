@@ -28,7 +28,7 @@ class MinimumNodeService : public Service
 public:
   /// @cond LIBRARY
   virtual void process() override; 
-  virtual void process(const Action &action) override; 
+  virtual void processAction(const Action &action) override; 
 
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_MNS; }
   virtual byte getServiceVersionID() const override { return 1; }

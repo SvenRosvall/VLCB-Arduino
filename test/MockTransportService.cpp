@@ -16,7 +16,7 @@ void MockTransportService::process()
   }
 }
 
-void MockTransportService::process(const VLCB::Action &action)
+void MockTransportService::processAction(const VLCB::Action &action)
 {
   switch (action.actionType)
   {

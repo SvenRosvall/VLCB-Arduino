@@ -10,7 +10,7 @@
 namespace VLCB
 {
 
-void EventSlotTeachingService::process(const Action &action)
+void EventSlotTeachingService::processAction(const Action &action)
 {
   if (action.actionType == ACT_MESSAGE_IN)
   {

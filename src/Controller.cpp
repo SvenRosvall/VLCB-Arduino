@@ -164,11 +164,12 @@ void Controller::process()
   //Serial << F("Ctrl::process() start, action queue size = ") << actionQueue.size();
   if (actionQueue.available())
   {
+    // Get the next action and store it locally so that it is not overwritten if the action queue gets full.
     Action action = actionQueue.pop();
     //Serial << F(" action type = ") << action.actionType << endl;
     for (Service *service: services)
     {
-      service->process(action);
+      service->processAction(action);
     }
   }
 

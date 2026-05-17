@@ -43,7 +43,7 @@ class LongMessageService : public Service
 public:
 
   virtual void process() override;
-  virtual void process(const Action &action) override;
+  virtual void processAction(const Action &action) override;
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
   virtual void processReceivedMessageFragment(const VlcbMessage *frame);

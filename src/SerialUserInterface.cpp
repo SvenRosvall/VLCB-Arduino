@@ -17,7 +17,7 @@ void SerialUserInterface::process()
   processSerialInput();
 }
 
-void SerialUserInterface::process(const Action &action)
+void SerialUserInterface::processAction(const Action &action)
 {
   handleAction(action);
 }

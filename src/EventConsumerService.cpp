@@ -48,7 +48,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
   }
 }
 
-void EventConsumerService::process(const Action &action)
+void EventConsumerService::processAction(const Action &action)
 {
 
   switch (action.actionType)

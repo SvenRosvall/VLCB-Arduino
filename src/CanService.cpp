@@ -33,7 +33,7 @@ void CanService::process()
   checkCANenumTimout();
 }
 
-void CanService::process(const Action &action)
+void CanService::processAction(const Action &action)
 {
   switch (action.actionType)
   {

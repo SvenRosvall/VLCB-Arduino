@@ -43,7 +43,7 @@ void LEDUserInterface::process()
   checkRequestedAction();
 }
 
-void LEDUserInterface::process(const Action &action)
+void LEDUserInterface::processAction(const Action &action)
 {
   switch (action.actionType)
   {

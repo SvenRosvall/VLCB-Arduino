@@ -11,7 +11,7 @@
 namespace VLCB
 {
 
-void EventTeachingService::process(const Action &action)
+void EventTeachingService::processAction(const Action &action)
 {
   if (action.actionType == ACT_MESSAGE_IN)
   {

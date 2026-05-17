@@ -30,7 +30,7 @@ public:
 
   bool isButtonPressed();
   virtual void process() override;
-  virtual void process(const Action &action) override;
+  virtual void processAction(const Action &action) override;
   /// @endcond 
 
 private:

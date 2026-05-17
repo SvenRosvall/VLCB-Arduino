@@ -33,7 +33,7 @@ void LongMessageService::subscribe(byte *stream_ids, const byte num_stream_ids, 
 	// DEBUG_SERIAL << F("> subscribe: num_stream_ids = ") << num_stream_ids << F(", receive_buff_len = ") << receive_buff_len << endl;
 }
 
-void LongMessageService::process(const Action &action)
+void LongMessageService::processAction(const Action &action)
 {
   if (action.actionType == ACT_MESSAGE_IN)
   {

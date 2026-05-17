@@ -115,7 +115,7 @@ void MinimumNodeService::heartbeat()
 // MinimumNode Service processing procedure
 //
 
-void MinimumNodeService::process(const Action &action)
+void MinimumNodeService::processAction(const Action &action)
 {
   switch (action.actionType)
   {

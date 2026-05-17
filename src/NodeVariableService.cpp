@@ -11,7 +11,7 @@
 namespace VLCB
 {
 
-void NodeVariableService::process(const Action &action)
+void NodeVariableService::processAction(const Action &action)
 {
   if (action.actionType == ACT_MESSAGE_IN)
   {

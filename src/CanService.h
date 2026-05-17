@@ -39,7 +39,7 @@ public:
   virtual Data getServiceData();
 
   virtual void process() override;
-  virtual void process(const Action &action) override;
+  virtual void processAction(const Action &action) override;
 
 protected:
   CanTransport * canTransport;

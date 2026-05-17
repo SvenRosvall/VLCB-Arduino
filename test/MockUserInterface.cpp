@@ -8,7 +8,7 @@
 #include "MockUserInterface.h"
 #include "Controller.h"
 
-void MockUserInterface::process(const VLCB::Action &action)
+void MockUserInterface::processAction(const VLCB::Action &action)
 {
   if (action.actionType == VLCB::ACT_INDICATE_MODE)
   {

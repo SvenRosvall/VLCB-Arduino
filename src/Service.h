@@ -60,7 +60,7 @@ public:
   /// @brief Called when there is an action available.
   /// 
   /// @param action The action that the service may have interest in.
-  virtual void process(const Action & action) {};
+  virtual void processAction(const Action & action) {};
 
   /// @brief Report a given diagnostic value
   /// 

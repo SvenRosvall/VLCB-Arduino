@@ -23,7 +23,7 @@ public:
   virtual byte getServiceVersionID() const override { return 1; }
 
   virtual void process() override;
-  virtual void process(const VLCB::Action & action) override;
+  virtual void processAction(const VLCB::Action & action) override;
 
   // Mock support to inject messages to be received and inspect sent messages
   void setNextMessage(VLCB::VlcbMessage msg);
