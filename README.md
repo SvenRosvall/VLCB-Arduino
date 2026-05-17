@@ -16,7 +16,7 @@ See below under [Credits](#credits).
 This library is intended for module developers to make it as easy as
 possible to create new VLCB module types.
 You don't need to understand the internals of the library to use it.
-Refer to [sketch development](docs/SketchDevelopment.md) document for
+Refer to the [sketch development](docs/SketchDevelopment.md) document for
 more information on how to develop your own VLCB module.
 
 ## Library development
