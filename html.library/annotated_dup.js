@@ -27,7 +27,6 @@ var annotated_dup =
       [ "EventSlotTeachingService", "class_v_l_c_b_1_1_event_slot_teaching_service.html", "class_v_l_c_b_1_1_event_slot_teaching_service" ],
       [ "EventTeachingService", "class_v_l_c_b_1_1_event_teaching_service.html", "class_v_l_c_b_1_1_event_teaching_service" ],
       [ "EventTeachingServiceWithDiagnostics", "class_v_l_c_b_1_1_event_teaching_service_with_diagnostics.html", "class_v_l_c_b_1_1_event_teaching_service_with_diagnostics" ],
-      [ "flash_page_t", "struct_v_l_c_b_1_1flash__page__t.html", "struct_v_l_c_b_1_1flash__page__t" ],
       [ "FlashStorage", "class_v_l_c_b_1_1_flash_storage.html", "class_v_l_c_b_1_1_flash_storage" ],
       [ "LED", "class_v_l_c_b_1_1_l_e_d.html", "class_v_l_c_b_1_1_l_e_d" ],
       [ "LEDUserInterface", "class_v_l_c_b_1_1_l_e_d_user_interface.html", "class_v_l_c_b_1_1_l_e_d_user_interface" ],

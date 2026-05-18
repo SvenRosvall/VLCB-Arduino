@@ -111,7 +111,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad96ed22091a5d21b9beaad36d24d3fb3" id="r_ad96ed22091a5d21b9beaad36d24d3fb3"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad96ed22091a5d21b9beaad36d24d3fb3">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:ad96ed22091a5d21b9beaad36d24d3fb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:a554fcf50e1a5a04570716c05b105f31d" id="r_a554fcf50e1a5a04570716c05b105f31d"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a554fcf50e1a5a04570716c05b105f31d">getServiceVersionID</a> () const override</td></tr>
-<tr class="memdesc:a554fcf50e1a5a04570716c05b105f31d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the implementation of this service.  <br /></td></tr>
+<tr class="memdesc:a554fcf50e1a5a04570716c05b105f31d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the service specification implemented by this service.  <br /></td></tr>
 <tr class="memitem:ab1cffa56bc27fba267c9573369117298" id="r_ab1cffa56bc27fba267c9573369117298"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#ab1cffa56bc27fba267c9573369117298">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
 <tr class="memdesc:ab1cffa56bc27fba267c9573369117298"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
 <tr class="inherit_header pub_methods_class_v_l_c_b_1_1_service"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_class_v_l_c_b_1_1_service')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_service.html">VLCB::Service</a></td></tr>
@@ -192,8 +192,8 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the version of the implementation of this service. </p>
-<p>This version is used by configuration utilities to identify any updated features in the service. </p>
+<p>Return the version of the service specification implemented by this service. </p>
+<p>This version is used by configuration utilities to identify which features are implemented by this service. </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#aa5a83565c5d79516810e41e4dfcfdfa3">VLCB::Service</a>.</p>
 

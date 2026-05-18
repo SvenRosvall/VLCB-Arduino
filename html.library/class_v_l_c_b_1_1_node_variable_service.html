@@ -111,7 +111,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ab4c0930949c451b1da8d9d43b0e71596" id="r_ab4c0930949c451b1da8d9d43b0e71596"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab4c0930949c451b1da8d9d43b0e71596">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:ab4c0930949c451b1da8d9d43b0e71596"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:af3e62cced2dbdf3b016e98b004b33c2f" id="r_af3e62cced2dbdf3b016e98b004b33c2f"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#af3e62cced2dbdf3b016e98b004b33c2f">getServiceVersionID</a> () const override</td></tr>
-<tr class="memdesc:af3e62cced2dbdf3b016e98b004b33c2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the implementation of this service.  <br /></td></tr>
+<tr class="memdesc:af3e62cced2dbdf3b016e98b004b33c2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the service specification implemented by this service.  <br /></td></tr>
 <tr class="memitem:a18033514d71cd627b94ba07e829c7030" id="r_a18033514d71cd627b94ba07e829c7030"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a18033514d71cd627b94ba07e829c7030">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
 <tr class="memdesc:a18033514d71cd627b94ba07e829c7030"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
 <tr class="memitem:a36cdcc232a891705634214c8fb5cef4d" id="r_a36cdcc232a891705634214c8fb5cef4d"><td class="memItemLeft">virtual <a class="el" href="struct_v_l_c_b_1_1_service_1_1_data.html">Data</a>&#160;</td><td class="memItemRight"><a class="el" href="#a36cdcc232a891705634214c8fb5cef4d">getServiceData</a> () override</td></tr>
@@ -193,8 +193,8 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Return the version of the implementation of this service. </p>
-<p>This version is used by configuration utilities to identify any updated features in the service. </p>
+<p>Return the version of the service specification implemented by this service. </p>
+<p>This version is used by configuration utilities to identify which features are implemented by this service. </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#aa5a83565c5d79516810e41e4dfcfdfa3">VLCB::Service</a>.</p>
 

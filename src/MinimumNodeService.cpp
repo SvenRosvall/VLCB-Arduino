@@ -11,7 +11,7 @@
 namespace VLCB
 {
 
-void copyName(uint8_t *dest, const char *name)
+static void copyName(uint8_t *dest, const char *name)
 {
   int i = 0;
   for (; i < 7 ; ++i)
