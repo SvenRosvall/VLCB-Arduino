@@ -18,26 +18,63 @@ struct Action;
 /// 
 /// Each VLCB module sketch shall be set up with a list of services that 
 /// define capabilities of the module. 
+/// @cond LIBRARY
+/// This class defines the interface that each such service class must implement.
+/// @endcond
 class Service
 {
 /// @cond LIBRARY
 protected:
-  bool isThisNodeNumber(unsigned int nn);
+  /// Helper function to decide if a given node number is the same as what is assigned to this node.
+  bool isThisNodeNumber(unsigned int nodeNumber);
 
+  /// Pointer to the Controller object that can be used by implementing classes.
   Controller * controller;
 
 public:
+  /// Set a pointer to the controller object for use in implementing class.
   void setController(Controller * ctrl) { this->controller = ctrl; }
+  
+  /// @brief This optional method is called at the beginning of the Arduino sketch.
+  /// Define this method for the service to do any setup required at the beginning. 
   virtual void begin() {}
+  
+  /// @brief Return a unique ID for this service.
+  /// 
+  /// This ID is used by configuration utilities to identify the service type.
+  /// The service IDs are listed in the VLCB service specifications.
   virtual VlcbServiceTypes getServiceID() const = 0;
+  
+  /// @brief Return the version of the service specification implemented by this service.
+  ///
+  /// This version is used by configuration utilities to identify which features are
+  /// implemented by this service.
   virtual byte getServiceVersionID() const = 0;
 
+  /// @brief This method that be called regularly from the VLCB core.
+  /// 
+  /// Implementing service classes shall implement this to perform tasks specific to that service
+  /// such as polling for changes of input pins.
+  /// 
+  /// It takes a pointer to an Action that needs to be processed or a null pointer if there is
+  /// no Action to be processed.
   virtual void process(const Action * action) = 0;
 
+  /// @brief Report a given diagnostic value
+  /// 
+  /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
+  /// @param diagnosticsCode code for the diagnostic to report. This code is specific to the implemented service.
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode);
+  /// @brief Report all diagnostics available for a service.
+  /// 
+  /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
   virtual void reportAllDiagnostics(byte serviceIndex);
 
+  /// Container for service data bytes.
   struct Data { byte data1, data2, data3; };
+
+  /// @brief Return Data bytes specific for the implementing service. 
+  /// The meaning of each data byte is defined in the service specification.
   virtual Data getServiceData();
 /// @endcond
 };
