@@ -3,16 +3,33 @@
 # VLCB-Arduino
 This project implements an Arduino library for [VLCB](https://github.com/Versatile-LCB/VLCB-documents) running over CAN bus.
 VLCB is an extension of [CBUS](https://www.merg.org.uk/resources/cbus). 
+It fascilitates development of new VLCB modules as Arduino sketches.
 
 CBUS(R) is a registered trademark of Dr. Michael Bolton.
 
 This VLCB library code is based on a [CBUS library](https://github.com/MERG-DEV/CBUS) created by Duncan Greenwood
 and extended by members of [MERG](https://www.merg.org.uk/). 
-See below under Credits.
+See below under [Credits](#credits).
 
-See [Design documents](docs/Design.md) for how this library is structured.
+## Developing a sketch for a VLCB module
 
-There will be documentation for sketch authors that describe how to use this library.
+This library is intended for module developers to make it as easy as
+possible to create new VLCB module types.
+You don't need to understand the internals of the library to use it.
+Refer to the [sketch development](docs/SketchDevelopment.md) document for
+more information on how to develop your own VLCB module.
+
+## Library development
+
+This VLCB library is built with an object-oriented architecture
+described in the [design document](docs/Design.md).
+It uses a `Controller` object for the core tasks, a `Configuration`
+object for storing module configurations and a set of [services](docs/Service.md).
+The [Full API documentation](html.library/index.html) describes all of these
+objects.
+
+If you want to share improvements please create a branch of the respository
+and create a pull request.
 
 ## File Structure
 This library consists of the following sub-directories and files:
@@ -63,27 +80,10 @@ Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 l
 Support for Raspberry Pi Pico boards is provided by Martin Da Costa
 in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).
 
-## Developing a sketch for a VLCB module
-
-This library is intended for module developers to make it as easy as
-possible to create new module types. 
-You don't need to understand the internals of the library to use it.
-Refer to [sketch development](docs/SketchDevelopment.md) document for
-more information on how to develop your own VLCB module.
-
-## Library development
-
-This VLCB library is built with an object-oriented architecture
-described in the [design document](Design.md).
-It uses a `Controller` object for the core tasks, a `Configuration`
-object for storing module configurations and a set of [services](Service.md).
-The [Full API documentation](html.library/index.html) describes all of these 
-objects.
-
 ## Getting help and support
 
 If you have any questions or suggestions please contact the library maintainers
-by email to vlcb@rosvall.ie or create an issue in GitHub.
+by email to vlcb@rosvall.ie or create an [issue in GitHub](https://github.com/SvenRosvall/VLCB-Arduino/issues).
 
 ## Credits
 
