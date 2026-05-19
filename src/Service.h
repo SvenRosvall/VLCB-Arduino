@@ -25,7 +25,7 @@ class Service
 {
 /// @cond LIBRARY
 protected:
-  /// Helper function to decide if a given node number is the same as what is assigned to this node.
+  /// Helper function to decide if a given node number is the same as that assigned to this node.
   bool isThisNodeNumber(unsigned int nodeNumber);
 
   /// Pointer to the Controller object that can be used by implementing classes.
