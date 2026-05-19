@@ -51,13 +51,16 @@ public:
   /// implemented by this service.
   virtual byte getServiceVersionID() const = 0;
 
-  /// @brief This method that be called regularly from the VLCB core.
+  /// @brief This method that be called regularly from the VLCB core to let the service perform regular tasks.
   /// 
   /// Implementing service classes shall implement this to perform tasks specific to that service
   /// such as polling for changes of input pins.
+  /// This method does not need to be implemented if there are no such regular tasks for the service.
   virtual void process() {};
   
   /// @brief Called when there is an action available.
+  /// 
+  /// This method does not need to be implemented if the service does react to any actions.
   /// 
   /// @param action The action that the service may have interest in.
   virtual void processAction(const Action & action) {};

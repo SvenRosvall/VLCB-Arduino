@@ -110,8 +110,8 @@ Inheritance diagram for VLCB::EventTeachingService:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a898866e9d213ec25c6627d5f6ae81312" id="r_a898866e9d213ec25c6627d5f6ae81312"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a898866e9d213ec25c6627d5f6ae81312">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
-<tr class="memdesc:a898866e9d213ec25c6627d5f6ae81312"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
+<tr class="memitem:afc1ecf0082fef56f6a6b83d124a063ce" id="r_afc1ecf0082fef56f6a6b83d124a063ce"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#afc1ecf0082fef56f6a6b83d124a063ce">processAction</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;action) override</td></tr>
+<tr class="memdesc:afc1ecf0082fef56f6a6b83d124a063ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when there is an action available.  <br /></td></tr>
 <tr class="memitem:a03966bf08ffa4c1c542d7fb81b0c5ef1" id="r_a03966bf08ffa4c1c542d7fb81b0c5ef1"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#a03966bf08ffa4c1c542d7fb81b0c5ef1">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:a03966bf08ffa4c1c542d7fb81b0c5ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:ae189b00ec4a27545052bc98ea45bf404" id="r_ae189b00ec4a27545052bc98ea45bf404"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#ae189b00ec4a27545052bc98ea45bf404">getServiceVersionID</a> () const override</td></tr>
@@ -127,6 +127,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:af44e970aef06e5ad14ac11af6584a39b inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a pointer to the controller object for use in implementing class.  <br /></td></tr>
 <tr class="memitem:ad68d3a41fc077fe1eb3398d035f90129 inherit pub_methods_class_v_l_c_b_1_1_service" id="r_ad68d3a41fc077fe1eb3398d035f90129"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#ad68d3a41fc077fe1eb3398d035f90129">begin</a> ()</td></tr>
 <tr class="memdesc:ad68d3a41fc077fe1eb3398d035f90129 inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">This optional method is called at the beginning of the Arduino sketch. Define this method for the service to do any setup required at the beginning.  <br /></td></tr>
+<tr class="memitem:a1fbded51bba05e0eb81047ca5bef5ac2 inherit pub_methods_class_v_l_c_b_1_1_service" id="r_a1fbded51bba05e0eb81047ca5bef5ac2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a1fbded51bba05e0eb81047ca5bef5ac2">process</a> ()</td></tr>
+<tr class="memdesc:a1fbded51bba05e0eb81047ca5bef5ac2 inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core to let the service perform regular tasks.  <br /></td></tr>
 <tr class="memitem:a3118e27d99fb094e431b9e76be39d259 inherit pub_methods_class_v_l_c_b_1_1_service" id="r_a3118e27d99fb094e431b9e76be39d259"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a3118e27d99fb094e431b9e76be39d259">reportDiagnostics</a> (byte serviceIndex, byte diagnosticsCode)</td></tr>
 <tr class="memdesc:a3118e27d99fb094e431b9e76be39d259 inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report a given diagnostic value.  <br /></td></tr>
 <tr class="memitem:a95f4c25466ca323eda30a263d262d0c9 inherit pub_methods_class_v_l_c_b_1_1_service" id="r_a95f4c25466ca323eda30a263d262d0c9"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a95f4c25466ca323eda30a263d262d0c9">reportAllDiagnostics</a> (byte serviceIndex)</td></tr>
@@ -152,8 +154,8 @@ Additional Inherited Members</h2></td></tr>
 <p>This service allows an Events Table to be created and managed using the MMC or similar. A full description of events can be found in the document <span class="tt"><a class="el" href="namespace_v_l_c_b.html">VLCB</a> Event Model</span>. The Events Table is used by the Producer and Consumer Services. This Event Teaching <a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> is only required if one or both of these other services are present.</p>
 <p>There are no user functions in this service. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a898866e9d213ec25c6627d5f6ae81312" name="a898866e9d213ec25c6627d5f6ae81312"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a898866e9d213ec25c6627d5f6ae81312">&#9670;&#160;</a></span>process()</h2>
+<a id="afc1ecf0082fef56f6a6b83d124a063ce" name="afc1ecf0082fef56f6a6b83d124a063ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc1ecf0082fef56f6a6b83d124a063ce">&#9670;&#160;</a></span>processAction()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -162,9 +164,9 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void VLCB::EventTeachingService::process </td>
+          <td class="memname">void VLCB::EventTeachingService::processAction </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -175,11 +177,16 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core. </p>
-<p>Implementing service classes shall implement this to perform tasks specific to that service such as polling for changes of input pins.</p>
-<p>It takes a pointer to an <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> that needs to be processed or a null pointer if there is no <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> to be processed. </p>
+<p>Called when there is an action available. </p>
+<p>This method does not need to be implemented if the service does react to any actions.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action that the service may have interest in. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#a404393cfe90193db0675e75afbf5142d">VLCB::Service</a>.</p>
+<p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a7198d79026d95a05148518d85d0aec6b">VLCB::Service</a>.</p>
 
 </div>
 </div>
