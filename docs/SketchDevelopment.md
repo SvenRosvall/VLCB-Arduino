@@ -112,12 +112,14 @@ This is the recommended style.
 
 These sketches follow a structure with certain elements in order:
 1. Declaration of constants and global objects that are used in the sketch.
-2. The `setup()` function. This is usually split up into a setupVlcb() where all the
-VLCB specific parameters are set up such as manufacturer and module ID and what
-services will be used.
-The list of services are described [here](../html.sketch/class_v_l_c_b_1_1_service.html).
-The other setup part is the function setupModule() where all module specific
-things are set up such as I/O pins.
+2. The `setup()` function. This is usually split up into two functions that
+set up different things.
+   1. `setupVlcb()` where all the VLCB specific parameters are set up such
+   as manufacturer and module ID and what services will be used.
+   The list of services are described [here](../html.sketch/class_v_l_c_b_1_1_service.html).
+   Note that the service [MinimumNodeService](../html.sketch/class_v_l_c_b_1_1_minimum_node_service.html) must be included in this list.
+   1. The other setup part is the function `setupModule()` where all module specific
+   things are set up such as I/O pins.
 3. The `loop()` function. This is where all the recurring tasks happen such as
 calling `VLCB::process()` which does all the internal processing of VLCB.
 4. Any other supporting functions such as event handlers and checking for

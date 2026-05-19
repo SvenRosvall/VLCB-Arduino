@@ -9,9 +9,9 @@
 namespace VLCB
 {
 
-bool Service::isThisNodeNumber(unsigned int nn)
+bool Service::isThisNodeNumber(unsigned int nodeNumber)
 {
-  return nn == controller->getModuleConfig()->nodeNum;
+  return nodeNumber == controller->getModuleConfig()->nodeNum;
 }
 
 void Service::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)

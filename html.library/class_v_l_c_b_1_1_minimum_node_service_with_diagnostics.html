@@ -107,12 +107,18 @@ Inheritance diagram for VLCB::MinimumNodeServiceWithDiagnostics:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a12f114ad3a31fbb3df279938d6378a48" id="r_a12f114ad3a31fbb3df279938d6378a48"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a12f114ad3a31fbb3df279938d6378a48">reportDiagnostics</a> (byte serviceIndex, byte diagnosticsCode) override</td></tr>
+<tr class="memdesc:a12f114ad3a31fbb3df279938d6378a48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report a given diagnostic value.  <br /></td></tr>
 <tr class="memitem:ae94cbdf82773e4a2f5d432ac10cff360" id="r_ae94cbdf82773e4a2f5d432ac10cff360"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#ae94cbdf82773e4a2f5d432ac10cff360">reportAllDiagnostics</a> (byte serviceIndex) override</td></tr>
+<tr class="memdesc:ae94cbdf82773e4a2f5d432ac10cff360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report all diagnostics available for a service.  <br /></td></tr>
 <tr class="inherit_header pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_class_v_l_c_b_1_1_minimum_node_service')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html">VLCB::MinimumNodeService</a></td></tr>
 <tr class="memitem:a96ec21fcdcd84adc1334a9b42fd51053 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_a96ec21fcdcd84adc1334a9b42fd51053"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#a96ec21fcdcd84adc1334a9b42fd51053">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
+<tr class="memdesc:a96ec21fcdcd84adc1334a9b42fd51053 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
 <tr class="memitem:a248e09a2503a4027ee267e83ea2a3f22 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_a248e09a2503a4027ee267e83ea2a3f22"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#a248e09a2503a4027ee267e83ea2a3f22">getServiceID</a> () const override</td></tr>
+<tr class="memdesc:a248e09a2503a4027ee267e83ea2a3f22 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:a36d1ea088521b56ef469131d2ca15aa0 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_a36d1ea088521b56ef469131d2ca15aa0"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#a36d1ea088521b56ef469131d2ca15aa0">getServiceVersionID</a> () const override</td></tr>
+<tr class="memdesc:a36d1ea088521b56ef469131d2ca15aa0 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the implementation of this service.  <br /></td></tr>
 <tr class="memitem:afbe4ce0704b3d7b7109c64594d215dfe inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_afbe4ce0704b3d7b7109c64594d215dfe"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#afbe4ce0704b3d7b7109c64594d215dfe">begin</a> () override</td></tr>
+<tr class="memdesc:afbe4ce0704b3d7b7109c64594d215dfe inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">This optional method is called at the beginning of the Arduino sketch. Define this method for the service to do any setup required at the beginning.  <br /></td></tr>
 <tr class="memitem:a7df24dbba3f091017e37f5b893318bf8 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_a7df24dbba3f091017e37f5b893318bf8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#a7df24dbba3f091017e37f5b893318bf8">setHeartBeat</a> (bool f)</td></tr>
 <tr class="memitem:ab88b75a144d7bcbd9258a19ce8af0a1e inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service" id="r_ab88b75a144d7bcbd9258a19ce8af0a1e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_minimum_node_service.html#ab88b75a144d7bcbd9258a19ce8af0a1e">setSetupMode</a> ()</td></tr>
 <tr class="memdesc:ab88b75a144d7bcbd9258a19ce8af0a1e inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forces instantMode to SETUP_MODE for testing purposes only.  <br /></td></tr>
@@ -121,19 +127,23 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a535e72e0cc1d642a63bd52520d8b71a3 inherit pub_methods_class_v_l_c_b_1_1_minimum_node_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when OPC_SNN is received. It will set MODE_NORMAL and the node number to nn.  <br /></td></tr>
 <tr class="inherit_header pub_methods_class_v_l_c_b_1_1_service"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_class_v_l_c_b_1_1_service')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_service.html">VLCB::Service</a></td></tr>
 <tr class="memitem:af44e970aef06e5ad14ac11af6584a39b inherit pub_methods_class_v_l_c_b_1_1_service" id="r_af44e970aef06e5ad14ac11af6584a39b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#af44e970aef06e5ad14ac11af6584a39b">setController</a> (<a class="el" href="class_v_l_c_b_1_1_controller.html">Controller</a> *ctrl)</td></tr>
+<tr class="memdesc:af44e970aef06e5ad14ac11af6584a39b inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a pointer to the controller object for use in implementing class.  <br /></td></tr>
 <tr class="memitem:ab0ced3d6218914eee7508b60b1fd6ffa inherit pub_methods_class_v_l_c_b_1_1_service" id="r_ab0ced3d6218914eee7508b60b1fd6ffa"><td class="memItemLeft">virtual <a class="el" href="struct_v_l_c_b_1_1_service_1_1_data.html">Data</a>&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#ab0ced3d6218914eee7508b60b1fd6ffa">getServiceData</a> ()</td></tr>
+<tr class="memdesc:ab0ced3d6218914eee7508b60b1fd6ffa inherit pub_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <a class="el" href="struct_v_l_c_b_1_1_service_1_1_data.html" title="Container for service data bytes.">Data</a> bytes specific for the implementing service. The meaning of each data byte is defined in the service specification.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a9692484d10faff803416560d7a3697e2" id="r_a9692484d10faff803416560d7a3697e2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a9692484d10faff803416560d7a3697e2">handleMessage</a> (const <a class="el" href="struct_v_l_c_b_1_1_vlcb_message.html">VlcbMessage</a> *msg) override</td></tr>
 <tr class="memitem:a973bac5ed4fffa3fcf1a2c1bc5f083d2" id="r_a973bac5ed4fffa3fcf1a2c1bc5f083d2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a973bac5ed4fffa3fcf1a2c1bc5f083d2">diagNodeNumberChanged</a> () override</td></tr>
 <tr class="inherit_header pro_methods_class_v_l_c_b_1_1_service"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_methods_class_v_l_c_b_1_1_service')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_service.html">VLCB::Service</a></td></tr>
-<tr class="memitem:a8f0fe6d2d41e8520aed3697a1bb6e624 inherit pro_methods_class_v_l_c_b_1_1_service" id="r_a8f0fe6d2d41e8520aed3697a1bb6e624"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a8f0fe6d2d41e8520aed3697a1bb6e624">isThisNodeNumber</a> (unsigned int nn)</td></tr>
+<tr class="memitem:a5a30a8834124c27deb2d90a07c61a7a3 inherit pro_methods_class_v_l_c_b_1_1_service" id="r_a5a30a8834124c27deb2d90a07c61a7a3"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a5a30a8834124c27deb2d90a07c61a7a3">isThisNodeNumber</a> (unsigned int nodeNumber)</td></tr>
+<tr class="memdesc:a5a30a8834124c27deb2d90a07c61a7a3 inherit pro_methods_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper function to decide if a given node number is the same as what is assigned to this node.  <br /></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-inherited" class="groupheader"><a id="inherited" name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_class_v_l_c_b_1_1_service"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pro_attribs_class_v_l_c_b_1_1_service')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Protected Attributes inherited from <a class="el" href="class_v_l_c_b_1_1_service.html">VLCB::Service</a></td></tr>
 <tr class="memitem:a50e13262cee7886d32588cffe2e8a208 inherit pro_attribs_class_v_l_c_b_1_1_service" id="r_a50e13262cee7886d32588cffe2e8a208"><td class="memItemLeft"><a class="el" href="class_v_l_c_b_1_1_controller.html">Controller</a> *&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html#a50e13262cee7886d32588cffe2e8a208">controller</a></td></tr>
+<tr class="memdesc:a50e13262cee7886d32588cffe2e8a208 inherit pro_attribs_class_v_l_c_b_1_1_service"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to the <a class="el" href="class_v_l_c_b_1_1_controller.html" title="Main object in VLCB. Coordinates transport, ui, configuration and services.">Controller</a> object that can be used by implementing classes.  <br /></td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a12f114ad3a31fbb3df279938d6378a48" name="a12f114ad3a31fbb3df279938d6378a48"></a>
@@ -163,6 +173,15 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
+<p>Report a given diagnostic value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serviceIndex</td><td>index of the service. Not used by the implementation, just passed through to the response message. </td></tr>
+    <tr><td class="paramname">diagnosticsCode</td><td>code for the diagnostic to report. This code is specific to the implemented service. </td></tr>
+  </table>
+  </dd>
+</dl>
+
 <p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a3118e27d99fb094e431b9e76be39d259">VLCB::Service</a>.</p>
 
 </div>
@@ -189,6 +208,14 @@ Additional Inherited Members</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Report all diagnostics available for a service. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">serviceIndex</td><td>index of the service. Not used by the implementation, just passed through to the response message. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a95f4c25466ca323eda30a263d262d0c9">VLCB::Service</a>.</p>
 
