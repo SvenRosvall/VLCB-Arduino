@@ -107,13 +107,10 @@ Inheritance diagram for VLCB::FlashStorage:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae9d6edb59f6fd9c28387f715724c10da" id="r_ae9d6edb59f6fd9c28387f715724c10da"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#ae9d6edb59f6fd9c28387f715724c10da">begin</a> () override</td></tr>
 <tr class="memitem:a90c41af0e0fc3a4f1026eda503b892a7" id="r_a90c41af0e0fc3a4f1026eda503b892a7"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a90c41af0e0fc3a4f1026eda503b892a7">read</a> (unsigned int eeaddress) override</td></tr>
-<tr class="memdesc:a90c41af0e0fc3a4f1026eda503b892a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a single byte from EEPROM  <br /></td></tr>
 <tr class="memitem:a78e4e1dc8e375056631b0be8406455bf" id="r_a78e4e1dc8e375056631b0be8406455bf"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a78e4e1dc8e375056631b0be8406455bf">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[]) override</td></tr>
 <tr class="memitem:aee4e1c4397de927ddc9990b5f68a0fa3" id="r_aee4e1c4397de927ddc9990b5f68a0fa3"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#aee4e1c4397de927ddc9990b5f68a0fa3">write</a> (unsigned int eeaddress, byte data) override</td></tr>
-<tr class="memdesc:aee4e1c4397de927ddc9990b5f68a0fa3"><td class="mdescLeft">&#160;</td><td class="mdescRight">write a byte  <br /></td></tr>
 <tr class="memitem:a841b9cc37ae259d742855b4febb3adbe" id="r_a841b9cc37ae259d742855b4febb3adbe"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a841b9cc37ae259d742855b4febb3adbe">writeBytes</a> (unsigned int eeaddress, const byte src[], byte numbytes) override</td></tr>
 <tr class="memitem:ab90e8fe70088cadf025ee97def00440b" id="r_ab90e8fe70088cadf025ee97def00440b"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#ab90e8fe70088cadf025ee97def00440b">reset</a> () override</td></tr>
-<tr class="memdesc:ab90e8fe70088cadf025ee97def00440b"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear all event data in external EEPROM chip  <br /></td></tr>
 <tr class="inherit_header pub_methods_class_v_l_c_b_1_1_storage"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_class_v_l_c_b_1_1_storage')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_storage.html">VLCB::Storage</a></td></tr>
 <tr class="memitem:a96c85dde579e9da841e6fad0a96dc576 inherit pub_methods_class_v_l_c_b_1_1_storage" id="r_a96c85dde579e9da841e6fad0a96dc576"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_storage.html#a96c85dde579e9da841e6fad0a96dc576">commitWriteEEPROM</a> ()</td></tr>
 </table>
@@ -168,8 +165,6 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>read a single byte from EEPROM </p>
-
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#ae7d5373ba96869e293cd0c16f86a6266">VLCB::Storage</a>.</p>
 
 </div>
@@ -205,7 +200,6 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>read a number of bytes from EEPROM external EEPROM must use 16-bit addresses !! </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#a4263030a0a01ee3b8a5aef97a54d1741">VLCB::Storage</a>.</p>
 
@@ -237,8 +231,6 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>write a byte </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#a6368a48b484d3718735cf51f2daf3c63">VLCB::Storage</a>.</p>
 
@@ -275,7 +267,6 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>write a number of bytes to EEPROM external EEPROM must use 16-bit addresses !! </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#aa64f7795fe2ed13a88c6af0fce0a5ac0">VLCB::Storage</a>.</p>
 
@@ -303,8 +294,6 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>clear all event data in external EEPROM chip </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#a5aa9c8ae6d25a25ffbb4f5b61df98d09">VLCB::Storage</a>.</p>
 

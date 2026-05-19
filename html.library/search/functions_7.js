@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['getcanid_0',['getCANID',['../namespace_v_l_c_b.html#a7bddd917da6ee3f6d80aa4d895b0cc8a',1,'VLCB::getCANID(unsigned long header)'],['../namespace_v_l_c_b.html#afdbd716415513eecc98597480bd85daa',1,'VLCB::getCANID()']]],
+  ['getcanid_0',['getCANID',['../namespace_v_l_c_b.html#afdbd716415513eecc98597480bd85daa',1,'VLCB']]],
   ['getcurrentmode_1',['getCurrentMode',['../namespace_v_l_c_b.html#afc9d9eaacfa65438d13a45e95ad7eb8f',1,'VLCB']]],
   ['getcurrentstateduration_2',['getCurrentStateDuration',['../class_v_l_c_b_1_1_switch.html#a1d446cb5f3674731d9bfb5d0e1c89aea',1,'VLCB::Switch']]],
   ['geteventevval_3',['getEventEVval',['../class_v_l_c_b_1_1_configuration.html#a5ca75f47db7f024a28e5f96c263296cd',1,'VLCB::Configuration::getEventEVval()'],['../namespace_v_l_c_b.html#af4db790a620d538341751018e3fe7107',1,'VLCB::getEventEVval()']]],

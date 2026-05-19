@@ -5,14 +5,42 @@
 
 #include "FlashStorage.h"
 
+// #ifdef __AVR_XMEGA__
+#if defined(DXCORE)
+#include <Flash.h>
+//#else
+//#error Can only use flash memory on DXCORE platforms.
+#endif
+
 namespace VLCB
 {
 
 // #ifdef __AVR_XMEGA__
 #if defined(DXCORE)
+
+struct flash_page_t {
+  bool dirty;
+  uint8_t data[FLASH_PAGE_SIZE];
+};
+
 flash_page_t cache_page;                // flash page cache
 byte curr_page_num = 0;
+
 #endif
+
+
+#if defined(DXCORE)
+// Note: Using #if here as PROGMEM_SIZE is only available on DXCORE
+const int FLASH_AREA_BASE_ADDRESS = (PROGMEM_SIZE - (0x800));        // top 2K bytes of flash
+#endif
+const int FLASH_PAGE_SIZE = 512;
+const int NUM_FLASH_PAGES = 4;
+
+static void flash_cache_page(const byte page);
+static bool flash_writeback_page(const byte page);
+static bool flash_write_bytes(const uint16_t address, const uint8_t *data, const uint16_t number);
+static byte flash_read_byte(const uint16_t address);
+static void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest);
 
 
 void FlashStorage::begin()
@@ -37,7 +65,7 @@ void FlashStorage::begin()
 
 
 //
-/// read a single byte from EEPROM
+// read a single byte from EEPROM
 //
 byte FlashStorage::read(unsigned int eeaddress)
 {
@@ -54,8 +82,8 @@ byte FlashStorage::read(unsigned int eeaddress)
 
 
 //
-/// read a number of bytes from EEPROM
-/// external EEPROM must use 16-bit addresses !!
+// read a number of bytes from EEPROM
+// external EEPROM must use 16-bit addresses !!
 //
 byte FlashStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 {
@@ -73,7 +101,7 @@ byte FlashStorage::readBytes(unsigned int eeaddress, byte nbytes, byte dest[])
 
 
 //
-/// write a byte
+// write a byte
 //
 void FlashStorage::write(unsigned int eeaddress, byte data)
 {
@@ -84,8 +112,8 @@ void FlashStorage::write(unsigned int eeaddress, byte data)
 }
 
 //
-/// write a number of bytes to EEPROM
-/// external EEPROM must use 16-bit addresses !!
+// write a number of bytes to EEPROM
+// external EEPROM must use 16-bit addresses !!
 //
 void FlashStorage::writeBytes(unsigned int eeaddress, const byte src[], byte numbytes)
 {
@@ -96,7 +124,7 @@ void FlashStorage::writeBytes(unsigned int eeaddress, const byte src[], byte num
 }
 
 //
-/// clear all event data in external EEPROM chip
+// clear all event data in external EEPROM chip
 //
 void FlashStorage::reset()
 {
@@ -112,9 +140,9 @@ void FlashStorage::reset()
 }
 
 //
-/// flash routines for AVR-Dx devices
-/// we allocate 2048 bytes at the far end of flash, and cache the data of one of four 512 byte pages (0-3)
-/// dirty pages must be erased and written back before moving on
+// flash routines for AVR-Dx devices
+// we allocate 2048 bytes at the far end of flash, and cache the data of one of four 512 byte pages (0-3)
+// dirty pages must be erased and written back before moving on
 //
 
 // #ifdef __AVR_XMEGA__

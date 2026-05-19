@@ -114,7 +114,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a248e09a2503a4027ee267e83ea2a3f22" id="r_a248e09a2503a4027ee267e83ea2a3f22"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#a248e09a2503a4027ee267e83ea2a3f22">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:a248e09a2503a4027ee267e83ea2a3f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:a36d1ea088521b56ef469131d2ca15aa0" id="r_a36d1ea088521b56ef469131d2ca15aa0"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a36d1ea088521b56ef469131d2ca15aa0">getServiceVersionID</a> () const override</td></tr>
-<tr class="memdesc:a36d1ea088521b56ef469131d2ca15aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the implementation of this service.  <br /></td></tr>
+<tr class="memdesc:a36d1ea088521b56ef469131d2ca15aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the service specification implemented by this service.  <br /></td></tr>
 <tr class="memitem:afbe4ce0704b3d7b7109c64594d215dfe" id="r_afbe4ce0704b3d7b7109c64594d215dfe"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#afbe4ce0704b3d7b7109c64594d215dfe">begin</a> () override</td></tr>
 <tr class="memdesc:afbe4ce0704b3d7b7109c64594d215dfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">This optional method is called at the beginning of the Arduino sketch. Define this method for the service to do any setup required at the beginning.  <br /></td></tr>
 <tr id="pub-methods-0" class="groupHeader"><td colspan="2"><div class="groupHeader">Backdoors for testing</div></td></tr>
@@ -240,8 +240,8 @@ Minimum Node Service API</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Return the version of the implementation of this service. </p>
-<p>This version is used by configuration utilities to identify any updated features in the service. </p>
+<p>Return the version of the service specification implemented by this service. </p>
+<p>This version is used by configuration utilities to identify which features are implemented by this service. </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#aa5a83565c5d79516810e41e4dfcfdfa3">VLCB::Service</a>.</p>
 

@@ -116,7 +116,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abf5dbf3dea1e388003a97a35d0297abe" id="r_abf5dbf3dea1e388003a97a35d0297abe"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#abf5dbf3dea1e388003a97a35d0297abe">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:abf5dbf3dea1e388003a97a35d0297abe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:aaa4fcd083b679430ee4f10ea74269e26" id="r_aaa4fcd083b679430ee4f10ea74269e26"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#aaa4fcd083b679430ee4f10ea74269e26">getServiceVersionID</a> () const override</td></tr>
-<tr class="memdesc:aaa4fcd083b679430ee4f10ea74269e26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the implementation of this service.  <br /></td></tr>
+<tr class="memdesc:aaa4fcd083b679430ee4f10ea74269e26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the service specification implemented by this service.  <br /></td></tr>
 <tr class="memitem:acfa8286a440c8a115f7688966b40fa4f" id="r_acfa8286a440c8a115f7688966b40fa4f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acfa8286a440c8a115f7688966b40fa4f">sendEventAtIndex</a> (bool state, byte evIndex)</td></tr>
 <tr class="memitem:aa3d2f002853a7dec4b199aecece7f107" id="r_aa3d2f002853a7dec4b199aecece7f107"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa3d2f002853a7dec4b199aecece7f107">sendEventAtIndex</a> (bool state, byte evIndex, byte data1)</td></tr>
 <tr class="memitem:acef46eb323068fc61f36bc9d0ab97f9e" id="r_acef46eb323068fc61f36bc9d0ab97f9e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acef46eb323068fc61f36bc9d0ab97f9e">sendEventAtIndex</a> (bool state, byte evIndex, byte data1, byte data2)</td></tr>
@@ -260,8 +260,8 @@ Event Producer Service API</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Return the version of the implementation of this service. </p>
-<p>This version is used by configuration utilities to identify any updated features in the service. </p>
+<p>Return the version of the service specification implemented by this service. </p>
+<p>This version is used by configuration utilities to identify which features are implemented by this service. </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#aa5a83565c5d79516810e41e4dfcfdfa3">VLCB::Service</a>.</p>
 
