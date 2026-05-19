@@ -111,7 +111,7 @@ namespace VLCB
 
   // Function to convert a pair of hexadecimal characters to a byte value
   //
-  int ascii_pair_to_byte(const char *pair)
+  static int ascii_pair_to_byte(const char *pair)
   {
       unsigned char* data = (unsigned char*)pair;
       int result;
@@ -125,7 +125,7 @@ namespace VLCB
 
   // check supplied array is comprised of only hexadecimal characters
   //
-  bool checkHexChars(const char *charBuff, int count)
+  static bool checkHexChars(const char *charBuff, int count)
   {
     for (int i = 0 ; i< count; i++)
     {

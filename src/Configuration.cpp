@@ -480,7 +480,7 @@ void Configuration::commitToEEPROM()
 #define AVR_RESET_METHOD 4     // don't use watchdog timer method as it's unreliable on some boards
 #endif
 
-void (*rebootFunc)() = 0;  // just causes a jump to address zero - not a full chip reset
+static void (*rebootFunc)() = 0;  // just causes a jump to address zero - not a full chip reset
 
 void Configuration::reboot()
 {

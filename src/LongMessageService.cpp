@@ -16,8 +16,8 @@
 namespace VLCB
 {
 
-uint16_t crc16(uint8_t *data_p, uint16_t length);
-uint32_t crc32(const char *s, size_t n);
+static uint16_t crc16(uint8_t *data_p, uint16_t length);
+static uint32_t crc32(const char *s, size_t n);
 
 //
 /// subscribe to a range of stream IDs
@@ -715,7 +715,7 @@ void LongMessageServiceEx::use_crc(bool use_crc)
 
 ///////////////////////////////////////////////////////////////////////////////
 //////// CRC implementations
-uint32_t crc32(const byte *s, size_t n)
+static uint32_t crc32(const byte *s, size_t n)
 {
 	uint32_t crc = 0xFFFFFFFF;
 

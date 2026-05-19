@@ -119,9 +119,18 @@ void CanService::handleEnumeration(unsigned int nn)
 //
 /// extract CANID from CAN frame header
 //
-inline byte getCANID(unsigned long header)
+static inline byte getCANID(unsigned long header)
 {
   return header & 0x7f;
+}
+
+/// actual implementation of the makeHeader method
+/// so it can be called directly or as a Controller class method
+/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CAN priority) + (7 bits of CAN ID)
+/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
+static inline uint32_t makeHeader_impl(byte id, byte priority)
+{
+  return (priority << 7) + (id & 0x7f);
 }
 
 //
@@ -206,15 +215,6 @@ void CanService::checkIncomingCanFrame()
   memcpy(action.vlcbMessage.data, canFrame.data, canFrame.len);
 
   controller->putAction(action);
-}
-
-/// actual implementation of the makeHeader method
-/// so it can be called directly or as a Controller class method
-/// the 11 bit ID of a standard CAN frame is comprised of: (4 bits of CAN priority) + (7 bits of CAN ID)
-/// priority = 1011 (0xB hex, 11 dec) as default argument, which translates to medium/low
-inline uint32_t makeHeader_impl(byte id, byte priority)
-{
-  return (priority << 7) + (id & 0x7f);
 }
 
 bool CanService::sendMessage(const VlcbMessage *msg)
