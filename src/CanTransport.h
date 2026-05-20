@@ -30,6 +30,7 @@ struct CANFrame
 /// @brief Interface base class for CAN transport implementations.
 /// 
 /// A concrete class derived from CanTransport must be used with CanService.
+/// @note There are more concrete classes outside this VLCB-Arduino library.
 class CanTransport : public Transport
 {
 public:
