@@ -98,22 +98,22 @@ $(function(){initNavTree('class_v_l_c_b_1_1_circular_buffer.html','','class_v_l_
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a281717ba139ced6bbebd1403eb6fdac0" id="r_a281717ba139ced6bbebd1403eb6fdac0"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a281717ba139ced6bbebd1403eb6fdac0">CircularBuffer</a> (uint8_t bufferCapacity=4)</td></tr>
 <tr class="memitem:a309f282015ebc8cac795d16df144d30c" id="r_a309f282015ebc8cac795d16df144d30c"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a309f282015ebc8cac795d16df144d30c">~CircularBuffer</a> ()</td></tr>
-<tr class="memitem:a6e5e803377de3cd8d0d4f2532b4036cd" id="r_a6e5e803377de3cd8d0d4f2532b4036cd"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a6e5e803377de3cd8d0d4f2532b4036cd">available</a> ()</td></tr>
-<tr class="memdesc:a6e5e803377de3cd8d0d4f2532b4036cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">if buffer has one or more stored items  <br /></td></tr>
+<tr class="memitem:a7b9b43c6b71599a956e48e9b8d184a20" id="r_a7b9b43c6b71599a956e48e9b8d184a20"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a7b9b43c6b71599a956e48e9b8d184a20">available</a> () const</td></tr>
+<tr class="memdesc:a7b9b43c6b71599a956e48e9b8d184a20"><td class="mdescLeft">&#160;</td><td class="mdescRight">if buffer has one or more stored items  <br /></td></tr>
 <tr class="memitem:a7833317379041d0c1447829edc758591" id="r_a7833317379041d0c1447829edc758591"><td class="memItemLeft">E *&#160;</td><td class="memItemRight"><a class="el" href="#a7833317379041d0c1447829edc758591">peek</a> ()</td></tr>
 <tr class="memdesc:a7833317379041d0c1447829edc758591"><td class="mdescLeft">&#160;</td><td class="mdescRight">peek at the next item in the buffer without removing it  <br /></td></tr>
 <tr class="memitem:ac4eac66a32927b2be81f952c051fb355" id="r_ac4eac66a32927b2be81f952c051fb355"><td class="memItemLeft">const E &amp;&#160;</td><td class="memItemRight"><a class="el" href="#ac4eac66a32927b2be81f952c051fb355">pop</a> ()</td></tr>
-<tr class="memdesc:ac4eac66a32927b2be81f952c051fb355"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve the next item from the buffer, requires that <a class="el" href="#a6e5e803377de3cd8d0d4f2532b4036cd" title="if buffer has one or more stored items">available()</a> is checked first.  <br /></td></tr>
+<tr class="memdesc:ac4eac66a32927b2be81f952c051fb355"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve the next item from the buffer, requires that <a class="el" href="#a7b9b43c6b71599a956e48e9b8d184a20" title="if buffer has one or more stored items">available()</a> is checked first.  <br /></td></tr>
 <tr class="memitem:ac8bd8f52e51dcc01fb01b5c1f07d6852" id="r_ac8bd8f52e51dcc01fb01b5c1f07d6852"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac8bd8f52e51dcc01fb01b5c1f07d6852">put</a> (const E &amp;entry)</td></tr>
 <tr class="memitem:a7fac83a593d5246814c0344d6833933b" id="r_a7fac83a593d5246814c0344d6833933b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7fac83a593d5246814c0344d6833933b">clear</a> ()</td></tr>
 <tr class="memdesc:a7fac83a593d5246814c0344d6833933b"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear all items  <br /></td></tr>
-<tr class="memitem:a0300b87b3c2d9bc90be770a574bb97f7" id="r_a0300b87b3c2d9bc90be770a574bb97f7"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a0300b87b3c2d9bc90be770a574bb97f7">getNumberOfPuts</a> ()</td></tr>
-<tr class="memdesc:a0300b87b3c2d9bc90be770a574bb97f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of puts  <br /></td></tr>
-<tr class="memitem:a49b9c7b2d173dfc3d56ce17db25b88c4" id="r_a49b9c7b2d173dfc3d56ce17db25b88c4"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a49b9c7b2d173dfc3d56ce17db25b88c4">getNumberOfGets</a> ()</td></tr>
-<tr class="memdesc:a49b9c7b2d173dfc3d56ce17db25b88c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of gets  <br /></td></tr>
-<tr class="memitem:a1f12eb8fdbb07465dca089e095756bb3" id="r_a1f12eb8fdbb07465dca089e095756bb3"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a1f12eb8fdbb07465dca089e095756bb3">getOverflows</a> ()</td></tr>
-<tr class="memdesc:a1f12eb8fdbb07465dca089e095756bb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of overflows  <br /></td></tr>
-<tr class="memitem:a4d4f372fe208dd8133c985230ba46fb6" id="r_a4d4f372fe208dd8133c985230ba46fb6"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a4d4f372fe208dd8133c985230ba46fb6">getHighWaterMark</a> ()</td></tr>
+<tr class="memitem:ae975ff6da12b93b0fe2b10837eecf770" id="r_ae975ff6da12b93b0fe2b10837eecf770"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#ae975ff6da12b93b0fe2b10837eecf770">getNumberOfPuts</a> () const</td></tr>
+<tr class="memdesc:ae975ff6da12b93b0fe2b10837eecf770"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of puts  <br /></td></tr>
+<tr class="memitem:ab3a02148afae26ca7bc5844fddbcaa11" id="r_ab3a02148afae26ca7bc5844fddbcaa11"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#ab3a02148afae26ca7bc5844fddbcaa11">getNumberOfGets</a> () const</td></tr>
+<tr class="memdesc:ab3a02148afae26ca7bc5844fddbcaa11"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of gets  <br /></td></tr>
+<tr class="memitem:ae6b597160b81b45fd1e007c654720779" id="r_ae6b597160b81b45fd1e007c654720779"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#ae6b597160b81b45fd1e007c654720779">getOverflows</a> () const</td></tr>
+<tr class="memdesc:ae6b597160b81b45fd1e007c654720779"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of overflows  <br /></td></tr>
+<tr class="memitem:aed0551cb3a2cbd311819f8a0e21d4b60" id="r_aed0551cb3a2cbd311819f8a0e21d4b60"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#aed0551cb3a2cbd311819f8a0e21d4b60">getHighWaterMark</a> () const</td></tr>
 </table>
 <a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a281717ba139ced6bbebd1403eb6fdac0" name="a281717ba139ced6bbebd1403eb6fdac0"></a>
@@ -163,8 +163,8 @@ template&lt;typename E&gt; </div>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a6e5e803377de3cd8d0d4f2532b4036cd" name="a6e5e803377de3cd8d0d4f2532b4036cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6e5e803377de3cd8d0d4f2532b4036cd">&#9670;&#160;</a></span>available()</h2>
+<a id="a7b9b43c6b71599a956e48e9b8d184a20" name="a7b9b43c6b71599a956e48e9b8d184a20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b9b43c6b71599a956e48e9b8d184a20">&#9670;&#160;</a></span>available()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -175,7 +175,7 @@ template&lt;typename E&gt; </div>
           <td class="memname">bool <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::available </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -222,7 +222,7 @@ template&lt;typename E&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p>retrieve the next item from the buffer, requires that <a class="el" href="#a6e5e803377de3cd8d0d4f2532b4036cd" title="if buffer has one or more stored items">available()</a> is checked first. </p>
+<p>retrieve the next item from the buffer, requires that <a class="el" href="#a7b9b43c6b71599a956e48e9b8d184a20" title="if buffer has one or more stored items">available()</a> is checked first. </p>
 
 </div>
 </div>
@@ -237,12 +237,12 @@ template&lt;typename E&gt; </div>
         <tr>
           <td class="memname">void <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::put </td>
           <td>(</td>
-          <td class="paramtype">const E &amp;</td>          <td class="paramname"><span class="paramname"><em>msg</em></span></td><td>)</td>
+          <td class="paramtype">const E &amp;</td>          <td class="paramname"><span class="paramname"><em>entry</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>store an item to the buffer - overwrite oldest item if buffer is full never called from an interrupt context so we don't need to worry about interrupts </p>
+<p>store an item to the buffer - overwrite the oldest item if buffer is full never called from an interrupt context so we don't need to worry about interrupts </p>
 
 </div>
 </div>
@@ -267,8 +267,8 @@ template&lt;typename E&gt; </div>
 
 </div>
 </div>
-<a id="a0300b87b3c2d9bc90be770a574bb97f7" name="a0300b87b3c2d9bc90be770a574bb97f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0300b87b3c2d9bc90be770a574bb97f7">&#9670;&#160;</a></span>getNumberOfPuts()</h2>
+<a id="ae975ff6da12b93b0fe2b10837eecf770" name="ae975ff6da12b93b0fe2b10837eecf770"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae975ff6da12b93b0fe2b10837eecf770">&#9670;&#160;</a></span>getNumberOfPuts()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -279,7 +279,7 @@ template&lt;typename E&gt; </div>
           <td class="memname">unsigned int <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::getNumberOfPuts </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -288,8 +288,8 @@ template&lt;typename E&gt; </div>
 
 </div>
 </div>
-<a id="a49b9c7b2d173dfc3d56ce17db25b88c4" name="a49b9c7b2d173dfc3d56ce17db25b88c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49b9c7b2d173dfc3d56ce17db25b88c4">&#9670;&#160;</a></span>getNumberOfGets()</h2>
+<a id="ab3a02148afae26ca7bc5844fddbcaa11" name="ab3a02148afae26ca7bc5844fddbcaa11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3a02148afae26ca7bc5844fddbcaa11">&#9670;&#160;</a></span>getNumberOfGets()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +300,7 @@ template&lt;typename E&gt; </div>
           <td class="memname">unsigned int <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::getNumberOfGets </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -309,8 +309,8 @@ template&lt;typename E&gt; </div>
 
 </div>
 </div>
-<a id="a1f12eb8fdbb07465dca089e095756bb3" name="a1f12eb8fdbb07465dca089e095756bb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1f12eb8fdbb07465dca089e095756bb3">&#9670;&#160;</a></span>getOverflows()</h2>
+<a id="ae6b597160b81b45fd1e007c654720779" name="ae6b597160b81b45fd1e007c654720779"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6b597160b81b45fd1e007c654720779">&#9670;&#160;</a></span>getOverflows()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -321,7 +321,7 @@ template&lt;typename E&gt; </div>
           <td class="memname">unsigned int <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::getOverflows </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -330,8 +330,8 @@ template&lt;typename E&gt; </div>
 
 </div>
 </div>
-<a id="a4d4f372fe208dd8133c985230ba46fb6" name="a4d4f372fe208dd8133c985230ba46fb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d4f372fe208dd8133c985230ba46fb6">&#9670;&#160;</a></span>getHighWaterMark()</h2>
+<a id="aed0551cb3a2cbd311819f8a0e21d4b60" name="aed0551cb3a2cbd311819f8a0e21d4b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed0551cb3a2cbd311819f8a0e21d4b60">&#9670;&#160;</a></span>getHighWaterMark()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -342,7 +342,7 @@ template&lt;typename E&gt; </div>
           <td class="memname">unsigned int <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">VLCB::CircularBuffer</a>&lt; E &gt;::getHighWaterMark </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
