@@ -3,51 +3,7 @@
 The Minimum Node Service provides the basic VLCB interface and functions for the library. As such,
 it is the only service whose inclusion is mandatory.
 
-The interface looks like this:
-```
-class MinimumNodeService : public Service
-{
-public:
-  virtual void setController(Controller *cntrl) override;
-  virtual void process(UserInterface::RequestedAction requestedAction) override; 
-  virtual Processed handleMessage(unsigned int opc, VlcbMessage *msg) override;
-
-  virtual byte getServiceID() override { return SERVICE_ID_MNS; }
-  virtual byte getServiceVersionID() override { return 1; }
-  
-  virtual void begin() override;
-  
-};
-```
-
-The methods in this interface are:
-
-setController
-: set a pointer to the controller object in the implementing class.
-
-process
-: Performs periodic actions for timeouts, heartbeat and polling the user interface.
-
-handleMessage
-: Handle an incoming message.
-The op-code is provided to help the service deciding what to do for the message.
-Return a value ```PROCESSED``` if the message was handled and no other services need
-to see this message. 
-Otherwise, return ```NOT_PROCESSED``` so that the system knows that this message was not
-processed and other services shall get a chance to process this message.
-
-getServiceID
-: Shall return a unique ID for this service.
-This ID is used by configuration utilities to identify the service type.
-
-getServiceVersionID
-: Shall return the version of the implementation of this service.
-This version is used by configuration utilities to identify any updated features in the
-service. 
-There is no need to bump up the version number for minor changes and bug fixes.
-
-begin
-: Defines the setup required at the beginning. 
+Detailed documentation is available in [MinimumNodeService API definition](../html.library/class_v_l_c_b_1_1_minimum_node_service.html)
 
 ## Operating Mode
 
@@ -123,7 +79,7 @@ The following command values are used by the Minimum Node Service:
 Service Usage Command Code Turn on Heartbeat will cause a OPC_HEARTB(0xAB) to be sent every
 5000mS.  Turn of Heartbeat will stop the transmission of OPC_HEARTB.
 
-### Request Service Discovery = OPC_RQSD(0x78)
+### Request Service Discovery - OPC_RQSD(0x78)
 
 If the Service Index is zero, then the module will send OPC_SD(0xAC) with the number of 
 services supported.  It will then send an OPC_SD for each of those services.
@@ -141,36 +97,3 @@ to that specific service.
 
 This OP-code is only available when using the diagnostics enabled service
 class ```MinimumNodeServiceWithDiagnostics```.
-
-## User Sketch
-
-A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
-the main loop.
-
-The include files may look like this:
-```
-// VLCB library header files
-#include <Controller.h>               // Controller class
-#include <Configuration.h>            // module configuration
-#include <Parameters.h>               // VLCB parameters
-#include <vlcbdefs.hpp>               // VLCB constants
-#include <LEDUserInterface.h>
-#include "MinimumNodeService.h"
-```
-This represents the minimum, mandatory libraries.  To this list optional libraries need to be
-added for Transport service and other services required, such as Event Consumer.
-
-The setup code may look like:
-```
-// Controller objects
-VLCB::Configuration modconfig;               // configuration object
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::MinimumNodeService mnService;
-VLCB::Controller controller( &modconfig, ledUserInterface,
-                            { &mnService }); // Controller object
-
-setup()
-{
-  See examples for what needs to be added depending upon services included.
-}
-```
