@@ -17,20 +17,20 @@ public:
   explicit CircularBuffer(uint8_t bufferCapacity = 4);
   ~CircularBuffer();
 
-  bool available();
+  bool available() const;
   E *peek();
   const E & pop();
   void put(const E &entry);
   void clear();
 
   // Diagnostic metrics access
-  unsigned int getNumberOfPuts();
-  unsigned int getNumberOfGets();
-  unsigned int getOverflows();
-  unsigned int getHighWaterMark();   // High Watermark
+  unsigned int getNumberOfPuts() const;
+  unsigned int getNumberOfGets() const;
+  unsigned int getOverflows() const;
+  unsigned int getHighWaterMark() const;   // High Watermark
 
 private:
-  uint8_t bufUse();
+  uint8_t bufUse() const;
 
   uint8_t capacity;
   uint8_t head = 0;
@@ -61,18 +61,17 @@ CircularBuffer<E>::~CircularBuffer()
 
 /// if buffer has one or more stored items
 template <typename E>
-bool CircularBuffer<E>::available()
+bool CircularBuffer<E>::available() const
 {
   return full || (head != tail);
 }
 
-/// store an item to the buffer - overwrite oldest item if buffer is full
+/// store an item to the buffer - overwrite the oldest item if buffer is full
 /// never called from an interrupt context so we don't need to worry about interrupts
 template <typename E>
-void CircularBuffer<E>::put(const E &msg)
+void CircularBuffer<E>::put(const E &entry)
 {
-//  E msg;
-  buffer[head] = msg;
+  buffer[head] = entry;
 
   if (full)
   {
@@ -86,7 +85,7 @@ void CircularBuffer<E>::put(const E &msg)
   uint8_t size = bufUse();
   if (size > hwm)
   {
-    // Tracks high water mark (hwm)
+    // Tracks high watermark (hwm)
     hwm = size;
   }
   ++numPuts;        // Counts how many events put to buffer.
@@ -131,7 +130,7 @@ void CircularBuffer<E>::clear()
 
 /// recalculate number of items in the buffer
 template <typename E>
-uint8_t CircularBuffer<E>::bufUse()
+uint8_t CircularBuffer<E>::bufUse() const
 {
   int8_t size = capacity;
   if (!full)
@@ -147,27 +146,27 @@ uint8_t CircularBuffer<E>::bufUse()
 
 /// number of puts
 template <typename E>
-unsigned int CircularBuffer<E>::getNumberOfPuts()
+unsigned int CircularBuffer<E>::getNumberOfPuts() const
 {
   return numPuts;
 }
 
 /// number of gets
 template <typename E>
-unsigned int CircularBuffer<E>::getNumberOfGets()
+unsigned int CircularBuffer<E>::getNumberOfGets() const
 {
   return numGets;
 }
 
 /// number of overflows
 template <typename E>
-unsigned int CircularBuffer<E>::getOverflows()
+unsigned int CircularBuffer<E>::getOverflows() const
 {
   return numOverflows;
 }
 
 template <typename E>
-unsigned int CircularBuffer<E>::getHighWaterMark()
+unsigned int CircularBuffer<E>::getHighWaterMark() const
 {
   return hwm;
 }
