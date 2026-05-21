@@ -93,7 +93,7 @@ A dedicated service could provide free memory amount as a diagnostic value.
 
 What internal information would be useful for this service?
 * Free memory. (as listed above)
-* Monitor the action queue. Current use, high watermark. (See CanService buffer use for inspiration.)
+* Monitor the action queue. Current use, high water mark. (See CanService buffer use for inspiration.)
 * Count of generated actions. 
 * TimedResponse data such as number of tasks in queue, total number of tasks created. 
 

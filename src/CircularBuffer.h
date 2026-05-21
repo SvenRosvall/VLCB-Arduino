@@ -27,7 +27,7 @@ public:
   unsigned int getNumberOfPuts() const;
   unsigned int getNumberOfGets() const;
   unsigned int getOverflows() const;
-  unsigned int getHighWaterMark() const;   // High Watermark
+  unsigned int getHighWaterMark() const;   // High Water Mark
 
 private:
   uint8_t bufUse() const;
@@ -38,7 +38,7 @@ private:
   bool full = false;
 
   // Diagnostic metrics
-  uint8_t hwm = 0;  // High watermark
+  uint8_t hwm = 0;  // High water Mark
   uint8_t numPuts = 0;
   uint8_t numGets = 0;
   uint8_t numOverflows = 0;
@@ -85,7 +85,7 @@ void CircularBuffer<E>::put(const E &entry)
   uint8_t size = bufUse();
   if (size > hwm)
   {
-    // Tracks high watermark (hwm)
+    // Tracks high water mark (hwm)
     hwm = size;
   }
   ++numPuts;        // Counts how many events put to buffer.
