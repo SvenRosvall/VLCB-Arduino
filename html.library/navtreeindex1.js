@@ -1,6 +1,6 @@
 var NAVTREEINDEX1 =
 {
-"class_v_l_c_b_1_1_circular_buffer.html#ac8bd8f52e51dcc01fb01b5c1f07d6852":[1,0,1,7,5],
+"class_v_l_c_b_1_1_circular_buffer.html#aed0551cb3a2cbd311819f8a0e21d4b60":[1,0,1,7,10],
 "class_v_l_c_b_1_1_configuration.html":[0,0,1,8],
 "class_v_l_c_b_1_1_configuration.html":[1,0,1,8],
 "class_v_l_c_b_1_1_configuration.html#a0539aaffb49e372af6d9540d12d00715":[0,0,1,8,45],

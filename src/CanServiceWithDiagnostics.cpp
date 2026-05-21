@@ -39,10 +39,10 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
     case 0x09: // RX message counter
       diagnosticsValue = canTransport->receiveCounter();
       break;
-    case 0x11: // Transmit buffers used high watermark - Added in service version 2
+    case 0x11: // Transmit buffers used high water mark - Added in service version 2
       diagnosticsValue = canTransport->transmitBufferPeak();
       break;
-    case 0x12: // Receive buffers used high watermark - Added in service version 2
+    case 0x12: // Receive buffers used high water mark - Added in service version 2
       diagnosticsValue = canTransport->receiveBufferPeak();
       break;
 

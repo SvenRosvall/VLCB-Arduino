@@ -63,7 +63,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_abstract_event_teaching_service_8cpp.html",
-"class_v_l_c_b_1_1_circular_buffer.html#ac8bd8f52e51dcc01fb01b5c1f07d6852",
+"class_v_l_c_b_1_1_circular_buffer.html#aed0551cb3a2cbd311819f8a0e21d4b60",
 "class_v_l_c_b_1_1_event_consumer_service.html#a58c87764c1fd1964dd57be272cf647b2",
 "class_v_l_c_b_1_1_minimum_node_service.html#aa72e36ee9490218251d94e0a34f243f1",
 "functions_o.html",
