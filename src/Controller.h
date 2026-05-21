@@ -28,28 +28,29 @@ struct VlcbMessage
   uint8_t data[8];
 };
 
-// Action type
+/// Type of Action.
 enum ACTION : byte
 {
-  ACT_MESSAGE_IN,
-  ACT_MESSAGE_OUT,
-  ACT_START_CAN_ENUMERATION,
-  ACT_CHANGE_MODE,
-  ACT_RENEGOTIATE,
-  ACT_INDICATE_ACTIVITY,
-  ACT_INDICATE_WORK,
-  ACT_INDICATE_MODE,
+  ACT_MESSAGE_IN,             ///< A message coming in to the node.
+  ACT_MESSAGE_OUT,            ///< A message sent out from the node.
+  ACT_START_CAN_ENUMERATION,  ///< A request to start CAN enumeration from the user interface.
+  ACT_CHANGE_MODE,            ///< A request to change mode from the user interface.
+  ACT_RENEGOTIATE,            ///< A request to change node number from the user interface.
+  ACT_INDICATE_ACTIVITY,      ///< Some minor activity happened that should be indicated by the user interface.
+  ACT_INDICATE_WORK,          ///< Some work for the node occurred and should be indicated by the user interface.
+  ACT_INDICATE_MODE,          ///< The mode has changed and should be indicated by the user interface.
   // ...
 };
 
+/// An action to be performed.
 struct Action
 {
-  enum ACTION actionType;
+  enum ACTION actionType; ///< Type of action.
   union
   {
-    VlcbMessage vlcbMessage; // with ACT_MESSAGE_IN & ACT_MESSAGE_OUT
-    bool fromENUM; // with ACT_START_CAN_ENUMERATION
-    VlcbModeParams mode; // with ACT_INDICATE_MODE
+    VlcbMessage vlcbMessage; ///< with ACT_MESSAGE_IN & ACT_MESSAGE_OUT
+    bool fromENUM; ///< with ACT_START_CAN_ENUMERATION
+    VlcbModeParams mode; ///< with ACT_INDICATE_MODE
   };
 };
 

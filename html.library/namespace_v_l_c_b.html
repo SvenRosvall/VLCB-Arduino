@@ -114,6 +114,7 @@ Classes</h2></td></tr>
 <tr class="memitem:VlcbMessage" id="r_VlcbMessage"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="struct_v_l_c_b_1_1_vlcb_message.html">VlcbMessage</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CAN/Controller message type.  <a href="struct_v_l_c_b_1_1_vlcb_message.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Action" id="r_Action"><td class="memItemLeft">struct &#160;</td><td class="memItemRight"><a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An action to be performed.  <a href="struct_v_l_c_b_1_1_action.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Controller" id="r_Controller"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_controller.html">Controller</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Main object in <a class="el" href="namespace_v_l_c_b.html">VLCB</a>. Coordinates transport, ui, configuration and services.  <a href="class_v_l_c_b_1_1_controller.html#details">More...</a><br /></td></tr>
 <tr class="memitem:DueEepromEmulationStorage" id="r_DueEepromEmulationStorage"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_due_eeprom_emulation_storage.html">DueEepromEmulationStorage</a></td></tr>
@@ -186,6 +187,7 @@ Enumerations</h2></td></tr>
 , <a class="el" href="#a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d">ACT_INDICATE_MODE</a>
 <br />
  }</td></tr>
+<tr class="memdesc:a2e0e9b99da8cf32dcd00b3a96705ff90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a>.  <a href="#a2e0e9b99da8cf32dcd00b3a96705ff90">More...</a><br /></td></tr>
 <tr class="memitem:a0ace055974f174e06163198c3709d7c5" id="r_a0ace055974f174e06163198c3709d7c5"><td class="memItemLeft">enum &#160;</td><td class="memItemRight">{ <br />
 &#160;&#160;<a class="el" href="#a0ace055974f174e06163198c3709d7c5ada2694ad364ad8242354873ef2ae417c">LONG_MESSAGE_INCOMPLETE</a> = 0
 , <a class="el" href="#a0ace055974f174e06163198c3709d7c5a3753ad6052d6591dfc558a4cd2c4a779">LONG_MESSAGE_COMPLETE</a>
@@ -326,15 +328,25 @@ VLCB functions</h2>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Type of <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a>. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90a9cc60b8d7cdc2309963db7bf389f5ec4" name="a2e0e9b99da8cf32dcd00b3a96705ff90a9cc60b8d7cdc2309963db7bf389f5ec4"></a>ACT_MESSAGE_IN&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90af683c05edf0cda53168a67e512503402" name="a2e0e9b99da8cf32dcd00b3a96705ff90af683c05edf0cda53168a67e512503402"></a>ACT_MESSAGE_OUT&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90aa8d7482872d53fd56fbcd34005fe531e" name="a2e0e9b99da8cf32dcd00b3a96705ff90aa8d7482872d53fd56fbcd34005fe531e"></a>ACT_START_CAN_ENUMERATION&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90afc854be83fa1b556dee310deaf671fc7" name="a2e0e9b99da8cf32dcd00b3a96705ff90afc854be83fa1b556dee310deaf671fc7"></a>ACT_CHANGE_MODE&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ae9450965a26beee1662824d4e097256e" name="a2e0e9b99da8cf32dcd00b3a96705ff90ae9450965a26beee1662824d4e097256e"></a>ACT_RENEGOTIATE&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ad4912456dc3645e28aaac0a9767eba3c" name="a2e0e9b99da8cf32dcd00b3a96705ff90ad4912456dc3645e28aaac0a9767eba3c"></a>ACT_INDICATE_ACTIVITY&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ae0a714704b1995e4f09f29b4a6ad2409" name="a2e0e9b99da8cf32dcd00b3a96705ff90ae0a714704b1995e4f09f29b4a6ad2409"></a>ACT_INDICATE_WORK&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d" name="a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d"></a>ACT_INDICATE_MODE&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90a9cc60b8d7cdc2309963db7bf389f5ec4" name="a2e0e9b99da8cf32dcd00b3a96705ff90a9cc60b8d7cdc2309963db7bf389f5ec4"></a>ACT_MESSAGE_IN&#160;</td><td class="fielddoc"><p>A message coming in to the node. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90af683c05edf0cda53168a67e512503402" name="a2e0e9b99da8cf32dcd00b3a96705ff90af683c05edf0cda53168a67e512503402"></a>ACT_MESSAGE_OUT&#160;</td><td class="fielddoc"><p>A message sent out from the node. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90aa8d7482872d53fd56fbcd34005fe531e" name="a2e0e9b99da8cf32dcd00b3a96705ff90aa8d7482872d53fd56fbcd34005fe531e"></a>ACT_START_CAN_ENUMERATION&#160;</td><td class="fielddoc"><p>A request to start CAN enumeration from the user interface. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90afc854be83fa1b556dee310deaf671fc7" name="a2e0e9b99da8cf32dcd00b3a96705ff90afc854be83fa1b556dee310deaf671fc7"></a>ACT_CHANGE_MODE&#160;</td><td class="fielddoc"><p>A request to change mode from the user interface. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ae9450965a26beee1662824d4e097256e" name="a2e0e9b99da8cf32dcd00b3a96705ff90ae9450965a26beee1662824d4e097256e"></a>ACT_RENEGOTIATE&#160;</td><td class="fielddoc"><p>A request to change node number from the user interface. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ad4912456dc3645e28aaac0a9767eba3c" name="a2e0e9b99da8cf32dcd00b3a96705ff90ad4912456dc3645e28aaac0a9767eba3c"></a>ACT_INDICATE_ACTIVITY&#160;</td><td class="fielddoc"><p>Some minor activity happened that should be indicated by the user interface. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90ae0a714704b1995e4f09f29b4a6ad2409" name="a2e0e9b99da8cf32dcd00b3a96705ff90ae0a714704b1995e4f09f29b4a6ad2409"></a>ACT_INDICATE_WORK&#160;</td><td class="fielddoc"><p>Some work for the node occurred and should be indicated by the user interface. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d" name="a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d"></a>ACT_INDICATE_MODE&#160;</td><td class="fielddoc"><p>The mode has changed and should be indicated by the user interface. </p>
+</td></tr>
 </table>
 
 </div>
