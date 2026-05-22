@@ -19,15 +19,6 @@
 namespace VLCB
 {
 
-// TODO: This is a sign something is wrong. Need to be this big to handle 
-// large number of generated messages such as when asking for node parameters.
-// Each entry uses 10 bytes so a size of 30 uses 300 bytes.
-// This will get worse for for example queries for all events.
-// Need a mechanism like TimedResponse to create messages slowly so they can
-// be sent through the transport without requiring this buffering. 
-const int ACTION_QUEUE_SIZE = 30;
-
-
 //Controller::Controller()
 //  : services()
 //  , actionQueue(ACTION_QUEUE_SIZE)
@@ -38,8 +29,6 @@ const int ACTION_QUEUE_SIZE = 30;
 
 Controller::Controller(Configuration *conf)
   : module_config(conf)
-  , services()
-  , actionQueue(ACTION_QUEUE_SIZE)
 {
 }
 
@@ -63,7 +52,6 @@ Controller::Controller(Configuration *conf)
 Controller::Controller(Configuration *conf, std::initializer_list<Service *> services)
   : module_config(conf)
   , services(services)
-  , actionQueue(ACTION_QUEUE_SIZE)
 {
   for (Service * service : services)
   {
