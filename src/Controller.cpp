@@ -8,7 +8,7 @@
 
 // Controller library
 #include <Controller.h>
-#include "MinimumNodeService.h"
+#include <Service.h>
 #include <stdarg.h>
 
 //
@@ -178,6 +178,27 @@ void Controller::process()
     service->process(pAction);
   }
   
+  if (timedResponses.available())
+  {
+    TimedResponse::Task * task = *timedResponses.peek();
+    TimedResponse::Result result = (*task)();
+    switch (result)
+    {
+      case TimedResponse::Result::PROGRESS:
+        ++task->sequence;
+        break;
+
+      case TimedResponse::Result::RETRY:
+        // Keep the task so it can be run again with the same sequence number.
+        break;
+
+      case TimedResponse::Result::FINISHED:
+        delete task;
+        timedResponses.pop();
+        break;
+    }
+  }
+  
   module_config->commitToEEPROM();
 }
 
@@ -252,6 +273,11 @@ void Controller::messageActedOn()
 {
   putAction(ACT_INDICATE_WORK);
   ++diagMsgsActed;
+}
+
+void Controller::addTimedResponse(TimedResponse::Task * task)
+{
+  timedResponses.put(task);
 }
 
 }

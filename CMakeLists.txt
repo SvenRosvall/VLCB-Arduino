@@ -88,6 +88,7 @@ add_library(core_library OBJECT
         src/CircularBuffer.h
         src/VLCB.h
         src/VLCB.cpp
+        src/TimedResponse.h
 )
 
 target_link_libraries(core_library PUBLIC)

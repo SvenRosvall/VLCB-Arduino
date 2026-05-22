@@ -7,6 +7,7 @@
 
 #include "MinimumNodeService.h"
 #include "Controller.h"
+#include "TimedResponse.h"
 
 namespace VLCB
 {
@@ -303,6 +304,28 @@ void MinimumNodeService::handleRequestNodeParameters()
   controller->messageActedOn();
 }
 
+class RespondParam : public TimedResponse::Task
+{
+public: 
+  RespondParam(Controller *controller)
+    : controller(controller)
+  {}
+  TimedResponse::Result operator()()
+  {
+    if (sequence <= controller->getParam(PAR_NUM))
+    {
+      controller->sendMessageWithNN(OPC_PARAN, sequence, controller->getParam((VlcbParams) sequence));
+      return TimedResponse::PROGRESS;
+    }
+    else
+    {
+      return TimedResponse::FINISHED;
+    }
+  }
+private:
+  Controller *controller;
+};
+  
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -322,10 +345,7 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
 
     if ((paran == 0) && notFcuCompatible)
     {
-      for (byte i = 0; i <= controller->getParam(PAR_NUM); i++)
-      {
-        controller->sendMessageWithNN(OPC_PARAN, i, controller->getParam((VlcbParams) i));
-      }
+      controller->addTimedResponse(new RespondParam(controller));
     }
     else if (paran <= controller->getParam(PAR_NUM))
     {

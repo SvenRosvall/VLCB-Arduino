@@ -9,13 +9,11 @@
 #define DEBUG_SERIAL Serial
 #endif
 
-#include <SPI.h>
-
-#include <Transport.h>
 #include "initializer_list.h"
 #include "ArrayHolder.h"
 #include "CircularBuffer.h"
 #include "Configuration.h"
+#include "TimedResponse.h"
 
 namespace VLCB
 {
@@ -107,11 +105,14 @@ public:
   
   const CircularBuffer<Action> & getActionQueue() const { return actionQueue; }
 
+  void addTimedResponse(TimedResponse::Task * task);
+
 private:
   Configuration *module_config;
   ArrayHolder<Service *> services;
 
   CircularBuffer<Action> actionQueue;
+  CircularBuffer<TimedResponse::Task *> timedResponses;
 
   bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(VlcbOpCodes opc, int len, ...);
