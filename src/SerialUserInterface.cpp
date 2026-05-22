@@ -120,7 +120,14 @@ void SerialUserInterface::processSerialInput()
 
       case 'm':
         // free memory
-        Serial << F("> free SRAM = ") << modconfig->freeSRAM() << F(" bytes") << endl;
+        Serial << F("Free SRAM = ") << modconfig->freeSRAM() << F(" bytes") << endl;
+        break;
+        
+      case 'a':
+        // Action queue info
+        Serial << F("Action Queue Size=") << controller->getActionQueue().bufUse()
+               << F(" High Water Mark=") << controller->getActionQueue().getHighWaterMark() 
+               << F(" Overflows=") << controller->getActionQueue().getOverflows() << endl;
         break;
 
       case 's': // "s" == "setup"
