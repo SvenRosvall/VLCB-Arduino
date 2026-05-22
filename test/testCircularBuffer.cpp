@@ -26,7 +26,7 @@ void testHasOne()
 {
   test();
   
-  VLCB::CircularBuffer<int> buffer(4);
+  VLCB::CircularBuffer<int, 4> buffer;
   int entry = 17;
   buffer.put(entry);
 
@@ -45,7 +45,7 @@ void testFull()
 {
   test();
   
-  VLCB::CircularBuffer<int> buffer(4);
+  VLCB::CircularBuffer<int, 4> buffer;
   int entry = 1;
   buffer.put(entry);
   buffer.put(entry);
@@ -63,7 +63,7 @@ void testOverflow()
 {
   test();
   
-  VLCB::CircularBuffer<int> buffer(4);
+  VLCB::CircularBuffer<int, 4> buffer;
   int entry = 1;
   buffer.put(entry);
   entry = 2;
@@ -89,7 +89,7 @@ void testHeadWrapAround()
 {
   test();
   
-  VLCB::CircularBuffer<int> buffer(4);
+  VLCB::CircularBuffer<int, 4> buffer;
   int entry = 1;
   buffer.put(entry);
   entry = 2;
