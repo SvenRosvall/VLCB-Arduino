@@ -310,7 +310,7 @@ public:
   RespondParam(Controller *controller)
     : controller(controller)
   {}
-  TimedResponse::Result operator()()
+  virtual TimedResponse::Result operator()() override
   {
     if (sequence <= controller->getParam(PAR_NUM))
     {

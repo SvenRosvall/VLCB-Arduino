@@ -121,7 +121,7 @@ private:
   ArrayHolder<Service *> services;
 
   CircularBuffer<Action, ACTION_QUEUE_SIZE> actionQueue;
-  CircularBuffer<TimedResponse::Task *> timedResponses;
+  TimedResponse timedResponses;
 
   bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(VlcbOpCodes opc, int len, ...);

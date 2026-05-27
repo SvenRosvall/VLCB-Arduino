@@ -166,26 +166,7 @@ void Controller::process()
     service->process(pAction);
   }
   
-  if (timedResponses.available())
-  {
-    TimedResponse::Task * task = *timedResponses.peek();
-    TimedResponse::Result result = (*task)();
-    switch (result)
-    {
-      case TimedResponse::Result::PROGRESS:
-        ++task->sequence;
-        break;
-
-      case TimedResponse::Result::RETRY:
-        // Keep the task so it can be run again with the same sequence number.
-        break;
-
-      case TimedResponse::Result::FINISHED:
-        delete task;
-        timedResponses.pop();
-        break;
-    }
-  }
+  timedResponses.process();
   
   module_config->commitToEEPROM();
 }
@@ -265,7 +246,7 @@ void Controller::messageActedOn()
 
 void Controller::addTimedResponse(TimedResponse::Task * task)
 {
-  timedResponses.put(task);
+  timedResponses.add(task);
 }
 
 }

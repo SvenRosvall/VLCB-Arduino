@@ -5,9 +5,16 @@
 
 #pragma once
 
+#include "CircularBuffer.h"
+
 namespace VLCB
 {
 
+/// @brief Manage tasks that respond with messages at timed intervals
+/// 
+/// Users of this class add a task that sends a response message each time
+/// it is called.
+/// This avoids sending messages faster than the transport object can send them.
 class TimedResponse
 {
 public:
@@ -16,10 +23,20 @@ public:
   class Task
   {
   public:
+    virtual ~Task() = default;
     virtual Result operator()() = 0;
     int sequence = 0;
   };
   
+  void add(Task * task)
+  {
+    tasks.put(task);
+  }
+  
+  void process();
+
+private:
+  CircularBuffer<Task *> tasks;
 };
 
 } // VLCB
