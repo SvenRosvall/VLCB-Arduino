@@ -89,7 +89,7 @@ add_library(core_library OBJECT
         src/VLCB.h
         src/VLCB.cpp
         src/TimedResponse.h
-        src/TimeResponse.cpp
+        src/TimedResponse.cpp
 )
 
 target_link_libraries(core_library PUBLIC)
