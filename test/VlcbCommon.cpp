@@ -77,7 +77,7 @@ void processWithTasks(VLCB::Controller &controller)
   process(controller);
   for (int i = 0 ; controller.pendingTasks() && i < MAX_TASK_STEPS; ++i)
   {
-    addMillis(10);
+    addMillis(5);
     process(controller);
   }
 }

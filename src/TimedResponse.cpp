@@ -9,7 +9,7 @@
 namespace VLCB
 {
 
-static const int TASK_INTERVAL = 10;
+static const int TASK_INTERVAL = 5; // Same interval as VLCBlib_PIC
 
 void TimedResponse::process()
 {
