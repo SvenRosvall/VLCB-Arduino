@@ -32,6 +32,8 @@ to generate its messages within a time, where the requestor gives up,
 the generation of sent messages can be abandoned.
 
 This will be part of `Controller` where the action queue exists.
+But it would be nice if as much as possible of the code could be
+separated out to avoid cluttering `Controller`.
 
 Ian's implementation can only handle one such task at a time. 
 This may be limiting. Allow for a small queue of such tasks.
@@ -41,13 +43,39 @@ next request.
 Responses to Start-of-Day may get intermingled with MMC/FCU requests.
 
 Throttle running of these tasks if the Action queue is getting full.
-Also, only run a task once every 1ms.
+Also, only run a task once every 5ms.
 
 Could this be implemented as a service?
 This would then be run from the general process() loop.
 This would separate the task management from the `Controller` class which is 
 big enough already.
 It may be tricky for other services to get hold of this service to place a task.
+
+Ian's implementation uses TimedResponse for:
+
+| OP-code | Comments                            | Status |
+|---------|-------------------------------------|--------|
+| SOD     | Used by user sketch                 |        |
+| NERD    | Events                              |        |
+| RQSD    | Services                            |        |
+| RDGN    | Diagnostics for one or all services |        |
+| REQEV   | Event variables                     |        |
+| NVRD    | Node variables                      |        |
+| RQNPN   | Node Parameters                     | Done   |
+
+Analysis of the ActionQueue shows that it gets full of 
+ACT_INDICATE_ACTIVITY actions.
+These come from CanService when it sends a message.
+As the ACT_MESSAGE_OUT actions are queued up in the ActuionQueue, the
+ACT_INDICATE_ACTIVITY actions are piled at the end of the queue.
+Thus, the ActionQueue does not shrink when message is sent.
+And the green LED indication is very brief.
+
+Using the TimedResponse leaves gaps for the ACT_INDICATE_ACTIVITY
+to get processed.
+The green LED is now lit during the whole message sending period.
+(The activity is indicated with a 20ms flash which is longer than the
+5ms interval between actions.)
 
 ## Keep Node data in Controller
 NodeNumber etc are split across ```Controller``` and ```Configuration```. 
