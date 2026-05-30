@@ -356,7 +356,7 @@ void testReadNodeParameterCount()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(21, mockTransportService->sent_messages.size());

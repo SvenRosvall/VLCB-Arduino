@@ -108,6 +108,7 @@ public:
   void putAction(const Action & action);
   void putAction(ACTION action);
   bool pendingAction();
+  bool pendingTasks();
 
   void messageActedOn();
   unsigned int getMessagesActedOn() { return diagMsgsActed; }

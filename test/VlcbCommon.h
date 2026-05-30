@@ -31,3 +31,4 @@ VLCB::Controller createController(VlcbModeParams startupMode, std::initializer_l
 VLCB::Controller createController(VLCB::Transport * trp, std::initializer_list<VLCB::Service *> services);
 
 void process(VLCB::Controller &controller);
+void processWithTasks(VLCB::Controller &controller);

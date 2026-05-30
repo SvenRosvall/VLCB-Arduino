@@ -3,17 +3,28 @@
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
+#include "Arduino.h"
 #include "TimedResponse.h"
 
 namespace VLCB
 {
 
+static const int TASK_INTERVAL = 10;
+
 void TimedResponse::process()
 {
+  if (lastTaskTime + TASK_INTERVAL > millis())
+  {
+    // Not time yet for next task step.
+    return;
+  }
+
   if (tasks.available())
   {
     Task * task = *tasks.peek();
     Result result = (*task)();
+    lastTaskTime = millis();
+
     switch (result)
     {
       case PROGRESS:

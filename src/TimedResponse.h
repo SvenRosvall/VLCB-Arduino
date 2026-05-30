@@ -34,9 +34,15 @@ public:
   }
   
   void process();
+  
+  bool pendingTasks() const
+  {
+    return tasks.available();
+  }
 
 private:
   CircularBuffer<Task *> tasks;
+  unsigned long lastTaskTime = 0;
 };
 
 } // VLCB

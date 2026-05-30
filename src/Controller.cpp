@@ -238,6 +238,11 @@ bool Controller::pendingAction()
   return actionQueue.available();
 }
 
+bool Controller::pendingTasks()
+{
+  return timedResponses.pendingTasks();
+}
+
 void Controller::messageActedOn()
 {
   putAction(ACT_INDICATE_WORK);
