@@ -10,6 +10,8 @@
 namespace VLCB
 {
 
+class Controller;
+
 /// @brief Manage tasks that respond with messages at timed intervals
 /// 
 /// Users of this class add a task that sends a response message each time
@@ -23,9 +25,12 @@ public:
   class Task
   {
   public:
+    Task(Controller * controller) : controller(controller) {}
     virtual ~Task() = default;
     virtual Result operator()() = 0;
     int sequence = 0;
+  protected:
+    Controller *controller;
   };
   
   void add(Task * task)

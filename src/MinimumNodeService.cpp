@@ -307,23 +307,16 @@ void MinimumNodeService::handleRequestNodeParameters()
 class RespondParam : public TimedResponse::Task
 {
 public: 
-  RespondParam(Controller *controller)
-    : controller(controller)
-  {}
+  RespondParam(Controller *controller) : Task(controller) {}
   virtual TimedResponse::Result operator()() override
   {
-    if (sequence <= controller->getParam(PAR_NUM))
-    {
-      controller->sendMessageWithNN(OPC_PARAN, sequence, controller->getParam((VlcbParams) sequence));
-      return TimedResponse::PROGRESS;
-    }
-    else
+    if (sequence > controller->getParam(PAR_NUM))
     {
       return TimedResponse::FINISHED;
     }
+    controller->sendMessageWithNN(OPC_PARAN, sequence, controller->getParam((VlcbParams) sequence));
+    return TimedResponse::PROGRESS;
   }
-private:
-  Controller *controller;
 };
   
 void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn)
