@@ -395,6 +395,25 @@ static int countServices(const VLCB::ArrayHolder<Service *> &services)
   return count;
 }
 
+class RespondService : public TimedResponse::Task
+{
+public: 
+  RespondService(Controller *controller) : Task(controller) {}
+  virtual TimedResponse::Result operator()() override
+  {
+    if (sequence >= controller->getServices().size())
+    {
+      return TimedResponse::FINISHED;
+    }
+    Service * svc = controller->getServices()[sequence];
+    if (svc->getServiceID() > 0)
+    {
+      controller->sendMessageWithNN(OPC_SD, sequence+1, svc->getServiceID(), svc->getServiceVersionID());
+    }
+    return TimedResponse::PROGRESS;
+  }
+};
+
 void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -416,16 +435,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
 
     // and then details of each service.
-    byte svcIndex = 0;
-    for (auto svc: controller->getServices())
-    {
-      ++svcIndex;
-      if (svc->getServiceID() > 0)
-      {
-        // TODO: Need to space out these messages, put in a queue or use a TimedResponse structure.
-        controller->sendMessageWithNN(OPC_SD, svcIndex, svc->getServiceID(), svc->getServiceVersionID());
-      }
-    }
+    controller->addTimedResponse(new RespondService(controller));
   }
   else if (serviceIndex <= controller->getServices().size())
   {

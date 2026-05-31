@@ -517,7 +517,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   size_t serviceCount = controller.getServices().size();
   size_t expectedResponseServices = serviceCount - 1; // Omit the user interface.

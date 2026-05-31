@@ -47,7 +47,7 @@ void testServiceDiscovery()
   VLCB::CANFrame msg = {0x11, false, false, 4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockCanTransport->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(3, mockCanTransport->sent_frames.size());
