@@ -53,15 +53,15 @@ It may be tricky for other services to get hold of this service to place a task.
 
 Ian's implementation uses TimedResponse for:
 
-| OP-code | Comments                            | Status |
-|---------|-------------------------------------|--------|
-| SOD     | Used by user sketch                 |        |
-| NERD    | Events                              |        |
-| RQSD    | Services                            | Done   |
-| RDGN    | Diagnostics for one or all services |        |
-| REQEV   | Event variables                     |        |
-| NVRD    | Node variables                      |        |
-| RQNPN   | Node Parameters                     | Done   |
+| OP-code | Service               | Comments                            | Status |
+|---------|-----------------------|-------------------------------------|--------|
+| SOD     | User sketch           | Used by user sketch                 |        |
+| NERD    | All EventTeaching     | Events                              |        |
+| RQSD    | MNS                   | Services                            | Done   |
+| RDGN    | All                   | Diagnostics for one or all services |        |
+| REQEV   | Classic EventTeaching | Event variables                     |        |
+| NVRD    | NodeVariable          | Node variables                      | Done   |
+| RQNPN   | MNS                   | Node Parameters                     | Done   |
 
 Analysis of the ActionQueue shows that it gets full of 
 ACT_INDICATE_ACTIVITY actions.

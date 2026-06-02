@@ -6,6 +6,7 @@
 #include <Streaming.h>
 #include "NodeVariableService.h"
 #include "Controller.h"
+#include "TimedResponse.h"
 #include <vlcbdefs.hpp>
 
 namespace VLCB
@@ -48,6 +49,21 @@ void NodeVariableService::handleMessage(const VlcbMessage *msg)
   }
 }
 
+class RespondNodeVar : public TimedResponse::Task
+{
+public: 
+  RespondNodeVar(Controller *controller) : Task(controller) {}
+  virtual TimedResponse::Result operator()() override
+  {
+    if (sequence >= controller->getModuleConfig()->getNumNodeVariables())
+    {
+      return TimedResponse::FINISHED;
+    }
+    controller->sendMessageWithNN(OPC_NVANS, sequence + 1, controller->getModuleConfig()->readNV(sequence + 1));
+    return TimedResponse::PROGRESS;
+  }
+};
+
 void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -77,10 +93,7 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
     controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->getNumNodeVariables());
     if (!module_config->fcuCompatible)
     {
-      for (int i = 1; i <= module_config->getNumNodeVariables(); ++i)
-      {
-        controller->sendMessageWithNN(OPC_NVANS, i, module_config->readNV(i));
-      }
+      controller->addTimedResponse(new RespondNodeVar(controller));
     }
   }
   else

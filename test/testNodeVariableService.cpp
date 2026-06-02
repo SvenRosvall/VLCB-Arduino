@@ -213,7 +213,7 @@ void testReadNVAll()
   VLCB::VlcbMessage msg = {4, {OPC_NVRD, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(1 + configuration->getNumNodeVariables(), mockTransportService->sent_messages.size());
