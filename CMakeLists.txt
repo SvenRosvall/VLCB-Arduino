@@ -55,6 +55,8 @@ add_library(core_library OBJECT
         src/Storage.h
         src/Service.h
         src/Service.cpp
+        src/InternalDiagnosticsService.cpp
+        src/InternalDiagnosticsService.h
         src/LongMessageService.h
         src/MinimumNodeService.cpp
         src/MinimumNodeService.h

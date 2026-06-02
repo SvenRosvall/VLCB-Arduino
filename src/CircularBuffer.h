@@ -24,13 +24,13 @@ public:
   void clear();
 
   // Diagnostic metrics access
+  uint8_t bufUse() const;
   unsigned int getNumberOfPuts() const;
   unsigned int getNumberOfGets() const;
   unsigned int getOverflows() const;
   unsigned int getHighWaterMark() const;   // High Water Mark
 
 private:
-  uint8_t bufUse() const;
 
   uint8_t capacity;
   uint8_t head = 0;

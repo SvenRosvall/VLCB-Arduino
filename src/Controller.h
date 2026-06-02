@@ -105,6 +105,8 @@ public:
 
   void messageActedOn();
   unsigned int getMessagesActedOn() { return diagMsgsActed; }
+  
+  const CircularBuffer<Action> & getActionQueue() const { return actionQueue; }
 
 private:
   Configuration *module_config;
