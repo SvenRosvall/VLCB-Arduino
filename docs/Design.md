@@ -29,12 +29,14 @@ and services.
   will include queues.
 
 ## Workflow
-The Controller maintains a ```Action``` bus, which is implemented as a circular buffer.
+The Controller maintains a ```Action``` bus, which is implemented as a circular buffer of 
+[Action](../html.library/struct_v_l_c_b_1_1_action.html) objects.
 Each service can put actions on this bus and act on actions placed there by other services.
 An action represents tasks or information to be shared with other services. 
 The Action bus decouples services from each other and makes it easier to add new services.
 
-The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function.
+The main workflow is that the VLCB Controller object runs every so often from the sketch loop() function
+which calls `VLCB::process()`.
 During each iteration the controller calls out to each service to do any processing it needs to do. 
 The top element on the action bus (if any) is included in this call.
 
@@ -46,6 +48,11 @@ the user sketch can act on this event for example to turn on an LED or move a se
 
 The user sketch may produce events that are managed by the ```EventProducerService``` object which then passes
 the event as an Action via the Controller to the transport object.
+
+A user interface service may put actions on the queue to start CAN enumeration,
+or change mode of the node.
+The user interface service will also react to actions that indicate that work
+has been performed by the node.
 
 ### Dataflow
 Most of the VLCB functionality uses a message object ```VlcbMessage``` that passes incoming and
@@ -75,18 +82,19 @@ It provides functions that deal with these NVs and EVs.
 It makes use of a Storage interface where implementing classes store the data at a given
 address.
 
-There are a few implementing storage classes:
+There are a few classes that implement the 
+[Storage](../html.library/class_v_l_c_b_1_1_storage.html) interface:
 
-EepromInternalStorage
+[EepromInternalStorage](../html.library/class_v_l_c_b_1_1_eeprom_internal_storage.html)
 : Stores data in EEPROM directly on the processor.
 
-EepromExternalStorage
+[EepromExternalStorage](../html.library/class_v_l_c_b_1_1_eeprom_external_storage.html)
 : Stores data in external EEPROM connected via I2C.
 
-DueEepromEmulationStorage
+[DueEepromEmulationStorage](../html.library/class_v_l_c_b_1_1_due_eeprom_emulation_storage.html)
 : Support by emulating EEPROM for the Arduino DUE.
 
-FlashStorage
+[FlashStorage](/html.library/class_v_l_c_b_1_1_flash_storage.html)
 : Stores data in Flash memory. Useful for modules that do not have onboard EEPROM or too
 little EEPROM.
 
@@ -97,131 +105,5 @@ VLCB offers up a message to each service in turn.
 If a service is able to handle that message no further services will be offered the message.
 Thus, the order of configured services is important.
 
-Read more about the ```Service``` interface and how services work in 
+Read more about the [Service](../html.library/class_v_l_c_b_1_1_service.html) interface and how services work in 
 [Service documentation](Service.md).
-
-Examples of some services:
-
-MinimumNodeService
-: Handles all the mandatory op-codes that all VLCB modules must implement. 
-These op-codes involve running modes and basic node configuration such as node number and
-module parameters.
-
-EventConsumerService
-: Handles incoming events that shall result in actions on the module.
-If the COE parameter is set it will also handle outgoing events.
-
-ConsumeOwnEventsService
-: Enables passing events produced by the producer service back to the consumer service.
-It doesn't do anything else than setting the COE parameter flag which also tells
-the EventConsumerService to also look for outgoing events on the action bus.
-
-LongMessageService
-: Handles the long message extension to CBUS as defined in RFC005.
-
-LEDUserInterface
-: Implements a low level UI using a push button, a green LED and a yellow LED.
-
-It will be possible to implement new user interfaces that make use of, for example, an OLED screen or simply
-use the USB connection for serial communication.
-
-## Diagnostics
-
-Diagnostics are optional. 
-The implementation of diagnostics uses substantial amount of memory which
-might not be available in smaller processors.
-This library provides a choice to enable or omit diagnostics by using a
-variation of service classes.
-
-The services listed above do not have diagnostics included.
-To enable diagnostics choose service classes with a "WithDiagnostics" suffix.
-E.g. The CAN service class ```CanService``` does not provide diagnostics
-while the class ```CanServiceWithDiagnostics``` does provide diagnostics.
-
-Note: Not all services have a diagnostics enabled counterpart yet.
-
-## User Sketch
-
-A user sketch needs to set up the required VLCB objects and then call ```VLCB.process()``` from 
-the main loop.
-
-The setup code may look like:
-```
-// Global definitions
-VLCB::LEDUserInterface userInterface(greenLedPin, yellowLedPin, pushButtonPin); 
-VLCB::CAN2515 can2515(interruptPin, csPin); 
-VLCB::CanService canService(&can2515);
-VLCB::MnsService mnsService;
-VLCB::EventConsumerService eventConsumerService(myActionCallback);
-VLCB::Configuration config;
-VLCB::Controller moduleController(&config, {mnsService, userInterface, canService, eventConsumerService});
-
-setup()
-{
-  // set config layout parameters
-  modconfig.setNumNodeVariables(10);
-  modconfig.setNumEvents(32);
-  modconfig.EE_PRODUCED_EVENTS = 1;
-  modconfig.setNumEVs(2);
-
-  // set module parameters
-  modconfig.setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  modconfig.setModuleId(MANUFACTURER, MODULE_ID);  
-  modconfig.setName(mname);
-
-  can2515.setNumBuffers(2);
-  can2515.setOscFreq(OSC_FREQ);
-  can2515.begin();
-  
-  controller.begin();
-}
-```
-See also the example sketches how to use the VLCB library.
-
-### Convenience functions
-A set of convenience functions have been introduced to remove some
-complexity.
-```
-VLCB::CAN2515 can2515;                  // CAN transport object
-
-// Service objects
-VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
-VLCB::MinimumNodeServiceWithDiagnostics mnService;
-VLCB::CanServiceWithDiagnostics canService(&can2515);
-VLCB::NodeVariableService nvService;
-VLCB::ConsumeOwnEventsService coeService;
-VLCB::EventConsumerService ecService;
-VLCB::EventTeachingService etService;
-VLCB::EventProducerService epService;
-
-//
-/// setup VLCB - runs once at power on from setup()
-//
-void setupVLCB()
-{
-  VLCB::checkStartupAction(LED_GRN, LED_YLW, SWITCH0);
-
-  VLCB::setServices({
-    &mnService, &ledUserInterface, &canService, &nvService,
-    &ecService, &epService, &etService, &coeService});
-
-  // set config layout parameters
-  VLCB::setNumNodeVariables(10);
-  VLCB::setMaxEvents(32);
-  VLCB::setNumProducedEvents(1);
-  VLCB::setNumEventVariables(2);
-
-  // set module parameters
-  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
-  VLCB::setModuleId(MANUFACTURER, MODULE_ID);
-
-  // set module name
-  VLCB::setName(mname);
-
-  can2515.setNumBuffers(2);
-  can2515.setOscFreq(OSC_FREQ);
-  can2515.begin();
-  
-  VLCB::begin();
-}
-```
