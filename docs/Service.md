@@ -18,8 +18,12 @@ Below is a list of services provided by the VLCB library that
 can be used in a VLCB module sketch.
 
 The services listed below do not include diagnostics.
-Such diagnostics are provided by child classes with the suffix "WithDiagnostics".
+Such diagnostics are optional and provided by child classes with the suffix "WithDiagnostics".
+E.g. The CAN service class ```CanService``` does not provide diagnostics
+while the class ```CanServiceWithDiagnostics``` does provide diagnostics.
 Diagnostics is made optional to save memory on smaller Arduino systems.
+
+Note: Not all services have a diagnostics enabled counterpart yet.
 
 ### [MinimumNodeService](MinimumNodeService.md)
 Handles the OP-codes for managing nodes.
