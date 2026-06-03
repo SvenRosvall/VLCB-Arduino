@@ -12,11 +12,14 @@ extern void printConfig();
 namespace VLCB
 {
 
-void SerialUserInterface::process(const Action *action)
+void SerialUserInterface::process()
+{
+  processSerialInput();
+}
+
+void SerialUserInterface::processAction(const Action &action)
 {
   handleAction(action);
-  
-  processSerialInput();
 }
 
 void SerialUserInterface::processSerialInput()
@@ -147,14 +150,9 @@ void SerialUserInterface::processSerialInput()
   }
 }
 
-void SerialUserInterface::handleAction(const Action *action)
+void SerialUserInterface::handleAction(const Action &action)
 {
-  if (action == nullptr)
-  {
-    return;
-  }
-
-  switch (action->actionType)
+  switch (action.actionType)
   {
     case ACT_INDICATE_ACTIVITY:
       // Don't indicate this. Too noisy.
@@ -165,7 +163,7 @@ void SerialUserInterface::handleAction(const Action *action)
       break;
 
     case ACT_INDICATE_MODE:
-      indicateMode(action->mode);
+      indicateMode(action.mode);
       break;
 
     default:
@@ -178,15 +176,15 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
   switch (mode) 
   {
     case MODE_NORMAL:
-      Serial << "Module in NORMAL mode" << endl;
+      Serial << F("Module in NORMAL mode") << endl;
       break;
 
     case MODE_UNINITIALISED:
-      Serial << "Module in UNINITIALISED mode" << endl;
+      Serial << F("Module in UNINITIALISED mode") << endl;
       break;
 
     case MODE_SETUP:
-      Serial << "Module in SETUP mode" << endl;
+      Serial << F("Module in SETUP mode") << endl;
       break;
 
     default:

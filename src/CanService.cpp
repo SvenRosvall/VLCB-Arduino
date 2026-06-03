@@ -19,7 +19,7 @@ Service::Data CanService::getServiceData()
   return {canType, 0, 0};
 }
 
-void CanService::process(const Action *action)
+void CanService::process()
 {
   checkIncomingCanFrame();
 
@@ -31,24 +31,22 @@ void CanService::process(const Action *action)
   }
 
   checkCANenumTimout();
+}
 
-  if (action == nullptr)
-  {
-    return;
-  }
-
-  switch (action->actionType)
+void CanService::processAction(const Action &action)
+{
+  switch (action.actionType)
   {
     case ACT_MESSAGE_OUT:
-      sendMessage(&action->vlcbMessage);
+      sendMessage(&action.vlcbMessage);
       break;
 
     case ACT_MESSAGE_IN:
-      handleCanServiceMessage(&action->vlcbMessage);
+      handleCanServiceMessage(&action.vlcbMessage);
       break;
     
     case ACT_START_CAN_ENUMERATION:
-      startCANenumeration(action->fromENUM);
+      startCANenumeration(action.fromENUM);
       break;
       
     default:

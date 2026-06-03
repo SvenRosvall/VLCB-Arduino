@@ -115,22 +115,23 @@ $(function(){initNavTree('_l_e_d_user_interface_8h_source.html','',''); });
 <div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  <span class="keyword">virtual</span> <span class="keywordtype">byte</span> getServiceVersionID()<span class="keyword"> const override </span>{ <span class="keywordflow">return</span> 1; };</div>
 <div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>  <span class="keywordtype">bool</span> isButtonPressed();</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespace_v_l_c_b.html#af217aaaec8431562509e9df92a3ca6f0">process</a>(<span class="keyword">const</span> Action *action) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span> </div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  LED greenLed;</div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  LED yellowLed;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  Switch pushButton;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span> </div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>  <span class="keywordtype">bool</span> resetRequested();</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keywordtype">void</span> handleAction(<span class="keyword">const</span> Action *action);</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <span class="keywordtype">void</span> checkRequestedAction();</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span> </div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>  <span class="keywordtype">void</span> indicateMode(<a class="code hl_enumeration" href="vlcbdefs_8hpp.html#a534e4bde5d507b2db9a873b6d0b20a06">VlcbModeParams</a> mode);</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>};</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="namespace_v_l_c_b.html#af217aaaec8431562509e9df92a3ca6f0">process</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  <span class="keyword">virtual</span> <span class="keywordtype">void</span> processAction(<span class="keyword">const</span> Action &amp;action) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span> </div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  LED greenLed;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  LED yellowLed;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>  Switch pushButton;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keywordtype">bool</span> resetRequested();</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <span class="keywordtype">void</span> handleAction(<span class="keyword">const</span> Action &amp;action);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  <span class="keywordtype">void</span> checkRequestedAction();</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>  <span class="keywordtype">void</span> indicateMode(<a class="code hl_enumeration" href="vlcbdefs_8hpp.html#a534e4bde5d507b2db9a873b6d0b20a06">VlcbModeParams</a> mode);</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>};</div>
 </div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span> </div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>}</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>}</div>
 <div class="ttc" id="a_service_8h_html"><div class="ttname"><a href="_service_8h.html">Service.h</a></div></div>
 <div class="ttc" id="aclass_v_l_c_b_1_1_l_e_d_user_interface_html_aeba4e2c90b821db53095f5585e9f56f6"><div class="ttname"><a href="class_v_l_c_b_1_1_l_e_d_user_interface.html#aeba4e2c90b821db53095f5585e9f56f6">VLCB::LEDUserInterface::LEDUserInterface</a></div><div class="ttdeci">LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin)</div></div>
 <div class="ttc" id="aclass_v_l_c_b_1_1_service_html"><div class="ttname"><a href="class_v_l_c_b_1_1_service.html">VLCB::Service</a></div><div class="ttdoc">Interface base class for all VLCB services.</div><div class="ttdef"><b>Definition</b> Service.h:25</div></div>

@@ -42,10 +42,10 @@ class LongMessageService : public Service
 
 public:
 
-  virtual void process(const Action * action) override;
+  virtual void process() override;
+  virtual void processAction(const Action &action) override;
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
   void subscribe(byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void (*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status));
-  bool process();
   virtual void processReceivedMessageFragment(const VlcbMessage *frame);
   bool is_sending();
   void setDelay(byte delay_in_millis);
@@ -101,7 +101,7 @@ public:
 
   bool allocateContexts(byte num_receive_contexts = NUM_EX_CONTEXTS, unsigned int receive_buffer_len = EX_BUFFER_LEN, byte num_send_contexts = NUM_EX_CONTEXTS);
   bool sendLongMessage(const void *msg, const unsigned int msg_len, const byte stream_id);
-  bool process();
+  virtual void process() override;
   void subscribe(byte *stream_ids, const byte num_stream_ids, void (*messagehandler)(void *msg, unsigned int msg_len, byte stream_id, byte status));
   virtual void processReceivedMessageFragment(const VlcbMessage *frame);
   byte is_sending();

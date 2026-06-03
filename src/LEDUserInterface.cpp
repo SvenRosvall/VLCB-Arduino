@@ -28,7 +28,7 @@ bool LEDUserInterface::isButtonPressed()
   return pushButton.isPressed();
 }
 
-void LEDUserInterface::process(const Action *action)
+void LEDUserInterface::process()
 {
   pushButton.run();
   greenLed.run();
@@ -39,20 +39,13 @@ void LEDUserInterface::process(const Action *action)
     // Serial << F("> Button is pressed for mode change") << endl;
     indicateMode(MODE_SETUP);
   }
-  
-  handleAction(action);
 
   checkRequestedAction();
 }
 
-void LEDUserInterface::handleAction(const Action *action)
+void LEDUserInterface::processAction(const Action &action)
 {
-  if (action == nullptr)
-  {
-    return;
-  }
-
-  switch (action->actionType)
+  switch (action.actionType)
   {
     case ACT_INDICATE_ACTIVITY:
       if (controller->getModuleConfig()->currentMode == MODE_UNINITIALISED)
@@ -77,7 +70,7 @@ void LEDUserInterface::handleAction(const Action *action)
       break;
 
     case ACT_INDICATE_MODE:
-      indicateMode(action->mode);
+      indicateMode(action.mode);
       break;
       
     default:
