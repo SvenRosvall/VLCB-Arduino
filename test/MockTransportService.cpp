@@ -6,7 +6,7 @@
 #include "MockTransportService.h"
 #include "Controller.h"
 
-void MockTransportService::process(const VLCB::Action *action)
+void MockTransportService::process()
 {
   if (!incoming_messages.empty())
   {
@@ -14,16 +14,14 @@ void MockTransportService::process(const VLCB::Action *action)
     controller->putAction(incomingAction);
     incoming_messages.pop_front();
   }
+}
 
-  if (action == nullptr)
-  {
-    return;
-  }
-
-  switch (action->actionType)
+void MockTransportService::processAction(const VLCB::Action &action)
+{
+  switch (action.actionType)
   {
     case VLCB::ACT_MESSAGE_OUT:
-      sent_messages.push_back(action->vlcbMessage);
+      sent_messages.push_back(action.vlcbMessage);
       break;
       
     default:

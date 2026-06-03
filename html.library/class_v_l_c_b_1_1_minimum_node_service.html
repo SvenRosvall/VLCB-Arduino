@@ -109,8 +109,10 @@ Inheritance diagram for VLCB::MinimumNodeService:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a96ec21fcdcd84adc1334a9b42fd51053" id="r_a96ec21fcdcd84adc1334a9b42fd51053"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a96ec21fcdcd84adc1334a9b42fd51053">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
-<tr class="memdesc:a96ec21fcdcd84adc1334a9b42fd51053"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
+<tr class="memitem:afba47dc3b348c77b3af33568897079f1" id="r_afba47dc3b348c77b3af33568897079f1"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#afba47dc3b348c77b3af33568897079f1">process</a> () override</td></tr>
+<tr class="memdesc:afba47dc3b348c77b3af33568897079f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core to let the service perform regular tasks.  <br /></td></tr>
+<tr class="memitem:a08d0b151c2924693ca195bbef029d156" id="r_a08d0b151c2924693ca195bbef029d156"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a08d0b151c2924693ca195bbef029d156">processAction</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;action) override</td></tr>
+<tr class="memdesc:a08d0b151c2924693ca195bbef029d156"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when there is an action available.  <br /></td></tr>
 <tr class="memitem:a248e09a2503a4027ee267e83ea2a3f22" id="r_a248e09a2503a4027ee267e83ea2a3f22"><td class="memItemLeft">virtual <a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#a248e09a2503a4027ee267e83ea2a3f22">getServiceID</a> () const override</td></tr>
 <tr class="memdesc:a248e09a2503a4027ee267e83ea2a3f22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:a36d1ea088521b56ef469131d2ca15aa0" id="r_a36d1ea088521b56ef469131d2ca15aa0"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a36d1ea088521b56ef469131d2ca15aa0">getServiceVersionID</a> () const override</td></tr>
@@ -156,8 +158,8 @@ Additional Inherited Members</h2></td></tr>
 Minimum Node Service API</h1>
 <p>This service is mandatory within the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> structure. It manages the setting up of a node by handling all of the communication with the external management system. The MNS will also act upon various Mode Commands either setting flags or instigating operations in other services, if present. In normal sketch use, there are no application calls directly to the MNS. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a96ec21fcdcd84adc1334a9b42fd51053" name="a96ec21fcdcd84adc1334a9b42fd51053"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96ec21fcdcd84adc1334a9b42fd51053">&#9670;&#160;</a></span>process()</h2>
+<a id="afba47dc3b348c77b3af33568897079f1" name="afba47dc3b348c77b3af33568897079f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afba47dc3b348c77b3af33568897079f1">&#9670;&#160;</a></span>process()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -168,7 +170,7 @@ Minimum Node Service API</h1>
         <tr>
           <td class="memname">void VLCB::MinimumNodeService::process </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -179,11 +181,46 @@ Minimum Node Service API</h1>
 </table>
 </div><div class="memdoc">
 
-<p>This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core. </p>
-<p>Implementing service classes shall implement this to perform tasks specific to that service such as polling for changes of input pins.</p>
-<p>It takes a pointer to an <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a> that needs to be processed or a null pointer if there is no <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a> to be processed. </p>
+<p>This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core to let the service perform regular tasks. </p>
+<p>Implementing service classes shall implement this to perform tasks specific to that service such as polling for changes of input pins. This method does not need to be implemented if there are no such regular tasks for the service. </p>
 
-<p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#a404393cfe90193db0675e75afbf5142d">VLCB::Service</a>.</p>
+<p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a1fbded51bba05e0eb81047ca5bef5ac2">VLCB::Service</a>.</p>
+
+</div>
+</div>
+<a id="a08d0b151c2924693ca195bbef029d156" name="a08d0b151c2924693ca195bbef029d156"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08d0b151c2924693ca195bbef029d156">&#9670;&#160;</a></span>processAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::MinimumNodeService::processAction </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Called when there is an action available. </p>
+<p>This method does not need to be implemented if the service does react to any actions.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action that the service may have interest in. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a7198d79026d95a05148518d85d0aec6b">VLCB::Service</a>.</p>
 
 </div>
 </div>

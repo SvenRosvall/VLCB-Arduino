@@ -161,23 +161,23 @@ void Controller::indicateActivity()
 //
 void Controller::process()
 {
-  //Serial << F("Ctrl::process() start, pAction queue size = ") << actionQueue.size();
-  const Action * pAction = nullptr;
-  Action action;
+  //Serial << F("Ctrl::process() start, action queue size = ") << actionQueue.size();
   if (actionQueue.available())
   {
-    action = actionQueue.pop();
-    pAction = &action;
+    // Get the next action and store it locally so that it is not overwritten if the action queue gets full.
+    Action action = actionQueue.pop();
+    //Serial << F(" action type = ") << action.actionType << endl;
+    for (Service *service: services)
+    {
+      service->processAction(action);
+    }
   }
-  //Serial << F(" pAction type = ");
-  //if (pAction) Serial << pAction->actionType; else Serial << F("null");
-  //Serial << endl;
 
   for (Service *service: services)
   {
-    service->process(pAction);
+    service->process();
   }
-  
+
   module_config->commitToEEPROM();
 }
 

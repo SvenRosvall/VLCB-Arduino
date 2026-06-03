@@ -106,12 +106,12 @@ Inheritance diagram for VLCB::LongMessageService:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a900683920f36c5a63cb81318379e8b6c" id="r_a900683920f36c5a63cb81318379e8b6c"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a900683920f36c5a63cb81318379e8b6c">process</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *action) override</td></tr>
-<tr class="memdesc:a900683920f36c5a63cb81318379e8b6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core.  <br /></td></tr>
+<tr class="memitem:a93bfbbb1c23338a05c7bebe9267e01e2" id="r_a93bfbbb1c23338a05c7bebe9267e01e2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a93bfbbb1c23338a05c7bebe9267e01e2">process</a> () override</td></tr>
+<tr class="memitem:acf41e7bfb0e6bf4c0400a4d77d00f2fb" id="r_acf41e7bfb0e6bf4c0400a4d77d00f2fb"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#acf41e7bfb0e6bf4c0400a4d77d00f2fb">processAction</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;action) override</td></tr>
+<tr class="memdesc:acf41e7bfb0e6bf4c0400a4d77d00f2fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when there is an action available.  <br /></td></tr>
 <tr class="memitem:ae1e526704a562cbedfe5975c38afae21" id="r_ae1e526704a562cbedfe5975c38afae21"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#ae1e526704a562cbedfe5975c38afae21">sendLongMessage</a> (const void *msg, const unsigned int msg_len, const byte stream_id)</td></tr>
 <tr class="memitem:a3f8170e7d550bef4b3f6a9adde4e1df8" id="r_a3f8170e7d550bef4b3f6a9adde4e1df8"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3f8170e7d550bef4b3f6a9adde4e1df8">subscribe</a> (byte *stream_ids, const byte num_stream_ids, void *receive_buffer, const unsigned int receive_buffer_len, void(*messagehandler)(void *fragment, const unsigned int fragment_len, const byte stream_id, const byte status))</td></tr>
 <tr class="memdesc:a3f8170e7d550bef4b3f6a9adde4e1df8"><td class="mdescLeft">&#160;</td><td class="mdescRight">subscribe to a range of stream IDs  <br /></td></tr>
-<tr class="memitem:a3ae41f76f5d1c96f81f39f2afb0e07d5" id="r_a3ae41f76f5d1c96f81f39f2afb0e07d5"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a3ae41f76f5d1c96f81f39f2afb0e07d5">process</a> ()</td></tr>
 <tr class="memitem:a12ba879006cea9dd32fbd6892c351bbb" id="r_a12ba879006cea9dd32fbd6892c351bbb"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a12ba879006cea9dd32fbd6892c351bbb">processReceivedMessageFragment</a> (const <a class="el" href="struct_v_l_c_b_1_1_vlcb_message.html">VlcbMessage</a> *frame)</td></tr>
 <tr class="memitem:a1123e6d42f44eb9576d2318f91b0c869" id="r_a1123e6d42f44eb9576d2318f91b0c869"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a1123e6d42f44eb9576d2318f91b0c869">is_sending</a> ()</td></tr>
 <tr class="memitem:adb63f86ce79b7df4ce8ff7a6d20fd4ca" id="r_adb63f86ce79b7df4ce8ff7a6d20fd4ca"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#adb63f86ce79b7df4ce8ff7a6d20fd4ca">setDelay</a> (byte delay_in_millis)</td></tr>
@@ -171,8 +171,8 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a basic class to send and receive <a class="el" href="class_v_l_c_b_1_1_controller.html" title="Main object in VLCB. Coordinates transport, ui, configuration and services.">Controller</a> long messages per MERG RFC 0005 See <a href="https://www.merg.org.uk/merg_wiki/doku.php?id=rfc:longmessageprotocol">https://www.merg.org.uk/merg_wiki/doku.php?id=rfc:longmessageprotocol</a> handles a single message, sending and receiving suitable for small microcontrollers with limited memory </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a900683920f36c5a63cb81318379e8b6c" name="a900683920f36c5a63cb81318379e8b6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a900683920f36c5a63cb81318379e8b6c">&#9670;&#160;</a></span>process() <span class="overload">[1/2]</span></h2>
+<a id="a93bfbbb1c23338a05c7bebe9267e01e2" name="a93bfbbb1c23338a05c7bebe9267e01e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93bfbbb1c23338a05c7bebe9267e01e2">&#9670;&#160;</a></span>process()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,7 +183,37 @@ Protected Attributes</h2></td></tr>
         <tr>
           <td class="memname">void VLCB::LongMessageService::process </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> *</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>the process method is called regularly from the user's loop function we use this to send the individual fragments of an outgoing message and check the message receive timeout </p>
+
+<p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a1fbded51bba05e0eb81047ca5bef5ac2">VLCB::Service</a>.</p>
+
+<p>Reimplemented in <a class="el" href="class_v_l_c_b_1_1_long_message_service_ex.html#aaffc63e78be30ff36c15bd0b421c8fbe">VLCB::LongMessageServiceEx</a>.</p>
+
+</div>
+</div>
+<a id="acf41e7bfb0e6bf4c0400a4d77d00f2fb" name="acf41e7bfb0e6bf4c0400a4d77d00f2fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf41e7bfb0e6bf4c0400a4d77d00f2fb">&#9670;&#160;</a></span>processAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::LongMessageService::processAction </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>action</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -194,11 +224,16 @@ Protected Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>This method that be called regularly from the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> core. </p>
-<p>Implementing service classes shall implement this to perform tasks specific to that service such as polling for changes of input pins.</p>
-<p>It takes a pointer to an <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a> that needs to be processed or a null pointer if there is no <a class="el" href="struct_v_l_c_b_1_1_action.html" title="An action to be performed.">Action</a> to be processed. </p>
+<p>Called when there is an action available. </p>
+<p>This method does not need to be implemented if the service does react to any actions.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action that the service may have interest in. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#a404393cfe90193db0675e75afbf5142d">VLCB::Service</a>.</p>
+<p>Reimplemented from <a class="el" href="class_v_l_c_b_1_1_service.html#a7198d79026d95a05148518d85d0aec6b">VLCB::Service</a>.</p>
 
 </div>
 </div>
@@ -225,7 +260,7 @@ Protected Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>initiate sending of a long message this method sends the first message - the header packet the remainder of the message is sent in chunks from the <a class="el" href="#a3ae41f76f5d1c96f81f39f2afb0e07d5">process()</a> method </p>
+<p>initiate sending of a long message this method sends the first message - the header packet the remainder of the message is sent in chunks from the <a class="el" href="#a93bfbbb1c23338a05c7bebe9267e01e2">process()</a> method </p>
 
 </div>
 </div>
@@ -264,24 +299,6 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>subscribe to a range of stream IDs </p>
-
-</div>
-</div>
-<a id="a3ae41f76f5d1c96f81f39f2afb0e07d5" name="a3ae41f76f5d1c96f81f39f2afb0e07d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ae41f76f5d1c96f81f39f2afb0e07d5">&#9670;&#160;</a></span>process() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool VLCB::LongMessageService::process </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>the process method is called regularly from the user's loop function we use this to send the individual fragments of an outgoing message and check the message receive timeout </p>
 
 </div>
 </div>

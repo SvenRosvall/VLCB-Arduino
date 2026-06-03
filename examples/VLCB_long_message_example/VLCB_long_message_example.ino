@@ -121,13 +121,6 @@ void loop()
   VLCB::process();
 
   //
-  /// do RFC0005 Controller long message processing
-  //
-  if (!lmsg.process()) {
-    Serial << F("> error in long message processing") << endl;
-  }
-
-  //
   /// check CAN message buffers
   //
   if (can2515.receiveBufferPeak() > can2515.receiveBufferSize())

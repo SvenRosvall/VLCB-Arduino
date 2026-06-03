@@ -1,6 +1,7 @@
 var class_v_l_c_b_1_1_minimum_node_service =
 [
-    [ "process", "class_v_l_c_b_1_1_minimum_node_service.html#a96ec21fcdcd84adc1334a9b42fd51053", null ],
+    [ "process", "class_v_l_c_b_1_1_minimum_node_service.html#afba47dc3b348c77b3af33568897079f1", null ],
+    [ "processAction", "class_v_l_c_b_1_1_minimum_node_service.html#a08d0b151c2924693ca195bbef029d156", null ],
     [ "getServiceID", "class_v_l_c_b_1_1_minimum_node_service.html#a248e09a2503a4027ee267e83ea2a3f22", null ],
     [ "getServiceVersionID", "class_v_l_c_b_1_1_minimum_node_service.html#a36d1ea088521b56ef469131d2ca15aa0", null ],
     [ "begin", "class_v_l_c_b_1_1_minimum_node_service.html#afbe4ce0704b3d7b7109c64594d215dfe", null ],

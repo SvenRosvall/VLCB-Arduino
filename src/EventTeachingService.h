@@ -24,7 +24,7 @@ class EventTeachingService : public AbstractEventTeachingService
 {
 /// @cond LIBRARY
 public:
-  virtual void process(const Action * action) override;
+  virtual void processAction(const Action &action) override;
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_OLD_TEACH; }
   virtual byte getServiceVersionID() const override { return 3; }
 

@@ -38,7 +38,8 @@ public:
   virtual byte getServiceVersionID() const override { return 2; }
   virtual Data getServiceData();
 
-  virtual void process(const Action * action) override;
+  virtual void process() override;
+  virtual void processAction(const Action &action) override;
 
 protected:
   CanTransport * canTransport;
