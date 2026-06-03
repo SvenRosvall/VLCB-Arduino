@@ -56,7 +56,7 @@ Ian's implementation uses TimedResponse for:
 | OP-code | Service               | Comments                            | Status |
 |---------|-----------------------|-------------------------------------|--------|
 | SOD     | User sketch           | Used by user sketch                 |        |
-| NERD    | All EventTeaching     | Events                              |        |
+| NERD    | All EventTeaching     | Events                              | Done   |
 | RQSD    | MNS                   | Services                            | Done   |
 | RDGN    | All                   | Diagnostics for one or all services |        |
 | REQEV   | Classic EventTeaching | Event variables                     |        |

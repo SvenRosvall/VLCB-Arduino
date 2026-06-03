@@ -793,7 +793,7 @@ void testEventHashCollisionAndUnlearn()
   msg = {3, {OPC_NERD, 0x01, 0x04}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   assertEquals(1, mockTransportService->sent_messages.size());
   assertEquals(OPC_ENRSP, mockTransportService->sent_messages[0].data[0]);
