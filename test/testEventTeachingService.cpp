@@ -356,7 +356,7 @@ void testTeachEvent()
   msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 0}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   assertEquals(3, mockTransportService->sent_messages.size());
 

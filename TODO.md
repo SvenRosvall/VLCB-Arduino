@@ -59,7 +59,7 @@ Ian's implementation uses TimedResponse for:
 | NERD    | All EventTeaching     | Events                              | Done   |
 | RQSD    | MNS                   | Services                            | Done   |
 | RDGN    | All                   | Diagnostics for one or all services |        |
-| REQEV   | Classic EventTeaching | Event variables                     |        |
+| REQEV   | Classic EventTeaching | Event variables                     | Done   |
 | NVRD    | NodeVariable          | Node variables                      | Done   |
 | RQNPN   | MNS                   | Node Parameters                     | Done   |
 

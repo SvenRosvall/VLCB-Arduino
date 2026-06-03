@@ -44,6 +44,31 @@ void EventTeachingService::handleMessage(const VlcbMessage *msg)
   }
 }
 
+class RespondEV : public TimedResponse::Task
+{
+private:
+  Configuration *module_config;
+  VlcbMessage response; // A prepopulated response message.
+  byte eventIndex;
+
+public:
+  RespondEV(Controller * controller, Configuration *module_config, const VlcbMessage & response, byte eventIndex)
+    : Task(controller), module_config(module_config), response(response), eventIndex(eventIndex)
+  {}
+  
+  virtual TimedResponse::Result operator()() override
+  {
+    if (sequence >= module_config->getNumEVs())
+    {
+      return TimedResponse::FINISHED;
+    }
+    response.data[5] = sequence + 1;
+    response.data[6] = module_config->getEventEVval(eventIndex, sequence + 1);
+    controller->sendMessage(&response);
+    return TimedResponse::PROGRESS;
+  }
+};
+
 void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, unsigned int nn, unsigned int en)
 {
   if (!bLearn)
@@ -60,10 +85,10 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   }
 
   Configuration *module_config = controller->getModuleConfig();
-  byte index = module_config->findExistingEvent(nn, en);
+  byte eventIndex = module_config->findExistingEvent(nn, en);
   byte evnum = msg->data[5];
 
-  if (index >= module_config->getNumEvents())
+  if (eventIndex >= module_config->getNumEvents())
   {
     //DEBUG_SERIAL << F("ets> event not found") << endl;
     controller->sendCMDERR(CMDERR_INVALID_EVENT);
@@ -92,18 +117,13 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     controller->sendMessage(&response);
     if (!module_config->fcuCompatible)
     {
-      for (byte i = 1; i <= module_config->getNumEVs(); i++)
-      {
-        response.data[5] = i;
-        response.data[6] = module_config->getEventEVval(index, i);
-        controller->sendMessage(&response);
-      }
+      controller->addTimedResponse(new RespondEV(controller, module_config, response, eventIndex));
     }
   }
   else
   {
     // Reuse the incoming message as it contains the event NN/EN and event index.
-    response.data[6] = module_config->getEventEVval(index, evnum);    
+    response.data[6] = module_config->getEventEVval(eventIndex, evnum);    
     controller->sendMessage(&response);
   }
 }
