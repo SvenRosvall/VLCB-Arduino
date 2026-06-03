@@ -43,6 +43,8 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "GridConnect.cpp", "_grid_connect_8cpp.html", "_grid_connect_8cpp" ],
     [ "GridConnect.h", "_grid_connect_8h.html", "_grid_connect_8h" ],
     [ "initializer_list.h", "initializer__list_8h.html", "initializer__list_8h" ],
+    [ "InternalDiagnosticsService.cpp", "_internal_diagnostics_service_8cpp.html", null ],
+    [ "InternalDiagnosticsService.h", "_internal_diagnostics_service_8h.html", "_internal_diagnostics_service_8h" ],
     [ "LED.cpp", "_l_e_d_8cpp.html", null ],
     [ "LED.h", "_l_e_d_8h.html", "_l_e_d_8h" ],
     [ "LEDUserInterface.cpp", "_l_e_d_user_interface_8cpp.html", "_l_e_d_user_interface_8cpp" ],

@@ -10,5 +10,6 @@ var searchData=
   ['blink_5frate_7',['BLINK_RATE',['../namespace_v_l_c_b.html#a42883bba86bc6001c7146f58d2a51689',1,'VLCB']]],
   ['blinking_5foff_8',['Blinking_Off',['../class_v_l_c_b_1_1_l_e_d.html#a42ae133cb00a6e9e2135cf56d7ae1816aedc7f6cbe88efd5b9a2d8a9252ab8dd1',1,'VLCB::LED']]],
   ['blinking_5fon_9',['Blinking_On',['../class_v_l_c_b_1_1_l_e_d.html#a42ae133cb00a6e9e2135cf56d7ae1816aa0af9cceb3dc24b3f567f09abab395ca',1,'VLCB::LED']]],
-  ['buffer_10',['buffer',['../struct_v_l_c_b_1_1receive__context__t.html#ac80f705f7bfa701912577f959a867f22',1,'VLCB::receive_context_t::buffer'],['../struct_v_l_c_b_1_1send__context__t.html#a11d7bdbfc5f66a1555f648ce3985358a',1,'VLCB::send_context_t::buffer']]]
+  ['buffer_10',['buffer',['../struct_v_l_c_b_1_1receive__context__t.html#ac80f705f7bfa701912577f959a867f22',1,'VLCB::receive_context_t::buffer'],['../struct_v_l_c_b_1_1send__context__t.html#a11d7bdbfc5f66a1555f648ce3985358a',1,'VLCB::send_context_t::buffer']]],
+  ['bufuse_11',['bufUse',['../class_v_l_c_b_1_1_circular_buffer.html#a50fbf2b765b5a0e090bcbe54cffdfc8b',1,'VLCB::CircularBuffer']]]
 ];

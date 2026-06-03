@@ -12,6 +12,7 @@ var namespace_v_l_c_b =
     [ "EventProducerService", "class_v_l_c_b_1_1_event_producer_service.html", "class_v_l_c_b_1_1_event_producer_service" ],
     [ "EventSlotTeachingService", "class_v_l_c_b_1_1_event_slot_teaching_service.html", null ],
     [ "EventTeachingService", "class_v_l_c_b_1_1_event_teaching_service.html", null ],
+    [ "InternalDiagnosticsService", "class_v_l_c_b_1_1_internal_diagnostics_service.html", "class_v_l_c_b_1_1_internal_diagnostics_service" ],
     [ "MinimumNodeService", "class_v_l_c_b_1_1_minimum_node_service.html", null ],
     [ "NodeVariableService", "class_v_l_c_b_1_1_node_variable_service.html", null ],
     [ "Service", "class_v_l_c_b_1_1_service.html", null ],

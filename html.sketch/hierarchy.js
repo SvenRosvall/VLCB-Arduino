@@ -10,6 +10,7 @@ var hierarchy =
       [ "VLCB::ConsumeOwnEventsService", "class_v_l_c_b_1_1_consume_own_events_service.html", null ],
       [ "VLCB::EventConsumerService", "class_v_l_c_b_1_1_event_consumer_service.html", null ],
       [ "VLCB::EventProducerService", "class_v_l_c_b_1_1_event_producer_service.html", null ],
+      [ "VLCB::InternalDiagnosticsService", "class_v_l_c_b_1_1_internal_diagnostics_service.html", null ],
       [ "VLCB::LEDUserInterface", "class_v_l_c_b_1_1_l_e_d_user_interface.html", null ],
       [ "VLCB::MinimumNodeService", "class_v_l_c_b_1_1_minimum_node_service.html", null ],
       [ "VLCB::NodeVariableService", "class_v_l_c_b_1_1_node_variable_service.html", null ],

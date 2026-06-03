@@ -24,6 +24,7 @@ var namespace_v_l_c_b =
     [ "EventTeachingService", "class_v_l_c_b_1_1_event_teaching_service.html", "class_v_l_c_b_1_1_event_teaching_service" ],
     [ "EventTeachingServiceWithDiagnostics", "class_v_l_c_b_1_1_event_teaching_service_with_diagnostics.html", "class_v_l_c_b_1_1_event_teaching_service_with_diagnostics" ],
     [ "FlashStorage", "class_v_l_c_b_1_1_flash_storage.html", "class_v_l_c_b_1_1_flash_storage" ],
+    [ "InternalDiagnosticsService", "class_v_l_c_b_1_1_internal_diagnostics_service.html", "class_v_l_c_b_1_1_internal_diagnostics_service" ],
     [ "LED", "class_v_l_c_b_1_1_l_e_d.html", "class_v_l_c_b_1_1_l_e_d" ],
     [ "LEDUserInterface", "class_v_l_c_b_1_1_l_e_d_user_interface.html", "class_v_l_c_b_1_1_l_e_d_user_interface" ],
     [ "LongMessageService", "class_v_l_c_b_1_1_long_message_service.html", "class_v_l_c_b_1_1_long_message_service" ],

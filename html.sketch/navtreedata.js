@@ -56,8 +56,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_abstract_event_teaching_service_8h.html",
-"vlcbdefs_8hpp.html#a2c53a2367445493162ee7a864ff47b97a4f08811a16f8b3ddb74da09df55bd799",
-"vlcbdefs_8hpp.html#ab0a99f2600a899ad3f05834d22c3c2d5a45abbb54ac27c493f72f58d2683cb88a"
+"vlcbdefs_8hpp.html#a1c60595e1ce1905f1c30f09f5b1e6d59a4af5647042408d32ce491e88d51918ae",
+"vlcbdefs_8hpp.html#ab0a99f2600a899ad3f05834d22c3c2d5a28dc4a44e7336855e20b1645af00bcd4"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';
