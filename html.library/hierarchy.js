@@ -29,6 +29,7 @@ var hierarchy =
       [ "VLCB::EventProducerService", "class_v_l_c_b_1_1_event_producer_service.html", [
         [ "VLCB::EventProducerServiceWithDiagnostics", "class_v_l_c_b_1_1_event_producer_service_with_diagnostics.html", null ]
       ] ],
+      [ "VLCB::InternalDiagnosticsService", "class_v_l_c_b_1_1_internal_diagnostics_service.html", null ],
       [ "VLCB::LEDUserInterface", "class_v_l_c_b_1_1_l_e_d_user_interface.html", null ],
       [ "VLCB::LongMessageService", "class_v_l_c_b_1_1_long_message_service.html", [
         [ "VLCB::LongMessageServiceEx", "class_v_l_c_b_1_1_long_message_service_ex.html", null ]

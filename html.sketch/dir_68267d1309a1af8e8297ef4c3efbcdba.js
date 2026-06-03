@@ -10,6 +10,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "EventSlotTeachingService.h", "_event_slot_teaching_service_8h.html", "_event_slot_teaching_service_8h" ],
     [ "EventTeachingService.h", "_event_teaching_service_8h.html", "_event_teaching_service_8h" ],
     [ "initializer_list.h", "initializer__list_8h.html", "initializer__list_8h" ],
+    [ "InternalDiagnosticsService.h", "_internal_diagnostics_service_8h.html", "_internal_diagnostics_service_8h" ],
     [ "LEDUserInterface.h", "_l_e_d_user_interface_8h.html", "_l_e_d_user_interface_8h" ],
     [ "MinimumNodeService.h", "_minimum_node_service_8h.html", "_minimum_node_service_8h" ],
     [ "NodeVariableService.h", "_node_variable_service_8h.html", "_node_variable_service_8h" ],

@@ -10,6 +10,13 @@ Fixes:
 * Provide more example sketches that communicate over serial line.
 * Update reboot method for RP2040.
 * Improve documentation for sketch developers and library developers.
+* API documentation generated with Doxygen.
+* Split Service::process(Action * action) into two functions to simplify
+  writing child services.  
+  **Note:** This is a breaking change for any user defined services.
+* Add InternalDiagnosticsService that provides diagnostics for internal
+  state such as free memory and action queue usage.
+* Extend SerialUserInterface to show action queue usage.
 
 # 2.2.0 - Split EventTeachingService
 
