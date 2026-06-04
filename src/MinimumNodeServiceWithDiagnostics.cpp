@@ -52,6 +52,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
   if (serviceIndex == 0)
   {
     // Request for diagnostics for all services.
+    // TODO: TimedResponse 
     for (serviceIndex = 1; serviceIndex <= controller->getServices().size(); serviceIndex++)
     {
       Service * svc = controller->getServices()[serviceIndex - 1];
@@ -61,6 +62,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
         continue;
       }
 
+      // TODO: TimedResponse
       svc->reportAllDiagnostics(serviceIndex);
     }
   }
@@ -77,6 +79,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
     byte diagnosticCode = msg->data[4];
     if (diagnosticCode == 0)
     {
+      // TODO: TimedResponse
       svc->reportAllDiagnostics(serviceIndex);
     }
     else
@@ -91,9 +94,6 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
   unsigned int diagnosticsValue;
   switch (diagnosticsCode)
   {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      return;
     case 0x02: // Uptime upper word
       diagnosticsValue = ((millis() / 1000) >> 16) & 0xFFFF;
       break;
@@ -126,6 +126,7 @@ void MinimumNodeServiceWithDiagnostics::diagNodeNumberChanged()
   ++diagNodeNumberChanges;
 }
 
+// TODO: Replace this with TimedResponse
 void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
 {
   controller->sendDGN(serviceIndex, 0, 6);

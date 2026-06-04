@@ -15,9 +15,6 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
   unsigned int diagnosticsValue;
   switch (diagnosticsCode)
   {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      return;
     case 0x01: // CAN RX error counter
       diagnosticsValue = canTransport->receiveErrorCounter();
       break;
