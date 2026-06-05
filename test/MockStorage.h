@@ -14,7 +14,7 @@ class MockStorage : public VLCB::Storage
 {
 public:
   MockStorage();
-  virtual void begin() override;
+  virtual void begin(unsigned int size) override;
   virtual byte read(unsigned int eeaddress) override;
   virtual void write(unsigned int eeaddress, byte data) override;
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;

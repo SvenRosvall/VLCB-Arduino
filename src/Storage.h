@@ -10,11 +10,13 @@
 namespace VLCB
 {
 
-// Interface for persistent storage. Used by Configuration class.
+/// Interface for persistent storage. Used by Configuration class.
 class Storage
 {
 public:
-  virtual void begin() = 0;
+  /// @brief Initialise the storage.
+  /// @param size Amount of persistent storage that will be used by VLCB configuration.
+  virtual void begin(unsigned int size) = 0;
 
   virtual byte read(unsigned int eeaddress) = 0;
   virtual void write(unsigned int eeaddress, byte data) = 0;

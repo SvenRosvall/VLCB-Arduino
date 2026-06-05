@@ -43,7 +43,7 @@ static byte flash_read_byte(const uint16_t address);
 static void flash_read_bytes(const uint16_t address, const uint16_t number, uint8_t *dest);
 
 
-void FlashStorage::begin()
+void FlashStorage::begin(unsigned int size)
 {
   // check flash is writable
 #if defined(DXCORE)  // Flash is only available for DXCORE platforms

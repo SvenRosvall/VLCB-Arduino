@@ -60,7 +60,7 @@ void Configuration::begin()
     // as this would move the location for stored events. 
   }
 
-  storage->begin();
+  storage->begin(EE_EVENTS_START + (getNumEvents() * EE_BYTES_PER_EVENT) + EE_USER_BYTES);
   loadNVs();
 
   if ((storage->read(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state

@@ -12,7 +12,7 @@
 namespace VLCB
 {
 
-void DueEepromEmulationStorage::begin()
+void DueEepromEmulationStorage::begin(unsigned int size)
 {
 }
 

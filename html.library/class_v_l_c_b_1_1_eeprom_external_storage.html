@@ -99,7 +99,7 @@ Inheritance diagram for VLCB::EepromExternalStorage:</div>
  <div class="center">
   <img src="class_v_l_c_b_1_1_eeprom_external_storage.png" usemap="#VLCB_3A_3AEepromExternalStorage_map" alt=""/>
   <map id="VLCB_3A_3AEepromExternalStorage_map" name="VLCB_3A_3AEepromExternalStorage_map">
-<area href="class_v_l_c_b_1_1_storage.html" alt="VLCB::Storage" shape="rect" coords="0,0,184,24"/>
+<area href="class_v_l_c_b_1_1_storage.html" title="Interface for persistent storage. Used by Configuration class." alt="VLCB::Storage" shape="rect" coords="0,0,184,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -107,7 +107,7 @@ Inheritance diagram for VLCB::EepromExternalStorage:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a27d1ed53c77fb8af7a1f00ac88b4564e" id="r_a27d1ed53c77fb8af7a1f00ac88b4564e"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a27d1ed53c77fb8af7a1f00ac88b4564e">EepromExternalStorage</a> (byte address)</td></tr>
 <tr class="memitem:ab508d28caf2993cd73a8df411139da7d" id="r_ab508d28caf2993cd73a8df411139da7d"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ab508d28caf2993cd73a8df411139da7d">EepromExternalStorage</a> (byte address, TwoWire *bus)</td></tr>
-<tr class="memitem:af29bd200f01272d7f7c57a562f2dada2" id="r_af29bd200f01272d7f7c57a562f2dada2"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#af29bd200f01272d7f7c57a562f2dada2">begin</a> () override</td></tr>
+<tr class="memitem:a2d515646885b60854810c2f2ad3d3c3c" id="r_a2d515646885b60854810c2f2ad3d3c3c"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a2d515646885b60854810c2f2ad3d3c3c">begin</a> (unsigned int size) override</td></tr>
 <tr class="memitem:a8f95035147ad6110581ed834dc2f4f8e" id="r_a8f95035147ad6110581ed834dc2f4f8e"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a8f95035147ad6110581ed834dc2f4f8e">read</a> (unsigned int eeaddress) override</td></tr>
 <tr class="memdesc:a8f95035147ad6110581ed834dc2f4f8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a single byte from EEPROM  <br /></td></tr>
 <tr class="memitem:ac981e04ca04be3ce7ddb24e29d747c77" id="r_ac981e04ca04be3ce7ddb24e29d747c77"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#ac981e04ca04be3ce7ddb24e29d747c77">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[]) override</td></tr>
@@ -159,8 +159,8 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="af29bd200f01272d7f7c57a562f2dada2" name="af29bd200f01272d7f7c57a562f2dada2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af29bd200f01272d7f7c57a562f2dada2">&#9670;&#160;</a></span>begin()</h2>
+<a id="a2d515646885b60854810c2f2ad3d3c3c" name="a2d515646885b60854810c2f2ad3d3c3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d515646885b60854810c2f2ad3d3c3c">&#9670;&#160;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,7 +171,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">void VLCB::EepromExternalStorage::begin </td>
           <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -181,8 +181,14 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Initialise the storage. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size</td><td>Amount of persistent storage that will be used by <a class="el" href="namespace_v_l_c_b.html">VLCB</a> configuration. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#a08f160630b035779b6dd25ecf25e8ef9">VLCB::Storage</a>.</p>
+<p>Implements <a class="el" href="class_v_l_c_b_1_1_storage.html#a93e05c0f8eeb7e68ea86c1e7d2bf4aa3">VLCB::Storage</a>.</p>
 
 </div>
 </div>

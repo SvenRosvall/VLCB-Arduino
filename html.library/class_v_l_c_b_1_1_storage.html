@@ -92,6 +92,9 @@ $(function(){initNavTree('class_v_l_c_b_1_1_storage.html','','class_v_l_c_b_1_1_
 </div><!--header-->
 <div class="contents">
 
+<p>Interface for persistent storage. Used by <a class="el" href="class_v_l_c_b_1_1_configuration.html" title="a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc">Configuration</a> class.  
+ <a href="#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="_storage_8h_source.html">Storage.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for VLCB::Storage:</div>
@@ -108,7 +111,7 @@ Inheritance diagram for VLCB::Storage:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a08f160630b035779b6dd25ecf25e8ef9" id="r_a08f160630b035779b6dd25ecf25e8ef9"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a08f160630b035779b6dd25ecf25e8ef9">begin</a> ()=0</td></tr>
+<tr class="memitem:a93e05c0f8eeb7e68ea86c1e7d2bf4aa3" id="r_a93e05c0f8eeb7e68ea86c1e7d2bf4aa3"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a93e05c0f8eeb7e68ea86c1e7d2bf4aa3">begin</a> (unsigned int size)=0</td></tr>
 <tr class="memitem:ae7d5373ba96869e293cd0c16f86a6266" id="r_ae7d5373ba96869e293cd0c16f86a6266"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#ae7d5373ba96869e293cd0c16f86a6266">read</a> (unsigned int eeaddress)=0</td></tr>
 <tr class="memitem:a6368a48b484d3718735cf51f2daf3c63" id="r_a6368a48b484d3718735cf51f2daf3c63"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a6368a48b484d3718735cf51f2daf3c63">write</a> (unsigned int eeaddress, byte data)=0</td></tr>
 <tr class="memitem:a4263030a0a01ee3b8a5aef97a54d1741" id="r_a4263030a0a01ee3b8a5aef97a54d1741"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a4263030a0a01ee3b8a5aef97a54d1741">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[])=0</td></tr>
@@ -116,9 +119,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5aa9c8ae6d25a25ffbb4f5b61df98d09" id="r_a5aa9c8ae6d25a25ffbb4f5b61df98d09"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a5aa9c8ae6d25a25ffbb4f5b61df98d09">reset</a> ()=0</td></tr>
 <tr class="memitem:a96c85dde579e9da841e6fad0a96dc576" id="r_a96c85dde579e9da841e6fad0a96dc576"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a96c85dde579e9da841e6fad0a96dc576">commitWriteEEPROM</a> ()</td></tr>
 </table>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a08f160630b035779b6dd25ecf25e8ef9" name="a08f160630b035779b6dd25ecf25e8ef9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08f160630b035779b6dd25ecf25e8ef9">&#9670;&#160;</a></span>begin()</h2>
+<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Interface for persistent storage. Used by <a class="el" href="class_v_l_c_b_1_1_configuration.html" title="a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc">Configuration</a> class. </p>
+</div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
+<a id="a93e05c0f8eeb7e68ea86c1e7d2bf4aa3" name="a93e05c0f8eeb7e68ea86c1e7d2bf4aa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93e05c0f8eeb7e68ea86c1e7d2bf4aa3">&#9670;&#160;</a></span>begin()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -129,7 +134,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual void VLCB::Storage::begin </td>
           <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td class="paramtype">unsigned int</td>          <td class="paramname"><span class="paramname"><em>size</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -139,8 +144,14 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>Initialise the storage. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">size</td><td>Amount of persistent storage that will be used by <a class="el" href="namespace_v_l_c_b.html">VLCB</a> configuration. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p>Implemented in <a class="el" href="class_v_l_c_b_1_1_due_eeprom_emulation_storage.html#ade891b9807162653de424c03b6b34e9d">VLCB::DueEepromEmulationStorage</a>, <a class="el" href="class_v_l_c_b_1_1_eeprom_external_storage.html#af29bd200f01272d7f7c57a562f2dada2">VLCB::EepromExternalStorage</a>, <a class="el" href="class_v_l_c_b_1_1_eeprom_internal_storage.html#a331b03142c93a8bcaccdedadb3a52964">VLCB::EepromInternalStorage</a>, and <a class="el" href="class_v_l_c_b_1_1_flash_storage.html#ae9d6edb59f6fd9c28387f715724c10da">VLCB::FlashStorage</a>.</p>
+<p>Implemented in <a class="el" href="class_v_l_c_b_1_1_due_eeprom_emulation_storage.html#a1e3db6131ec96d9c3d3b6fb108255921">VLCB::DueEepromEmulationStorage</a>, <a class="el" href="class_v_l_c_b_1_1_eeprom_external_storage.html#a2d515646885b60854810c2f2ad3d3c3c">VLCB::EepromExternalStorage</a>, <a class="el" href="class_v_l_c_b_1_1_eeprom_internal_storage.html#a8f5271755a0fb721c314e83d408179a9">VLCB::EepromInternalStorage</a>, and <a class="el" href="class_v_l_c_b_1_1_flash_storage.html#a186b7b6b6151694f77ecac4c9244b5bd">VLCB::FlashStorage</a>.</p>
 
 </div>
 </div>

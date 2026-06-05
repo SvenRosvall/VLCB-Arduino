@@ -19,7 +19,7 @@ public:
   EepromInternalStorage() = delete;
 #endif
 
-  virtual void begin() override;
+  virtual void begin(unsigned int size) override;
 
   virtual byte read(unsigned int eeaddress) override;
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;
