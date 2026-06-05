@@ -108,6 +108,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a27d1ed53c77fb8af7a1f00ac88b4564e" id="r_a27d1ed53c77fb8af7a1f00ac88b4564e"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a27d1ed53c77fb8af7a1f00ac88b4564e">EepromExternalStorage</a> (byte address)</td></tr>
 <tr class="memitem:ab508d28caf2993cd73a8df411139da7d" id="r_ab508d28caf2993cd73a8df411139da7d"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ab508d28caf2993cd73a8df411139da7d">EepromExternalStorage</a> (byte address, TwoWire *bus)</td></tr>
 <tr class="memitem:a2d515646885b60854810c2f2ad3d3c3c" id="r_a2d515646885b60854810c2f2ad3d3c3c"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a2d515646885b60854810c2f2ad3d3c3c">begin</a> (unsigned int size) override</td></tr>
+<tr class="memdesc:a2d515646885b60854810c2f2ad3d3c3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the storage.  <br /></td></tr>
 <tr class="memitem:a8f95035147ad6110581ed834dc2f4f8e" id="r_a8f95035147ad6110581ed834dc2f4f8e"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a8f95035147ad6110581ed834dc2f4f8e">read</a> (unsigned int eeaddress) override</td></tr>
 <tr class="memdesc:a8f95035147ad6110581ed834dc2f4f8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a single byte from EEPROM  <br /></td></tr>
 <tr class="memitem:ac981e04ca04be3ce7ddb24e29d747c77" id="r_ac981e04ca04be3ce7ddb24e29d747c77"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#ac981e04ca04be3ce7ddb24e29d747c77">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[]) override</td></tr>
@@ -181,7 +182,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Initialise the storage. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Initialise the storage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Amount of persistent storage that will be used by <a class="el" href="namespace_v_l_c_b.html">VLCB</a> configuration. </td></tr>
   </table>

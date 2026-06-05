@@ -107,6 +107,7 @@ Inheritance diagram for VLCB::DueEepromEmulationStorage:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a493c167fd88db751352eaf8132ced12c" id="r_a493c167fd88db751352eaf8132ced12c"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a493c167fd88db751352eaf8132ced12c">DueEepromEmulationStorage</a> ()=delete</td></tr>
 <tr class="memitem:a1e3db6131ec96d9c3d3b6fb108255921" id="r_a1e3db6131ec96d9c3d3b6fb108255921"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a1e3db6131ec96d9c3d3b6fb108255921">begin</a> (unsigned int size) override</td></tr>
+<tr class="memdesc:a1e3db6131ec96d9c3d3b6fb108255921"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the storage.  <br /></td></tr>
 <tr class="memitem:a9a6af5f48545f8b5dc1cac178875d7a1" id="r_a9a6af5f48545f8b5dc1cac178875d7a1"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a9a6af5f48545f8b5dc1cac178875d7a1">read</a> (unsigned int eeaddress) override</td></tr>
 <tr class="memdesc:a9a6af5f48545f8b5dc1cac178875d7a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a single byte from EEPROM  <br /></td></tr>
 <tr class="memitem:a307ef82d0b80fa60c3ac44c1161bdab2" id="r_a307ef82d0b80fa60c3ac44c1161bdab2"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a307ef82d0b80fa60c3ac44c1161bdab2">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[]) override</td></tr>
@@ -167,7 +168,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Initialise the storage. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Initialise the storage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Amount of persistent storage that will be used by <a class="el" href="namespace_v_l_c_b.html">VLCB</a> configuration. </td></tr>
   </table>

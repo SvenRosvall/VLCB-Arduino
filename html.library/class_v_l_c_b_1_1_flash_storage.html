@@ -106,6 +106,7 @@ Inheritance diagram for VLCB::FlashStorage:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a186b7b6b6151694f77ecac4c9244b5bd" id="r_a186b7b6b6151694f77ecac4c9244b5bd"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a186b7b6b6151694f77ecac4c9244b5bd">begin</a> (unsigned int size) override</td></tr>
+<tr class="memdesc:a186b7b6b6151694f77ecac4c9244b5bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the storage.  <br /></td></tr>
 <tr class="memitem:a90c41af0e0fc3a4f1026eda503b892a7" id="r_a90c41af0e0fc3a4f1026eda503b892a7"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a90c41af0e0fc3a4f1026eda503b892a7">read</a> (unsigned int eeaddress) override</td></tr>
 <tr class="memitem:a78e4e1dc8e375056631b0be8406455bf" id="r_a78e4e1dc8e375056631b0be8406455bf"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#a78e4e1dc8e375056631b0be8406455bf">readBytes</a> (unsigned int eeaddress, byte nbytes, byte dest[]) override</td></tr>
 <tr class="memitem:aee4e1c4397de927ddc9990b5f68a0fa3" id="r_aee4e1c4397de927ddc9990b5f68a0fa3"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#aee4e1c4397de927ddc9990b5f68a0fa3">write</a> (unsigned int eeaddress, byte data) override</td></tr>
@@ -137,7 +138,9 @@ Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Initialise the storage. </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Initialise the storage. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">size</td><td>Amount of persistent storage that will be used by <a class="el" href="namespace_v_l_c_b.html">VLCB</a> configuration. </td></tr>
   </table>
