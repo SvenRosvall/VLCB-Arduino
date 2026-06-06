@@ -83,7 +83,68 @@ void testServiceDiscoveryEventProdSvc()
   // Not testing service data bytes.
 }
 
-void testSendOn()
+void testSendShortEventOn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  eventProducerService->sendShortEvent(true, 40);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ASON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(40, mockTransportService->sent_messages[0].data[4]);
+}
+
+void testSendLongEventOff()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  eventProducerService->sendLongEvent(false, 41);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ACOF, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(0x01, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(0x04, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0x00, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(41, mockTransportService->sent_messages[0].data[4]);
+
+}
+
+void testSendLongEventWithSpoofedNodeNumberOn()
+{
+  test();
+
+  VLCB::Controller controller = createController();
+  controller.begin();
+
+  eventProducerService->sendLongEventWithSpoofedNodeNumber(true, 17, 42);
+
+  process(controller);
+
+  assertEquals(1, mockTransportService->sent_messages.size());
+  assertEquals(OPC_ACON, mockTransportService->sent_messages[0].data[0]);
+  assertEquals(5, mockTransportService->sent_messages[0].len);
+  assertEquals(0, mockTransportService->sent_messages[0].data[1]);
+  assertEquals(17, mockTransportService->sent_messages[0].data[2]);
+  assertEquals(0, mockTransportService->sent_messages[0].data[3]);
+  assertEquals(42, mockTransportService->sent_messages[0].data[4]);
+}
+
+void testSendIndexedEventOn()
 {
   test();
 
@@ -107,7 +168,7 @@ void testSendOn()
   assertEquals(0x01, mockTransportService->sent_messages[0].data[4]);
 }
 
-void testSend1Off()
+void testSendIndexedEvent1Off()
 {
   test();
 
@@ -132,7 +193,7 @@ void testSend1Off()
   assertEquals(42, mockTransportService->sent_messages[0].data[5]);
 }
 
-void testSendShort2On()
+void testSendShortIndexedEvent2On()
 {
   test();
 
@@ -158,7 +219,7 @@ void testSendShort2On()
   assertEquals(17, mockTransportService->sent_messages[0].data[6]);
 }
 
-void testSendShort3Off()
+void testSendShortIndexedEvent3Off()
 {
   test();
 
@@ -388,10 +449,13 @@ void testEventProducerService()
 {
   testServiceDiscovery();
   testServiceDiscoveryEventProdSvc();
-  testSendOn();
-  testSend1Off();
-  testSendShort2On();
-  testSendShort3Off();
+  testSendShortEventOn();
+  testSendLongEventOff();
+  testSendLongEventWithSpoofedNodeNumberOn();
+  testSendIndexedEventOn();
+  testSendIndexedEvent1Off();
+  testSendShortIndexedEvent2On();
+  testSendShortIndexedEvent3Off();
   testNoDefaultEventsOnNewBoard();
   testLongRequestStatus();
   testShortRequestStatusWithNN();

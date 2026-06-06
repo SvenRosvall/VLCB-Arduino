@@ -40,6 +40,15 @@ public:
   }
 /// @endcond
 
+  /// Send a short event with `state` and node number of this node and given eventNumber.
+  void sendShortEvent(bool state, int eventNumber);
+
+  /// Send a long event with `state` and node number of this node and given eventNumber.
+  void sendLongEvent(bool state, int eventNumber);
+
+  /// Send an event with `state` and given nodeNumber and eventNumber.
+  void sendLongEventWithSpoofedNodeNumber(bool state, int nodeNumber, int eventNumber);
+
   /// Causes an event to be sent with `state` indicating `on` for TRUE
   /// and `off` for FALSE. Short or Long event is determined by the
   /// Event Table entry at `evIndex`.

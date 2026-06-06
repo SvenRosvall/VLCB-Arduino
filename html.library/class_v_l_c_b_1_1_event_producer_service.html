@@ -117,6 +117,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:abf5dbf3dea1e388003a97a35d0297abe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a unique ID for this service.  <br /></td></tr>
 <tr class="memitem:aaa4fcd083b679430ee4f10ea74269e26" id="r_aaa4fcd083b679430ee4f10ea74269e26"><td class="memItemLeft">virtual byte&#160;</td><td class="memItemRight"><a class="el" href="#aaa4fcd083b679430ee4f10ea74269e26">getServiceVersionID</a> () const override</td></tr>
 <tr class="memdesc:aaa4fcd083b679430ee4f10ea74269e26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the version of the service specification implemented by this service.  <br /></td></tr>
+<tr class="memitem:ab88758e6deaa4d3490d2c7c7468747c9" id="r_ab88758e6deaa4d3490d2c7c7468747c9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab88758e6deaa4d3490d2c7c7468747c9">sendShortEvent</a> (bool state, int eventNumber)</td></tr>
+<tr class="memdesc:ab88758e6deaa4d3490d2c7c7468747c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a short event with <span class="tt">state</span> and node number of this node and given eventNumber.  <br /></td></tr>
+<tr class="memitem:af7855684cfdd8c2e53e88ee3607711fa" id="r_af7855684cfdd8c2e53e88ee3607711fa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af7855684cfdd8c2e53e88ee3607711fa">sendLongEvent</a> (bool state, int eventNumber)</td></tr>
+<tr class="memdesc:af7855684cfdd8c2e53e88ee3607711fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a long event with <span class="tt">state</span> and node number of this node and given eventNumber.  <br /></td></tr>
+<tr class="memitem:acc5b59e0f5967b669410562a8f66a387" id="r_acc5b59e0f5967b669410562a8f66a387"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acc5b59e0f5967b669410562a8f66a387">sendLongEventWithSpoofedNodeNumber</a> (bool state, int nodeNumber, int eventNumber)</td></tr>
+<tr class="memdesc:acc5b59e0f5967b669410562a8f66a387"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an event with <span class="tt">state</span> and given nodeNumber and eventNumber.  <br /></td></tr>
 <tr class="memitem:acfa8286a440c8a115f7688966b40fa4f" id="r_acfa8286a440c8a115f7688966b40fa4f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acfa8286a440c8a115f7688966b40fa4f">sendEventAtIndex</a> (bool state, byte evIndex)</td></tr>
 <tr class="memitem:aa3d2f002853a7dec4b199aecece7f107" id="r_aa3d2f002853a7dec4b199aecece7f107"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa3d2f002853a7dec4b199aecece7f107">sendEventAtIndex</a> (bool state, byte evIndex, byte data1)</td></tr>
 <tr class="memitem:acef46eb323068fc61f36bc9d0ab97f9e" id="r_acef46eb323068fc61f36bc9d0ab97f9e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acef46eb323068fc61f36bc9d0ab97f9e">sendEventAtIndex</a> (bool state, byte evIndex, byte data1, byte data2)</td></tr>
@@ -271,6 +277,80 @@ Event Producer Service API</h1>
 <p>This version is used by configuration utilities to identify which features are implemented by this service. </p>
 
 <p>Implements <a class="el" href="class_v_l_c_b_1_1_service.html#aa5a83565c5d79516810e41e4dfcfdfa3">VLCB::Service</a>.</p>
+
+</div>
+</div>
+<a id="ab88758e6deaa4d3490d2c7c7468747c9" name="ab88758e6deaa4d3490d2c7c7468747c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab88758e6deaa4d3490d2c7c7468747c9">&#9670;&#160;</a></span>sendShortEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendShortEvent </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a short event with <span class="tt">state</span> and node number of this node and given eventNumber. </p>
+
+</div>
+</div>
+<a id="af7855684cfdd8c2e53e88ee3607711fa" name="af7855684cfdd8c2e53e88ee3607711fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7855684cfdd8c2e53e88ee3607711fa">&#9670;&#160;</a></span>sendLongEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendLongEvent </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a long event with <span class="tt">state</span> and node number of this node and given eventNumber. </p>
+
+</div>
+</div>
+<a id="acc5b59e0f5967b669410562a8f66a387" name="acc5b59e0f5967b669410562a8f66a387"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc5b59e0f5967b669410562a8f66a387">&#9670;&#160;</a></span>sendLongEventWithSpoofedNodeNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendLongEventWithSpoofedNodeNumber </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nodeNumber</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send an event with <span class="tt">state</span> and given nodeNumber and eventNumber. </p>
 
 </div>
 </div>

@@ -65,10 +65,10 @@ var NAVTREEINDEX =
 "_abstract_event_teaching_service_8cpp.html",
 "class_v_l_c_b_1_1_circular_buffer.html#ac8bd8f52e51dcc01fb01b5c1f07d6852",
 "class_v_l_c_b_1_1_eeprom_internal_storage.html#ad388c24fd4c064697dd4e62dc6d772e5",
-"class_v_l_c_b_1_1_long_message_service_ex.html#afe8aef80f8f78a5b0b687fd9f5af0b77",
-"functions_func_b.html",
-"vlcbdefs_8hpp.html#a1b13177ef0977f1f71d814fb32868268a4d0e8ee5bb20043faeaf0ec5deff2057",
-"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feeac87845a69f6fefdbcd3b08d8e38eabdb"
+"class_v_l_c_b_1_1_long_message_service_ex.html#ad07d1fd59c81efe27ef1932e00906489",
+"functions_enum.html",
+"vlcbdefs_8hpp.html#a1b13177ef0977f1f71d814fb32868268a192e90813e5eb6c72fab0c1c0f2bcde5",
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feea62d7790ff15c124ae0464e276b4f3f04"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';
