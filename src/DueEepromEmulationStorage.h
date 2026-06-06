@@ -21,7 +21,7 @@ public:
 // If not SAM3X8E then this file shall be compilable but this class shall not be instantiatable and will not compile if used anyway.
   DueEepromEmulationStorage() = delete;
 #endif
-  virtual void begin() override;
+  virtual void begin(unsigned int size) override;
 
   virtual byte read(unsigned int eeaddress) override;
   virtual byte readBytes(unsigned int eeaddress, byte nbytes, byte dest[]) override;

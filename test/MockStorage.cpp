@@ -12,7 +12,7 @@ MockStorage::MockStorage()
   : eeprom(1000, 0xFF)
 {}
 
-void MockStorage::begin()
+void MockStorage::begin(unsigned int size)
 {
 
 }

@@ -59,8 +59,9 @@ void Configuration::begin()
     // Note: The formula above does not allow for upgrades to user app where NVs are added 
     // as this would move the location for stored events. 
   }
+  EE_FREE_BASE = EE_EVENTS_START + (EE_BYTES_PER_EVENT * getNumEvents());
 
-  storage->begin();
+  storage->begin(EE_FREE_BASE + EE_USER_BYTES);
   loadNVs();
 
   if ((storage->read(LOCATION_MODE) == 0xFF) && (nodeNum == 0xFFFF))   // EEPROM is in factory virgin state
@@ -72,8 +73,6 @@ void Configuration::begin()
   }
 
   makeEvHashTable();
-  
-  EE_FREE_BASE = EE_EVENTS_START + (EE_BYTES_PER_EVENT * getNumEvents());
 }
 
 void Configuration::setModuleUninitializedMode()
