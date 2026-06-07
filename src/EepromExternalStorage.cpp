@@ -22,7 +22,7 @@ EepromExternalStorage::EepromExternalStorage(byte address, TwoWire *bus)
   I2Cbus = bus;
 }
 
-void EepromExternalStorage::begin()
+void EepromExternalStorage::begin(unsigned int size)
 {
   // from Configuration::setEEPROMtype()
 

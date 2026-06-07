@@ -156,6 +156,7 @@ Classes</h2></td></tr>
 <tr class="memitem:Service" id="r_Service"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_service.html">Service</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface base class for all <a class="el" href="namespace_v_l_c_b.html">VLCB</a> services.  <a href="class_v_l_c_b_1_1_service.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Storage" id="r_Storage"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_storage.html">Storage</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for persistent storage. Used by <a class="el" href="class_v_l_c_b_1_1_configuration.html" title="a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc">Configuration</a> class.  <a href="class_v_l_c_b_1_1_storage.html#details">More...</a><br /></td></tr>
 <tr class="memitem:Switch" id="r_Switch"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_switch.html">Switch</a></td></tr>
 <tr class="memitem:Transport" id="r_Transport"><td class="memItemLeft">class &#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_transport.html">Transport</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for statistics on the transport layer.  <a href="class_v_l_c_b_1_1_transport.html#details">More...</a><br /></td></tr>
@@ -267,13 +268,13 @@ Variables</h2></td></tr>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>construct a <a class="el" href="class_v_l_c_b_1_1_controller.html" title="Main object in VLCB. Coordinates transport, ui, configuration and services.">Controller</a> object with an external <a class="el" href="class_v_l_c_b_1_1_configuration.html" title="a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc">Configuration</a> object named "config" that is defined in user code</p>
 <p>Implementation of <a class="el" href="class_v_l_c_b_1_1_controller.html" title="Main object in VLCB. Coordinates transport, ui, configuration and services.">Controller</a> Long Message Support RFC 0005 by Dave McCabe (M4933) Developed by Duncan Greenwood (M5767)</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
 VLCB API</h1>
 <p>This <a class="el" href="namespace_v_l_c_b.html">VLCB</a> library is built with an object-oriented architecture described in the design document. It uses a <span class="tt"><a class="el" href="class_v_l_c_b_1_1_controller.html" title="Main object in VLCB. Coordinates transport, ui, configuration and services.">Controller</a></span> object for the core tasks, a <span class="tt"><a class="el" href="class_v_l_c_b_1_1_configuration.html" title="a class to encapsulate Controller module configuration, events, NVs, EEPROM, etc">Configuration</a></span> object for storing module configurations and a set of services.</p>
 <p>The <a class="el" href="namespace_v_l_c_b.html">VLCB</a> module code can be written in two different styles. One style is to define these objects and calling member functions of these objects.</p>
 <p>The other style is to use functions in the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> namespace. These functions are "free" functions and do not require objects. These <a class="el" href="namespace_v_l_c_b.html">VLCB</a> namespace functions are provided for convenience and clarity. Some are just forwarding calls to these objects while others do more work to simplify writing module code.</p>
 <p>The example sketches are using the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> function style.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 VLCB functions</h2>
 <p>These functions are in the <a class="el" href="namespace_v_l_c_b.html">VLCB</a> namespace to avoid name clashes with other libraries. Prefix each call with <span class="tt"><a class="el" href="namespace_v_l_c_b.html">VLCB</a>::</span> or add a <span class="tt">using namespace <a class="el" href="namespace_v_l_c_b.html">VLCB</a>;</span> directive at the top of your code file. </p>
 </div><a name="doc-enum-members" id="doc-enum-members"></a><h2 id="header-doc-enum-members" class="groupheader">Enumeration Type Documentation</h2>

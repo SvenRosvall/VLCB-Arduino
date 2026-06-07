@@ -94,12 +94,6 @@ Need to change the notion of SLiM/FLiM to VLCB modes.
 Should be part of the MNS service.
 
 
-## Updates to the Storage interface
-The begin method should take a size parameter. 
-See calculation of this size in EepromInternalStorage.cpp. 
-This calculation should sit in Controller. 
-The various storage implementations may choose to ignore this size value.
-
 ## Provide access to persistent storage for user code
 The Storage interface provides a simple API to persistent storage regardless of
 type of storage. 

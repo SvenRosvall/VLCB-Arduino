@@ -12,12 +12,12 @@
 namespace VLCB
 {
 
-void EepromInternalStorage::begin()
+void EepromInternalStorage::begin(unsigned int size)
 {
   // these devices require an explicit begin with the desired emulated size
 
 #if defined ESP32 || defined ESP8266
-  EEPROM.begin(EE_EVENTS_START + (getNumEvents() * EE_BYTES_PER_EVENT) + EE_USER_BYTES);
+  EEPROM.begin(size);
 #endif
 
 #ifdef ARDUINO_ARCH_RP2040

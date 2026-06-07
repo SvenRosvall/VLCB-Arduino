@@ -1,6 +1,6 @@
 var class_v_l_c_b_1_1_storage =
 [
-    [ "begin", "class_v_l_c_b_1_1_storage.html#a08f160630b035779b6dd25ecf25e8ef9", null ],
+    [ "begin", "class_v_l_c_b_1_1_storage.html#a93e05c0f8eeb7e68ea86c1e7d2bf4aa3", null ],
     [ "read", "class_v_l_c_b_1_1_storage.html#ae7d5373ba96869e293cd0c16f86a6266", null ],
     [ "write", "class_v_l_c_b_1_1_storage.html#a6368a48b484d3718735cf51f2daf3c63", null ],
     [ "readBytes", "class_v_l_c_b_1_1_storage.html#a4263030a0a01ee3b8a5aef97a54d1741", null ],

@@ -7,7 +7,7 @@ var searchData=
   ['manu_5fspectrum_4',['MANU_SPECTRUM',['../vlcbdefs_8hpp.html#a8cbd4bb860da8549fc178515e5471114a50f3f643c807a036059f4b3ee50e40dc',1,'vlcbdefs.hpp']]],
   ['manu_5fsprog_5',['MANU_SPROG',['../vlcbdefs_8hpp.html#a8cbd4bb860da8549fc178515e5471114a185f3a4d4f4c2051d4ce636869c40982',1,'vlcbdefs.hpp']]],
   ['manu_5fsyspixie_6',['MANU_SYSPIXIE',['../vlcbdefs_8hpp.html#a8cbd4bb860da8549fc178515e5471114a87913c890de1199595c25beb64dcab13',1,'vlcbdefs.hpp']]],
-  ['minimum_20node_20service_20api_7',['Minimum Node Service API',['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md5',1,'']]],
+  ['minimum_20node_20service_20api_7',['Minimum Node Service API',['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md4',1,'']]],
   ['minimumnodeservice_8',['MinimumNodeService',['../class_v_l_c_b_1_1_minimum_node_service.html',1,'VLCB']]],
   ['minimumnodeservice_2eh_9',['MinimumNodeService.h',['../_minimum_node_service_8h.html',1,'']]],
   ['mode_5fboot_10',['MODE_BOOT',['../vlcbdefs_8hpp.html#a534e4bde5d507b2db9a873b6d0b20a06ad755055375575fe30cddb62e9cae8ea9',1,'vlcbdefs.hpp']]],
