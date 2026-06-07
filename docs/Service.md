@@ -53,11 +53,11 @@ The arguments provided to the handler function are:
 
 ### [EventProducerService](../html.library/class_v_l_c_b_1_1_event_producer_service.html)
 Facilitates sending events. 
-Call the ```sendEventAtIndex()``` from the application code.
-The parameters should be
-* ```state``` : A flag to say if the event is an on or off event.
-* ```index``` : An index for the produced event that relates to the event table entry.
-* ```data1``` - ```data3``` : Up to three data bytes to go with the event.
+The events can either be:
+* Direct events where the event number is given and the node number of the
+node is used. Optionally a node number can be provided for spoofed node numbers.
+* Taught events that are stored in the events table. These events are
+accessed by an index into the events table.
 
 ### [EventTeachingService](../html.library/class_v_l_c_b_1_1_event_teaching_service.html)
 Facilitates teaching events using classic event teaching.

@@ -16,7 +16,7 @@ var searchData=
   ['action_5fqueue_5fsize_13',['ACTION_QUEUE_SIZE',['../namespace_v_l_c_b.html#a4d64847ece89bd3e3251bd85c551cb74',1,'VLCB']]],
   ['actiontype_14',['actionType',['../struct_v_l_c_b_1_1_action.html#a35f3008b1a864a367a1f526761c52e8e',1,'VLCB::Action']]],
   ['allocatecontexts_15',['allocateContexts',['../class_v_l_c_b_1_1_long_message_service_ex.html#aef140f3be5a81d34fee0c98d7c8879ab',1,'VLCB::LongMessageServiceEx']]],
-  ['api_16',['API',['../class_v_l_c_b_1_1_consume_own_events_service.html#autotoc_md0',1,'Consue Own Events Service API'],['../class_v_l_c_b_1_1_event_consumer_service.html#autotoc_md1',1,'Event Consumer Service API'],['../class_v_l_c_b_1_1_event_producer_service.html#autotoc_md2',1,'Event Producer Service API'],['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md3',1,'Minimum Node Service API'],['../namespace_v_l_c_b.html#autotoc_md4',1,'VLCB API']]],
+  ['api_16',['API',['../class_v_l_c_b_1_1_consume_own_events_service.html#autotoc_md0',1,'Consue Own Events Service API'],['../class_v_l_c_b_1_1_event_consumer_service.html#autotoc_md1',1,'Event Consumer Service API'],['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md2',1,'Minimum Node Service API'],['../namespace_v_l_c_b.html#autotoc_md3',1,'VLCB API']]],
   ['arm1176jzf_5fs_17',['ARM1176JZF_S',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393a5c24e55086cd7e4b70cc38cbd3ef1081',1,'vlcbdefs.hpp']]],
   ['armcortex_5fa53_18',['ARMCortex_A53',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393aa8bf23dd0df958f2f3bef6ddf304a2be',1,'vlcbdefs.hpp']]],
   ['armcortex_5fa7_19',['ARMCortex_A7',['../vlcbdefs_8hpp.html#a25387f843f5626da4e3ab2370e01c393a20c224b717fecc3faf915f8bb3a48bf2',1,'vlcbdefs.hpp']]],

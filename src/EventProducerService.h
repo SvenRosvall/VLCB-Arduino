@@ -14,13 +14,12 @@ struct VlcbMessage;
 
 /// @brief Service for producing events.
 /// 
-/// # Event Producer Service API
-///
 /// This service provides a means of generating VLCB events and
 /// interrogating their status. A full description of events can
 /// be found in the document `VLCB Event Model`.
-/// The events that a module can produce are held in the Events Table.
-/// Specific events are identified by their table index number.
+/// 
+/// The events that a module can produce are either taught events
+/// which are stored in the events table or direct events.
 ///
 class EventProducerService : public Service {
 public:
@@ -40,33 +39,77 @@ public:
   }
 /// @endcond
 
-  /// Send a short event with `state` and node number of this node and given eventNumber.
+  /// @brief Send a short event.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param eventNumber event number for the short event.
+  /// 
+  /// The event does not need to be taught, and stored in the events table.
   void sendShortEvent(bool state, int eventNumber);
 
-  /// Send a long event with `state` and node number of this node and given eventNumber.
+  /// @brief Send a long event.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param eventNumber event number for the long event.
+  /// 
+  /// The event does not need to be taught, and stored in the events table.
+  /// The node number is the number of this node.
   void sendLongEvent(bool state, int eventNumber);
 
-  /// Send an event with `state` and given nodeNumber and eventNumber.
+  /// @brief Send a long event with a spoofed node number.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param nodeNumber node number to use for the long event instead of the current node.
+  /// @param eventNumber event number for the long event.
+  /// 
+  /// The event does not need to be taught, and stored in the events table.
+  /// 
+  /// Use spoofed node numbers only when many nodes send the same long event.
+  /// It is recommended to use short events for many-to-many events.
   void sendLongEventWithSpoofedNodeNumber(bool state, int nodeNumber, int eventNumber);
 
-  /// Causes an event to be sent with `state` indicating `on` for TRUE
-  /// and `off` for FALSE. Short or Long event is determined by the
-  /// Event Table entry at `evIndex`.
+  /// @brief Send an event from the taught events table.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param evIndex index into the taught events table for the event to use.
+  /// 
+  /// The indexed event determines if the sent event is short or long.
   void sendEventAtIndex(bool state, byte evIndex);
   
-  /// Causes an event with one data byte to be sent with `state` indicating `on` for TRUE
-  /// and `off` for FALSE. Short or Long event is determined by the
-  /// Event Table entry at `evIndex`. The data sent is `data1`.
+  /// @brief Send an event from the taught events table with data.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param evIndex index into the taught events table for the event to use.
+  /// @param data1 data byte to b  /// @brief Send a long event.
+  //  /// 
+  //  /// @param state send an ON event if state is `true` or OFF event if `false`
+  //  /// @param eventNumber event number for the long event.
+  //  /// 
+  //  /// The event does not need to be taught, and stored in the events table.
+  //  /// The node number is the number of this node.e included in the event.
+  /// 
+  /// The indexed event determines if the sent event is short or long.
   void sendEventAtIndex(bool state, byte evIndex, byte data1);
-  
-  /// Causes an event with two data bytes to be sent with `state` indicating `on` for TRUE
-  /// and `off` for FALSE. Short or Long event is determined by the
-  /// Event Table entry at `evIndex`. The data sent is `data1` and `data2`.
+
+  /// @brief Send an event from the taught events table with data.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param evIndex index into the taught events table for the event to use.
+  /// @param data1 first data byte to be included in the event.
+  /// @param data2 second data byte to be included in the event.
+  /// 
+  /// The indexed event determines if the sent event is short or long.
   void sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2);
   
-  /// Causes an event with three data bytes to be sent with `state` indicating `on` for TRUE
-  /// and `off` for FALSE. Short or Long event is determined by the
-  /// Event Table entry at `evIndex`. The data sent is `data1` and `data2` and `data3`.
+  /// @brief Send an event from the taught events table with data.
+  /// 
+  /// @param state send an ON event if state is `true` or OFF event if `false`
+  /// @param evIndex index into the taught events table for the event to use.
+  /// @param data1 first data byte to be included in the event.
+  /// @param data2 second data byte to be included in the event.
+  /// @param data3 third data byte to be included in the event.
+  /// 
+  /// The indexed event determines if the sent event is short or long.
   void sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2, byte data3);
   
   /// Causes an Accessory Response to be sent with `state` indicating `on` for TRUE
