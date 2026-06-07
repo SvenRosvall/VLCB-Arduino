@@ -17,6 +17,7 @@ Fixes:
 * Add InternalDiagnosticsService that provides diagnostics for internal
   state such as free memory and action queue usage.
 * Extend SerialUserInterface to show action queue usage.
+* Add functions to EventProducerService to send events that are not taught.
 
 # 2.2.0 - Split EventTeachingService
 
