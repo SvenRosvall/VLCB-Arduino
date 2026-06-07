@@ -31,6 +31,30 @@ void EventProducerService::processAction(const Action & action)
   }
 }
 
+void EventProducerService::sendShortEvent(bool state, int eventNumber)
+{
+  controller->sendMessageWithNN(state ? OPC_ASON : OPC_ASOF, highByte(eventNumber), lowByte(eventNumber));
+  ++diagEventsProduced;
+}
+
+void EventProducerService::sendLongEvent(bool state, int eventNumber)
+{
+  controller->sendMessageWithNN(state ? OPC_ACON : OPC_ACOF, highByte(eventNumber), lowByte(eventNumber));
+  ++diagEventsProduced;
+}
+
+void EventProducerService::sendLongEventWithSpoofedNodeNumber(bool state, int nodeNumber, int eventNumber)
+{
+  VlcbMessage msg;
+  msg.len = 5;
+  msg.data[0] = state ? OPC_ACON : OPC_ACOF;
+  Configuration::setTwoBytes(&msg.data[1], nodeNumber);
+  Configuration::setTwoBytes(&msg.data[3], eventNumber);
+  
+  controller->sendMessage(&msg);
+  ++diagEventsProduced;
+}
+
 void EventProducerService::sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en)
 {
   msg.data[0] = opCode;

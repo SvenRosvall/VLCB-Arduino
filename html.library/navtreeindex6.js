@@ -1,5 +1,11 @@
 var NAVTREEINDEX6 =
 {
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feea62d7790ff15c124ae0464e276b4f3f04":[2,0,0,71,2,0],
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feea6fef6545ad2e904b216ddc2a5c6e0fc4":[2,0,0,71,2,8],
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feea7094f31fad2e55fedd7d768d9d64906f":[2,0,0,71,2,5],
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feea9d4bc2585f74e7b6761d86b469650fde":[2,0,0,71,2,1],
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feeaa03d42b1e93457e9c7c2ae28ec9e73ed":[2,0,0,71,2,2],
+"vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feeaa812eb3a3c63b7c8a48a5bf13d6de014":[2,0,0,71,2,4],
 "vlcbdefs_8hpp.html#aaab77f3b759f14b4e1346ce59c851feeac87845a69f6fefdbcd3b08d8e38eabdb":[2,0,0,71,2,7],
 "vlcbdefs_8hpp.html#ab07f338372abc62f46ad390d6d3655b8":[2,0,0,71,20],
 "vlcbdefs_8hpp.html#ab07f338372abc62f46ad390d6d3655b8aae0f273d80e4c5a3a6b29dfcbfd58502":[2,0,0,71,20,1],

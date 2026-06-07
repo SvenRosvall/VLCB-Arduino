@@ -8,7 +8,7 @@ var searchData=
   ['manu_5fsprog_5',['MANU_SPROG',['../vlcbdefs_8hpp.html#a8cbd4bb860da8549fc178515e5471114a185f3a4d4f4c2051d4ce636869c40982',1,'vlcbdefs.hpp']]],
   ['manu_5fsyspixie_6',['MANU_SYSPIXIE',['../vlcbdefs_8hpp.html#a8cbd4bb860da8549fc178515e5471114a87913c890de1199595c25beb64dcab13',1,'vlcbdefs.hpp']]],
   ['messageactedon_7',['messageActedOn',['../class_v_l_c_b_1_1_controller.html#a6fea56e128b5871e2fb955ecca39be97',1,'VLCB::Controller']]],
-  ['minimum_20node_20service_20api_8',['Minimum Node Service API',['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md3',1,'']]],
+  ['minimum_20node_20service_20api_8',['Minimum Node Service API',['../class_v_l_c_b_1_1_minimum_node_service.html#autotoc_md2',1,'']]],
   ['minimumnodeservice_9',['MinimumNodeService',['../class_v_l_c_b_1_1_minimum_node_service.html',1,'VLCB']]],
   ['minimumnodeservice_2ecpp_10',['MinimumNodeService.cpp',['../_minimum_node_service_8cpp.html',1,'']]],
   ['minimumnodeservice_2eh_11',['MinimumNodeService.h',['../_minimum_node_service_8h.html',1,'']]],

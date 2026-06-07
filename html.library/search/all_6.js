@@ -13,5 +13,5 @@ var searchData=
   ['flashstorage_2eh_10',['FlashStorage.h',['../_flash_storage_8h.html',1,'']]],
   ['freesram_11',['freeSRAM',['../class_v_l_c_b_1_1_configuration.html#a29a39e9216d00f580053a84514d8fcbc',1,'VLCB::Configuration']]],
   ['fromenum_12',['fromENUM',['../struct_v_l_c_b_1_1_action.html#a31820aa02b0a206e6c5a61567df74c23',1,'VLCB::Action']]],
-  ['functions_13',['VLCB functions',['../namespace_v_l_c_b.html#autotoc_md5',1,'']]]
+  ['functions_13',['VLCB functions',['../namespace_v_l_c_b.html#autotoc_md4',1,'']]]
 ];

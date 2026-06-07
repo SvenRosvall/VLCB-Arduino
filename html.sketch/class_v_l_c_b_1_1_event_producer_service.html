@@ -109,10 +109,20 @@ Inheritance diagram for VLCB::EventProducerService:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1cb7cccd04e9bedaf01ace95125dbbc4" id="r_a1cb7cccd04e9bedaf01ace95125dbbc4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a1cb7cccd04e9bedaf01ace95125dbbc4">setRequestEventHandler</a> (void(*fptr)(byte index, const VlcbMessage *msg))</td></tr>
+<tr class="memitem:ab88758e6deaa4d3490d2c7c7468747c9" id="r_ab88758e6deaa4d3490d2c7c7468747c9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ab88758e6deaa4d3490d2c7c7468747c9">sendShortEvent</a> (bool state, int eventNumber)</td></tr>
+<tr class="memdesc:ab88758e6deaa4d3490d2c7c7468747c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a short event.  <br /></td></tr>
+<tr class="memitem:af7855684cfdd8c2e53e88ee3607711fa" id="r_af7855684cfdd8c2e53e88ee3607711fa"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#af7855684cfdd8c2e53e88ee3607711fa">sendLongEvent</a> (bool state, int eventNumber)</td></tr>
+<tr class="memdesc:af7855684cfdd8c2e53e88ee3607711fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a long event.  <br /></td></tr>
+<tr class="memitem:acc5b59e0f5967b669410562a8f66a387" id="r_acc5b59e0f5967b669410562a8f66a387"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acc5b59e0f5967b669410562a8f66a387">sendLongEventWithSpoofedNodeNumber</a> (bool state, int nodeNumber, int eventNumber)</td></tr>
+<tr class="memdesc:acc5b59e0f5967b669410562a8f66a387"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a long event with a spoofed node number.  <br /></td></tr>
 <tr class="memitem:acfa8286a440c8a115f7688966b40fa4f" id="r_acfa8286a440c8a115f7688966b40fa4f"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acfa8286a440c8a115f7688966b40fa4f">sendEventAtIndex</a> (bool state, byte evIndex)</td></tr>
+<tr class="memdesc:acfa8286a440c8a115f7688966b40fa4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an event from the taught events table.  <br /></td></tr>
 <tr class="memitem:aa3d2f002853a7dec4b199aecece7f107" id="r_aa3d2f002853a7dec4b199aecece7f107"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa3d2f002853a7dec4b199aecece7f107">sendEventAtIndex</a> (bool state, byte evIndex, byte data1)</td></tr>
+<tr class="memdesc:aa3d2f002853a7dec4b199aecece7f107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an event from the taught events table with data.  <br /></td></tr>
 <tr class="memitem:acef46eb323068fc61f36bc9d0ab97f9e" id="r_acef46eb323068fc61f36bc9d0ab97f9e"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#acef46eb323068fc61f36bc9d0ab97f9e">sendEventAtIndex</a> (bool state, byte evIndex, byte data1, byte data2)</td></tr>
+<tr class="memdesc:acef46eb323068fc61f36bc9d0ab97f9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an event from the taught events table with data.  <br /></td></tr>
 <tr class="memitem:a8a86d7d5907e913f8efa70f7eed57ec2" id="r_a8a86d7d5907e913f8efa70f7eed57ec2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a8a86d7d5907e913f8efa70f7eed57ec2">sendEventAtIndex</a> (bool state, byte evIndex, byte data1, byte data2, byte data3)</td></tr>
+<tr class="memdesc:a8a86d7d5907e913f8efa70f7eed57ec2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send an event from the taught events table with data.  <br /></td></tr>
 <tr class="memitem:a3835423d1c32cb24504d63e7a4599843" id="r_a3835423d1c32cb24504d63e7a4599843"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a3835423d1c32cb24504d63e7a4599843">sendEventResponse</a> (bool state, byte index)</td></tr>
 <tr class="memitem:a5192ea896e8705805d56d2cfffc3c068" id="r_a5192ea896e8705805d56d2cfffc3c068"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5192ea896e8705805d56d2cfffc3c068">sendEventResponse</a> (bool state, byte index, byte data1)</td></tr>
 <tr class="memitem:aae4277a8eb18729768ea03d070cf7cc2" id="r_aae4277a8eb18729768ea03d070cf7cc2"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aae4277a8eb18729768ea03d070cf7cc2">sendEventResponse</a> (bool state, byte index, byte data1, byte data2)</td></tr>
@@ -120,9 +130,8 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p><a class="el" href="class_v_l_c_b_1_1_service.html" title="Interface base class for all VLCB services.">Service</a> for producing events. </p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
-Event Producer Service API</h1>
-<p>This service provides a means of generating <a class="el" href="namespace_v_l_c_b.html">VLCB</a> events and interrogating their status. A full description of events can be found in the document <span class="tt"><a class="el" href="namespace_v_l_c_b.html">VLCB</a> Event Model</span>. The events that a module can produce are held in the Events Table. Specific events are identified by their table index number. </p>
+<p>This service provides a means of generating <a class="el" href="namespace_v_l_c_b.html">VLCB</a> events and interrogating their status. A full description of events can be found in the document <span class="tt"><a class="el" href="namespace_v_l_c_b.html">VLCB</a> Event Model</span>.</p>
+<p>The events that a module can produce are either taught events which are stored in the events table or direct events. </p>
 </div><a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="a1cb7cccd04e9bedaf01ace95125dbbc4" name="a1cb7cccd04e9bedaf01ace95125dbbc4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1cb7cccd04e9bedaf01ace95125dbbc4">&#9670;&#160;</a></span>setRequestEventHandler()</h2>
@@ -139,6 +148,106 @@ Event Producer Service API</h1>
       </table>
 </div><div class="memdoc">
 <p>Sets the callback function that is called when an Accessory Request opcode or Accessory Request Short Event opcode is received. </p>
+
+</div>
+</div>
+<a id="ab88758e6deaa4d3490d2c7c7468747c9" name="ab88758e6deaa4d3490d2c7c7468747c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab88758e6deaa4d3490d2c7c7468747c9">&#9670;&#160;</a></span>sendShortEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendShortEvent </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a short event. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">eventNumber</td><td>event number for the short event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The event does not need to be taught, and stored in the events table. </p>
+
+</div>
+</div>
+<a id="af7855684cfdd8c2e53e88ee3607711fa" name="af7855684cfdd8c2e53e88ee3607711fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7855684cfdd8c2e53e88ee3607711fa">&#9670;&#160;</a></span>sendLongEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendLongEvent </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a long event. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">eventNumber</td><td>event number for the long event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The event does not need to be taught, and stored in the events table. The node number is the number of this node. </p>
+
+</div>
+</div>
+<a id="acc5b59e0f5967b669410562a8f66a387" name="acc5b59e0f5967b669410562a8f66a387"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc5b59e0f5967b669410562a8f66a387">&#9670;&#160;</a></span>sendLongEventWithSpoofedNodeNumber()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::EventProducerService::sendLongEventWithSpoofedNodeNumber </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>state</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>nodeNumber</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>eventNumber</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Send a long event with a spoofed node number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">nodeNumber</td><td>node number to use for the long event instead of the current node. </td></tr>
+    <tr><td class="paramname">eventNumber</td><td>event number for the long event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The event does not need to be taught, and stored in the events table.</p>
+<p>Use spoofed node numbers only when many nodes send the same long event. It is recommended to use short events for many-to-many events. </p>
 
 </div>
 </div>
@@ -160,7 +269,16 @@ Event Producer Service API</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Causes an event to be sent with <span class="tt">state</span> indicating <span class="tt">on</span> for TRUE and <span class="tt">off</span> for FALSE. Short or Long event is determined by the Event Table entry at <span class="tt">evIndex</span>. </p>
+
+<p>Send an event from the taught events table. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">evIndex</td><td>index into the taught events table for the event to use.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The indexed event determines if the sent event is short or long. </p>
 
 </div>
 </div>
@@ -187,7 +305,16 @@ Event Producer Service API</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Causes an event with one data byte to be sent with <span class="tt">state</span> indicating <span class="tt">on</span> for TRUE and <span class="tt">off</span> for FALSE. Short or Long event is determined by the Event Table entry at <span class="tt">evIndex</span>. The data sent is <span class="tt">data1</span>. </p>
+
+<p>Send an event from the taught events table with data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">evIndex</td><td>index into the taught events table for the event to use. </td></tr>
+    <tr><td class="paramname">data1</td><td>data byte to b /// Send a long event. The indexed event determines if the sent event is short or long. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -219,7 +346,18 @@ Event Producer Service API</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Causes an event with two data bytes to be sent with <span class="tt">state</span> indicating <span class="tt">on</span> for TRUE and <span class="tt">off</span> for FALSE. Short or Long event is determined by the Event Table entry at <span class="tt">evIndex</span>. The data sent is <span class="tt">data1</span> and <span class="tt">data2</span>. </p>
+
+<p>Send an event from the taught events table with data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">evIndex</td><td>index into the taught events table for the event to use. </td></tr>
+    <tr><td class="paramname">data1</td><td>first data byte to be included in the event. </td></tr>
+    <tr><td class="paramname">data2</td><td>second data byte to be included in the event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The indexed event determines if the sent event is short or long. </p>
 
 </div>
 </div>
@@ -256,7 +394,19 @@ Event Producer Service API</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Causes an event with three data bytes to be sent with <span class="tt">state</span> indicating <span class="tt">on</span> for TRUE and <span class="tt">off</span> for FALSE. Short or Long event is determined by the Event Table entry at <span class="tt">evIndex</span>. The data sent is <span class="tt">data1</span> and <span class="tt">data2</span> and <span class="tt">data3</span>. </p>
+
+<p>Send an event from the taught events table with data. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">state</td><td>send an ON event if state is <span class="tt">true</span> or OFF event if <span class="tt">false</span> </td></tr>
+    <tr><td class="paramname">evIndex</td><td>index into the taught events table for the event to use. </td></tr>
+    <tr><td class="paramname">data1</td><td>first data byte to be included in the event. </td></tr>
+    <tr><td class="paramname">data2</td><td>second data byte to be included in the event. </td></tr>
+    <tr><td class="paramname">data3</td><td>third data byte to be included in the event.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The indexed event determines if the sent event is short or long. </p>
 
 </div>
 </div>
