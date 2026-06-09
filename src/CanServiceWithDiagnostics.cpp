@@ -74,4 +74,8 @@ void CanServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
   }
 }
 
+int CanServiceWithDiagnostics::getDiagnosticCount()
+{
+  return 18;
+}
 } // VLCB

@@ -28,6 +28,27 @@ void MinimumNodeServiceWithDiagnostics::handleMessage(const VlcbMessage *msg)
   }
 }
 
+class ServiceDiagnosticsResponse : public TimedResponse::Task
+{
+  Service * svc;
+  int serviceIndex;
+  int diagnosticCount;
+public:
+  ServiceDiagnosticsResponse(Controller * controller, Service * svc, int serviceIndex, int diagnosticCount)
+    : Task(controller), svc(svc), serviceIndex(serviceIndex), diagnosticCount(diagnosticCount) {}
+
+  TimedResponse::Result operator()() override
+  {
+    if (this->sequence == diagnosticCount)
+    {
+      return TimedResponse::FINISHED;
+    }
+    svc->reportDiagnostics(serviceIndex, sequence + 1);
+    return TimedResponse::PROGRESS;
+  }
+
+};
+
 void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -79,8 +100,12 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
     byte diagnosticCode = msg->data[4];
     if (diagnosticCode == 0)
     {
-      // TODO: TimedResponse
-      svc->reportAllDiagnostics(serviceIndex);
+      int diagnosticCount = svc->getDiagnosticCount();
+      controller->sendDGN(serviceIndex, 0, diagnosticCount);
+      if (diagnosticCount > 0)
+      {
+        controller->addTimedResponse(new ServiceDiagnosticsResponse(controller, svc, serviceIndex, diagnosticCount));
+      }
     }
     else
     {
@@ -134,6 +159,11 @@ void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
   {
     reportDiagnostics(serviceIndex, i);
   }
+}
+
+int MinimumNodeServiceWithDiagnostics::getDiagnosticCount()
+{
+  return 6;
 }
 
 }

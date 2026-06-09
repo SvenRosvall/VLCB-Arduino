@@ -303,7 +303,7 @@ void testRequestAllDiagnosticsCanService()
   VLCB::CANFrame msg = {0x11, false, false, 5, {OPC_RDGN, 0x01, 0x04, serviceIndex, 0}};
   mockCanTransport->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(19, mockCanTransport->sent_frames.size());

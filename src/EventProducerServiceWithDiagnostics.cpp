@@ -29,5 +29,10 @@ void EventProducerServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex
   {
     reportDiagnostics(serviceIndex, i);
   }
-}      
+}
+
+int EventProducerServiceWithDiagnostics::getDiagnosticCount()
+{
+  return 1;
+}
 }

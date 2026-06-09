@@ -56,8 +56,8 @@ public:
   /// Implementing service classes shall implement this to perform tasks specific to that service
   /// such as polling for changes of input pins.
   /// This method does not need to be implemented if there are no such regular tasks for the service.
-  virtual void process() {};
-  
+  virtual void process() {}
+
   /// @brief Called when there is an action available.
   /// 
   /// This method does not need to be implemented if the service does react to any actions.
@@ -74,7 +74,11 @@ public:
   /// @brief Report all diagnostics available for a service.
   /// 
   /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
+  // TODO: Remove this as it is replaced by TimedResponse code.
   virtual void reportAllDiagnostics(byte serviceIndex);
+
+  /// @brief report how many diagnostics this service supports.
+  virtual int getDiagnosticCount() { return 0; }
 
   /// Container for service data bytes.
   struct Data { byte data1, data2, data3; };

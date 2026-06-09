@@ -47,4 +47,9 @@ void InternalDiagnosticsService::reportAllDiagnostics(byte serviceIndex)
   }
 }
 
+int InternalDiagnosticsService::getDiagnosticCount()
+{
+  return 4;
+}
+
 }

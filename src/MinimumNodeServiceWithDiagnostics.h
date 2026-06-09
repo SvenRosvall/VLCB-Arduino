@@ -18,6 +18,7 @@ class MinimumNodeServiceWithDiagnostics : public MinimumNodeService
 public:
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
   virtual void reportAllDiagnostics(byte serviceIndex) override;
+  virtual int getDiagnosticCount() override;
 
 protected:
   virtual void handleMessage(const VlcbMessage *msg) override; 

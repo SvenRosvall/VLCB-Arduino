@@ -32,5 +32,11 @@ void EventConsumerServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex
   {
     reportDiagnostics(serviceIndex, i);
   }
-}      
+}
+
+int EventConsumerServiceWithDiagnostics::getDiagnosticCount()
+{
+  return 2;
+}
+
 }

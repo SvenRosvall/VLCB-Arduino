@@ -29,5 +29,12 @@ void EventTeachingServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex
   {
     reportDiagnostics(serviceIndex, i);
   }
-}      
+}
+
+
+int EventTeachingServiceWithDiagnostics::getDiagnosticCount()
+{
+  return 1;
+}
+
 }
