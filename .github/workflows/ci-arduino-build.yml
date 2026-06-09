@@ -1,0 +1,44 @@
+name: Arduino Firmware Build
+
+on:
+  pull_request:
+    paths:
+      - examples/**
+      - src/**
+      - library.properties
+      - .github/workflows/ci-arduino-build.yml
+  push:
+    paths:
+      - examples/**
+      - src/**
+      - library.properties
+      - .github/workflows/ci-arduino-build.yml
+  workflow_dispatch:
+
+jobs:
+  compile-examples:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install Arduino core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr
+
+      - name: Install library dependencies
+        run: |
+          arduino-cli lib install ACAN2515
+          arduino-cli lib install Streaming
+
+      - name: Compile representative examples for Arduino Uno
+        run: |
+          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_empty
+          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_1in1out
+          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_4in4out
+          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_SerialGC_empty
