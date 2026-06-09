@@ -36,9 +36,11 @@ jobs:
           arduino-cli lib install ACAN2515
           arduino-cli lib install Streaming
 
-      - name: Compile representative examples for Arduino Uno
+      - name: Compile all examples for Arduino Uno
         run: |
-          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_empty
-          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_1in1out
-          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_4in4out
-          arduino-cli compile --fqbn arduino:avr:uno --library . ./examples/VLCB_SerialGC_empty
+          for dir in ./examples/*; do
+            if [ -d "$dir" ] && ls "$dir"/*.ino >/dev/null 2>&1; then
+              echo "Compiling $dir"
+              arduino-cli compile --fqbn arduino:avr:uno --library . "$dir"
+            fi
+          done
