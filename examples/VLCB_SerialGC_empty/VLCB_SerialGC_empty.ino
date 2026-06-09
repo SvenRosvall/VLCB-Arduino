@@ -47,7 +47,7 @@ VLCB::SerialGC serialGC;                  // CAN transport object using serial
 // Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
 VLCB::MinimumNodeServiceWithDiagnostics mnService;
-VLCB::CanServiceWithDiagnostics canService(&can2515);
+VLCB::CanServiceWithDiagnostics canService(&serialGC);
 
 //
 /// setup VLCB - runs once at power on from setup()
@@ -66,11 +66,8 @@ void setupVLCB()
   // set module name
   VLCB::setName(mname);
 
-  // configure and start CAN bus and VLCB message processing
-  can2515.setNumBuffers(2, 1);      // more buffers = more memory used, fewer = less
-  can2515.setOscFreq(16000000UL);   // select the crystal frequency of the CAN module
-  can2515.setPins(10, 2);           // select pins for CAN bus CE and interrupt connections
-  if (!can2515.begin())
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
   {
     Serial << F("> error starting VLCB") << endl;
   }
