@@ -80,13 +80,7 @@ public:
   /// 
   /// @param state send an ON event if state is `true` or OFF event if `false`
   /// @param evIndex index into the taught events table for the event to use.
-  /// @param data1 data byte to b  /// @brief Send a long event.
-  //  /// 
-  //  /// @param state send an ON event if state is `true` or OFF event if `false`
-  //  /// @param eventNumber event number for the long event.
-  //  /// 
-  //  /// The event does not need to be taught, and stored in the events table.
-  //  /// The node number is the number of this node.e included in the event.
+  /// @param data1 data byte to be included in the event.
   /// 
   /// The indexed event determines if the sent event is short or long.
   void sendEventAtIndex(bool state, byte evIndex, byte data1);
