@@ -12,9 +12,6 @@ void EventTeachingServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
 {
   switch (diagnosticsCode)
   {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      break;
     case 0x01: 
       controller->sendDGN(serviceIndex, diagnosticsCode, diagEventsTaught);
       break;

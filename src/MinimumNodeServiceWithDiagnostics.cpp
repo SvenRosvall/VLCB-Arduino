@@ -91,9 +91,6 @@ void MinimumNodeServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byt
   unsigned int diagnosticsValue;
   switch (diagnosticsCode)
   {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      return;
     case 0x02: // Uptime upper word
       diagnosticsValue = ((millis() / 1000) >> 16) & 0xFFFF;
       break;

@@ -16,9 +16,6 @@ void InternalDiagnosticsService::reportDiagnostics(byte serviceIndex, byte diagn
   unsigned int diagnosticsValue;
   switch (diagnosticsCode)
   {
-    case 0x00:
-      reportAllDiagnostics(serviceIndex);
-      return;
     case 0x01: // Free memory.
       diagnosticsValue = controller->getModuleConfig()->freeSRAM();
       break;
