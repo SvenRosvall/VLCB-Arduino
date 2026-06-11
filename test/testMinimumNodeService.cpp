@@ -735,7 +735,7 @@ void testRequestAllDiagnosticsAllServices()
   VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 0, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(11, mockTransportService->sent_messages.size());
