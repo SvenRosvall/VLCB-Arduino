@@ -20,17 +20,7 @@ void EventConsumerServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
       break;
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
-      return;
-  }
-}
-
-void EventConsumerServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
-{
-  byte diagCount = 2;
-  controller->sendDGN(serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
+      break;
   }
 }
 

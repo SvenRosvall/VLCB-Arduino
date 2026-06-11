@@ -203,16 +203,6 @@ void MinimumNodeServiceWithDiagnostics::diagNodeNumberChanged()
   ++diagNodeNumberChanges;
 }
 
-// TODO: Replace this with TimedResponse
-void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
-{
-  controller->sendDGN(serviceIndex, 0, 6);
-  for (byte i = 1; i <= 0x06 ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
-}
-
 int MinimumNodeServiceWithDiagnostics::getDiagnosticCount()
 {
   return 6;

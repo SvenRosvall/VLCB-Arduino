@@ -58,7 +58,7 @@ Ian's implementation uses TimedResponse for:
 | SOD     | User sketch           | Used by user sketch                 |        |
 | NERD    | All EventTeaching     | Events                              | Done   |
 | RQSD    | MNS                   | Services                            | Done   |
-| RDGN    | All                   | Diagnostics for one or all services |        |
+| RDGN    | All                   | Diagnostics for one or all services | Done   |
 | REQEV   | Classic EventTeaching | Event variables                     | Done   |
 | NVRD    | NodeVariable          | Node variables                      | Done   |
 | RQNPN   | MNS                   | Node Parameters                     | Done   |

@@ -17,20 +17,9 @@ void EventTeachingServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
       break;
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
-      return;
+      break;
   }
 }
-
-void EventTeachingServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
-{
-  byte diagCount = 1;
-  controller->sendDGN( serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
-}
-
 
 int EventTeachingServiceWithDiagnostics::getDiagnosticCount()
 {

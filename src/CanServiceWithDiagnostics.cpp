@@ -64,16 +64,6 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
   controller->sendDGN(serviceIndex, diagnosticsCode, diagnosticsValue);
 }
 
-void CanServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
-{
-  byte diagCount = 18;
-  controller->sendDGN(serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
-}
-
 int CanServiceWithDiagnostics::getDiagnosticCount()
 {
   return 18;

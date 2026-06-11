@@ -29,7 +29,6 @@ public:
   byte getServiceVersionID() const override { return 1; }
 
   void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
-  void reportAllDiagnostics(byte serviceIndex) override;
   virtual int getDiagnosticCount() override;
 };
 

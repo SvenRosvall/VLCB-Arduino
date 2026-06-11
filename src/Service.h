@@ -71,12 +71,6 @@ public:
   /// @param diagnosticsCode code for the diagnostic to report. This code is specific to the implemented service.
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode);
 
-  /// @brief Report all diagnostics available for a service.
-  /// 
-  /// @param serviceIndex index of the service. Not used by the implementation, just passed through to the response message.
-  // TODO: Remove this as it is replaced by TimedResponse code.
-  virtual void reportAllDiagnostics(byte serviceIndex);
-
   /// @brief report how many diagnostics this service supports.
   virtual int getDiagnosticCount() { return 0; }
 

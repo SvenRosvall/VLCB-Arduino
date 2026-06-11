@@ -16,7 +16,6 @@ class EventConsumerServiceWithDiagnostics : public EventConsumerService
 {
 public:
   virtual void reportDiagnostics(byte serviceIndex, byte diagnosticsCode) override;
-  virtual void reportAllDiagnostics(byte serviceIndex) override;
   virtual int getDiagnosticCount() override;
 
 };
