@@ -5,6 +5,9 @@
 
 #pragma once
 
+#include <Arduino.h>
+#include <Stream.h>
+
 #include "Service.h"
 #include "Configuration.h"
 #include "Transport.h"
@@ -20,6 +23,8 @@ class SerialUserInterface : public Service
 {
 public:
   /// @cond LIBRARY
+  SerialUserInterface(Stream& _serial = Serial) : serial(_serial) {}
+
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
   virtual byte getServiceVersionID() const override { return 1; };
 
@@ -28,6 +33,8 @@ public:
   /// @endcond
 
 private:
+  Stream& serial;
+
   void handleAction(const Action &action);
   void processSerialInput();
   void indicateMode(VlcbModeParams i);

@@ -107,3 +107,11 @@ use for programming the Arduino.
 You can then start FCU (or any other configuration utility) and connect through
 this serial port.
 The FCU will then communicate with your Arduino module as a CBUS module.
+
+## [VLCB_SerialGC_SerialUI_SoftwareSerial](../examples/VLCB_SerialGC_SerialUI_SoftwareSerial/VLCB_SerialGC_SerialUI_SoftwareSerial.ino)
+This example demonstrates split serial usage on a single node.
+The hardware serial port is dedicated to [SerialGC](../docs/CanTransport.md) for VLCB/GridConnect traffic,
+while a separate SoftwareSerial port is used for [SerialUserInterface](SerialUserInterface.md) commands and status output.
+
+This layout is useful when you want to keep the transport channel and the user console separate.
+It also shows the intended use of the Stream-based serial refactor for either HardwareSerial or SoftwareSerial.
