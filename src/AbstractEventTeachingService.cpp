@@ -313,6 +313,7 @@ void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *ms
     {
       for (byte i = 1; i <= module_config->getNumEVs(); i++)
       {
+        // TODO: Replace with TimedResponse
         byte value = module_config->getEventEVval(eventIndex, i);
         controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
       }
