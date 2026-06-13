@@ -1,5 +1,10 @@
 # TODO List
 
+This list contains minor code improvements that are not user facing.
+
+User facing bugs and improvements are managed as
+[GitHub Issues](https://github.com/SvenRosvall/VLCB-Arduino/issues).
+
 ## Introduce TimedResponse
 The Action queue has a limited size of 30 which is enough to handle
 all responses for RQNPN.
@@ -80,20 +85,6 @@ Split this class in two:
   1. all the other stuff a developer would want, such as transport statistics and
      resetting the module.
 
-## Introduce InternalDiagnosticsService
-If SerialUserInterface is not included in the service list then there is no
-way to check free memory.
-A dedicated service could provide free memory amount as a diagnostic value.
-
-What internal information would be useful for this service?
-* Free memory. (as listed above)
-* Monitor the action queue. Current use, high water mark. (See CanService buffer use for inspiration.)
-* Count of generated actions. 
-* TimedResponse data such as number of tasks in queue, total number of tasks created. 
-
-Is this a service that should be included in the VLCB specifications?
-Or should it be treated as a user defined service?
-
 ## Move CAN2515 to its own package/repo
 Now that we are getting more CAN transport implementations it is time to move CAN2515 
 away into its own library. 
@@ -155,36 +146,3 @@ into the action queue.
    of queueing actions for any piece of code that creates messages.
    Of course the action consumers must be able to receive these single messges,
    which means that CAN transport must have enough buffer space for those messags.
-
-## Split `Service.process(Action *)` into `poll()` and `processAction(Action)`
-
-Current `process(Action *)` takes a pointer that may be null if there is
-no active action.
-This function has to perform both the house-keeping tasks and process any action.
-
-Split these two tasks into `poll()` for house-keeping tasks and `processAction(Action&)`
-so that each function do one thing only. 
-A service that do not need house-keeping does not need to implement `poll()`.
-The `processAction()` will only be called when there is an action available.
-
-This also means that there is no need to implement `poll()` if there are no 
-house-keeping to do for a service.
-Also, there is no need for checking if the pointer to an action is null.
-
-This TODO is inspired by Ian Hogg's `VLCBlib_PIC` library.
-See the global `poll()` function in the file `vlcb.c`.
-
-## Documentation
-
-### Split documentation based on audience
-Need to clarify which documents are intended for which audience.
-There are a few distinct kinds of audiences:
-  1. Developers of VLCB-Arduino library.
-  2. Sketch creators that use the VLCB-Arduino library.
-  3. Users of created sketches. These should probably be catered for by the sketch authors.
-
-### How-to guide for Sketch Authors
-Describe how to write a sketch with VLCB setup. 
-How to create service objects and the controller object.
-How to configure any parameters and service specifics.
-
