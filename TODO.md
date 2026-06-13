@@ -70,26 +70,6 @@ Configuration today has
 Need to change the notion of SLiM/FLiM to VLCB modes.
 Should be part of the MNS service.
 
-
-## Provide access to persistent storage for user code
-The Storage interface provides a simple API to persistent storage regardless of
-type of storage. 
-The user code should be able to reserve a chunk of bytes in this space.
-
-## Split SerialUserInterface
-The SerialUserInterface class contains everything a developer could need.
-This adds code bloat. 
-Split this class in two: 
-  1. do the same things as the push-button does, i.e. initiate CAN enumeration, 
-     initiate setup mode.
-  1. all the other stuff a developer would want, such as transport statistics and
-     resetting the module.
-
-## Move CAN2515 to its own package/repo
-Now that we are getting more CAN transport implementations it is time to move CAN2515 
-away into its own library. 
-This breaks the dependency on ACAN2515 which should not be required for other CAN transports.
-
 ## Ideas for reducing memory usage
 ### Make CanFrame polymorphic
 Use virtual functions to get each field.
