@@ -132,12 +132,6 @@ void setupVLCB()
   // set module name
   VLCB::setName(mname);
 
-  // configure and start Serial GridConnect transport
-  if (!serialGC.begin())
-  {
-    Serial << F("> error starting VLCB") << endl;
-  }
-
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
@@ -145,6 +139,12 @@ void setupVLCB()
   
   // register a validator for taught VLCB events.
   etService.setEventValidator(eventValidator);
+
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
 
   // initialise and load configuration
   VLCB::begin();

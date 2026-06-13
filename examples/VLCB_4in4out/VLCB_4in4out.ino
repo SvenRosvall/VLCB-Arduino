@@ -37,7 +37,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 // 
-// Node variables:
+// There are 4 node variables, one for each switch.
 //  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
 //
 // Event variables:
@@ -115,6 +115,7 @@ void setupVLCB()
   VLCB::setServices({
     &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
     &ecService, &epService, &etService, &coeService});
+
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
   VLCB::setMaxEvents(64);
@@ -369,7 +370,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
   DEBUG_PRINT(F("sk> NN = ") << node_number << F(", EN = ") << event_number);
   DEBUG_PRINT(F("sk> op_code = ") << opc);
 
-  switch (opc) 
+  switch (opc)
   {
     case OPC_ACON:
     case OPC_ASON:
@@ -380,7 +381,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
         byte evval = VLCB::getEventEVval(index, ev);
         DEBUG_PRINT(F("sk> EV = ") << ev << (" Value = ") << evval);
 
-        switch (evval) 
+        switch (evval)
         {
           case 1:
             moduleLED[i].on();
