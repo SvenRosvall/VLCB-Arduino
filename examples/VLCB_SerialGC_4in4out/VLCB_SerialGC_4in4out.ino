@@ -140,6 +140,12 @@ void setupVLCB()
   // register a validator for taught VLCB events.
   etService.setEventValidator(eventValidator);
 
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
+
   // initialise and load configuration
   VLCB::begin();
 

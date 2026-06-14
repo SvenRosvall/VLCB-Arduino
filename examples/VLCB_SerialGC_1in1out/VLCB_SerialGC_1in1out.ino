@@ -86,6 +86,12 @@ void setupVLCB()
   // register our VLCB event handler, to receive event messages of learned events
   ecService.setEventHandler(eventhandler);
 
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
+
   // initialise and load configuration
   VLCB::begin();
 
