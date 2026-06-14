@@ -99,64 +99,8 @@ byte lowByte(unsigned int i)
   return i & 0xFF;
 }
 
-void Serial_T::begin(int baudRate)
-{
-}
-
-bool Serial_T::available()
-{
-  return true;
-}
-
-char Serial_T::read()
-{
-  return ' ';
-}
-
-void Serial_T::print(const char *)
-{
-}
-
-void Serial_T::println(const char *)
-{
-}
-
-void Serial_T::flush()
-{
-}
-
-Serial_T & operator<<(Serial_T & s, int i)
-{
-  std::cout << i;
-  return s;
-}
-Serial_T & operator<<(Serial_T & s, unsigned int i)
-{
-  std::cout << i;
-  return s;
-}
-Serial_T & operator<<(Serial_T & s, long i)
-{
-  std::cout << i;
-  return s;
-}
-Serial_T & operator<<(Serial_T & s, unsigned long i)
-{
-  std::cout << i;
-  return s;
-}
-Serial_T & operator<<(Serial_T & s, const char * i)
-{
-  std::cout << i;
-  return s;
-}
-Serial_T & operator<<(Serial_T & s, const ENDL_T & e)
-{
-  std::cout << std::endl;
-  return s;
-}
 ENDL_T endl;
-Serial_T Serial;
+Stream Serial;
 //template <typename T> T _HEX(T);
 
 // Hardware values used by ADC free running mode.

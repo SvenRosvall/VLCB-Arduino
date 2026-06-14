@@ -112,6 +112,7 @@ add_executable(VLCB_Arduino
         examples/VLCB_SerialGC_4in4out/VLCB_SerialGC_4in4out.ino
         examples/VLCB_SerialGC_4in4out_slot/VLCB_SerialGC_4in4out_slot.ino
         examples/VLCB_SerialGC_empty/VLCB_SerialGC_empty.ino
+        examples/VLCB_SerialGC_SerialUI_SoftwareSerial/VLCB_SerialGC_SerialUI_SoftwareSerial.ino
 )
 
 add_executable(testAll
