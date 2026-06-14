@@ -1,0 +1,23 @@
+name: Host Tests
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+
+      - name: Build test target
+        run: cmake --build build --target testAll --config Release
+
+      - name: Run tests
+        run: ./build/testAll
