@@ -36,6 +36,8 @@ namespace VLCB
 
     virtual unsigned int receiveCounter() override { return receivedCount; }
     virtual unsigned int transmitCounter() override { return transmitCount; }
+    virtual unsigned int receiveBufferSize() override { return RXBUFFERSIZE; }
+    virtual unsigned int transmitBufferSize() override { return RXBUFFERSIZE; }
     virtual unsigned int receiveErrorCounter() override { return receiveErrorCount; }
     virtual unsigned int transmitErrorCounter() override { return transmitErrorCount; }
     virtual unsigned int receiveBufferUsage() override { return 0; };

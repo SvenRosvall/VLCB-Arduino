@@ -43,6 +43,8 @@
 //        There are 10 slots per LED so that there can be many events that activate the same LED.
 
 // There are 4 node variables, one for each switch.
+//  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
+
 // There is only one event variable. It is used for consumed events to control the action
 // for the LED: 0) No change 1) Normal 2) Slow blink 3) Fast blink
 
@@ -116,6 +118,7 @@ void setupVLCB()
   VLCB::setServices({
     &mnService, &ledUserInterface, &serialUserInterface, &canService, &nvService,
     &ecService, &epService, &etService, &coeService});
+
   // set config layout parameters
   VLCB::setNumNodeVariables(NUM_SWITCHES);
   VLCB::setMaxEvents(64);
@@ -306,14 +309,14 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
   DEBUG_PRINT(F("sk> event handler: index = ") << index << F(" for LED = ") << ledNum); 
   DEBUG_PRINT(F("sk> opcode = 0x") << _HEX(msg->data[0]) << F(" = ") << opc);
 
-  switch (opc) 
+  switch (opc)
   {
     case OPC_ACON:
     case OPC_ASON:
       DEBUG_PRINT(F("sk> case is opCode ON"));
       DEBUG_PRINT(F("sk> EV1 Value = ") << evval);
 
-      switch (evval) 
+      switch (evval)
       {
         case 1:
           moduleLED[ledNum - 1].on();
