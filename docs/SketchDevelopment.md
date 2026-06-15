@@ -25,10 +25,25 @@ or to cause the module to perform some other action.
 Event variables are also used for produced events to control how and when
 these events are produced.
 
-There are two strategies for organising events and event variables: 1) classic
+There are two strategies for organising and teaching events and event variables: 1) classic
 events, and 2) slot events.
 These strategies deal with how events are stored in the events table and 
 what event variables are required.
+
+It is also possible to produce direct (default) produced events. 
+These events are not taught.
+These can be sent by the node when inputs change even if there is no
+taught event for this. 
+This is convenient for users as events show up in configuration utilities
+without having to be taught.
+However, these events are not stored in the events table and don't show up
+in configuration utilities when the node is asked for its events.
+
+An alternative design is to let the node teach itself an event when an
+input changes, and then send that produced event. 
+This means that these default events appear automatically when an input
+changes, and it is stored in the events table.
+This is how the example sketches are designed.
 
 ### Classic Events
 When using classic events the events are stored at any location in the events
