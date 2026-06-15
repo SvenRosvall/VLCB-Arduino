@@ -94,7 +94,10 @@ OP_CODE | HEX | Function
 ### Event Variables
 
 Event Variable 1 (EV1) identifies a consumed only event if its value is zero.
-A non-zero value will identify the source (in this case switch) for a produced
+A value of 255 identifies the event as a request for Start-of-Day reporting,
+i.e. send an event for each input to update control panels etc, of the current
+state.
+A value of 1 to 4 will identify the source (in this case switch) for a produced
 event.
 
 ### Consumed Events
