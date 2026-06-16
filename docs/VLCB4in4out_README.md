@@ -94,7 +94,7 @@ OP_CODE | HEX | Function
 ### Event Variables
 
 Event Variable 1 (EV1) identifies a consumed only event if its value is zero.
-A value of 255 identifies the event as a request for Start-of-Day reporting,
+A value of 255 identifies the event as a request for [Start-of-Day reporting](#start-of-day-event),
 i.e. send an event for each input to update control panels etc, of the current
 state.
 A value of 1 to 4 will identify the source (in this case switch) for a produced
@@ -155,6 +155,19 @@ value of 0xFF if not written to. Event Variable 1 will contain the value of
 the producer trigger or switch. If the Event Variables are populated as shown
 in the table in the Consumed Events Section above, the LEDs will respond
 accordingly to a Produced Event.
+
+### Start-of-Day event
+When a Start-of-Day event is received the node will respond
+with an event for each input (switch) to indicate its state.
+
+Note that ON-only switches and OFF-only switches do not
+generate these state events as the state will always be ON or OFF.
+
+A toggle switch should ideally remember its state when
+powering off the node. 
+Instead, the reported state for a toggle switch will be the
+default state unless it has not changed state since start up 
+of the node.
 
 ## Node Variables
 
