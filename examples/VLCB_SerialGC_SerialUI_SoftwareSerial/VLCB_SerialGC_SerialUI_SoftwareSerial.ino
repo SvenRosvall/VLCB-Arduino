@@ -7,22 +7,26 @@
       3rd party libraries needed for compilation: (not for binary-only distributions)
 
       Streaming      -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      SoftwareSerial -- Arduino software serial library
+      SoftwareSerial -- Arduino software serial library (not needed when USE_MEGA_SERIAL1 is set)
 */
 
-//
 // This example demonstrates split serial usage:
-// - SerialGC uses the hardware Serial port for GridConnect transport
+//
+// - SerialGC uses the default hardware Serial port for GridConnect transport
 // - SerialUserInterface uses SoftwareSerial for user commands and status output
+// - Optionally, hardware Serial1 can be used for the SerialUserInterface on Mega2560 by setting the USE_MEGA_SERIAL1 build flag in platformio.ini
 //
 // This is useful on boards where the USB serial port is already committed to
 // the VLCB/GridConnect transport, but a separate command console is still wanted.
 //
+// Based on VLCB_SerialGC_empty example, modified by Bruno Rocci (MERG 9690).
 
 
 // 3rd party libraries
 #include <Streaming.h>
+#ifndef USE_MEGA_SERIAL1
 #include <SoftwareSerial.h>
+#endif
 
 // VLCB library header files
 #include <VLCB.h>
@@ -46,11 +50,15 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-// SoftwareSerial pins: RX, TX
-// Wire the external serial terminal or adapter to these pins.
-const byte UI_RX_PIN = 10;
-const byte UI_TX_PIN = 11;
+#ifdef USE_MEGA_SERIAL1
+// Use hardware Serial1 on pins 18 (TX1) and 19 (RX1)
+#define serialUserPort Serial1
+#else
+// Use SoftwareSerial on pins 2 (RX) and 3 (TX)
+const byte UI_RX_PIN = 2;
+const byte UI_TX_PIN = 3;
 SoftwareSerial serialUserPort(UI_RX_PIN, UI_TX_PIN);
+#endif
 
 // module objects
 VLCB::SerialGC serialGC(Serial);                 // CAN transport object using hardware serial
@@ -90,14 +98,32 @@ void setupVLCB()
 }
 
 //
+/// print code version config details and copyright notice
+//
+void printConfig()
+{
+  // code version
+  serialUserPort << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
+  serialUserPort << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
+
+  // copyright
+  serialUserPort << F("> © Sven Rosvall (MERG 3777) 2026") << endl;
+}
+
+//
 /// setup - runs once at power on
 //
 void setup()
 {
   Serial.begin(115200);
   serialUserPort.begin(9600);
+  delay(2000);  // Give some time to PIO to open the serial monitor before printing anything
 
-  serialUserPort << F("> ** VLCB split SerialGC + SoftwareSerial UI example ** ") << __FILE__ << endl;
+#ifdef USE_MEGA_SERIAL1
+  serialUserPort << F("> ** VLCB split: SerialGC + Serial1 UI example ** ") << __FILE__ << endl;
+#else
+  serialUserPort << F("> ** VLCB split: SerialGC + SoftwareSerial UI example ** ") << __FILE__ << endl;
+#endif
 
   setupVLCB();
 
@@ -115,17 +141,4 @@ void loop()
   VLCB::process();
 
   // bottom of loop()
-}
-
-//
-/// print code version config details and copyright notice
-//
-void printConfig()
-{
-  // code version
-  serialUserPort << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
-  serialUserPort << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
-
-  // copyright
-  serialUserPort << F("> © Sven Rosvall (MERG 3777) 2026") << endl;
 }
