@@ -363,7 +363,7 @@ void processSwitches(void)
 void doStartOfDay()
 {
   DEBUG_PRINT(F("sk> Starting of Day Start"));
-  for (byte i = 0; i < NUM_LEDS; i++)
+  for (byte i = 0; i < NUM_SWITCHES; i++)
   {
     byte swNum = i + 1;
     DEBUG_PRINT(F("sk> Button ") << swNum);
@@ -375,8 +375,20 @@ void doStartOfDay()
       continue;
     }
 
-    // TODO: Should we send events for on/off only switches?
-    epService.sendEventAtIndex(state[i], eventIndex);
+    // Send events for switch that can change state.
+    byte nv = i + 1;
+    byte nvval = VLCB::readNV(nv);
+    switch (nvval)
+    {
+      case 1: // ON and OFF
+      case 4: // Toggle button
+        epService.sendEventAtIndex(state[i], eventIndex);
+        break;
+        
+      default:
+        // Don't send events for other switch types.
+        break;
+    }
   }
   DEBUG_PRINT(F("sk> Stopping of Day Start"));
 }
