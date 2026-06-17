@@ -262,6 +262,27 @@ void AbstractEventTeachingService::handleReadEvents(unsigned int nn)
   controller->addTimedResponse(new RespondEvents(controller, controller->getModuleConfig(), nn));
 }
 
+class RespondEventVar : public TimedResponse::Task
+{
+  byte eventIndex;
+  byte numEVs;
+public:
+  RespondEventVar(Controller * controller, byte eventIndex, byte numEVs)
+    : Task(controller), eventIndex(eventIndex), numEVs(numEVs) {}
+  TimedResponse::Result operator()() override
+  {
+    if (sequence >= numEVs)
+    {
+      return TimedResponse::FINISHED;
+    }
+    
+    byte value = controller->getModuleConfig()->getEventEVval(eventIndex, sequence + 1);
+    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, sequence + 1, value);
+
+    return TimedResponse::PROGRESS;
+  }
+};
+
 void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -311,12 +332,7 @@ void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *ms
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->getNumEVs());
     if (!module_config->fcuCompatible)
     {
-      for (byte i = 1; i <= module_config->getNumEVs(); i++)
-      {
-        // TODO: Replace with TimedResponse
-        byte value = module_config->getEventEVval(eventIndex, i);
-        controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
-      }
+      controller->addTimedResponse(new RespondEventVar(controller, eventIndex, module_config->getNumEVs()));
     }
   }
   else

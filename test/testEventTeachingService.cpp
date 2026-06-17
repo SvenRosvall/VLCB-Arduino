@@ -1262,7 +1262,7 @@ void testReval()
   // Data: OP, NN, Event index, EV#
   msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 0}};
   mockTransportService->setNextMessage(msg);
-  process(controller);
+  processWithTasks(controller);
   assertEquals(3, mockTransportService->sent_messages.size());
   assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0, mockTransportService->sent_messages[0].data[3]);
