@@ -15,9 +15,22 @@ The VLCB-Arduino library has two sets of API documentation, one complete
 set for library developers, and a second restricted set that describes 
 functions and objects that sketch developers need.
 
-## Using Doxygen in VLCB-Arduino
+## CI-automated documentation
 
-Download and install Doxygen from https://www.doxygen.nl/
+The documentation is generated automatically by a [GitHub Actions workflow](../.github/workflows/ci-docs.yaml)
+on every push or pull request that changes source files or documentation.
+On pushes to the `main` branch, the generated documentation is deployed to GitHub Pages.
+
+The live documentation is available at:
+- [Library developer docs](https://svenrosvall.github.io/VLCB-Arduino/html.library/index.html)
+- [Sketch developer docs](https://svenrosvall.github.io/VLCB-Arduino/html.sketch/index.html)
+
+The main repository is maintained at https://svenrosvall.github.io/VLCB-Arduino
+
+## Generating documentation locally
+
+For previewing changes before pushing, generate the documentation locally.
+Download and install Doxygen from https://www.doxygen.nl/.
 
 Doxygen requires a configuration file.
 This is [Doxygen.conf](../Doxygen.Sketch.conf) in the root directory.
@@ -30,32 +43,13 @@ doxygen Doxygen.Library.conf
 This updates documentation in the `html.sketch` directory and 
 `html.library` directory respectively.
 
-Once the documentation is updated, review it and commit to git.
-Note that some new files may have been created. 
-These needed to be staged for addition to git.
-
-## Browsing the generated documentation
-
 Read the generated documentation locally by opening one of the
 [Sketch developer index file](../html.sketch/index.html) or
 [Library developer index file](../html.library/index.html)
 in your browser.
 
-If you browse the index file from Github you will see the raw HTML
-source code.
-Github has a feature (called "pages") that renders the HTML pages
-(and Markdown pages).
-Enable the "pages" in **Settings** in the Github repository.
-Select **Pages** on the left.
-Set **Source** to "Deploy from a brach" and under **Branch** choose
-the branch that is used for documentation (if anything else than "main").
-The directory shall be "/ (root)".
-Press [Save] and you are done.
-The pages will now be available at https:<your-username>.githop.io/VLCB-Arduino.
-(See https://stackoverflow.com/questions/8446218/how-to-see-an-html-page-on-github-as-a-normal-rendered-html-page-to-see-preview)
-
-The main repository will be maintained in https://svenrosvall.github.io/VLCB-Arduino
-The index of the generated documentation is available at https://svenrosvall.github.io/VLCB-Arduino/html.library/index.html
+> **Note**: Do not commit the generated `html.sketch/` or `html.library/` directories.
+> The CI workflow generates and deploys them automatically.
 
 ## What to document
 High level documentation is kept in the `docs` directory.
