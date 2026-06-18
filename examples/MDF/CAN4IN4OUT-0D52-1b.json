@@ -61,7 +61,8 @@
         {"label": "Switch 1", "value": 1},
         {"label": "Switch 2", "value": 2},
         {"label": "Switch 3", "value": 3},
-        {"label": "Switch 4", "value": 4}
+        {"label": "Switch 4", "value": 4},
+        {"label": "Start of Day", "value": 255}
       ]
     },
     {

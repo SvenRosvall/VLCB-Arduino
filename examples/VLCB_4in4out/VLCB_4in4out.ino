@@ -42,6 +42,7 @@
 //
 // Event variables:
 //  EV1 - Produce event for switch N where N is EV1 value in the range 1-4. Must be unique.
+//        A value of 255 means a Start-of-Day event.
 //  EV2-5 - Change LED 1-4: 0) No change 1) Normal 2) Slow blink 3) Fast blink
 
 #define DEBUG 1  // set to 0 for no serial debug
@@ -357,6 +358,42 @@ void processSwitches(void)
 }
 
 //
+/// Do Start-of-Day reporting. I.e. send events for each input with their current state.
+//
+void doStartOfDay()
+{
+  DEBUG_PRINT(F("sk> Starting of Day Start"));
+  for (byte i = 0; i < NUM_SWITCHES; i++)
+  {
+    byte swNum = i + 1;
+    DEBUG_PRINT(F("sk> Button ") << swNum);
+
+    byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
+    if (!VLCB::isEventIndexValid(eventIndex))
+    {
+      // No event for this switch.
+      continue;
+    }
+
+    // Send events for switch that can change state.
+    byte nv = i + 1;
+    byte nvval = VLCB::readNV(nv);
+    switch (nvval)
+    {
+      case 1: // ON and OFF
+      case 4: // Toggle button
+        epService.sendEventAtIndex(state[i], eventIndex);
+        break;
+        
+      default:
+        // Don't send events for other switch types.
+        break;
+    }
+  }
+  DEBUG_PRINT(F("sk> Stopping of Day Start"));
+}
+
+//
 /// called from the VLCB library when a learned event is received
 //
 void eventhandler(byte index, const VLCB::VlcbMessage *msg)
@@ -375,6 +412,12 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
     case OPC_ACON:
     case OPC_ASON:
       DEBUG_PRINT(F("sk> case is opCode ON"));
+      if (VLCB::getEventEVval(index, 1) == 0xFF)
+      {
+        doStartOfDay();
+        return;
+      }
+
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
