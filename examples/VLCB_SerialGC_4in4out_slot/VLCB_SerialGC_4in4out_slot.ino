@@ -47,7 +47,7 @@
 // 10-49: When receiving an event that is stored in one of the slots N*10 ... N*10+9, trigger action for LED N.
 //        There are 10 slots per LED so that there can be many events that activate the same LED.
 
-// Node variables:
+// There are 4 node variables, one for each switch.
 //  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
 
 // There is only one event variable. It is used for consumed events to control the action
@@ -139,6 +139,12 @@ void setupVLCB()
   ecService.setEventHandler(eventhandler);
   // register the VLCB request event handler to receive event status requests.
   epService.setRequestEventHandler(eventhandler);
+
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
 
   // initialise and load configuration
   VLCB::begin();

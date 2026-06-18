@@ -25,10 +25,25 @@ or to cause the module to perform some other action.
 Event variables are also used for produced events to control how and when
 these events are produced.
 
-There are two strategies for organising events and event variables: 1) classic
+There are two strategies for organising and teaching events and event variables: 1) classic
 events, and 2) slot events.
 These strategies deal with how events are stored in the events table and 
 what event variables are required.
+
+It is also possible to produce direct (default) produced events. 
+These events are not taught.
+These can be sent by the node when inputs change even if there is no
+taught event for this. 
+This is convenient for users as events show up in configuration utilities
+without having to be taught.
+However, these events are not stored in the events table and don't show up
+in configuration utilities when the node is asked for its events.
+
+An alternative design is to let the node teach itself an event when an
+input changes, and then send that produced event. 
+This means that these default events appear automatically when an input
+changes, and it is stored in the events table.
+This is how the example sketches are designed.
 
 ### Classic Events
 When using classic events the events are stored at any location in the events
@@ -73,6 +88,21 @@ slot for changing an LED.
 The slot event strategy reqires a larger event table but fewer event variables.
 Total memory consumption for the events table is very similar to classic
 events strategy.
+
+### Start-of-Day Event
+A Start-of-Day event is optional an event that is consumed by the node that triggers
+sending out a number of events to indicate the state of inputs on the node.
+These status events are used to update consumers on the layout that depend
+on the state of these inputs.
+An example for this is a control panel that needs to light up the correct
+indicator lights when powered up.
+
+A Start-of-Day event is an ordinary event that a node may consume and trigger
+the sending of status events.
+It is usually recognised with a special value in one of the event variables.
+
+The example sketch VLCB_4in4out.ino illustrates how a Start-of-Day event
+can be implemented. See its [README](VLCB4in4out_README.md#event-variables) file
 
 ## Choosing a module identifier
 A module identifier consists of a _Manufacturer ID_ and a _Module ID_.

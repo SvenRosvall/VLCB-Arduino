@@ -42,11 +42,12 @@
 
 //////////////////////////////////////////////////////////////////////////
 // 
-// Node variables:
+// There are 4 node variables, one for each switch.
 //  NV1-4 - Behaviour of switch 1-4: 0) None 1) On/Off 2) On only 3) Off only 4) Toggle
 //
 // Event variables:
 //  EV1 - Produce event for switch N where N is EV1 value in the range 1-4. Must be unique.
+//        A value of 255 means a Start-of-Day event.
 //  EV2-5 - Change LED 1-4: 0) No change 1) Normal 2) Slow blink 3) Fast blink
 
 #define DEBUG 1  // set to 0 for no serial debug
@@ -139,6 +140,12 @@ void setupVLCB()
   
   // register a validator for taught VLCB events.
   etService.setEventValidator(eventValidator);
+
+  // configure and start Serial GridConnect transport
+  if (!serialGC.begin())
+  {
+    Serial << F("> error starting VLCB") << endl;
+  }
 
   // initialise and load configuration
   VLCB::begin();
@@ -352,6 +359,30 @@ void processSwitches(void)
 }
 
 //
+/// Do Start-of-Day reporting. I.e. send events for each input with their current state.
+//
+void doStartOfDay()
+{
+  DEBUG_PRINT(F("sk> Starting of Day Start"));
+  for (byte i = 0; i < NUM_LEDS; i++)
+  {
+    byte swNum = i + 1;
+    DEBUG_PRINT(F("sk> Button ") << swNum);
+
+    byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
+    if (!VLCB::isEventIndexValid(eventIndex))
+    {
+      // No event for this switch.
+      continue;
+    }
+
+    // TODO: Should we send events for on/off only switches?
+    epService.sendEventAtIndex(state[i], eventIndex);
+  }
+  DEBUG_PRINT(F("sk> Stopping of Day Start"));
+}
+
+//
 /// called from the VLCB library when a learned event is received
 //
 void eventhandler(byte index, const VLCB::VlcbMessage *msg)
@@ -370,6 +401,12 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
     case OPC_ACON:
     case OPC_ASON:
       DEBUG_PRINT(F("sk> case is opCode ON"));
+      if (VLCB::getEventEVval(index, 1) == 0xFF)
+      {
+        doStartOfDay();
+        return;
+      }
+
       for (byte i = 0; i < NUM_LEDS; i++)
       {
         byte ev = i + 2;
