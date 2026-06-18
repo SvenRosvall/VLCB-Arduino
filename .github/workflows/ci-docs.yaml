@@ -2,16 +2,18 @@ name: Docs
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
+
 on:
   pull_request:
     paths:
+      - README.md
       - docs/**
       - src/**
       - Doxygen.*.conf
       - .github/workflows/ci-docs.yaml
   push:
     paths:
+      - README.md
       - docs/**
       - src/**
       - Doxygen.*.conf
@@ -20,30 +22,28 @@ on:
 
 jobs:
   generate-doxygen:
+    strategy:
+      matrix:
+        include:
+          - config: Doxygen.Sketch.conf
+            artifact: html-sketch
+            path: html.sketch
+            label: sketch (user-facing)
+          - config: Doxygen.Library.conf
+            artifact: html-library
+            path: html.library
+            label: library (internal API)
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install documentation tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y doxygen graphviz
+      - name: Generate ${{ matrix.label }} docs
+        run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
 
-      - name: Generate API documentation
-        run: |
-          doxygen Doxygen.Sketch.conf
-          doxygen Doxygen.Library.conf
-
-      - name: Upload sketch docs artifact
+      - name: Upload docs artifact
         uses: actions/upload-artifact@v4
         with:
-          name: html-sketch
-          path: html.sketch
-
-      - name: Upload library docs artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: html-library
-          path: html.library
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.path }}
