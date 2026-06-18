@@ -126,3 +126,16 @@ into the action queue.
    of queueing actions for any piece of code that creates messages.
    Of course the action consumers must be able to receive these single messges,
    which means that CAN transport must have enough buffer space for those messags.
+
+## Documentation improvements
+
+### FAQ
+1. Missing messages -> Review buffer sizes. There are several buffers.
+How to view buffer sizes, high-watermark etc.
+
+### How to write a User Service
+
+### How to use each service
+This is for sketch developers. 
+Some services are just included in the services list, some need 
+configuration or other setting up. E.g. event handler in EventConsumerService.
