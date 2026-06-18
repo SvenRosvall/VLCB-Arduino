@@ -9,13 +9,13 @@ on:
       - docs/**
       - src/**
       - Doxygen.*.conf
-      - .github/workflows/docs.yml
+      - .github/workflows/ci-docs.yaml
   push:
     paths:
       - docs/**
       - src/**
       - Doxygen.*.conf
-      - .github/workflows/docs.yml
+      - .github/workflows/ci-docs.yaml
   workflow_dispatch:
 
 jobs:
