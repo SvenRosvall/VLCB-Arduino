@@ -1,4 +1,4 @@
-//  Copyright (C) Sven Rosvall (sven@rosvall.ie)
+//  Copyright (C) Bruno Rocci (bruno_rocci@hotmail.com)
 //  This file is part of VLCB-Arduino project on https://github.com/SvenRosvall/VLCB-Arduino
 //  Licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
@@ -19,8 +19,7 @@
 // This is useful on boards where the USB serial port is already committed to
 // the VLCB/GridConnect transport, but a separate command console is still wanted.
 //
-// Based on VLCB_SerialGC_empty example, modified by Bruno Rocci (MERG 9690).
-
+// Based on VLCB_SerialGC_empty example from Sven Rosvall (MERG 3777)
 
 // 3rd party libraries
 #include <Streaming.h>
@@ -39,7 +38,7 @@ void printConfig();
 // constants
 const byte VER_MAJ = 1;             // code major version
 const char VER_MIN = 'a';           // code minor version
-const byte VER_BETA = 0;            // code beta sub-version
+const byte VER_BUILD = 0;           // code build number
 const byte MANUFACTURER = MANU_DEV; // for boards in development.
 const byte MODULE_ID = 98;          // VLCB module type
 
@@ -80,7 +79,7 @@ void setupVLCB()
     &mnService, &ledUserInterface, &serialUserInterface, &serialCanService});
 
   // set module parameters
-  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BETA);
+  VLCB::setVersion(VER_MAJ, VER_MIN, VER_BUILD);
   VLCB::setModuleId(MANUFACTURER, MODULE_ID);
 
   // set module name
@@ -95,19 +94,6 @@ void setupVLCB()
   serialUserPort << F(", NN = ") << VLCB::getNodeNum() << endl;
 
   printConfig();
-}
-
-//
-/// print code version config details and copyright notice
-//
-void printConfig()
-{
-  // code version
-  serialUserPort << F("> code version = ") << VER_MAJ << VER_MIN << F(" beta ") << VER_BETA << endl;
-  serialUserPort << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
-
-  // copyright
-  serialUserPort << F("> © Sven Rosvall (MERG 3777) 2026") << endl;
 }
 
 //
@@ -141,4 +127,17 @@ void loop()
   VLCB::process();
 
   // bottom of loop()
+}
+
+//
+/// print code version config details and copyright notice
+//
+void printConfig()
+{
+  // code version
+  serialUserPort << F("> code version = ") << VER_MAJ << VER_MIN << F(" build ") << VER_BUILD << endl;
+  serialUserPort << F("> compiled on ") << __DATE__ << F(" at ") << __TIME__ << F(", compiler ver = ") << __cplusplus << endl;
+
+  // copyright
+  serialUserPort << F("> Copyright © 2026 Bruno Rocci (MERG 9690)") << endl;
 }

@@ -22,9 +22,9 @@ namespace VLCB
 class SerialUserInterface : public Service
 {
 public:
-  /// @cond LIBRARY
   SerialUserInterface(Stream& _serial = Serial) : serial(_serial) {}
 
+  /// @cond LIBRARY
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
   virtual byte getServiceVersionID() const override { return 1; };
 

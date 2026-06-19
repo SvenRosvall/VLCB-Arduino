@@ -99,6 +99,68 @@ byte lowByte(unsigned int i)
   return i & 0xFF;
 }
 
+void Stream::begin(int baudRate)
+{
+}
+
+bool Stream::available()
+{
+        return true;
+}
+
+char Stream::read()
+{
+        return ' ';
+}
+
+void Stream::print(const char *)
+{
+}
+
+void Stream::println(const char *)
+{
+}
+
+void Stream::flush()
+{
+}
+
+Stream & operator<<(Stream & s, int i)
+{
+        std::cout << i;
+        return s;
+}
+
+Stream & operator<<(Stream & s, unsigned int i)
+{
+        std::cout << i;
+        return s;
+}
+
+Stream & operator<<(Stream & s, long i)
+{
+        std::cout << i;
+        return s;
+}
+
+Stream & operator<<(Stream & s, unsigned long i)
+{
+        std::cout << i;
+        return s;
+}
+
+Stream & operator<<(Stream & s, const char * i)
+{
+        std::cout << i;
+        return s;
+}
+
+Stream & operator<<(Stream & s, const ENDL_T & e)
+{
+        std::cout << std::endl;
+        return s;
+}
+
 ENDL_T endl;
 Stream Serial;
 //template <typename T> T _HEX(T);
