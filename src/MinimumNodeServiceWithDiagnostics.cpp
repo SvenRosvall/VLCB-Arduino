@@ -112,7 +112,6 @@ public:
   }
 };
 
-// TODO: Long function - break up into smaller pieces.
 void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
