@@ -108,7 +108,7 @@ You can then start FCU (or any other configuration utility) and connect through
 this serial port.
 The FCU will then communicate with your Arduino module as a CBUS module.
 
-## [VLCB_SerialGC_SerialUI_SoftwareSerial](../examples/VLCB_SerialGC_SerialUI_SoftwareSerial/VLCB_SerialGC_SerialUI_SoftwareSerial.ino)
+## [VLCB_SerialGC_SerialUI_empty](../examples/VLCB_SerialGC_SerialUI_empty/VLCB_SerialGC_SerialUI_empty.ino)
 This example demonstrates split serial usage on a single node.
 The hardware serial port is dedicated to [SerialGC](../docs/CanTransport.md) for VLCB/GridConnect traffic,
 while a separate SoftwareSerial port is used for [SerialUserInterface](SerialUserInterface.md) commands and status output.
