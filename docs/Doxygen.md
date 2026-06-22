@@ -21,11 +21,11 @@ The documentation is generated automatically by a [GitHub Actions workflow](../.
 on every push or pull request that changes source files or documentation.
 On pushes to the `main` branch, the generated documentation is deployed to GitHub Pages.
 
-The live documentation is available at:
+The generated documentation is available at:
 - [Library developer docs](https://svenrosvall.github.io/VLCB-Arduino/html.library/index.html)
 - [Sketch developer docs](https://svenrosvall.github.io/VLCB-Arduino/html.sketch/index.html)
 
-The main repository is maintained at https://svenrosvall.github.io/VLCB-Arduino
+The main documentation page is available here: https://svenrosvall.github.io/VLCB-Arduino
 
 ## Generating documentation locally
 

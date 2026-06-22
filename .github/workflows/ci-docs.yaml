@@ -37,7 +37,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Generate ${{ matrix.label }} docs
         run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
@@ -57,8 +58,9 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
-
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
       - name: Download sketch docs
         uses: actions/download-artifact@v4
         with:
