@@ -5,5 +5,18 @@
 
 .DS_Store
 .idea
-build
+build/
+
+# CI generates and deploys these automatically
+html.sketch/
+html.library/
+
+# Visual Studio Code
+.vscode/
+build-vscode/
+CMakePresets.json
+
+# Local working notes
+notes/
+
 

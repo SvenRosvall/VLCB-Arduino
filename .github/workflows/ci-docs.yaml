@@ -1,0 +1,87 @@
+name: Docs
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  pull_request:
+    paths:
+      - README.md
+      - docs/**
+      - src/**
+      - Doxygen.*.conf
+      - .github/workflows/ci-docs.yaml
+  push:
+    paths:
+      - README.md
+      - docs/**
+      - src/**
+      - Doxygen.*.conf
+      - .github/workflows/ci-docs.yaml
+  workflow_dispatch:
+
+jobs:
+  generate-doxygen:
+    strategy:
+      matrix:
+        include:
+          - config: Doxygen.Sketch.conf
+            artifact: html-sketch
+            path: html.sketch
+            label: sketch (user-facing)
+          - config: Doxygen.Library.conf
+            artifact: html-library
+            path: html.library
+            label: library (internal API)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Generate ${{ matrix.label }} docs
+        run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.path }}
+
+  deploy-gh-pages:
+    needs: [generate-doxygen]
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        
+      - name: Download sketch docs
+        uses: actions/download-artifact@v4
+        with:
+          name: html-sketch
+          path: html.sketch
+
+      - name: Download library docs
+        uses: actions/download-artifact@v4
+        with:
+          name: html-library
+          path: html.library
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
