@@ -13,5 +13,6 @@ var _controller_8h =
       [ "VLCB::ACT_INDICATE_ACTIVITY", "namespace_v_l_c_b.html#a2e0e9b99da8cf32dcd00b3a96705ff90ad4912456dc3645e28aaac0a9767eba3c", null ],
       [ "VLCB::ACT_INDICATE_WORK", "namespace_v_l_c_b.html#a2e0e9b99da8cf32dcd00b3a96705ff90ae0a714704b1995e4f09f29b4a6ad2409", null ],
       [ "VLCB::ACT_INDICATE_MODE", "namespace_v_l_c_b.html#a2e0e9b99da8cf32dcd00b3a96705ff90a7e29ad4deeb31f551670988fb2e6942d", null ]
-    ] ]
+    ] ],
+    [ "VLCB::ACTION_QUEUE_SIZE", "namespace_v_l_c_b.html#a4d64847ece89bd3e3251bd85c551cb74", null ]
 ];

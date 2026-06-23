@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['writeeventvariable_0',['writeEventVariable',['../namespace_v_l_c_b.html#ace8ce073febd299dc9274b52bbb0e298',1,'VLCB']]],
-  ['writenv_1',['writeNV',['../namespace_v_l_c_b.html#a12b1a419a8cf46ade3bb21af922ca4dc',1,'VLCB']]]
+  ['readnv_0',['readNV',['../namespace_v_l_c_b.html#a99d87e91bed12fc7d3ea0ff11883cfc4',1,'VLCB']]],
+  ['reportdiagnostics_1',['reportDiagnostics',['../class_v_l_c_b_1_1_internal_diagnostics_service.html#a01b2fa17ed8c41a50c3e19acad25c557',1,'VLCB::InternalDiagnosticsService']]],
+  ['resetmodule_2',['resetModule',['../namespace_v_l_c_b.html#a87f488c1538aee38c3b185c78ce33364',1,'VLCB']]]
 ];

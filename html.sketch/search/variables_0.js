@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['data_0',['data',['../struct_v_l_c_b_1_1_c_a_n_frame.html#af5b08bb20106e96b957eeea1af3834d3',1,'VLCB::CANFrame']]]
+  ['controller_0',['controller',['../class_v_l_c_b_1_1_timed_response_1_1_task.html#ad50ebfb3d8883d9f587bee58a038178c',1,'VLCB::TimedResponse::Task']]]
 ];

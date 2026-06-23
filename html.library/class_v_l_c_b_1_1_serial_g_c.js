@@ -9,6 +9,8 @@ var class_v_l_c_b_1_1_serial_g_c =
     [ "getHardwareType", "class_v_l_c_b_1_1_serial_g_c.html#a93e6ea06aaeb12be59336b7d0711b279", null ],
     [ "receiveCounter", "class_v_l_c_b_1_1_serial_g_c.html#a96ed7d1b53d969989aae9505df5dee97", null ],
     [ "transmitCounter", "class_v_l_c_b_1_1_serial_g_c.html#a8117aed8f2991f582ef2d799839873ff", null ],
+    [ "receiveBufferSize", "class_v_l_c_b_1_1_serial_g_c.html#ad54a65932b71d2c9fee8e8a62782ac77", null ],
+    [ "transmitBufferSize", "class_v_l_c_b_1_1_serial_g_c.html#a856b1ee93c6a41fcba48679a925bae1c", null ],
     [ "receiveErrorCounter", "class_v_l_c_b_1_1_serial_g_c.html#ab161914ef97cda2879229856b178dfbd", null ],
     [ "transmitErrorCounter", "class_v_l_c_b_1_1_serial_g_c.html#a514e262cbbfd3ddca78b808ee4fe3379", null ],
     [ "receiveBufferUsage", "class_v_l_c_b_1_1_serial_g_c.html#a58d1936be0ee46aa7c7f295b081e06a3", null ],

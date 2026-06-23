@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['readnv_0',['readNV',['../namespace_v_l_c_b.html#a99d87e91bed12fc7d3ea0ff11883cfc4',1,'VLCB']]],
-  ['reportalldiagnostics_1',['reportAllDiagnostics',['../class_v_l_c_b_1_1_internal_diagnostics_service.html#a7d1db0db6bd20c67fe6da47134dfd860',1,'VLCB::InternalDiagnosticsService']]],
-  ['reportdiagnostics_2',['reportDiagnostics',['../class_v_l_c_b_1_1_internal_diagnostics_service.html#a01b2fa17ed8c41a50c3e19acad25c557',1,'VLCB::InternalDiagnosticsService']]],
-  ['resetmodule_3',['resetModule',['../namespace_v_l_c_b.html#a87f488c1538aee38c3b185c78ce33364',1,'VLCB']]]
+  ['operator_28_29_0',['operator()',['../class_v_l_c_b_1_1_timed_response_1_1_task.html#a4937ce9dcac168ad833a2dceabb0754c',1,'VLCB::TimedResponse::Task']]]
 ];

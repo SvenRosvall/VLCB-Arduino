@@ -5,6 +5,7 @@ var namespace_v_l_c_b =
     [ "CanTransport", "class_v_l_c_b_1_1_can_transport.html", null ],
     [ "SerialGC", "class_v_l_c_b_1_1_serial_g_c.html", "class_v_l_c_b_1_1_serial_g_c" ],
     [ "CAN2515", "class_v_l_c_b_1_1_c_a_n2515.html", "class_v_l_c_b_1_1_c_a_n2515" ],
+    [ "TimedResponse", "class_v_l_c_b_1_1_timed_response.html", "class_v_l_c_b_1_1_timed_response" ],
     [ "AbstractEventTeachingService", "class_v_l_c_b_1_1_abstract_event_teaching_service.html", "class_v_l_c_b_1_1_abstract_event_teaching_service" ],
     [ "CanService", "class_v_l_c_b_1_1_can_service.html", "class_v_l_c_b_1_1_can_service" ],
     [ "ConsumeOwnEventsService", "class_v_l_c_b_1_1_consume_own_events_service.html", null ],
@@ -46,6 +47,7 @@ var namespace_v_l_c_b =
     [ "sendMessageWithNN", "namespace_v_l_c_b.html#a2a03c5bb0541134c16d1035673b15083", null ],
     [ "sendMessageWithNN", "namespace_v_l_c_b.html#aaeb4f2fe470df89ec5f39d240f8dde74", null ],
     [ "sendMessageWithNN", "namespace_v_l_c_b.html#a138d4887d5fb24e5d4a4d2c3a0aa690e", null ],
+    [ "addTimedResponse", "namespace_v_l_c_b.html#a8b167042357eca200c88db58d67dcb1d", null ],
     [ "resetModule", "namespace_v_l_c_b.html#a87f488c1538aee38c3b185c78ce33364", null ],
     [ "process", "namespace_v_l_c_b.html#af217aaaec8431562509e9df92a3ca6f0", null ]
 ];
