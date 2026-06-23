@@ -53,6 +53,8 @@ jobs:
     needs: [generate-doxygen]
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     permissions:
       pages: write
       id-token: write
