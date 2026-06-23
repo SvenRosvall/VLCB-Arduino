@@ -26,6 +26,7 @@ public:
   {
   public:
     Task(Controller * controller) : controller(controller) {}
+    Task() : controller(nullptr) {}
     virtual ~Task() = default;
     virtual Result operator()() = 0;
     int sequence = 0;

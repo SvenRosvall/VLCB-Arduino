@@ -360,38 +360,43 @@ void processSwitches(void)
 //
 /// Do Start-of-Day reporting. I.e. send events for each input with their current state.
 //
-void doStartOfDay()
+class StartOfDayResponse : public VLCB::TimedResponse::Task
 {
-  DEBUG_PRINT(F("sk> Starting of Day Start"));
-  for (byte i = 0; i < NUM_SWITCHES; i++)
+public:
+  VLCB::TimedResponse::Result operator()() override
   {
-    byte swNum = i + 1;
+    if (sequence >= NUM_SWITCHES)
+    {
+      DEBUG_PRINT(F("sk> Done all Start of Day events"));
+      return VLCB::TimedResponse::FINISHED;
+    }
+    byte swNum = sequence + 1;
     DEBUG_PRINT(F("sk> Button ") << swNum);
 
     byte eventIndex = VLCB::findExistingEventByEv(1, swNum);
     if (!VLCB::isEventIndexValid(eventIndex))
     {
       // No event for this switch.
-      continue;
+      return VLCB::TimedResponse::PROGRESS;
     }
 
     // Send events for switch that can change state.
-    byte nv = i + 1;
+    byte nv = sequence + 1;
     byte nvval = VLCB::readNV(nv);
     switch (nvval)
     {
       case 1: // ON and OFF
       case 4: // Toggle button
-        epService.sendEventAtIndex(state[i], eventIndex);
+        epService.sendEventAtIndex(state[sequence], eventIndex);
         break;
         
       default:
         // Don't send events for other switch types.
         break;
     }
+    return VLCB::TimedResponse::PROGRESS;
   }
-  DEBUG_PRINT(F("sk> Stopping of Day Start"));
-}
+};
 
 //
 /// called from the VLCB library when a learned event is received
@@ -414,7 +419,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       DEBUG_PRINT(F("sk> case is opCode ON"));
       if (VLCB::getEventEVval(index, 1) == 0xFF)
       {
-        doStartOfDay();
+        VLCB::addTimedResponse(new StartOfDayResponse);
         return;
       }
 

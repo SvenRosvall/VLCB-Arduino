@@ -134,6 +134,8 @@ bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3);
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
 
+void addTimedResponse(TimedResponse::Task * task);
+
 void resetModule();
 
 ///@}
