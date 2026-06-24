@@ -104,7 +104,7 @@ Inheritance diagram for VLCB::RespondEV:</div>
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad28a98ed76fc556bdb603e5001a84273" id="r_ad28a98ed76fc556bdb603e5001a84273"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ad28a98ed76fc556bdb603e5001a84273">RespondEV</a> (<a class="el" href="class_v_l_c_b_1_1_controller.html">Controller</a> *<a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#ad50ebfb3d8883d9f587bee58a038178c">controller</a>, <a class="el" href="class_v_l_c_b_1_1_configuration.html">Configuration</a> *module_config, const <a class="el" href="struct_v_l_c_b_1_1_vlcb_message.html">VlcbMessage</a> &amp;response, byte eventIndex)</td></tr>
-<tr class="memitem:a94360b0a5249e161d6482a0600c50270" id="r_a94360b0a5249e161d6482a0600c50270"><td class="memItemLeft">virtual <a class="el" href="class_v_l_c_b_1_1_timed_response.html#a15c1994433c8b6bdd141a97075ea9ac8">TimedResponse::Result</a>&#160;</td><td class="memItemRight"><a class="el" href="#a94360b0a5249e161d6482a0600c50270">operator()</a> () override</td></tr>
+<tr class="memitem:ad899239f861cef6a18d125778efeef08" id="r_ad899239f861cef6a18d125778efeef08"><td class="memItemLeft">virtual <a class="el" href="class_v_l_c_b_1_1_timed_response.html#a15c1994433c8b6bdd141a97075ea9ac8">TimedResponse::Result</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad899239f861cef6a18d125778efeef08">runStep</a> () override</td></tr>
 <tr class="inherit_header pub_methods_class_v_l_c_b_1_1_timed_response_1_1_task"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_class_v_l_c_b_1_1_timed_response_1_1_task')"><span class="dynarrow"><span class="arrowhead closed"></span></span>Public Member Functions inherited from <a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html">VLCB::TimedResponse::Task</a></td></tr>
 <tr class="memitem:a3c3aa9610299221646e24e5e44ffc18b inherit pub_methods_class_v_l_c_b_1_1_timed_response_1_1_task" id="r_a3c3aa9610299221646e24e5e44ffc18b"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#a3c3aa9610299221646e24e5e44ffc18b">Task</a> (<a class="el" href="class_v_l_c_b_1_1_controller.html">Controller</a> *<a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#ad50ebfb3d8883d9f587bee58a038178c">controller</a>)</td></tr>
 <tr class="memitem:aae18472689652efd31ef81ec1e740c9d inherit pub_methods_class_v_l_c_b_1_1_timed_response_1_1_task" id="r_aae18472689652efd31ef81ec1e740c9d"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#aae18472689652efd31ef81ec1e740c9d">Task</a> ()</td></tr>
@@ -158,8 +158,8 @@ Additional Inherited Members</h2></td></tr>
 </div>
 </div>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="a94360b0a5249e161d6482a0600c50270" name="a94360b0a5249e161d6482a0600c50270"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94360b0a5249e161d6482a0600c50270">&#9670;&#160;</a></span>operator()()</h2>
+<a id="ad899239f861cef6a18d125778efeef08" name="ad899239f861cef6a18d125778efeef08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad899239f861cef6a18d125778efeef08">&#9670;&#160;</a></span>runStep()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -168,7 +168,7 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="class_v_l_c_b_1_1_timed_response.html#a15c1994433c8b6bdd141a97075ea9ac8">TimedResponse::Result</a> VLCB::RespondEV::operator() </td>
+          <td class="memname">virtual <a class="el" href="class_v_l_c_b_1_1_timed_response.html#a15c1994433c8b6bdd141a97075ea9ac8">TimedResponse::Result</a> VLCB::RespondEV::runStep </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
@@ -181,7 +181,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#a4937ce9dcac168ad833a2dceabb0754c">VLCB::TimedResponse::Task</a>.</p>
+<p>Implements <a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html#aa5e2de6b392b64dba35eb60a2aa71ef9">VLCB::TimedResponse::Task</a>.</p>
 
 </div>
 </div>

@@ -33,5 +33,5 @@ var class_v_l_c_b_1_1_controller =
     [ "messageActedOn", "class_v_l_c_b_1_1_controller.html#a6fea56e128b5871e2fb955ecca39be97", null ],
     [ "getMessagesActedOn", "class_v_l_c_b_1_1_controller.html#a700cd13de4fe534ec4d01b52a2a55420", null ],
     [ "getActionQueue", "class_v_l_c_b_1_1_controller.html#afec9a05ede27427f169fa5f036ee938e", null ],
-    [ "addTimedResponse", "class_v_l_c_b_1_1_controller.html#a790d84f046951a2ac7d51d1577218bc7", null ]
+    [ "addTimedResponseTask", "class_v_l_c_b_1_1_controller.html#ae06f6d9fc7f2776d75bc4d56196bd25b", null ]
 ];

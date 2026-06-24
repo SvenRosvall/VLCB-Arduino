@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['task_0',['Task',['../class_v_l_c_b_1_1_timed_response_1_1_task.html#a3c3aa9610299221646e24e5e44ffc18b',1,'VLCB::TimedResponse::Task::Task(Controller *controller)'],['../class_v_l_c_b_1_1_timed_response_1_1_task.html#aae18472689652efd31ef81ec1e740c9d',1,'VLCB::TimedResponse::Task::Task()']]]
+  ['writeeventvariable_0',['writeEventVariable',['../namespace_v_l_c_b.html#ace8ce073febd299dc9274b52bbb0e298',1,'VLCB']]],
+  ['writenv_1',['writeNV',['../namespace_v_l_c_b.html#a12b1a419a8cf46ade3bb21af922ca4dc',1,'VLCB']]]
 ];

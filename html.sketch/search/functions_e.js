@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['writeeventvariable_0',['writeEventVariable',['../namespace_v_l_c_b.html#ace8ce073febd299dc9274b52bbb0e298',1,'VLCB']]],
-  ['writenv_1',['writeNV',['../namespace_v_l_c_b.html#a12b1a419a8cf46ade3bb21af922ca4dc',1,'VLCB']]]
+  ['_7etask_0',['~Task',['../class_v_l_c_b_1_1_timed_response_1_1_task.html#a2b1d2b1a4a7943bd9e669d38cbb41432',1,'VLCB::TimedResponse::Task']]]
 ];
