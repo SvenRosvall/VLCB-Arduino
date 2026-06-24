@@ -18,13 +18,10 @@
 namespace VLCB
 {
 
-// TODO: This is a sign something is wrong. Need to be this big to handle 
-// large number of generated messages such as when asking for node parameters.
-// Each entry uses 10 bytes so a size of 30 uses 300 bytes.
-// This will get worse for for example queries for all events.
-// Need a mechanism like TimedResponse to create messages slowly so they can
-// be sent through the transport without requiring this buffering. 
-const int ACTION_QUEUE_SIZE = 30;
+// Size of the action queue. 
+// Testing shows that the queue often gets up to 4 elements.
+// Set size to 8 to be on the safe side.
+const int ACTION_QUEUE_SIZE = 8;
 
 //
 /// CAN/Controller message type
