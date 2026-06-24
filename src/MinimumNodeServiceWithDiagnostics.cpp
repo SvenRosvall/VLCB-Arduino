@@ -37,7 +37,7 @@ public:
   ServiceDiagnosticsResponse(Controller * controller, Service * svc, int serviceIndex, int diagnosticCount)
     : Task(controller), svc(svc), serviceIndex(serviceIndex), diagnosticCount(diagnosticCount) {}
 
-  TimedResponse::Result operator()() override
+  TimedResponse::Result runStep() override
   {
     if (this->sequence == diagnosticCount)
     {
@@ -66,7 +66,7 @@ public:
     return TimedResponse::PROGRESS;
   }
 
-  TimedResponse::Result operator()() override
+  TimedResponse::Result runStep() override
   {
     if (svcResponder == nullptr)
     {
@@ -90,7 +90,7 @@ public:
         return nextService();
       }
     }
-    TimedResponse::Result result = (*svcResponder)();
+    TimedResponse::Result result = svcResponder->runStep();
     switch (result)
     {
       case TimedResponse::RETRY:

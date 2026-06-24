@@ -36,7 +36,7 @@ void testCreateTimedResponse()
       deleted = true;
     }
 
-    VLCB::TimedResponse::Result operator()()
+    VLCB::TimedResponse::Result runStep()
     {
       ++callCount;
       return VLCB::TimedResponse::Result::FINISHED;
@@ -74,7 +74,7 @@ void testTimeResponseCalledAtInterval()
     : callCount(callCount)
     {}
 
-    VLCB::TimedResponse::Result operator()()
+    VLCB::TimedResponse::Result runStep()
     {
       ++callCount;
       if (sequence == 3)

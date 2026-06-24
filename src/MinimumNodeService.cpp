@@ -308,7 +308,7 @@ class RespondParam : public TimedResponse::Task
 {
 public: 
   RespondParam(Controller *controller) : Task(controller) {}
-  virtual TimedResponse::Result operator()() override
+  virtual TimedResponse::Result runStep() override
   {
     if (sequence > controller->getParam(PAR_NUM))
     {
@@ -399,7 +399,7 @@ class RespondService : public TimedResponse::Task
 {
 public: 
   RespondService(Controller *controller) : Task(controller) {}
-  virtual TimedResponse::Result operator()() override
+  virtual TimedResponse::Result runStep() override
   {
     if (sequence >= controller->getServices().size())
     {

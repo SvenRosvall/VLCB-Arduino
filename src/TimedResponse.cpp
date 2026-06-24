@@ -22,7 +22,7 @@ void TimedResponse::process()
   if (tasks.available())
   {
     Task * task = *tasks.peek();
-    Result result = (*task)();
+    Result result = task->runStep();
     lastTaskTime = millis();
 
     switch (result)

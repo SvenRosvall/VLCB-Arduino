@@ -56,7 +56,7 @@ public:
     : Task(controller), module_config(module_config), response(response), eventIndex(eventIndex)
   {}
   
-  virtual TimedResponse::Result operator()() override
+  virtual TimedResponse::Result runStep() override
   {
     if (sequence >= module_config->getNumEVs())
     {

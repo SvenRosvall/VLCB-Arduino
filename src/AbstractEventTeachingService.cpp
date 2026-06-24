@@ -229,7 +229,7 @@ public:
     msg.data[2] = lowByte(nodeNumber);   // my NN lo
   }
   
-  TimedResponse::Result operator()() override
+  TimedResponse::Result runStep() override
   {
     if (sequence >= module_config->getNumEvents())
     {
@@ -269,7 +269,7 @@ class RespondEventVar : public TimedResponse::Task
 public:
   RespondEventVar(Controller * controller, byte eventIndex, byte numEVs)
     : Task(controller), eventIndex(eventIndex), numEVs(numEVs) {}
-  TimedResponse::Result operator()() override
+  TimedResponse::Result runStep() override
   {
     if (sequence >= numEVs)
     {

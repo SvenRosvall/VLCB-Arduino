@@ -53,7 +53,7 @@ class RespondNodeVar : public TimedResponse::Task
 {
 public: 
   RespondNodeVar(Controller *controller) : Task(controller) {}
-  virtual TimedResponse::Result operator()() override
+  virtual TimedResponse::Result runStep() override
   {
     if (sequence >= controller->getModuleConfig()->getNumNodeVariables())
     {

@@ -28,7 +28,7 @@ public:
     Task(Controller * controller) : controller(controller) {}
     Task() : controller(nullptr) {}
     virtual ~Task() = default;
-    virtual Result operator()() = 0;
+    virtual Result runStep() = 0;
     int sequence = 0;
   protected:
     Controller *controller;
