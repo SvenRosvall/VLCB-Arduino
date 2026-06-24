@@ -145,4 +145,5 @@ add_executable(testAll
         test/testLED.cpp
         test/testSwitch.cpp
         test/MockUserInterface.h
+        test/testTimedResponse.cpp
 )
