@@ -93,7 +93,7 @@ void NodeVariableService::handleReadNV(const VlcbMessage *msg, unsigned int nn)
     controller->sendMessageWithNN(OPC_NVANS, nvindex, module_config->getNumNodeVariables());
     if (!module_config->fcuCompatible)
     {
-      controller->addTimedResponse(new RespondNodeVar(controller));
+      controller->addTimedResponseTask(new RespondNodeVar(controller));
     }
   }
   else

@@ -338,7 +338,7 @@ void MinimumNodeService::handleRequestNodeParameter(const VlcbMessage *msg, unsi
 
     if ((paran == 0) && notFcuCompatible)
     {
-      controller->addTimedResponse(new RespondParam(controller));
+      controller->addTimedResponseTask(new RespondParam(controller));
     }
     else if (paran <= controller->getParam(PAR_NUM))
     {
@@ -435,7 +435,7 @@ void MinimumNodeService::handleRequestServiceDefinitions(const VlcbMessage *msg,
     controller->sendMessageWithNN(OPC_SD, 0, 0, serviceCount);
 
     // and then details of each service.
-    controller->addTimedResponse(new RespondService(controller));
+    controller->addTimedResponseTask(new RespondService(controller));
   }
   else if (serviceIndex <= controller->getServices().size())
   {

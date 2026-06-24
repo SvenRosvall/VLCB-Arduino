@@ -136,7 +136,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
   if (serviceIndex == 0)
   {
     // Request for diagnostics for all services.
-    controller->addTimedResponse(new AllServiceDiagnosticsResponse(controller));
+    controller->addTimedResponseTask(new AllServiceDiagnosticsResponse(controller));
   }
   else
   {
@@ -155,7 +155,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
       controller->sendDGN(serviceIndex, 0, diagnosticCount);
       if (diagnosticCount > 0)
       {
-        controller->addTimedResponse(new ServiceDiagnosticsResponse(controller, svc, serviceIndex, diagnosticCount));
+        controller->addTimedResponseTask(new ServiceDiagnosticsResponse(controller, svc, serviceIndex, diagnosticCount));
       }
     }
     else

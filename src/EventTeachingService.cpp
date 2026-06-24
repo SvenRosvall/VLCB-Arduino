@@ -117,7 +117,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     controller->sendMessage(&response);
     if (!module_config->fcuCompatible)
     {
-      controller->addTimedResponse(new RespondEV(controller, module_config, response, eventIndex));
+      controller->addTimedResponseTask(new RespondEV(controller, module_config, response, eventIndex));
     }
   }
   else

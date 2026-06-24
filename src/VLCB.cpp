@@ -165,7 +165,7 @@ bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte
 
 void addTimedResponse(TimedResponse::Task *task)
 {
-  controller.addTimedResponse(task);
+  controller.addTimedResponseTask(task);
 }
 
 unsigned int getFreeEEPROMbase()

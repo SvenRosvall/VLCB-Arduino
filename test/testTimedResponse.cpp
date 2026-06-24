@@ -43,7 +43,7 @@ void testCreateTimedResponse()
     }
   };
   
-  controller.addTimedResponse(new TestResponder(callCount, deleted));
+  controller.addTimedResponseTask(new TestResponder(callCount, deleted));
   
   // Ensure there is a timed response task.
   assertEquals(true, controller.pendingTasks());
@@ -83,7 +83,7 @@ void testTimeResponseCalledAtInterval()
     }
   };
   
-  controller.addTimedResponse(new TestResponder(callCount));
+  controller.addTimedResponseTask(new TestResponder(callCount));
   
   addMillis(5);
   process(controller);

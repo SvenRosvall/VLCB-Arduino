@@ -249,7 +249,7 @@ void Controller::messageActedOn()
   ++diagMsgsActed;
 }
 
-void Controller::addTimedResponse(TimedResponse::Task * task)
+void Controller::addTimedResponseTask(TimedResponse::Task * task)
 {
   timedResponses.add(task);
 }

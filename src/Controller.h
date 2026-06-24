@@ -113,7 +113,7 @@ public:
   
   const CircularBuffer<Action, ACTION_QUEUE_SIZE> & getActionQueue() const { return actionQueue; }
 
-  void addTimedResponse(TimedResponse::Task * task);
+  void addTimedResponseTask(TimedResponse::Task * task);
 
 private:
   Configuration *module_config;

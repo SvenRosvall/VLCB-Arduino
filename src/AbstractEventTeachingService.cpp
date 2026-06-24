@@ -259,7 +259,7 @@ void AbstractEventTeachingService::handleReadEvents(unsigned int nn)
 
   controller->messageActedOn();
 
-  controller->addTimedResponse(new RespondEvents(controller, controller->getModuleConfig(), nn));
+  controller->addTimedResponseTask(new RespondEvents(controller, controller->getModuleConfig(), nn));
 }
 
 class RespondEventVar : public TimedResponse::Task
@@ -332,7 +332,7 @@ void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *ms
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->getNumEVs());
     if (!module_config->fcuCompatible)
     {
-      controller->addTimedResponse(new RespondEventVar(controller, eventIndex, module_config->getNumEVs()));
+      controller->addTimedResponseTask(new RespondEventVar(controller, eventIndex, module_config->getNumEVs()));
     }
   }
   else
