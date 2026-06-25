@@ -363,7 +363,7 @@ void processSwitches(void)
 class StartOfDayResponse : public VLCB::TimedResponse::Task
 {
 public:
-  VLCB::TimedResponse::Result operator()() override
+  VLCB::TimedResponse::Result runStep() override
   {
     if (sequence >= NUM_SWITCHES)
     {
@@ -419,7 +419,7 @@ void eventhandler(byte index, const VLCB::VlcbMessage *msg)
       DEBUG_PRINT(F("sk> case is opCode ON"));
       if (VLCB::getEventEVval(index, 1) == 0xFF)
       {
-        VLCB::addTimedResponse(new StartOfDayResponse);
+        VLCB::addTimedResponseTask(new StartOfDayResponse);
         return;
       }
 
