@@ -38,13 +38,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Generate ${{ matrix.label }} docs
         run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
 
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.path }}
@@ -61,16 +61,16 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Download sketch docs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: html-sketch
           path: html.sketch
 
       - name: Download library docs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: html-library
           path: html.library
@@ -82,7 +82,7 @@ jobs:
         uses: actions/jekyll-build-pages@v1
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v7
 
       - name: Deploy to GitHub Pages
         id: deployment
