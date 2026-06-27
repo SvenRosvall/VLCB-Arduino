@@ -141,7 +141,7 @@ void resetModule();
 ///@name Running
 ///@{
 
-/// Call this in the `loop()`function.
+/// Call this in the `loop()` function.
 /// It lets the VLCB library core execute its tasks such as check for new
 /// incoming messages and run queued tasks.
 void process();
