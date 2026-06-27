@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Generate ${{ matrix.label }} docs
         run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         
       - name: Download sketch docs
         uses: actions/download-artifact@v4
