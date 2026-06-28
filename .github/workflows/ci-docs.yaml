@@ -1,8 +1,5 @@
 name: Docs
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
   pull_request:
     paths:
@@ -76,14 +73,14 @@ jobs:
           path: html.library
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
