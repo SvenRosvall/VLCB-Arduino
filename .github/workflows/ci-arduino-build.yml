@@ -36,7 +36,6 @@ jobs:
 
       - name: Install library dependencies
         run: |
-          arduino-cli lib install ACAN2515
           arduino-cli lib install Streaming
 
       - name: Compile all examples for Arduino Uno

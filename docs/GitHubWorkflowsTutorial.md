@@ -60,8 +60,7 @@ Main steps:
 1. Check out the repository
 2. Install Arduino CLI
 3. Install `arduino:avr` core
-4. Install required libraries (`ACAN2515`, `Streaming`)
-5. Loop over all `examples/*` directories and compile detected `.ino` sketches for `arduino:avr:uno`
+4. Loop over all `examples/*` directories and compile detected `.ino` sketches for `arduino:avr:uno`
 
 This workflow makes sure:
 

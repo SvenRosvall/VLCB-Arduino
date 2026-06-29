@@ -24,13 +24,13 @@ sendCanFrame()
 
 This library provides the following concrete transport classes:
 
-CAN2515
-: Implementation for using the MCP2515 CAN transceiver.
-
 SerialGC
 : Use the GridConnect protocol for sending CAN frames over a serial connection.
 
 The following concrete transports exist externally.
+
+[CAN2515](https://github.com/SvenRosvall/VCAN2515)
+: Implementation for using the MCP2515 CAN transceiver.
 
 [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040)
 : Implementation for Raspberry Pi Pico using a software CAN transceiver.

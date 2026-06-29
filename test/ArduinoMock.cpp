@@ -4,7 +4,6 @@
 #include <iostream>
 #include "Arduino.hpp"
 #include "ArduinoMock.hpp"
-#include "ACAN2515.h"
 
 /* Functions provided by user sketch */
 
@@ -169,21 +168,4 @@ uint8_t ADCH;
 
 void sei()
 {
-}
-
-/* ACAN2515 methods */
-
-uint8_t ACAN2515::receiveErrorCounter() 
-{
-  return 0; 
-}
-
-uint8_t ACAN2515::transmitErrorCounter()
-{
-  return 0; 
-}
-
-uint8_t ACAN2515::errorFlagRegister()
-{
-  return 0; 
 }
