@@ -29,7 +29,7 @@ SerialGC
 
 The following concrete transports exist externally.
 
-[CAN2515](https://github.com/SvenRosvall/VCAN2515)
+[VCAN2515](https://github.com/SvenRosvall/VCAN2515)
 : Implementation for using the MCP2515 CAN transceiver.
 
 [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040)
