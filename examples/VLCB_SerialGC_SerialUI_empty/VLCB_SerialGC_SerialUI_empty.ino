@@ -12,14 +12,28 @@
 
 // This example demonstrates split serial usage:
 //
-// - SerialGC uses the default hardware Serial port for GridConnect transport
-// - SerialUserInterface uses SoftwareSerial for user commands and status output
-// - Optionally, hardware Serial1 can be used for the SerialUserInterface on Mega2560 by setting the USE_MEGA_SERIAL1 build flag in platformio.ini
+// - SerialGC uses the default hardware Serial port for GridConnect transport.
+// - SerialUserInterface uses SoftwareSerial for user commands and status output.
+// - On Mega2560, hardware Serial1 can optionally be used for SerialUserInterface.
+//   This is controlled by the USE_MEGA_SERIAL1 macro, which can be defined
+//   either in the sketch (Arduino IDE) or as a build flag (e.g. in platformio.ini).
 //
-// This is useful on boards where the USB serial port is already committed to
-// the VLCB/GridConnect transport, but a separate command console is still wanted.
+// To allow concurrent use of SerialGC and SerialUserInterface, the library lets
+// users assign each class to different serial interfaces in their declarations.
 //
-// Based on VLCB_SerialGC_empty example from Sven Rosvall (MERG 3777)
+// This is useful on boards where the USB serial port is already dedicated to
+// VLCB/GridConnect transport, but a separate command console is still required.
+//
+// Any Stream-compatible serial port can be used for the SerialUserInterface, but
+// SoftwareSerial is used in this example for compatibility with a wide range of
+// boards. Note that SoftwareSerial has some limitations, such as not being able
+// to receive data while transmitting, and may not be suitable for high-speed
+// communication. It is not recommended to use SoftwareSerial for the SerialGC
+// transport, as it may not be able to keep up with the data rate and could lead
+// to data loss. For better performance, consider using a board with multiple
+// hardware serial ports and connecting the SerialUserInterface to one of those.
+//
+// Based on the VLCB_SerialGC_empty example from Sven Rosvall (MERG 3777).
 
 // 3rd party libraries
 #include <Streaming.h>
@@ -60,8 +74,8 @@ SoftwareSerial serialUserPort(UI_RX_PIN, UI_TX_PIN);
 #endif
 
 // module objects
-VLCB::SerialGC serialGC(Serial);                 // CAN transport object using hardware serial
-VLCB::SerialUserInterface serialUserInterface(serialUserPort);
+VLCB::SerialGC serialGC(Serial);                                // CAN transport object using hardware serial
+VLCB::SerialUserInterface serialUserInterface(serialUserPort);  // User interface object using either SoftwareSerial or Serial1, depending on USE_MEGA_SERIAL1
 
 // Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
