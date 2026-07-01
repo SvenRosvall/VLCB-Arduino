@@ -93,7 +93,7 @@ by email to vlcb@rosvall.ie or create an [issue in GitHub](https://github.com/Sv
 * John Fletcher - Contributor
 * Chris Andrews - Contributor
 * David Ellis - Contributor
-* brocci - Contributor to the CBUS library
+* Bruno Rocci - Contributor to the CBUS library
 
 ## License
 

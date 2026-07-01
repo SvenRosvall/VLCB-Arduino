@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cstdio>
+#include <Stream.h>
 
 #define F(s) s
 
@@ -28,15 +29,4 @@ void pinMode(int, PinMode);
 void digitalWrite(int, PinState);
 byte digitalRead(int);
 
-struct Serial_T
-{
-  void begin(int baudrate);
-
-  bool available();
-  char read();
-  void flush();
-  unsigned char readBytesUntil(int termChar, char *string, int length);
-  void print(const char *);
-  void println(const char *);
-};
-extern struct Serial_T Serial;
+extern Stream Serial;

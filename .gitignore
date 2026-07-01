@@ -3,7 +3,6 @@
 *.exe
 *.out
 
-.DS_Store
 .idea
 build/
 
@@ -20,3 +19,32 @@ CMakePresets.json
 notes/
 
 
+#
+# MacOS
+#
+.DS_Store
+.localized
+__MACOSX/
+.AppleDouble
+._*
+
+#
+# Visual Studio Code
+#
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+!*.code-workspace
+# Built Visual Studio Code Extensions
+*.vsix
+
+#
+# PlatformIO
+#
+.pio
+.pioenvs
+.piolibdeps
+
+# Local working notes
+notes/

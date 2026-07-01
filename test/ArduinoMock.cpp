@@ -99,64 +99,70 @@ byte lowByte(unsigned int i)
   return i & 0xFF;
 }
 
-void Serial_T::begin(int baudRate)
+void Stream::begin(int baudRate)
 {
 }
 
-bool Serial_T::available()
+bool Stream::available()
 {
-  return true;
+        return true;
 }
 
-char Serial_T::read()
+char Stream::read()
 {
-  return ' ';
+        return ' ';
 }
 
-void Serial_T::print(const char *)
-{
-}
-
-void Serial_T::println(const char *)
+void Stream::print(const char *)
 {
 }
 
-void Serial_T::flush()
+void Stream::println(const char *)
 {
 }
 
-Serial_T & operator<<(Serial_T & s, int i)
+void Stream::flush()
 {
-  std::cout << i;
-  return s;
 }
-Serial_T & operator<<(Serial_T & s, unsigned int i)
+
+Stream & operator<<(Stream & s, int i)
 {
-  std::cout << i;
-  return s;
+        std::cout << i;
+        return s;
 }
-Serial_T & operator<<(Serial_T & s, long i)
+
+Stream & operator<<(Stream & s, unsigned int i)
 {
-  std::cout << i;
-  return s;
+        std::cout << i;
+        return s;
 }
-Serial_T & operator<<(Serial_T & s, unsigned long i)
+
+Stream & operator<<(Stream & s, long i)
 {
-  std::cout << i;
-  return s;
+        std::cout << i;
+        return s;
 }
-Serial_T & operator<<(Serial_T & s, const char * i)
+
+Stream & operator<<(Stream & s, unsigned long i)
 {
-  std::cout << i;
-  return s;
+        std::cout << i;
+        return s;
 }
-Serial_T & operator<<(Serial_T & s, const ENDL_T & e)
+
+Stream & operator<<(Stream & s, const char * i)
 {
-  std::cout << std::endl;
-  return s;
+        std::cout << i;
+        return s;
 }
+
+Stream & operator<<(Stream & s, const ENDL_T & e)
+{
+        std::cout << std::endl;
+        return s;
+}
+
 ENDL_T endl;
-Serial_T Serial;
+Stream Serial;
 //template <typename T> T _HEX(T);
 
 // Hardware values used by ADC free running mode.
