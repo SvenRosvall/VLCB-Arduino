@@ -1,6 +1,7 @@
 name: Arduino Firmware Build
 
 env:
+  # Fix for NodeJS 24 until action arduino/setup-arduino-cli is fixed.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   
 on:
