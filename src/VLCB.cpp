@@ -163,6 +163,11 @@ bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte
   return controller.sendMessageWithNN(opc, b1, b2, b3, b4, b5);
 }
 
+void addTimedResponseTask(TimedResponse::Task *task)
+{
+  controller.addTimedResponseTask(task);
+}
+
 unsigned int getFreeEEPROMbase()
 {
   return modconfig.EE_FREE_BASE;

@@ -64,14 +64,8 @@ void CanServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, byte diagno
   controller->sendDGN(serviceIndex, diagnosticsCode, diagnosticsValue);
 }
 
-void CanServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
+int CanServiceWithDiagnostics::getDiagnosticCount()
 {
-  byte diagCount = 18;
-  controller->sendDGN(serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
+  return 18;
 }
-
 } // VLCB

@@ -356,7 +356,7 @@ void testReadNodeParameterCount()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(21, mockTransportService->sent_messages.size());
@@ -517,7 +517,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   size_t serviceCount = controller.getServices().size();
   size_t expectedResponseServices = serviceCount - 1; // Omit the user interface.
@@ -735,7 +735,7 @@ void testRequestAllDiagnosticsAllServices()
   VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 0, 0}};
   mockTransportService->setNextMessage(msg_rqsd);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(11, mockTransportService->sent_messages.size());

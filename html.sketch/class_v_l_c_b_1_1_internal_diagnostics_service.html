@@ -111,7 +111,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad84b11ea283e1d807d130943cee40810" id="r_ad84b11ea283e1d807d130943cee40810"><td class="memItemLeft"><a class="el" href="vlcbdefs_8hpp.html#afabb37ae14e252c654fd10b14ee0c88f">VlcbServiceTypes</a>&#160;</td><td class="memItemRight"><a class="el" href="#ad84b11ea283e1d807d130943cee40810">getServiceID</a> () const override</td></tr>
 <tr class="memitem:a98fef7e4486654cb9ae6224e69423571" id="r_a98fef7e4486654cb9ae6224e69423571"><td class="memItemLeft">byte&#160;</td><td class="memItemRight"><a class="el" href="#a98fef7e4486654cb9ae6224e69423571">getServiceVersionID</a> () const override</td></tr>
 <tr class="memitem:a01b2fa17ed8c41a50c3e19acad25c557" id="r_a01b2fa17ed8c41a50c3e19acad25c557"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a01b2fa17ed8c41a50c3e19acad25c557">reportDiagnostics</a> (byte serviceIndex, byte diagnosticsCode) override</td></tr>
-<tr class="memitem:a7d1db0db6bd20c67fe6da47134dfd860" id="r_a7d1db0db6bd20c67fe6da47134dfd860"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a7d1db0db6bd20c67fe6da47134dfd860">reportAllDiagnostics</a> (byte serviceIndex) override</td></tr>
+<tr class="memitem:a845a102cf9feb93bfd72cefd142761aa" id="r_a845a102cf9feb93bfd72cefd142761aa"><td class="memItemLeft">virtual int&#160;</td><td class="memItemRight"><a class="el" href="#a845a102cf9feb93bfd72cefd142761aa">getDiagnosticCount</a> () override</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A dummy service that reports internal metrics as service diagnostics. </p>
@@ -196,8 +196,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a7d1db0db6bd20c67fe6da47134dfd860" name="a7d1db0db6bd20c67fe6da47134dfd860"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7d1db0db6bd20c67fe6da47134dfd860">&#9670;&#160;</a></span>reportAllDiagnostics()</h2>
+<a id="a845a102cf9feb93bfd72cefd142761aa" name="a845a102cf9feb93bfd72cefd142761aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a845a102cf9feb93bfd72cefd142761aa">&#9670;&#160;</a></span>getDiagnosticCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -206,15 +206,15 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void VLCB::InternalDiagnosticsService::reportAllDiagnostics </td>
+          <td class="memname">virtual int VLCB::InternalDiagnosticsService::getDiagnosticCount </td>
           <td>(</td>
-          <td class="paramtype">byte</td>          <td class="paramname"><span class="paramname"><em>serviceIndex</em></span></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel override">override</span></span>  </td>
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

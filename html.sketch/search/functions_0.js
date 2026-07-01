@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['begin_0',['begin',['../classstd_1_1initializer__list.html#a091f20db46528a0c66d7711133f9b6bb',1,'std::initializer_list::begin()'],['../namespace_v_l_c_b.html#a9b7733390999c3dfd8e922f7397a3cc2',1,'VLCB::begin()'],['../namespacestd.html#a5b3743752103933dc8699124dbd618a6',1,'std::begin()']]]
+  ['add_0',['add',['../class_v_l_c_b_1_1_timed_response.html#a11abbf0bc246526c2a5c8fe4c7c05d0a',1,'VLCB::TimedResponse']]],
+  ['addtimedresponse_1',['addTimedResponse',['../namespace_v_l_c_b.html#a8b167042357eca200c88db58d67dcb1d',1,'VLCB']]]
 ];

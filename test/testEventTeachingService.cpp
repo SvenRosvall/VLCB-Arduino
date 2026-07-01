@@ -79,7 +79,7 @@ void testServiceDiscovery()
   VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   // Verify sent messages.
   assertEquals(4, mockTransportService->sent_messages.size());
@@ -356,7 +356,7 @@ void testTeachEvent()
   msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 0}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   assertEquals(3, mockTransportService->sent_messages.size());
 
@@ -793,7 +793,7 @@ void testEventHashCollisionAndUnlearn()
   msg = {3, {OPC_NERD, 0x01, 0x04}};
   mockTransportService->setNextMessage(msg);
 
-  process(controller);
+  processWithTasks(controller);
 
   assertEquals(1, mockTransportService->sent_messages.size());
   assertEquals(OPC_ENRSP, mockTransportService->sent_messages[0].data[0]);
@@ -1262,7 +1262,7 @@ void testReval()
   // Data: OP, NN, Event index, EV#
   msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 0}};
   mockTransportService->setNextMessage(msg);
-  process(controller);
+  processWithTasks(controller);
   assertEquals(3, mockTransportService->sent_messages.size());
   assertEquals(OPC_NEVAL, mockTransportService->sent_messages[0].data[0]);
   assertEquals(0, mockTransportService->sent_messages[0].data[3]);

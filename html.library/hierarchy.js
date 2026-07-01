@@ -3,7 +3,7 @@ var hierarchy =
     [ "VLCB::Action", "struct_v_l_c_b_1_1_action.html", null ],
     [ "VLCB::ArrayHolder&lt; E &gt;", "class_v_l_c_b_1_1_array_holder.html", null ],
     [ "VLCB::CANFrame", "struct_v_l_c_b_1_1_c_a_n_frame.html", null ],
-    [ "VLCB::CircularBuffer&lt; E &gt;", "class_v_l_c_b_1_1_circular_buffer.html", null ],
+    [ "VLCB::CircularBuffer&lt; E, bufferCapacity &gt;", "class_v_l_c_b_1_1_circular_buffer.html", null ],
     [ "VLCB::Configuration", "class_v_l_c_b_1_1_configuration.html", null ],
     [ "VLCB::Controller", "class_v_l_c_b_1_1_controller.html", null ],
     [ "VLCB::Service::Data", "struct_v_l_c_b_1_1_service_1_1_data.html", null ],
@@ -47,6 +47,17 @@ var hierarchy =
       [ "VLCB::FlashStorage", "class_v_l_c_b_1_1_flash_storage.html", null ]
     ] ],
     [ "VLCB::Switch", "class_v_l_c_b_1_1_switch.html", null ],
+    [ "VLCB::TimedResponse::Task", "class_v_l_c_b_1_1_timed_response_1_1_task.html", [
+      [ "VLCB::AllServiceDiagnosticsResponse", "class_v_l_c_b_1_1_all_service_diagnostics_response.html", null ],
+      [ "VLCB::RespondEV", "class_v_l_c_b_1_1_respond_e_v.html", null ],
+      [ "VLCB::RespondEventVar", "class_v_l_c_b_1_1_respond_event_var.html", null ],
+      [ "VLCB::RespondEvents", "class_v_l_c_b_1_1_respond_events.html", null ],
+      [ "VLCB::RespondNodeVar", "class_v_l_c_b_1_1_respond_node_var.html", null ],
+      [ "VLCB::RespondParam", "class_v_l_c_b_1_1_respond_param.html", null ],
+      [ "VLCB::RespondService", "class_v_l_c_b_1_1_respond_service.html", null ],
+      [ "VLCB::ServiceDiagnosticsResponse", "class_v_l_c_b_1_1_service_diagnostics_response.html", null ]
+    ] ],
+    [ "VLCB::TimedResponse", "class_v_l_c_b_1_1_timed_response.html", null ],
     [ "VLCB::Transport", "class_v_l_c_b_1_1_transport.html", [
       [ "VLCB::CanTransport", "class_v_l_c_b_1_1_can_transport.html", [
         [ "VLCB::CAN2515", "class_v_l_c_b_1_1_c_a_n2515.html", null ],

@@ -37,14 +37,9 @@ void InternalDiagnosticsService::reportDiagnostics(byte serviceIndex, byte diagn
   controller->sendDGN(serviceIndex, diagnosticsCode, diagnosticsValue);
 }
 
-void InternalDiagnosticsService::reportAllDiagnostics(byte serviceIndex)
+int InternalDiagnosticsService::getDiagnosticCount()
 {
-  byte diagCount = 4;
-  controller->sendDGN(serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
+  return 4;
 }
 
 }

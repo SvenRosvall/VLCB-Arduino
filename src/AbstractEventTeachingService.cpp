@@ -213,6 +213,41 @@ void AbstractEventTeachingService::handleRequestEventCount(unsigned int nn)
   controller->sendMessageWithNN(OPC_NUMEV, controller->getModuleConfig()->numEvents());
 }
 
+class RespondEvents : public TimedResponse::Task
+{
+private:
+  Configuration *module_config;
+  VlcbMessage msg;
+
+public:
+  RespondEvents(Controller * controller, Configuration *module_config, int nodeNumber)
+    : Task(controller), module_config(module_config)
+  {
+    msg.len = 8;
+    msg.data[0] = OPC_ENRSP;     // response opcode
+    msg.data[1] = highByte(nodeNumber);  // my NN hi
+    msg.data[2] = lowByte(nodeNumber);   // my NN lo
+  }
+  
+  TimedResponse::Result runStep() override
+  {
+    if (sequence >= module_config->getNumEvents())
+    {
+      return TimedResponse::FINISHED;
+    }
+    if (module_config->getEvTableEntry(sequence) != 0)
+    {
+      // it's a valid stored event
+      // read the event data from EEPROM
+      // construct and send a ENRSP message
+      module_config->readEvent(sequence, &msg.data[3]);
+      msg.data[7] = sequence;  // event table index
+      controller->sendMessage(&msg);
+    }
+    return TimedResponse::PROGRESS;
+  }
+};
+
 void AbstractEventTeachingService::handleReadEvents(unsigned int nn)
 {
   //DEBUG_SERIAL << F("ets> NERD : request all stored events for nn = ") << nn << endl;
@@ -224,28 +259,29 @@ void AbstractEventTeachingService::handleReadEvents(unsigned int nn)
 
   controller->messageActedOn();
 
-  VlcbMessage msg;
-  msg.len = 8;
-  msg.data[0] = OPC_ENRSP;     // response opcode
-  msg.data[1] = highByte(nn);  // my NN hi
-  msg.data[2] = lowByte(nn);   // my NN lo
-
-  Configuration *module_config = controller->getModuleConfig();
-  for (byte i = 0; i < module_config->getNumEvents(); i++)
-  {
-    if (module_config->getEvTableEntry(i) != 0)
-    {
-      // it's a valid stored event
-      // read the event data from EEPROM
-      // construct and send a ENRSP message
-      module_config->readEvent(i, &msg.data[3]);
-      msg.data[7] = i;  // event table index
-
-      //DEBUG_SERIAL << F("> sending ENRSP reply for event index = ") << i << endl;
-      controller->sendMessage(&msg);
-    }  // valid stored ev
-  }    // loop each ev
+  controller->addTimedResponseTask(new RespondEvents(controller, controller->getModuleConfig(), nn));
 }
+
+class RespondEventVar : public TimedResponse::Task
+{
+  byte eventIndex;
+  byte numEVs;
+public:
+  RespondEventVar(Controller * controller, byte eventIndex, byte numEVs)
+    : Task(controller), eventIndex(eventIndex), numEVs(numEVs) {}
+  TimedResponse::Result runStep() override
+  {
+    if (sequence >= numEVs)
+    {
+      return TimedResponse::FINISHED;
+    }
+    
+    byte value = controller->getModuleConfig()->getEventEVval(eventIndex, sequence + 1);
+    controller->sendMessageWithNN(OPC_NEVAL, eventIndex, sequence + 1, value);
+
+    return TimedResponse::PROGRESS;
+  }
+};
 
 void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *msg, unsigned int nn)
 {
@@ -296,11 +332,7 @@ void AbstractEventTeachingService::handleReadEventVariable(const VlcbMessage *ms
     controller->sendMessageWithNN(OPC_NEVAL, eventIndex, evnum, module_config->getNumEVs());
     if (!module_config->fcuCompatible)
     {
-      for (byte i = 1; i <= module_config->getNumEVs(); i++)
-      {
-        byte value = module_config->getEventEVval(eventIndex, i);
-        controller->sendMessageWithNN(OPC_NEVAL, eventIndex, i, value);
-      }
+      controller->addTimedResponseTask(new RespondEventVar(controller, eventIndex, module_config->getNumEVs()));
     }
   }
   else
