@@ -93,3 +93,25 @@ default event is created.
 
 Consumed events in slots 10-19 activate LED 1,
 events in slots 20-29 activate LED 2, etc.
+
+## [VLCB_SerialGC_1in1out](../examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino)
+This example sketch has the same functionality as [VLCB_1in1out](Examples.md#vlcb_1in1out) above
+but uses a serial connection instead of CAN bus.
+This setup is useful for testing as it does not require any CAN bus equipment
+such as CANUSB or CANETHER. 
+Instead, simply use a USB cable connected between a computer and the Arduino
+(same cable as is used for programming the Arduino).
+You can then communicate with the Arduino through the same serial port as you
+use for programming the Arduino.
+
+You can then start FCU (or any other configuration utility) and connect through
+this serial port.
+The FCU will then communicate with your Arduino module as a CBUS module.
+
+## [VLCB_SerialGC_SerialUI_empty](../examples/VLCB_SerialGC_SerialUI_empty/VLCB_SerialGC_SerialUI_empty.ino)
+This example demonstrates split serial usage on a single node.
+The hardware serial port is dedicated to [SerialGC](../docs/CanTransport.md) for VLCB/GridConnect traffic,
+while a separate SoftwareSerial port is used for [SerialUserInterface](SerialUserInterface.md) commands and status output.
+
+This layout is useful when you want to keep the transport channel and the user console separate.
+It also shows the intended use of the Stream-based serial refactor for either HardwareSerial or SoftwareSerial.

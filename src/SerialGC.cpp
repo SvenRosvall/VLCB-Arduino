@@ -19,7 +19,6 @@ namespace VLCB
 
   bool SerialGC::begin()  
   {
-    Serial << F("> ** GridConnect over serial ** ") << endl;
     receivedCount = 0;
     transmitCount = 0;
     return true;

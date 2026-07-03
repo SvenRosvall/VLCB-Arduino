@@ -7,6 +7,7 @@
 
 // header files
 #include <Arduino.h>
+#include <Stream.h>
 #include <Controller.h>
 #include <CanTransport.h>
 #include <GridConnect.h>
@@ -24,7 +25,7 @@ namespace VLCB
   class SerialGC : public CanTransport
   {
   public:
-    SerialGC(typeof(Serial)& _serial = Serial) : serial(_serial) {}
+    SerialGC(Stream& _serial = Serial) : serial(_serial) {}
     /// @cond LIBRARY
     bool begin();
 
@@ -48,7 +49,7 @@ namespace VLCB
     /// @endcond
 
   private:
-    typeof(Serial)& serial;
+    Stream& serial;
 	
     char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
     char txBuffer[RXBUFFERSIZE]; // Define a byte array to store the outgoing data

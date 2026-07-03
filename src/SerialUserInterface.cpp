@@ -24,10 +24,10 @@ void SerialUserInterface::processAction(const Action &action)
 
 void SerialUserInterface::processSerialInput()
 {
-  if (Serial.available())
+  if (serial.available())
   {
     Configuration *modconfig = controller->getModuleConfig();
-    char c = Serial.read();
+    char c = serial.read();
 
     switch (c)
     {
@@ -36,78 +36,78 @@ void SerialUserInterface::processSerialInput()
         printConfig();
 
         // node identity
-        Serial << F("> VLCB node configuration") << endl;
-        Serial << F("> mode = ") << Configuration::modeString(modconfig->currentMode)
+        serial << F("> VLCB node configuration") << endl;
+        serial << F("> mode = ") << Configuration::modeString(modconfig->currentMode)
                << F(", CANID = ") << modconfig->CANID
                << F(", node number = ") << modconfig->nodeNum << endl;
-        Serial << endl;
+        serial << endl;
         break;
 
       case 'e':
         // EEPROM learned event data table
-        Serial << F("> stored events ") << endl;
-        Serial << F("  max events = ") << modconfig->getNumEvents()
+        serial << F("> stored events ") << endl;
+        serial << F("  max events = ") << modconfig->getNumEvents()
                << F(" EVs per event = ") << modconfig->getNumEVs() 
                << F(" bytes per event = ") << modconfig->EE_BYTES_PER_EVENT << endl;
 
         {
           byte uev = modconfig->numEvents();
 
-          Serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->getNumEvents() - uev) << endl;
-          Serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ")
+          serial << F("  stored events = ") << uev << F(", free = ") << (modconfig->getNumEvents() - uev) << endl;
+          serial << F("  using ") << (uev * modconfig->EE_BYTES_PER_EVENT) << F(" of ")
                  << (modconfig->getNumEvents() * modconfig->EE_BYTES_PER_EVENT) << F(" bytes") << endl << endl;
         }
-        Serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
+        serial << F("  Ev#  |  NNhi |  NNlo |  ENhi |  ENlo | ");
 
         for (byte j = 0; j < (modconfig->getNumEVs()); j++)
         {
-          Serial << _FMT(F("EV% | "), _WIDTHZ(j + 1, 3));
+          serial << _FMT(F("EV% | "), _WIDTHZ(j + 1, 3));
         }
 
-        Serial << F("Hash |") << endl;
-        Serial << F(" --------------------------------------------------------------") << endl;
+        serial << F("Hash |") << endl;
+        serial << F(" --------------------------------------------------------------") << endl;
 
         // for each event data line
         for (byte j = 0; j < modconfig->getNumEvents(); j++)
         {
           if (modconfig->getEvTableEntry(j) != 0)
           {
-            Serial << _FMT(F("  %  | "), _WIDTHZ(j, 3));
+            serial << _FMT(F("  %  | "), _WIDTHZ(j, 3));
 
             // for each data byte of this event
             byte evarray[EE_HASH_BYTES];
             modconfig->readEvent(j, evarray);
             for (byte e = 0; e < 4; e++)
             {
-              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(evarray[e]), 2));
+              serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(evarray[e]), 2));
             }
             for (byte ev = 1; ev <= modconfig->getNumEVs(); ev++)
             {
-              Serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
+              serial << _FMT(F(" 0x% | "), _WIDTHZ(_HEX(modconfig->getEventEVval(j, ev)), 2));
             }
 
-            Serial << _FMT("%", _WIDTH(modconfig->getEvTableEntry(j), 4)) << endl;
+            serial << _FMT("%", _WIDTH(modconfig->getEvTableEntry(j), 4)) << endl;
           }
         }
 
-        Serial << endl;
+        serial << endl;
 
         break;
 
         // NVs
       case 'v':
         // note NVs number from 1, not 0
-        Serial << F("> Node variables") << endl;
-        Serial << F("   NV   Val") << endl;
-        Serial << F("  --------------------") << endl;
+        serial << F("> Node variables") << endl;
+        serial << F("   NV   Val") << endl;
+        serial << F("  --------------------") << endl;
 
         for (byte j = 1; j <= modconfig->getNumNodeVariables(); j++)
         {
           byte v = modconfig->readNV(j);
-          Serial << _FMT(F(" - % : % | 0x%"), _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;
+          serial << _FMT(F(" - % : % | 0x%"), _WIDTHZ(j, 2), _WIDTH(v, 3), _HEX(v)) << endl;
         }
 
-        Serial << endl << endl;
+        serial << endl << endl;
 
         break;
 
@@ -123,12 +123,12 @@ void SerialUserInterface::processSerialInput()
 
       case 'm':
         // free memory
-        Serial << F("Free SRAM = ") << modconfig->freeSRAM() << F(" bytes") << endl;
+        serial << F("Free SRAM = ") << modconfig->freeSRAM() << F(" bytes") << endl;
         break;
         
       case 'a':
         // Action queue info
-        Serial << F("Action Queue Size=") << controller->getActionQueue().bufUse()
+        serial << F("Action Queue Size=") << controller->getActionQueue().bufUse()
                << F(" High Water Mark=") << controller->getActionQueue().getHighWaterMark() 
                << F(" Overflows=") << controller->getActionQueue().getOverflows() << endl;
         break;
@@ -140,11 +140,11 @@ void SerialUserInterface::processSerialInput()
 
       case '\r':
       case '\n':
-        Serial << endl;
+        serial << endl;
         break;
 
       default:
-        Serial << F("> unknown command ") << c << endl;
+        serial << F("> unknown command ") << c << endl;
         break;
     }
   }
@@ -176,15 +176,15 @@ void SerialUserInterface::indicateMode(VlcbModeParams mode)
   switch (mode) 
   {
     case MODE_NORMAL:
-      Serial << F("Module in NORMAL mode") << endl;
+      serial << F("Module in NORMAL mode") << endl;
       break;
 
     case MODE_UNINITIALISED:
-      Serial << F("Module in UNINITIALISED mode") << endl;
+      serial << F("Module in UNINITIALISED mode") << endl;
       break;
 
     case MODE_SETUP:
-      Serial << F("Module in SETUP mode") << endl;
+      serial << F("Module in SETUP mode") << endl;
       break;
 
     default:
