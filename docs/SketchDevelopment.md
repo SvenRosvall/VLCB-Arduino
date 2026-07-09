@@ -102,7 +102,8 @@ the sending of status events.
 It is usually recognised with a special value in one of the event variables.
 
 The example sketch VLCB_4in4out.ino illustrates how a Start-of-Day event
-can be implemented. See its [README](VLCB4in4out_README.md#event-variables) file
+can be implemented. See its [README](VLCB4in4out_README.md#event-variables) file.
+Note how it makes use of [TimedResponse](Design.md#timedresponse) to create task that sends the events.
 
 ## Choosing a module identifier
 A module identifier consists of a _Manufacturer ID_ and a _Module ID_.

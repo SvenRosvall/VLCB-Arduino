@@ -39,7 +39,7 @@ public:
 
   TimedResponse::Result runStep() override
   {
-    if (this->sequence == diagnosticCount)
+    if (this->sequence >= diagnosticCount)
     {
       return TimedResponse::FINISHED;
     }
