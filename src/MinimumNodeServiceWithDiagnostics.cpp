@@ -59,7 +59,7 @@ public:
 
   TimedResponse::Result nextService()
   {
-    if (++serviceIndex == controller->getServices().size())
+    if (++serviceIndex >= controller->getServices().size())
     {
       return TimedResponse::FINISHED;
     }
