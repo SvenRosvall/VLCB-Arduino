@@ -17,17 +17,12 @@ void EventProducerServiceWithDiagnostics::reportDiagnostics(byte serviceIndex, b
       break;
     default:
       controller->sendGRSP(OPC_RDGN, serviceIndex, GRSP_INVALID_DIAGNOSTIC);
-      return;
+      break;
   }
 }
 
-void EventProducerServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
+int EventProducerServiceWithDiagnostics::getDiagnosticCount()
 {
-  byte diagCount = 1;
-  controller->sendDGN(serviceIndex, 0, diagCount);
-  for (byte i = 1; i <= diagCount ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
-}      
+  return 1;
+}
 }

@@ -86,6 +86,8 @@ add_library(core_library OBJECT
         src/CircularBuffer.h
         src/VLCB.h
         src/VLCB.cpp
+        src/TimedResponse.h
+        src/TimedResponse.cpp
 )
 
 target_link_libraries(core_library PUBLIC)
@@ -136,4 +138,5 @@ add_executable(testAll
         test/testLED.cpp
         test/testSwitch.cpp
         test/MockUserInterface.h
+        test/testTimedResponse.cpp
 )

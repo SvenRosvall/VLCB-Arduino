@@ -4,6 +4,7 @@
 //  The full licence can be found at: http://creativecommons.org/licenses/by-nc-sa/4.0
 
 #include "VlcbCommon.h"
+#include "ArduinoMock.hpp"
 #include "MockStorage.h"
 #include "Parameters.h"
 #include "Controller.h"
@@ -67,5 +68,16 @@ void process(VLCB::Controller &controller)
   for (int i = 0 ; controller.pendingAction() && i < MAX_PROCESS_COUNT ; ++i)
   {
     controller.process();
+  }
+}
+
+void processWithTasks(VLCB::Controller &controller)
+{
+  const int MAX_TASK_STEPS = 30;
+  process(controller);
+  for (int i = 0 ; controller.pendingTasks() && i < MAX_TASK_STEPS; ++i)
+  {
+    addMillis(5);
+    process(controller);
   }
 }

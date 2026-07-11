@@ -28,6 +28,90 @@ void MinimumNodeServiceWithDiagnostics::handleMessage(const VlcbMessage *msg)
   }
 }
 
+class ServiceDiagnosticsResponse : public TimedResponse::Task
+{
+  Service * svc;
+  int serviceIndex;
+  int diagnosticCount;
+public:
+  ServiceDiagnosticsResponse(Controller * controller, Service * svc, int serviceIndex, int diagnosticCount)
+    : Task(controller), svc(svc), serviceIndex(serviceIndex), diagnosticCount(diagnosticCount) {}
+
+  TimedResponse::Result runStep() override
+  {
+    if (this->sequence >= diagnosticCount)
+    {
+      return TimedResponse::FINISHED;
+    }
+    svc->reportDiagnostics(serviceIndex, sequence + 1);
+    return TimedResponse::PROGRESS;
+  }
+};
+
+class AllServiceDiagnosticsResponse : public TimedResponse::Task
+{
+  int serviceIndex;
+  ServiceDiagnosticsResponse * svcResponder = nullptr;
+public:
+  AllServiceDiagnosticsResponse(Controller * controller) 
+    : Task(controller), serviceIndex(0)
+  { }
+
+  TimedResponse::Result nextService()
+  {
+    if (++serviceIndex >= controller->getServices().size())
+    {
+      return TimedResponse::FINISHED;
+    }
+    return TimedResponse::PROGRESS;
+  }
+
+  TimedResponse::Result runStep() override
+  {
+    if (svcResponder == nullptr)
+    {
+      Service * svc = controller->getServices()[serviceIndex];
+      if (svc->getServiceID() == 0)
+      {
+        // Not a real service, skip it.
+        return nextService();
+      }
+      int diagnosticCount = svc->getDiagnosticCount();
+      controller->sendDGN(serviceIndex + 1, 0, diagnosticCount);
+      if (diagnosticCount > 0)
+      {
+        // Create a responder for this service.
+        svcResponder = new ServiceDiagnosticsResponse(controller, svc, serviceIndex + 1, diagnosticCount);
+        return TimedResponse::PROGRESS;
+      }
+      else
+      {
+        // No diagnostics, move to next service
+        return nextService();
+      }
+    }
+    TimedResponse::Result result = svcResponder->runStep();
+    switch (result)
+    {
+      case TimedResponse::RETRY:
+        return TimedResponse::RETRY;
+        
+      case TimedResponse::PROGRESS:
+        // Move on to next diagnostic.
+        svcResponder->sequence++;
+        return TimedResponse::PROGRESS;
+
+      case TimedResponse::FINISHED:
+        // This service is complete. Go to next service.
+        delete svcResponder;
+        svcResponder = nullptr;
+        return nextService();
+    }
+    // Shouldn't happen. Keep the warnings quiet.
+    return result;
+  }
+};
+
 void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessage *msg, unsigned int nn)
 {
   if (!isThisNodeNumber(nn))
@@ -52,17 +136,7 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
   if (serviceIndex == 0)
   {
     // Request for diagnostics for all services.
-    for (serviceIndex = 1; serviceIndex <= controller->getServices().size(); serviceIndex++)
-    {
-      Service * svc = controller->getServices()[serviceIndex - 1];
-      if (svc->getServiceID() == 0)
-      {
-        // Not a real service, skip it.
-        continue;
-      }
-
-      svc->reportAllDiagnostics(serviceIndex);
-    }
+    controller->addTimedResponseTask(new AllServiceDiagnosticsResponse(controller));
   }
   else
   {
@@ -77,7 +151,12 @@ void MinimumNodeServiceWithDiagnostics::handleRequestDiagnostics(const VlcbMessa
     byte diagnosticCode = msg->data[4];
     if (diagnosticCode == 0)
     {
-      svc->reportAllDiagnostics(serviceIndex);
+      int diagnosticCount = svc->getDiagnosticCount();
+      controller->sendDGN(serviceIndex, 0, diagnosticCount);
+      if (diagnosticCount > 0)
+      {
+        controller->addTimedResponseTask(new ServiceDiagnosticsResponse(controller, svc, serviceIndex, diagnosticCount));
+      }
     }
     else
     {
@@ -123,13 +202,9 @@ void MinimumNodeServiceWithDiagnostics::diagNodeNumberChanged()
   ++diagNodeNumberChanges;
 }
 
-void MinimumNodeServiceWithDiagnostics::reportAllDiagnostics(byte serviceIndex)
+int MinimumNodeServiceWithDiagnostics::getDiagnosticCount()
 {
-  controller->sendDGN(serviceIndex, 0, 6);
-  for (byte i = 1; i <= 0x06 ; ++i)
-  {
-    reportDiagnostics(serviceIndex, i);
-  }
+  return 6;
 }
 
 }

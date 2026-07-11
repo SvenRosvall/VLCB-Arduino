@@ -30,6 +30,7 @@ var _v_l_c_b_8h =
     [ "VLCB::sendMessageWithNN", "namespace_v_l_c_b.html#a2a03c5bb0541134c16d1035673b15083", null ],
     [ "VLCB::sendMessageWithNN", "namespace_v_l_c_b.html#aaeb4f2fe470df89ec5f39d240f8dde74", null ],
     [ "VLCB::sendMessageWithNN", "namespace_v_l_c_b.html#a138d4887d5fb24e5d4a4d2c3a0aa690e", null ],
+    [ "VLCB::addTimedResponse", "namespace_v_l_c_b.html#a8b167042357eca200c88db58d67dcb1d", null ],
     [ "VLCB::resetModule", "namespace_v_l_c_b.html#a87f488c1538aee38c3b185c78ce33364", null ],
     [ "VLCB::process", "namespace_v_l_c_b.html#af217aaaec8431562509e9df92a3ca6f0", null ]
 ];

@@ -5,55 +5,6 @@ This list contains minor code improvements that are not user facing.
 User facing bugs and improvements are managed as
 [GitHub Issues](https://github.com/SvenRosvall/VLCB-Arduino/issues).
 
-## Introduce TimedResponse
-The Action queue has a limited size of 30 which is enough to handle
-all responses for RQNPN.
-If the node responds with more messages than the queue size then the 
-first messages will be dropped.
-This happened to Nick Locke where he had 59 events in response to NERD.
-The first 28 events were dropped.
-
-Ian Hogg implemented a TimedResponse algorithm that produces response 
-events in a slower pace to allow for the CAN transport to work off the Action queue.
-This also has the advantage that the pending actions don't use any memory
-as they have not been created yet.
-
-General algorithm:
-1. Response producer registers work to do with a callback function / object.
-2. At each process() call, check for time interval. (optional)
-3. Call the callback with a sequence number. Possibly also other information.
-4. The callback does its work for that sequence number. Return a state to indicate
-   task the job is complete.
-
-The sequence number can indicate which response to generate, such as parameter
-number or event at the index given by the sequence number.
-
-If an object is used instead of a callback function then it can hold
-the sequence number, or whatever it needs to keep track of work.
-There is a case where all diagnostics for all services are returned.
-Here the callback object can contain the service index and the diagnostic index.
-It can also contain a timer so that if it doesn't get enough time
-to generate its messages within a time, where the requestor gives up,
-the generation of sent messages can be abandoned.
-
-This will be part of `Controller` where the action queue exists.
-
-Ian's implementation can only handle one such task at a time. 
-This may be limiting. Allow for a small queue of such tasks.
-Typically, there won't be a need for more than one such task as
-the requestor (MMC or FCU) will wait for responses before sending the
-next request.
-Responses to Start-of-Day may get intermingled with MMC/FCU requests.
-
-Throttle running of these tasks if the Action queue is getting full.
-Also, only run a task once every 1ms.
-
-Could this be implemented as a service?
-This would then be run from the general process() loop.
-This would separate the task management from the `Controller` class which is 
-big enough already.
-It may be tricky for other services to get hold of this service to place a task.
-
 ## Keep Node data in Controller
 NodeNumber etc are split across ```Controller``` and ```Configuration```. 
 Keep all access to these in ```Controller```. 

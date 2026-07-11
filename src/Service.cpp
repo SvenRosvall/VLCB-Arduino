@@ -20,12 +20,6 @@ void Service::reportDiagnostics(byte serviceIndex, byte diagnosticsCode)
   controller->sendGRSP(OPC_RDGN, SERVICE_ID_MNS, GRSP_INVALID_DIAGNOSTIC);
 }
 
-void Service::reportAllDiagnostics(byte serviceIndex)
-{
-  // Default implementation is to not support diagnostics.
-  controller->sendDGN(serviceIndex, 0, 0);
-}
-
 Service::Data Service::getServiceData()
 {
   // Default implementation is to return 0 for all service data bytes.

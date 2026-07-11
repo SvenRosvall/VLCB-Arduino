@@ -139,6 +139,12 @@ Instead, the reported state for a toggle switch will be the
 default state unless it has not changed state since start up 
 of the node.
 
+Instead of sending all response events in a loop a [TimedResponse](../html.sketch/_timed_response_8h.html) instance, StartOfDayResponse, is used.
+This object is called by the library at an interval to separate the responses
+in time.
+Each call will use a different sequence number which is used to identify which
+switch to report state for.
+
 ## Node Variables
 
 Node Variables control the action to take when a switch is pressed or depressed.
