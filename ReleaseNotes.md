@@ -18,6 +18,7 @@ Fixes:
   state such as free memory and action queue usage.
 * Extend SerialUserInterface to show action queue usage.
 * Add functions to EventProducerService to send events that are not taught.
+* Use `TimedResponse` to send multiple response messages with timed intervals.
 
 # 2.2.0 - Split EventTeachingService
 

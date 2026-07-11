@@ -134,9 +134,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad8e7bd0ae34bf73fe6728aec98310f60" id="r_ad8e7bd0ae34bf73fe6728aec98310f60"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ad8e7bd0ae34bf73fe6728aec98310f60">putAction</a> (const <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &amp;action)</td></tr>
 <tr class="memitem:ac2760254f43e7e6f6b38070ab2816b36" id="r_ac2760254f43e7e6f6b38070ab2816b36"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ac2760254f43e7e6f6b38070ab2816b36">putAction</a> (<a class="el" href="namespace_v_l_c_b.html#a2e0e9b99da8cf32dcd00b3a96705ff90">ACTION</a> action)</td></tr>
 <tr class="memitem:aa93bfe8e3ff5f67f03ccaca330a777f4" id="r_aa93bfe8e3ff5f67f03ccaca330a777f4"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#aa93bfe8e3ff5f67f03ccaca330a777f4">pendingAction</a> ()</td></tr>
+<tr class="memitem:a6e1cc749a58840cc585146fd2438e047" id="r_a6e1cc749a58840cc585146fd2438e047"><td class="memItemLeft">bool&#160;</td><td class="memItemRight"><a class="el" href="#a6e1cc749a58840cc585146fd2438e047">pendingTasks</a> ()</td></tr>
 <tr class="memitem:a6fea56e128b5871e2fb955ecca39be97" id="r_a6fea56e128b5871e2fb955ecca39be97"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6fea56e128b5871e2fb955ecca39be97">messageActedOn</a> ()</td></tr>
 <tr class="memitem:a700cd13de4fe534ec4d01b52a2a55420" id="r_a700cd13de4fe534ec4d01b52a2a55420"><td class="memItemLeft">unsigned int&#160;</td><td class="memItemRight"><a class="el" href="#a700cd13de4fe534ec4d01b52a2a55420">getMessagesActedOn</a> ()</td></tr>
-<tr class="memitem:a5706756dc1cad9ae507b3c16cfdfa665" id="r_a5706756dc1cad9ae507b3c16cfdfa665"><td class="memItemLeft">const <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">CircularBuffer</a>&lt; <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &gt; &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a5706756dc1cad9ae507b3c16cfdfa665">getActionQueue</a> () const</td></tr>
+<tr class="memitem:afec9a05ede27427f169fa5f036ee938e" id="r_afec9a05ede27427f169fa5f036ee938e"><td class="memItemLeft">const <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">CircularBuffer</a>&lt; <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a>, <a class="el" href="namespace_v_l_c_b.html#a4d64847ece89bd3e3251bd85c551cb74">ACTION_QUEUE_SIZE</a> &gt; &amp;&#160;</td><td class="memItemRight"><a class="el" href="#afec9a05ede27427f169fa5f036ee938e">getActionQueue</a> () const</td></tr>
+<tr class="memitem:ae06f6d9fc7f2776d75bc4d56196bd25b" id="r_ae06f6d9fc7f2776d75bc4d56196bd25b"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae06f6d9fc7f2776d75bc4d56196bd25b">addTimedResponseTask</a> (<a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html">TimedResponse::Task</a> *task)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Main object in <a class="el" href="namespace_v_l_c_b.html">VLCB</a>. Coordinates transport, ui, configuration and services. </p>
@@ -840,6 +842,23 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a6e1cc749a58840cc585146fd2438e047" name="a6e1cc749a58840cc585146fd2438e047"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e1cc749a58840cc585146fd2438e047">&#9670;&#160;</a></span>pendingTasks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool VLCB::Controller::pendingTasks </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a6fea56e128b5871e2fb955ecca39be97" name="a6fea56e128b5871e2fb955ecca39be97"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6fea56e128b5871e2fb955ecca39be97">&#9670;&#160;</a></span>messageActedOn()</h2>
 
@@ -882,8 +901,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5706756dc1cad9ae507b3c16cfdfa665" name="a5706756dc1cad9ae507b3c16cfdfa665"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5706756dc1cad9ae507b3c16cfdfa665">&#9670;&#160;</a></span>getActionQueue()</h2>
+<a id="afec9a05ede27427f169fa5f036ee938e" name="afec9a05ede27427f169fa5f036ee938e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afec9a05ede27427f169fa5f036ee938e">&#9670;&#160;</a></span>getActionQueue()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -892,7 +911,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">CircularBuffer</a>&lt; <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a> &gt; &amp; VLCB::Controller::getActionQueue </td>
+          <td class="memname">const <a class="el" href="class_v_l_c_b_1_1_circular_buffer.html">CircularBuffer</a>&lt; <a class="el" href="struct_v_l_c_b_1_1_action.html">Action</a>, <a class="el" href="namespace_v_l_c_b.html#a4d64847ece89bd3e3251bd85c551cb74">ACTION_QUEUE_SIZE</a> &gt; &amp; VLCB::Controller::getActionQueue </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -903,6 +922,23 @@ Public Member Functions</h2></td></tr>
 <span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
   </tr>
 </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae06f6d9fc7f2776d75bc4d56196bd25b" name="ae06f6d9fc7f2776d75bc4d56196bd25b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae06f6d9fc7f2776d75bc4d56196bd25b">&#9670;&#160;</a></span>addTimedResponseTask()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void VLCB::Controller::addTimedResponseTask </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_v_l_c_b_1_1_timed_response_1_1_task.html">TimedResponse::Task</a> *</td>          <td class="paramname"><span class="paramname"><em>task</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
 </div><div class="memdoc">
 
 </div>

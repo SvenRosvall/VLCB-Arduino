@@ -29,7 +29,9 @@ var class_v_l_c_b_1_1_controller =
     [ "putAction", "class_v_l_c_b_1_1_controller.html#ad8e7bd0ae34bf73fe6728aec98310f60", null ],
     [ "putAction", "class_v_l_c_b_1_1_controller.html#ac2760254f43e7e6f6b38070ab2816b36", null ],
     [ "pendingAction", "class_v_l_c_b_1_1_controller.html#aa93bfe8e3ff5f67f03ccaca330a777f4", null ],
+    [ "pendingTasks", "class_v_l_c_b_1_1_controller.html#a6e1cc749a58840cc585146fd2438e047", null ],
     [ "messageActedOn", "class_v_l_c_b_1_1_controller.html#a6fea56e128b5871e2fb955ecca39be97", null ],
     [ "getMessagesActedOn", "class_v_l_c_b_1_1_controller.html#a700cd13de4fe534ec4d01b52a2a55420", null ],
-    [ "getActionQueue", "class_v_l_c_b_1_1_controller.html#a5706756dc1cad9ae507b3c16cfdfa665", null ]
+    [ "getActionQueue", "class_v_l_c_b_1_1_controller.html#afec9a05ede27427f169fa5f036ee938e", null ],
+    [ "addTimedResponseTask", "class_v_l_c_b_1_1_controller.html#ae06f6d9fc7f2776d75bc4d56196bd25b", null ]
 ];

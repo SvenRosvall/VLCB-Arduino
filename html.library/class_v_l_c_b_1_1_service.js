@@ -9,7 +9,7 @@ var class_v_l_c_b_1_1_service =
     [ "process", "class_v_l_c_b_1_1_service.html#a1fbded51bba05e0eb81047ca5bef5ac2", null ],
     [ "processAction", "class_v_l_c_b_1_1_service.html#a7198d79026d95a05148518d85d0aec6b", null ],
     [ "reportDiagnostics", "class_v_l_c_b_1_1_service.html#a3118e27d99fb094e431b9e76be39d259", null ],
-    [ "reportAllDiagnostics", "class_v_l_c_b_1_1_service.html#a95f4c25466ca323eda30a263d262d0c9", null ],
+    [ "getDiagnosticCount", "class_v_l_c_b_1_1_service.html#a9e44437deb78b108307167df8e7e8cea", null ],
     [ "getServiceData", "class_v_l_c_b_1_1_service.html#ab0ced3d6218914eee7508b60b1fd6ffa", null ],
     [ "controller", "class_v_l_c_b_1_1_service.html#a50e13262cee7886d32588cffe2e8a208", null ]
 ];

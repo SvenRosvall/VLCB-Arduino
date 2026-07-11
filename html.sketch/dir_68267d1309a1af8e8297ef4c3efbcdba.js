@@ -17,6 +17,7 @@ var dir_68267d1309a1af8e8297ef4c3efbcdba =
     [ "SerialGC.h", "_serial_g_c_8h.html", "_serial_g_c_8h" ],
     [ "SerialUserInterface.h", "_serial_user_interface_8h.html", "_serial_user_interface_8h" ],
     [ "Service.h", "_service_8h.html", "_service_8h" ],
+    [ "TimedResponse.h", "_timed_response_8h.html", "_timed_response_8h" ],
     [ "VLCB.h", "_v_l_c_b_8h.html", "_v_l_c_b_8h" ],
     [ "vlcbdefs.hpp", "vlcbdefs_8hpp.html", "vlcbdefs_8hpp" ]
 ];

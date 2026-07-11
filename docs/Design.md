@@ -70,6 +70,20 @@ This CAN frame is then passed to or from a CAN driver, such as CAN2515.
 CAN drivers may need to convert this CAN frame to a data structure used by any library
 that is used by that driver.
 
+### TimedResponse
+A service may respond to a request with a large number of response messages.
+Instead of creating these messages immediately and putting them all on the Action bus, a `TimedResponse`
+is used to manage their creation so as not to overwhelm the Action bus.
+
+A service creates a task object which is added to TimedResponse.
+The TimedResponse then calls this task object every 5ms to allow it to send one 
+response message. 
+The task object maintains a sequence counter to keep track of which response to 
+send at each call.
+
+The 5ms interval gives the system enough time to process and transmit the sent
+message without any of the CAN queues filling up.
+
 ## Configuration
 The Configuration object stores node variables (NV) and event variables(EV) and any other configuration
 that is required. It makes use of a storage object that has different implementations for different

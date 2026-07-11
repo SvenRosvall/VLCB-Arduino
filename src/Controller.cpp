@@ -8,7 +8,7 @@
 
 // Controller library
 #include <Controller.h>
-#include "MinimumNodeService.h"
+#include <Service.h>
 #include <stdarg.h>
 
 //
@@ -166,6 +166,8 @@ void Controller::process()
     service->process();
   }
 
+  timedResponses.process();
+  
   module_config->commitToEEPROM();
 }
 
@@ -236,10 +238,20 @@ bool Controller::pendingAction()
   return actionQueue.available();
 }
 
+bool Controller::pendingTasks()
+{
+  return timedResponses.pendingTasks();
+}
+
 void Controller::messageActedOn()
 {
   putAction(ACT_INDICATE_WORK);
   ++diagMsgsActed;
+}
+
+void Controller::addTimedResponseTask(TimedResponse::Task * task)
+{
+  timedResponses.add(task);
 }
 
 }

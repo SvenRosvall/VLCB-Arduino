@@ -137,8 +137,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7198d79026d95a05148518d85d0aec6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Called when there is an action available.  <br /></td></tr>
 <tr class="memitem:a3118e27d99fb094e431b9e76be39d259" id="r_a3118e27d99fb094e431b9e76be39d259"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a3118e27d99fb094e431b9e76be39d259">reportDiagnostics</a> (byte serviceIndex, byte diagnosticsCode)</td></tr>
 <tr class="memdesc:a3118e27d99fb094e431b9e76be39d259"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report a given diagnostic value.  <br /></td></tr>
-<tr class="memitem:a95f4c25466ca323eda30a263d262d0c9" id="r_a95f4c25466ca323eda30a263d262d0c9"><td class="memItemLeft">virtual void&#160;</td><td class="memItemRight"><a class="el" href="#a95f4c25466ca323eda30a263d262d0c9">reportAllDiagnostics</a> (byte serviceIndex)</td></tr>
-<tr class="memdesc:a95f4c25466ca323eda30a263d262d0c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report all diagnostics available for a service.  <br /></td></tr>
+<tr class="memitem:a9e44437deb78b108307167df8e7e8cea" id="r_a9e44437deb78b108307167df8e7e8cea"><td class="memItemLeft">virtual int&#160;</td><td class="memItemRight"><a class="el" href="#a9e44437deb78b108307167df8e7e8cea">getDiagnosticCount</a> ()</td></tr>
+<tr class="memdesc:a9e44437deb78b108307167df8e7e8cea"><td class="mdescLeft">&#160;</td><td class="mdescRight">report how many diagnostics this service supports.  <br /></td></tr>
 <tr class="memitem:ab0ced3d6218914eee7508b60b1fd6ffa" id="r_ab0ced3d6218914eee7508b60b1fd6ffa"><td class="memItemLeft">virtual <a class="el" href="struct_v_l_c_b_1_1_service_1_1_data.html">Data</a>&#160;</td><td class="memItemRight"><a class="el" href="#ab0ced3d6218914eee7508b60b1fd6ffa">getServiceData</a> ()</td></tr>
 <tr class="memdesc:ab0ced3d6218914eee7508b60b1fd6ffa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <a class="el" href="struct_v_l_c_b_1_1_service_1_1_data.html" title="Container for service data bytes.">Data</a> bytes specific for the implementing service. The meaning of each data byte is defined in the service specification.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -406,8 +406,8 @@ Protected Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a95f4c25466ca323eda30a263d262d0c9" name="a95f4c25466ca323eda30a263d262d0c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a95f4c25466ca323eda30a263d262d0c9">&#9670;&#160;</a></span>reportAllDiagnostics()</h2>
+<a id="a9e44437deb78b108307167df8e7e8cea" name="a9e44437deb78b108307167df8e7e8cea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e44437deb78b108307167df8e7e8cea">&#9670;&#160;</a></span>getDiagnosticCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -416,28 +416,22 @@ Protected Attributes</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void VLCB::Service::reportAllDiagnostics </td>
+          <td class="memname">virtual int VLCB::Service::getDiagnosticCount </td>
           <td>(</td>
-          <td class="paramtype">byte</td>          <td class="paramname"><span class="paramname"><em>serviceIndex</em></span></td><td>)</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel virtual">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Report all diagnostics available for a service. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">serviceIndex</td><td>index of the service. Not used by the implementation, just passed through to the response message. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>report how many diagnostics this service supports. </p>
 
-<p>Reimplemented in <a class="el" href="class_v_l_c_b_1_1_can_service_with_diagnostics.html#a68326ac04516de6ad105be3577e63e60">VLCB::CanServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_consumer_service_with_diagnostics.html#a735d07e6ddcae79803a4dab0b0bb1c44">VLCB::EventConsumerServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_producer_service_with_diagnostics.html#a18e784fda895a6b0dbaee53c5a072a42">VLCB::EventProducerServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_teaching_service_with_diagnostics.html#a3e4f03dbf56735f9df5da6ab9a303b84">VLCB::EventTeachingServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_internal_diagnostics_service.html#a7d1db0db6bd20c67fe6da47134dfd860">VLCB::InternalDiagnosticsService</a>, and <a class="el" href="class_v_l_c_b_1_1_minimum_node_service_with_diagnostics.html#ae94cbdf82773e4a2f5d432ac10cff360">VLCB::MinimumNodeServiceWithDiagnostics</a>.</p>
+<p>Reimplemented in <a class="el" href="class_v_l_c_b_1_1_can_service_with_diagnostics.html#a384cb4a65445375395c001b1069d571e">VLCB::CanServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_consumer_service_with_diagnostics.html#ad229601d23c5d2a3d463fa34f309341e">VLCB::EventConsumerServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_producer_service_with_diagnostics.html#af7ed8637dfa68ab872fda932f83c07f8">VLCB::EventProducerServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_event_teaching_service_with_diagnostics.html#a240da3d3b39faf7e2f22d5ae87fedc72">VLCB::EventTeachingServiceWithDiagnostics</a>, <a class="el" href="class_v_l_c_b_1_1_internal_diagnostics_service.html#a44ac5bcf077a7e48f26715c282488772">VLCB::InternalDiagnosticsService</a>, and <a class="el" href="class_v_l_c_b_1_1_minimum_node_service_with_diagnostics.html#a0c0549e1469ac2d470f3ddf774c25e78">VLCB::MinimumNodeServiceWithDiagnostics</a>.</p>
 
 </div>
 </div>

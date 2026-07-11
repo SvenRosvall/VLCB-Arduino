@@ -9,6 +9,7 @@ var annotated_dup =
       [ "CanTransport", "class_v_l_c_b_1_1_can_transport.html", null ],
       [ "SerialGC", "class_v_l_c_b_1_1_serial_g_c.html", "class_v_l_c_b_1_1_serial_g_c" ],
       [ "CAN2515", "class_v_l_c_b_1_1_c_a_n2515.html", "class_v_l_c_b_1_1_c_a_n2515" ],
+      [ "TimedResponse", "class_v_l_c_b_1_1_timed_response.html", "class_v_l_c_b_1_1_timed_response" ],
       [ "AbstractEventTeachingService", "class_v_l_c_b_1_1_abstract_event_teaching_service.html", "class_v_l_c_b_1_1_abstract_event_teaching_service" ],
       [ "CanService", "class_v_l_c_b_1_1_can_service.html", "class_v_l_c_b_1_1_can_service" ],
       [ "ConsumeOwnEventsService", "class_v_l_c_b_1_1_consume_own_events_service.html", null ],
