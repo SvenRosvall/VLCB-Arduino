@@ -70,12 +70,16 @@ CmakeLists.txt
 ## Dependencies
 Note that this library depends on a number of other libraries which must also be downloaded and included in the sketch:
 
-* [ACAN2515](https://github.com/pierremolinaro/acan2515) - CAN bus transport using the MCP2515 controller
 * [Streaming](https://github.com/janelia-arduino/Streaming) - C++ style output
 
 ## Hardware
 
-Currently supports the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 library.
+This library only contains CAN transport over serial communication which does
+not require any external dependencies.
+Implementation using specific CAN harddware are provided in separate libraries.
+
+Supports for the MCP2515 and MCP2565 CAN controller ICs via the ACAN2515 library
+is provided in the repository [VCAN2515](https://github.com/SvenRosvall/VCAN2515).
 
 Support for Raspberry Pi Pico boards is provided by Martin Da Costa
 in the repository [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040).

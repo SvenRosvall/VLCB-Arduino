@@ -15,8 +15,6 @@ include_directories(src)
 include_directories(Arduino)
 
 add_library(hardware_library OBJECT
-        src/CAN2515.cpp
-        src/CAN2515.h
         src/CreateDefaultStorageForPlatform.cpp
         src/DueEepromEmulationStorage.cpp
         src/DueEepromEmulationStorage.h
@@ -103,13 +101,7 @@ add_executable(VLCB_Arduino
         Arduino/Streaming.h
         Arduino/SPI.h
         Arduino/Wire.h
-        Arduino/ACAN2515.h
         Arduino/EEPROM.h
-        examples/VLCB_1in1out/VLCB_1in1out.ino
-        examples/VLCB_4in4out/VLCB_4in4out.ino
-        examples/VLCB_4in4out_slot/VLCB_4in4out_slot.ino
-        examples/VLCB_empty/VLCB_empty.ino
-        examples/VLCB_long_message_example/VLCB_long_message_example.ino
         examples/VLCB_SerialGC_1in1out/VLCB_SerialGC_1in1out.ino
         examples/VLCB_SerialGC_4in4out/VLCB_SerialGC_4in4out.ino
         examples/VLCB_SerialGC_4in4out_slot/VLCB_SerialGC_4in4out_slot.ino

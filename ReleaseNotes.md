@@ -19,6 +19,7 @@ Fixes:
 * Extend SerialUserInterface to show action queue usage.
 * Add functions to EventProducerService to send events that are not taught.
 * Use `TimedResponse` to send multiple response messages with timed intervals.
+* Move CAN2515 transport to its own repository.
 
 # 2.2.0 - Split EventTeachingService
 

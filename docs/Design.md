@@ -13,7 +13,6 @@ Services implement various groups of functionality within VLCB such as events or
 The user sketch can select the set of services needed to provide the necessary functionality
 for the VLCB module that is created.
 There are also services for user interfaces and communication over different transports such as CAN, Wi-Fi and BLE.
-Currently only a CAN transport using the CAN2515 chip is included in the library.
 
 The library supports storage for node variables and event variables in EEPROM or Flash memory.
 A Configuration object controls persistence of node specific data such as parameter, node variables
@@ -27,6 +26,11 @@ and services.
 * There is no message queuing in this diagram. Message queuing is expected to happen in the transport layer.
   Some transport hardware has message queues builtin, for others the transport implementation
   will include queues.
+* The core library only provides a concrete CanTransport for CAN over serial communication
+  by the SerialGC class. 
+  Other implementations for hardware CAN tranceivers are located in their own
+  libraries. This way this library does not need to dependend on other hardware
+  libraries used by the transport libraries.
 
 ## Workflow
 The Controller maintains a ```Action``` bus, which is implemented as a circular buffer of 
