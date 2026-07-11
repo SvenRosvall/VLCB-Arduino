@@ -4,6 +4,13 @@ Releases are listed on GitHub: https://github.com/SvenRosvall/VLCB-Arduino/relea
 
 # Current development - pending release
 
+# 3.0.0 - Separate out MCP2515 transport
+
+Moved CAN2515 class and example sketches that use this transport to its own
+repository.
+This is to remove dependency on external library ACAN2515 which is not needed
+if any other transport method is used.
+
 Fixes:
 * Clear event table after manufacturer reset to avoid old events re-appearing.
 * Event Teaching Service updated to service version 3.
