@@ -72,9 +72,8 @@ that is used by that driver.
 
 ### TimedResponse
 A service may respond to a request with a large number of response messages.
-Instead of creating these messages immediately and putting these on the Action bus
-a `TimedResponse` is used to delay creation of these response messages until
-they can be added to the Action bus.
+Instead of creating these messages immediately and putting them all on the Action bus, a `TimedResponse`
+is used to manage their creation so as not to overwhelm the Action bus.
 
 A service creates a task object which is added to TimedResponse.
 The TimedResponse then calls this task object every 5ms to allow it to send one 
