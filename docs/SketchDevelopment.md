@@ -136,7 +136,7 @@ These functions are "free" functions and do not require objects.
 These VLCB namespace functions are provided for convenience and clarity.
 Some are just forwarding calls to these objects while others do more
 work to simplify writing module code.
-These functions are described in [VLCB API documentation](../html.sketch/namespace_v_l_c_b.html)
+These functions are described in [VLCB API documentation](https://svenrosvall.github.io/VLCB-Arduino/html.sketch/namespace_v_l_c_b.html)
 
 The [example sketches](Examples.md) included here are using the VLCB function style.
 This is the recommended style.
@@ -147,8 +147,8 @@ These sketches follow a structure with certain elements in order:
 set up different things.
    1. `setupVlcb()` where all the VLCB specific parameters are set up such
    as manufacturer and module ID and what services will be used.
-   The list of services are described [here](../html.sketch/class_v_l_c_b_1_1_service.html).
-   Note that the service [MinimumNodeService](../html.sketch/class_v_l_c_b_1_1_minimum_node_service.html) must be included in this list.
+   The list of services are described [here](https://svenrosvall.github.io/VLCB-Arduino/html.sketch/class_v_l_c_b_1_1_service.html).
+   Note that the service [MinimumNodeService](https://svenrosvall.github.io/VLCB-Arduino/html.sketch/class_v_l_c_b_1_1_minimum_node_service.html) must be included in this list.
    1. The other setup part is the function `setupModule()` where all module specific
    things are set up such as I/O pins.
 3. The `loop()` function. This is where all the recurring tasks happen such as
