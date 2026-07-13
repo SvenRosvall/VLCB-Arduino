@@ -14,16 +14,18 @@ They provide a common environment for all developers.
 
 - `.github/workflows/ci-host-tests.yml`
 - `.github/workflows/ci-arduino-build.yml`
-- `.github/workflows/docs.yml`
+- `.github/workflows/ci-docs.yml`
 
 ## At a glance
 
-| Workflow | Purpose | Runs when |
-| --- | --- | --- |
-| `Host Tests` | Build and run host test executable (`testAll`) with CMake | Someone opens a PR, pushes code, or runs it manually |
-| `Arduino Firmware Build` | Compile all sketches in `examples/` for Arduino Uno | A PR or push changes Arduino-related files, or someone runs it manually |
-| `Docs` | Generate Doxygen HTML docs and upload artifacts | A PR or push changes docs/source/config files, or someone runs it manually |
+| Workflow | Purpose                                                                                                                         | Runs when |
+| --- |---------------------------------------------------------------------------------------------------------------------------------| --- |
+| `Host Tests` | Build and run host test executable (`testAll`) with CMake                                                                       | Someone opens a PR, pushes code, or runs it manually |
+| `Arduino Firmware Build` | Compile all sketches in `examples/` for Arduino Uno                                                                             | A PR or push changes Arduino-related files, or someone runs it manually |
+| `Docs` | Generate Doxygen HTML docs and upload artifacts to [Github Pages for this library](https://svenrosvall.github.io/VLCB-Arduino). | A PR or push changes docs/source/config files, or someone runs it manually |
 
+Note also that there is a workflow associated with the [Github Pages for this library](https://svenrosvall.github.io/VLCB-Arduino)
+that converts all markdown pages to HTML files.
 ## Learn more about GitHub Actions
 
 - Quickstart: https://docs.github.com/actions/quickstart

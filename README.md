@@ -11,6 +11,8 @@ This VLCB library code is based on a [CBUS library](https://github.com/MERG-DEV/
 and extended by members of [MERG](https://www.merg.org.uk/). 
 See below under [Credits](#credits).
 
+Full documentation is available in https://svenrosvall.github.io/VLCB-Arduino 
+
 ## Developing a sketch for a VLCB module
 
 This library is intended for module developers to make it as easy as
