@@ -3,7 +3,7 @@
 The Minimum Node Service provides the basic VLCB interface and functions for the library. As such,
 it is the only service whose inclusion is mandatory.
 
-Detailed documentation is available in [MinimumNodeService API definition](../html.library/class_v_l_c_b_1_1_minimum_node_service.html)
+Detailed documentation is available in [MinimumNodeService API definition](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_minimum_node_service.html)
 
 ## Operating Mode
 

@@ -34,7 +34,7 @@ and services.
 
 ## Workflow
 The Controller maintains a ```Action``` bus, which is implemented as a circular buffer of 
-[Action](../html.library/struct_v_l_c_b_1_1_action.html) objects.
+[Action](https://svenrosvall.github.io/VLCB-Arduino/html.library/struct_v_l_c_b_1_1_action.html) objects.
 Each service can put actions on this bus and act on actions placed there by other services.
 An action represents tasks or information to be shared with other services. 
 The Action bus decouples services from each other and makes it easier to add new services.
@@ -101,18 +101,18 @@ It makes use of a Storage interface where implementing classes store the data at
 address.
 
 There are a few classes that implement the 
-[Storage](../html.library/class_v_l_c_b_1_1_storage.html) interface:
+[Storage](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_storage.html) interface:
 
-[EepromInternalStorage](../html.library/class_v_l_c_b_1_1_eeprom_internal_storage.html)
+[EepromInternalStorage](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_eeprom_internal_storage.html)
 : Stores data in EEPROM directly on the processor.
 
-[EepromExternalStorage](../html.library/class_v_l_c_b_1_1_eeprom_external_storage.html)
+[EepromExternalStorage](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_eeprom_external_storage.html)
 : Stores data in external EEPROM connected via I2C.
 
-[DueEepromEmulationStorage](../html.library/class_v_l_c_b_1_1_due_eeprom_emulation_storage.html)
+[DueEepromEmulationStorage](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_due_eeprom_emulation_storage.html)
 : Support by emulating EEPROM for the Arduino DUE.
 
-[FlashStorage](/html.library/class_v_l_c_b_1_1_flash_storage.html)
+[FlashStorage](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_flash_storage.html)
 : Stores data in Flash memory. Useful for modules that do not have onboard EEPROM or too
 little EEPROM.
 
@@ -123,5 +123,5 @@ VLCB offers up a message to each service in turn.
 If a service is able to handle that message no further services will be offered the message.
 Thus, the order of configured services is important.
 
-Read more about the [Service](../html.library/class_v_l_c_b_1_1_service.html) interface and how services work in 
+Read more about the [Service](https://svenrosvall.github.io/VLCB-Arduino/html.library/class_v_l_c_b_1_1_service.html) interface and how services work in 
 [Service documentation](Service.md).
