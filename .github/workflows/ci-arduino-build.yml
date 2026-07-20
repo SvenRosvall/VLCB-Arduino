@@ -21,6 +21,16 @@ on:
 
 jobs:
   compile-examples:
+    strategy:
+      matrix:
+        include:
+          - board: arduino:avr:uno
+            processor: arduino:avr
+            label: Arduino Uno
+          - board: rp2040:rp2040:rpipico
+            processor: rp2040:rp2040
+            label: Raspberry Pico
+
     runs-on: ubuntu-latest
 
     steps:
@@ -33,17 +43,17 @@ jobs:
       - name: Install Arduino core
         run: |
           arduino-cli core update-index
-          arduino-cli core install arduino:avr
+          arduino-cli core install ${{ matrix.processor }}
 
       - name: Install library dependencies
         run: |
           arduino-cli lib install Streaming
 
-      - name: Compile all examples for Arduino Uno
+      - name: Compile all examples for ${{ matrix.label }}
         run: |
           for dir in ./examples/*; do
             if [ -d "$dir" ] && ls "$dir"/*.ino >/dev/null 2>&1; then
               echo "Compiling $dir"
-              arduino-cli compile --fqbn arduino:avr:uno --library . "$dir"
+              arduino-cli compile --fqbn ${{ matrix.board }} --library . "$dir"
             fi
           done
