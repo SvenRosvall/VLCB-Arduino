@@ -27,7 +27,7 @@ jobs:
           - board: arduino:avr:uno
             platform: arduino:avr
             label: Arduino Uno
-          - board: arduino:mbed_rp2040:rpipico
+          - board: arduino:mbed_rp2040:pico
             platform: arduino:mbed_rp2040
             label: Raspberry Pico
 
