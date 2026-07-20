@@ -27,8 +27,8 @@ jobs:
           - board: arduino:avr:uno
             platform: arduino:avr
             label: Arduino Uno
-          - board: arduino:mbed_rp2040:pico
-            platform: arduino:mbed_rp2040
+          - board: rp2040:rp2040:rpipico
+            platform: rp2040:rp2040
             label: Raspberry Pico
 
     runs-on: ubuntu-latest
@@ -42,8 +42,8 @@ jobs:
 
       - name: Install Arduino core
         run: |
-          arduino-cli core update-index
           arduino-cli core install ${{ matrix.platform }}
+          arduino-cli core update-index
 
       - name: Install library dependencies
         run: |
