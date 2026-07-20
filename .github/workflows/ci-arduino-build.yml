@@ -28,7 +28,7 @@ jobs:
             platform: arduino:avr
             label: Arduino Uno
           - board: rp2040:rp2040:rpipico
-            platform: rpipico
+            platform: arduino:mbed_rp2040
             label: Raspberry Pico
 
     runs-on: ubuntu-latest
