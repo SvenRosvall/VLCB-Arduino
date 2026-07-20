@@ -25,10 +25,10 @@ jobs:
       matrix:
         include:
           - board: arduino:avr:uno
-            processor: arduino:avr
+            platform: arduino:avr
             label: Arduino Uno
           - board: rp2040:rp2040:rpipico
-            processor: rp2040:rp2040
+            platform: rpipico
             label: Raspberry Pico
 
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
       - name: Install Arduino core
         run: |
           arduino-cli core update-index
-          arduino-cli core install ${{ matrix.processor }}
+          arduino-cli core install ${{ matrix.platform }}
 
       - name: Install library dependencies
         run: |
