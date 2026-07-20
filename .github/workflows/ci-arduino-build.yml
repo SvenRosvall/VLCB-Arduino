@@ -23,14 +23,16 @@ jobs:
   compile-examples:
     strategy:
       fail-fast: false # The default is to abort if one of the jobs fails, so do not abort
+
       matrix:
         include:
-#          - board: arduino:avr:uno
-#            platform: arduino:avr
-#            label: Arduino Uno
+          - board: arduino:avr:uno
+            platform: arduino:avr
+            label: Arduino Uno
           - board: rp2040:rp2040:rpipico
             platform: rp2040:rp2040
             label: Raspberry Pico
+            install-args: --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
 
     runs-on: ubuntu-latest
 
@@ -44,7 +46,7 @@ jobs:
       - name: Install Arduino core
         run: |
           arduino-cli core update-index
-          arduino-cli core install ${{ matrix.platform }} --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+          arduino-cli core install ${{ matrix.platform }} ${{ matrix.install-args }}
 
       - name: Install library dependencies
         run: |
