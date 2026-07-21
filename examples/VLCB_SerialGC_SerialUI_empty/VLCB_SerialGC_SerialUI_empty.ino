@@ -35,6 +35,11 @@
 //
 // Based on the VLCB_SerialGC_empty example from Sven Rosvall (MERG 3777).
 
+#if defined(ESP32)
+// ESP32 do not provide SoftwareSerial.h, but they have a second serial port so we can use Serial1.
+#define USE_MEGA_SERIAL1
+#endif
+
 // 3rd party libraries
 #include <Streaming.h>
 #ifndef USE_MEGA_SERIAL1
