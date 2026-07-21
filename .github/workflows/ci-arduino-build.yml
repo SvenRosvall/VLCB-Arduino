@@ -41,9 +41,20 @@ jobs:
 
       - name: Compile all examples for Arduino Uno
         run: |
+          results=""
           for dir in ./examples/*; do
             if [ -d "$dir" ] && ls "$dir"/*.ino >/dev/null 2>&1; then
+              exname=$(basename "$dir")
               echo "Compiling $dir"
-              arduino-cli compile --fqbn arduino:avr:uno --library . "$dir"
+              if arduino-cli compile --fqbn arduino:avr:uno --library . "$dir"; then
+                results="$results  PASS  $exname"$'\n'
+              else
+                results="$results  FAIL  $exname"$'\n'
+              fi
             fi
           done
+          echo "=== Summary ==="
+          echo "$results"
+          if echo "$results" | grep -q "^  FAIL"; then
+            exit 1
+          fi
