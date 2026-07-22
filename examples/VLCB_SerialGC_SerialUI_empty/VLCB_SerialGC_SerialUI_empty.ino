@@ -7,7 +7,7 @@
       3rd party libraries needed for compilation: (not for binary-only distributions)
 
       Streaming      -- C++ stream style output, v5, (http://arduiniana.org/libraries/streaming/)
-      SoftwareSerial -- Arduino software serial library (not needed when USE_MEGA_SERIAL1 is set)
+      SoftwareSerial -- Arduino software serial library (not needed when USE_SERIAL1 is set)
 */
 
 // This example demonstrates split serial usage:
@@ -15,7 +15,7 @@
 // - SerialGC uses the default hardware Serial port for GridConnect transport.
 // - SerialUserInterface uses SoftwareSerial for user commands and status output.
 // - On Mega2560, hardware Serial1 can optionally be used for SerialUserInterface.
-//   This is controlled by the USE_MEGA_SERIAL1 macro, which can be defined
+//   This is controlled by the USE_SERIAL1 macro, which can be defined
 //   either in the sketch (Arduino IDE) or as a build flag (e.g. in platformio.ini).
 //
 // To allow concurrent use of SerialGC and SerialUserInterface, the library lets
@@ -37,12 +37,12 @@
 
 #if defined(ESP32)
 // ESP32 do not provide SoftwareSerial.h, but they have a second serial port so we can use Serial1.
-#define USE_MEGA_SERIAL1
+#define USE_SERIAL1
 #endif
 
 // 3rd party libraries
 #include <Streaming.h>
-#ifndef USE_MEGA_SERIAL1
+#ifndef USE_SERIAL1
 #include <SoftwareSerial.h>
 #endif
 
@@ -68,8 +68,9 @@ const byte LED_GRN = 4;             // VLCB green Unitialised LED pin
 const byte LED_YLW = 7;             // VLCB yellow Normal LED pin
 const byte SWITCH0 = 8;             // VLCB push button switch pin
 
-#ifdef USE_MEGA_SERIAL1
-// Use hardware Serial1 on pins 18 (TX1) and 19 (RX1)
+#ifdef USE_SERIAL1
+// For MEGA, use hardware Serial1 on pins 18 (TX1) and 19 (RX1)
+// For ESP32, the hardware Serial1 pins can be set in Serial1.begin().
 #define serialUserPort Serial1
 #else
 // Use SoftwareSerial on pins 2 (RX) and 3 (TX)
@@ -80,7 +81,7 @@ SoftwareSerial serialUserPort(UI_RX_PIN, UI_TX_PIN);
 
 // module objects
 VLCB::SerialGC serialGC(Serial);                                // CAN transport object using hardware serial
-VLCB::SerialUserInterface serialUserInterface(serialUserPort);  // User interface object using either SoftwareSerial or Serial1, depending on USE_MEGA_SERIAL1
+VLCB::SerialUserInterface serialUserInterface(serialUserPort);  // User interface object using either SoftwareSerial or Serial1, depending on USE_SERIAL1
 
 // Service objects
 VLCB::LEDUserInterface ledUserInterface(LED_GRN, LED_YLW, SWITCH0);
@@ -124,7 +125,7 @@ void setup()
   serialUserPort.begin(9600);
   delay(2000);  // Give some time to PIO to open the serial monitor before printing anything
 
-#ifdef USE_MEGA_SERIAL1
+#ifdef USE_SERIAL1
   serialUserPort << F("> ** VLCB split: SerialGC + Serial1 UI example ** ") << __FILE__ << endl;
 #else
   serialUserPort << F("> ** VLCB split: SerialGC + SoftwareSerial UI example ** ") << __FILE__ << endl;
