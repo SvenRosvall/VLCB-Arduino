@@ -21,6 +21,22 @@ on:
 
 jobs:
   compile-examples:
+    strategy:
+      fail-fast: false # The default is to abort if one of the jobs fails, so do not abort
+
+      matrix:
+        include:
+          - label: Arduino Uno
+            board: arduino:avr:uno
+            platform: arduino:avr
+          - label: Raspberry Pico
+            board: rp2040:rp2040:rpipico
+            platform: rp2040:rp2040
+            install-args: --additional-urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+          - label: Espressif ESP32
+            board: esp32:esp32:esp32c6
+            platform: esp32:esp32
+
     runs-on: ubuntu-latest
 
     steps:
@@ -33,20 +49,20 @@ jobs:
       - name: Install Arduino core
         run: |
           arduino-cli core update-index
-          arduino-cli core install arduino:avr
+          arduino-cli core install ${{ matrix.platform }} ${{ matrix.install-args }}
 
       - name: Install library dependencies
         run: |
           arduino-cli lib install Streaming
 
-      - name: Compile all examples for Arduino Uno
+      - name: Compile all examples for ${{ matrix.label }}
         run: |
           results=""
           for dir in ./examples/*; do
             if [ -d "$dir" ] && ls "$dir"/*.ino >/dev/null 2>&1; then
               exname=$(basename "$dir")
               echo "Compiling $dir"
-              if arduino-cli compile --fqbn arduino:avr:uno --library . "$dir"; then
+              if arduino-cli compile --fqbn ${{ matrix.board }} --library . "$dir"; then
                 results="$results  PASS  $exname"$'\n'
               else
                 results="$results  FAIL  $exname"$'\n'
