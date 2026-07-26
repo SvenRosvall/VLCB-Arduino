@@ -98,6 +98,11 @@ byte lowByte(unsigned int i)
   return i & 0xFF;
 }
 
+Stream::operator bool()
+{
+        return true;
+}
+
 void Stream::begin(int baudRate)
 {
 }

@@ -8,6 +8,7 @@ public:
   Stream() = default;
   virtual ~Stream() = default;
 
+  virtual operator bool();
   virtual void begin(int);
   virtual bool available();
   virtual char read();
