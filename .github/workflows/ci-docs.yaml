@@ -3,16 +3,18 @@ name: Docs
 on:
   pull_request:
     paths:
-      - README.md
+      - '*.md'
       - docs/**
       - src/**
+      - ext-src/**
       - Doxygen.*.conf
       - .github/workflows/ci-docs.yaml
   push:
     paths:
-      - README.md
+      - '*.md'
       - docs/**
       - src/**
+      - ext-src/**
       - Doxygen.*.conf
       - .github/workflows/ci-docs.yaml
   workflow_dispatch:
