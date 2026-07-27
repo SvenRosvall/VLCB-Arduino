@@ -28,7 +28,7 @@ and services.
   will include queues.
 * The core library only provides a concrete CanTransport for CAN over serial communication
   by the SerialGC class. 
-  Other implementations for hardware CAN tranceivers are located in their own
+  Other implementations for hardware CAN controllers are located in their own
   libraries. This way this library does not need to dependend on other hardware
   libraries used by the transport libraries.
 

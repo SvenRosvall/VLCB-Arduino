@@ -1,11 +1,21 @@
 # Example Sketches
 A few example sketches are included in the `examples` directory.
 These illustrate how this library can be used.
+To test or re-use these example sketches pin assignments and any other
+hardware specific configuration must be adjusted for the board being used.
 
-As this library does not contain any support for hardware CAN tranceivers,
+The example sketches are intended to work with any platform supported by
+Arduino IDE, but there are no guarantees that this will work as we cannot
+test all sketches on all platforms.
+We do regular test compiles of these example sketches for Arduino Uno, 
+Raspberry Pi Pico and ESP32. See [GitHub Workflows](GitHubWorkflowsTutorial.md#2-arduino-firmware-build-workflow).
+
+As this library does not contain any support for hardware CAN controllers,
 all of these examples use the simpler serial CAN transport. 
+Example sketches for specific CAN controllers are provided with the libraries
+that support those controllers.
 
-This setup is useful for testing as it does not require any CAN bus equipment
+This serial CAN setup is useful for testing as it does not require any CAN bus equipment
 such as CANUSB or CANETHER.
 Instead, simply use a USB cable connected between a computer and the Arduino
 (same cable as is used for programming the Arduino).
@@ -16,8 +26,8 @@ You can then start FCU (or any other configuration utility) and connect through
 this serial port.
 The FCU will then communicate with your Arduino module as a CBUS module.
 
-Libraries that implement support for hardware CAN tranceivers contain
-similar example sketches as these but using those CAN tranceivers instead.
+Libraries that implement support for hardware CAN controllers contain
+similar example sketches as these but using those CAN controllers instead.
 
 ## Common structure
 All the example sketches have a structure that defines all the necessary
