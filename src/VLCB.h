@@ -107,6 +107,8 @@ void setMaxEvents(byte n);
 
 /// Set the number of event variables that are used by each stored event. 
 void setNumEventVariables(byte n);
+
+void resetModule();
 ///@}
 
 ///@name Module Configuration Access
@@ -126,6 +128,19 @@ bool doesEventExistAtIndex(byte eventIndex);
 byte findEmptyEventSpace();
 void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en);
 void writeEventVariable(byte eventIndex, byte evIndex, byte value);
+///@}
+
+///@name Send messages
+/// Helper functions to send messages with an OP-code and a number of data bytes.
+///@{
+bool sendMessage(VlcbOpCodes opc);
+bool sendMessage(VlcbOpCodes opc, byte b1);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6);
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
 
 bool sendMessageWithNN(VlcbOpCodes opc);
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
@@ -135,8 +150,6 @@ bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
 
 void addTimedResponseTask(TimedResponse::Task * task);
-
-void resetModule();
 
 ///@}
 

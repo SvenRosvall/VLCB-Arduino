@@ -178,6 +178,21 @@ bool Controller::sendMessage(const VlcbMessage *msg)
   return true;
 }
 
+bool Controller::sendMessageWithData(VlcbOpCodes opc, int len, ...)
+{
+  va_list args;
+  va_start(args, len);
+  VlcbMessage msg;
+  msg.len = len + 1;
+  msg.data[0] = opc;
+  for (int i = 0 ; i < len ; ++i)
+  {
+    msg.data[1 + i] = va_arg(args, int);
+  }
+  va_end(args);
+  return sendMessage(&msg);  
+}
+
 bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
 {
   va_list args;

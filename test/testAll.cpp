@@ -23,6 +23,7 @@ void testConsumeOwnEventsService();
 void testLongMessageService();
 void testGridConnect();
 void testTimedResponse();
+void testController();
 
 // Remaining services to implement
 //Bootloader (the CBUS PIC version) service #10
@@ -34,6 +35,7 @@ std::map<std::string, void (*)()> suites = {
         {"LED", testLED},
         {"Switch", testSwitch},
         {"Configuration", testConfiguration},
+        {"Controller", testController},
         {"MinimumNodeService", testMinimumNodeService},
         {"NodeVariableService", testNodeVariableService},
         {"CanService", testCanService},

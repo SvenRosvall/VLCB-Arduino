@@ -138,6 +138,39 @@ void writeEventVariable(byte eventIndex, byte evIndex, byte value)
   modconfig.writeEventEV(eventIndex, evIndex, value);
 }
 
+bool sendMessage(VlcbOpCodes opc)
+{
+  return controller.sendMessage(opc);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1)
+{
+  return controller.sendMessage(opc, b1);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2)
+{
+  return controller.sendMessage(opc, b1, b2);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3)
+{
+  return controller.sendMessage(opc, b1, b2, b3);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
+{
+  return controller.sendMessage(opc, b1, b2, b3, b4);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  return controller.sendMessage(opc, b1, b2, b3, b4, b5);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6)
+{
+  return controller.sendMessage(opc, b1, b2, b3, b4, b5, b6);
+}
+bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+{
+  return controller.sendMessage(opc, b1, b2, b3, b4, b5, b6, b7);
+}
+
 bool sendMessageWithNN(VlcbOpCodes opc)
 {
   return controller.sendMessageWithNN(opc);

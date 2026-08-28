@@ -87,6 +87,16 @@ public:
   bool sendMessage(const VlcbMessage *msg);
 
   void begin();
+
+  inline bool sendMessage(VlcbOpCodes opc);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6);
+  inline bool sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7);
+  
   inline bool sendMessageWithNN(VlcbOpCodes opc);
   inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
   inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2);
@@ -122,12 +132,54 @@ private:
   CircularBuffer<Action, ACTION_QUEUE_SIZE> actionQueue;
   TimedResponse timedResponses;
 
+  bool sendMessageWithData(VlcbOpCodes opc) { return sendMessageWithData(opc, 0, 0); }
+  bool sendMessageWithData(VlcbOpCodes opc, int len, ...);
   bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }
   bool sendMessageWithNNandData(VlcbOpCodes opc, int len, ...);
 
   // Really an MNS diagnostic but placed here as its data is collected across all services.
   unsigned int diagMsgsActed = 0;
 };
+
+bool Controller::sendMessage(VlcbOpCodes opc)
+{
+  return sendMessageWithData(opc);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1)
+{
+  return sendMessageWithData(opc, 1, b1);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2)
+{
+  return sendMessageWithData(opc, 2, b1, b2);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3)
+{
+  return sendMessageWithData(opc, 3, b1, b2, b3);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
+{
+  return sendMessageWithData(opc, 4, b1, b2, b3, b4);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  return sendMessageWithData(opc, 5, b1, b2, b3, b4, b5);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6)
+{
+  return sendMessageWithData(opc, 6, b1, b2, b3, b4, b5, b6);
+}
+
+bool Controller::sendMessage(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
+{
+  return sendMessageWithData(opc, 7, b1, b2, b3, b4, b5, b6, b7);
+}
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc)
 {
