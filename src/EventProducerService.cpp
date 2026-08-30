@@ -33,22 +33,19 @@ void EventProducerService::processAction(const Action & action)
 
 void EventProducerService::sendShortEvent(bool state, int eventNumber)
 {
-  controller->sendMessageWithNN(state ? OPC_ASON : OPC_ASOF, highByte(eventNumber), lowByte(eventNumber));
+  controller->sendMessage(VlcbMessage(state ? OPC_ASON : OPC_ASOF).addNN(controller->getModuleConfig()->nodeNum).addEN(eventNumber));
   ++diagEventsProduced;
 }
 
 void EventProducerService::sendLongEvent(bool state, int eventNumber)
 {
-  controller->sendMessageWithNN(state ? OPC_ACON : OPC_ACOF, highByte(eventNumber), lowByte(eventNumber));
+  controller->sendMessage(VlcbMessage(state ? OPC_ACON : OPC_ACOF).addNN(controller->getModuleConfig()->nodeNum).addEN(eventNumber));
   ++diagEventsProduced;
 }
 
 void EventProducerService::sendLongEventWithSpoofedNodeNumber(bool state, int nodeNumber, int eventNumber)
 {
-  VlcbMessage msg(state ? OPC_ACON : OPC_ACOF);
-  msg.addNN(nodeNumber);
-  msg.addEN(eventNumber);
-  controller->sendMessage(msg);
+  controller->sendMessage(VlcbMessage(state ? OPC_ACON : OPC_ACOF).addNN(nodeNumber).addEN(eventNumber));
   ++diagEventsProduced;
 }
 

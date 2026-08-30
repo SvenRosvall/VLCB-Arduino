@@ -42,7 +42,7 @@ void EventConsumerService::processAccessoryEvent(const VlcbMessage *msg, unsigne
     (void)(*eventhandler)(index, msg);
     if (modconfig->eventAck)
     {
-      controller->sendMessageWithNN(OPC_ENACK, msg->data[0], highByte(nn), lowByte(nn), highByte(en), lowByte(en));
+      controller->sendMessage(VlcbMessage(OPC_ENACK).addNN(modconfig->nodeNum).addData(msg->data[0]).addNN(nn).addEN(en));
       ++diagEventsAcknowledged;
     }
   }
