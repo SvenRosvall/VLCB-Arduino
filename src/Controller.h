@@ -30,6 +30,37 @@ struct VlcbMessage
 {
   uint8_t len; // Value 0-7 or FF for messages handled in CanTransport
   uint8_t data[8];
+  
+  VlcbMessage() = default;
+  VlcbMessage(uint8_t len, uint8_t data[])
+    : len(len)
+  {
+    memcpy(this->data, data, len);
+  }
+
+  VlcbMessage(VlcbOpCodes opc)
+    : len(1)
+  {
+    data[0] = opc;
+  }
+  
+  VlcbMessage & addData(byte b)
+  {
+    data[len++] = b;
+    return *this;
+  }
+
+  VlcbMessage & addNN(int nn)
+  {
+    data[len++] = highByte(nn);
+    data[len++] = lowByte(nn);
+    return *this;
+  }
+
+  VlcbMessage & addEN(int en)
+  {
+    return addNN(en);
+  }
 };
 
 /// Type of Action.
@@ -56,6 +87,25 @@ struct Action
     bool fromENUM; ///< with ACT_START_CAN_ENUMERATION
     VlcbModeParams mode; ///< with ACT_INDICATE_MODE
   };
+
+  Action() = default;
+
+  Action(ACTION type)
+    : actionType(type)
+    , fromENUM(false) // Must include one item from the union.
+  {}
+
+  Action(ACTION type, bool fromENUM)
+    : actionType(type), fromENUM(fromENUM)
+  {}
+
+  Action(ACTION type, const VlcbMessage & msg)
+    : actionType(type), vlcbMessage(msg)
+  {}
+
+  Action(ACTION type, VlcbModeParams mode)
+    : actionType(type), mode(mode)
+  {}
 };
 
 class Service;

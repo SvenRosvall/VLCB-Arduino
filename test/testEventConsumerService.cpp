@@ -40,7 +40,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -68,7 +68,7 @@ void testServiceDiscoveryEventProdSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -116,7 +116,7 @@ void testEventHandlerOff()
   configuration->writeEvent(1, 260, 1);
   configuration->updateEvHashEntry(1);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ACOF, 0x01, 0x04, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ACOF).addNN(260).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -147,7 +147,7 @@ void testEventHandlerShortOn()
   configuration->updateEvHashEntry(1);
   configuration->writeEventEV(1, 1, 42);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ASON, 0x01, 0x04, 0, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ASON).addNN(260).addEN(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -182,7 +182,7 @@ void testEventHandlerMultipleEvents()
   configuration->updateEvHashEntry(2);
   configuration->writeEventEV(2, 1, 18);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ASON, 0x01, 0x04, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ASON).addNN(260).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);

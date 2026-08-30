@@ -120,8 +120,7 @@ void Controller::updateParamFlags()
 void Controller::indicateMode(VlcbModeParams mode)
 {
   //DEBUG_SERIAL << F("ctrl> indicating mode = ") << mode << endl;
-  Action action = {ACT_INDICATE_MODE};
-  action.mode = mode;
+  Action action = {ACT_INDICATE_MODE, mode};
   putAction(action);
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);

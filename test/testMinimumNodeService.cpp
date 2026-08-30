@@ -168,7 +168,7 @@ void testSetupFromUninitializedReceiveRequestNodeNumberElsewhere()
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNN, 0x02, 0x07}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNN).addNN(519);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -188,7 +188,7 @@ void testSetupFromNormalReceiveRequestNodeNumberElsewhere()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNN, 0x02, 0x07}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNN).addNN(519);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -248,7 +248,7 @@ void testSetNodeNumber()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_SNN).addNN(519);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -265,7 +265,7 @@ void testSetNodeNumberNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_SNN).addNN(519);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -280,7 +280,7 @@ void testSetNodeNumberShort()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {2, {OPC_SNN, 0x02}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_SNN).addData(0x02);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -299,7 +299,7 @@ void testQueryNodeNumber()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_QNN);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -319,7 +319,7 @@ void testReadNodeParametersNormalMode()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {1, {OPC_RQNP}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNP);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -334,7 +334,7 @@ void testReadNodeParametersSetupMode()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {1, {OPC_RQNP}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNP);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -353,7 +353,7 @@ void testReadNodeParameterCount()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   processWithTasks(controller);
@@ -382,7 +382,7 @@ void testReadNodeParameterModuleId()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 3}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(3);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -401,7 +401,7 @@ void testReadNodeParameterInvalidIndex()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 33}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(33);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -423,7 +423,7 @@ void testReadNodeParameterShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQNPN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQNPN).addNN(260);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -443,7 +443,7 @@ void testModuleNameSetup()
   VLCB::Controller controller = createController();
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQMN);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -466,7 +466,7 @@ void testModuleNameLearn()
   VLCB::Controller controller = createController();
   controller.setParamFlag(PF_LRN, true); // Should really use the event teaching service here.
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQMN);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -481,7 +481,7 @@ void testModuleNameNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQMN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQMN);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -514,7 +514,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   processWithTasks(controller);
@@ -554,7 +554,7 @@ void testServiceDiscoveryLongMessageSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 5}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(5);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -573,7 +573,7 @@ void testServiceDiscoveryIndexOutOfBand()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 7}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(7);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -592,7 +592,7 @@ void testServiceDiscoveryIndexForUI()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -611,7 +611,7 @@ void testServiceDiscoveryShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_RQSD, 0x01, 0x04}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -630,7 +630,7 @@ void testRequestDiagnosticsIndexOutOfBand()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 7, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(7).addData(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -649,7 +649,7 @@ void testRequestDiagnosticsIndexForUI()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 2, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(2).addData(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -668,7 +668,7 @@ void testRequestDiagnosticsShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_RDGN, 0x01, 0x04, 1}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(1);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -689,7 +689,7 @@ void testRequestAllDiagnosticsIndexForMockService()
 
   // Request all diagnostics for MockCanService as it does not implement any diagnostics.
   const byte mockServiceIndex = 6;
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, mockServiceIndex, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(mockServiceIndex).addData(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -711,7 +711,7 @@ void testRequestInvalidDiagnosticsIndexForMockService()
 
   // Request all diagnostics for MockCanService as it does not implement any diagnostics.
   const byte mockServiceIndex = 6;
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, mockServiceIndex, 7}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(mockServiceIndex).addData(7);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -732,7 +732,7 @@ void testRequestAllDiagnosticsAllServices()
   VLCB::Controller controller = createController();
 
   // Request all diagnostics for MockCanService as it does not implement any diagnostics.
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, 0, 0}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addEN(0);
   mockTransportService->setNextMessage(msg_rqsd);
 
   processWithTasks(controller);
@@ -827,11 +827,11 @@ void testRequestMnsDiagnosticsUptime()
   VLCB::Controller controller = createController();
 
   // Request upper word of uptime
-  VLCB::VlcbMessage msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 2}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(SERVICE_ID_MNS).addData(2);
   mockTransportService->setNextMessage(msg_rqsd);
 
   // Request lower word of uptime
-  msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 3}};
+  msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(SERVICE_ID_MNS).addData(3);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -862,13 +862,13 @@ void testRequestMnsDiagnosticsNodeNumberChanges()
 
   // Change node number
   minimumNodeService->setSetupMode();
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_SNN, 0x02, 0x07}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_SNN).addNN(519);
   mockTransportService->setNextMessage(msg_rqsd);
   process(controller);
   mockTransportService->sent_messages.clear();
 
   // Request node number changes
-  msg_rqsd = {5, {OPC_RDGN, 0x02, 0x07, SERVICE_ID_MNS, 5}};
+  msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(519).addData(SERVICE_ID_MNS).addData(5);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -888,11 +888,11 @@ void testRequestMnsDiagnosticsMessagesActedOn()
   VLCB::Controller controller = createController();
 
   // Send some messages that MNS will act on.
-  VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_QNN);
   mockTransportService->setNextMessage(msg_rqsd);
-  msg_rqsd = {4, {OPC_RQNPN, 0x01, 0x04, 3}};
+  msg_rqsd = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(3);
   mockTransportService->setNextMessage(msg_rqsd);
-  msg_rqsd = {4, {OPC_RQSD, 0x01, 0x04, 5}};
+  msg_rqsd = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(5);
   mockTransportService->setNextMessage(msg_rqsd);
 
   // Process them
@@ -902,7 +902,7 @@ void testRequestMnsDiagnosticsMessagesActedOn()
 
 
   // Get the message acted on count
-  msg_rqsd = {5, {OPC_RDGN, 0x01, 0x04, SERVICE_ID_MNS, 6}};
+  msg_rqsd = VLCB::VlcbMessage(OPC_RDGN).addNN(260).addData(SERVICE_ID_MNS).addData(6);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -922,7 +922,7 @@ void testModeSetupFromUninitializedToNormal()
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_NORMAL);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -945,7 +945,7 @@ void testModeSetupFromNormalToNormal()
   VLCB::Controller controller = createController(MODE_NORMAL);
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_NORMAL);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -968,7 +968,7 @@ void testModeSetupToUnininitialized()
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_UNINITIALISED);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -990,7 +990,7 @@ void testModeNormalToSetup()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_SETUP}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_SETUP);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1017,7 +1017,7 @@ void testModeUninitializedToSetup()
 
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_SETUP);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1031,7 +1031,7 @@ void testModeUninitializedToNormal()
 
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_NORMAL}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_NORMAL);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1045,7 +1045,7 @@ void testModeUninitializedToUninitialized()
 
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_UNINITIALISED}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_UNINITIALISED);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1060,7 +1060,7 @@ void testModeSetupToSetup()
   VLCB::Controller controller = createController(MODE_UNINITIALISED);
   minimumNodeService->setSetupMode();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0, 0, MODE_SETUP}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(0).addData(MODE_SETUP);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1078,7 +1078,7 @@ void testModeNormalToNormal()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {4, {OPC_MODE, 0x01, 0x04, MODE_NORMAL}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_NORMAL);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
@@ -1096,7 +1096,7 @@ void testModeShortMessage()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {3, {OPC_MODE, 0x01, 0x04}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_MODE).addNN(260);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
