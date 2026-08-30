@@ -27,6 +27,28 @@ namespace VLCB
 //  module_config = &config;
 //}
 
+VlcbMessage & VlcbMessage::addData(byte b)
+{
+  data[len++] = b;
+  return *this;
+}
+
+VlcbMessage & VlcbMessage::add2Bytes(unsigned int n)
+{
+  data[len++] = highByte(n);
+  data[len++] = lowByte(n);
+  return *this;
+}
+
+VlcbMessage & VlcbMessage::addNNEN(byte nn_en[EE_HASH_BYTES])
+{
+  for (int i = 0; i < EE_HASH_BYTES; ++i)
+  {
+    addData(nn_en[i]);
+  }
+  return *this;
+}
+
 Controller::Controller(Configuration *conf)
   : module_config(conf)
 {

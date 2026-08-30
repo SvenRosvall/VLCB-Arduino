@@ -44,36 +44,11 @@ struct VlcbMessage
     data[0] = opc;
   }
   
-  VlcbMessage & addData(byte b)
-  {
-    data[len++] = b;
-    return *this;
-  }
-  
-  VlcbMessage & add2Bytes(unsigned int n)
-  {
-    data[len++] = highByte(n);
-    data[len++] = lowByte(n);
-    return *this;
-  }
-  VlcbMessage & addNN(unsigned int nn)
-  {
-    return add2Bytes(nn);
-  }
-
-  VlcbMessage & addEN(unsigned int en)
-  {
-    return add2Bytes(en);
-  }
-
-  VlcbMessage & addNNEN(byte nn_en[EE_HASH_BYTES])
-  {
-    for (int i = 0 ; i < EE_HASH_BYTES ; i++)
-    {
-      addData(nn_en[i]);
-    }
-    return *this;
-  }
+  VlcbMessage & addData(byte b);
+  VlcbMessage & add2Bytes(unsigned int n);
+  VlcbMessage & addNN(unsigned int nn) { return add2Bytes(nn); }
+  VlcbMessage & addEN(unsigned int en) { return add2Bytes(en); }
+  VlcbMessage & addNNEN(byte nn_en[EE_HASH_BYTES]);
 };
 
 /// Type of Action.
