@@ -12,7 +12,7 @@
 namespace VLCB
 {
 
-static void copyName(uint8_t *dest, const char *name)
+static void copyName(VlcbMessage &dest, const char *name)
 {
   int i = 0;
   for (; i < 7 ; ++i)
@@ -22,11 +22,11 @@ static void copyName(uint8_t *dest, const char *name)
       // If the string is shorter than 7 chars, then don't copy the null and continue below to pad with spaces. 
       break;
     }
-    dest[i] = name[i];
+    dest.addData(name[i]);
   }
   for (; i < 7 ; ++i)
   {
-    dest[i] = ' ';
+    dest.addData(' ');
   }
 }
 
@@ -236,11 +236,9 @@ void MinimumNodeService::handleMessage(const VlcbMessage *msg)
       if (instantMode == MODE_SETUP || (controller->getParam(PAR_FLAGS) & PF_LRN))
       {
         // respond with NAME
-        VlcbMessage response;
-        response.len = 8;
-        response.data[0] = OPC_NAME;
-        copyName(response.data + 1, module_config->getModuleName());
-        controller->sendMessage(&response);
+        VlcbMessage response(OPC_NAME);
+        copyName(response, module_config->getModuleName());
+        controller->sendMessage(response);
         controller->messageActedOn();
       }
       break;
@@ -289,16 +287,14 @@ void MinimumNodeService::handleRequestNodeParameters()
   // DEBUG_SERIAL << F("> responding to RQNP with PARAMS") << endl;
 
   // respond with PARAMS message
-  VlcbMessage response;
-  response.len = 8;
-  response.data[0] = OPC_PARAMS;    // opcode
-  response.data[1] = controller->getParam(PAR_MANU);     // manf code -- MERG
-  response.data[2] = controller->getParam(PAR_MINVER);     // minor code ver
-  response.data[3] = controller->getParam(PAR_MTYP);     // module ident
-  response.data[4] = controller->getParam(PAR_EVTNUM);     // number of events
-  response.data[5] = controller->getParam(PAR_EVNUM);     // events vars per event
-  response.data[6] = controller->getParam(PAR_NVNUM);     // number of NVs
-  response.data[7] = controller->getParam(PAR_MAJVER);     // major code ver
+  VlcbMessage response(OPC_PARAMS);    // opcode
+  response.addData(controller->getParam(PAR_MANU));     // manf code -- MERG
+  response.addData(controller->getParam(PAR_MINVER));     // minor code ver
+  response.addData(controller->getParam(PAR_MTYP));     // module ident
+  response.addData(controller->getParam(PAR_EVTNUM));     // number of events
+  response.addData(controller->getParam(PAR_EVNUM));     // events vars per event
+  response.addData(controller->getParam(PAR_NVNUM));     // number of NVs
+  response.addData(controller->getParam(PAR_MAJVER));     // major code ver
 
   controller->sendMessage(&response);
   controller->messageActedOn();

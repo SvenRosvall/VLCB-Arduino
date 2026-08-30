@@ -38,7 +38,7 @@ struct VlcbMessage
     memcpy(this->data, data, len);
   }
 
-  VlcbMessage(VlcbOpCodes opc)
+  explicit VlcbMessage(VlcbOpCodes opc)
     : len(1)
   {
     data[0] = opc;
@@ -49,17 +49,30 @@ struct VlcbMessage
     data[len++] = b;
     return *this;
   }
-
-  VlcbMessage & addNN(int nn)
+  
+  VlcbMessage & add2Bytes(unsigned int n)
   {
-    data[len++] = highByte(nn);
-    data[len++] = lowByte(nn);
+    data[len++] = highByte(n);
+    data[len++] = lowByte(n);
     return *this;
   }
-
-  VlcbMessage & addEN(int en)
+  VlcbMessage & addNN(unsigned int nn)
   {
-    return addNN(en);
+    return add2Bytes(nn);
+  }
+
+  VlcbMessage & addEN(unsigned int en)
+  {
+    return add2Bytes(en);
+  }
+
+  VlcbMessage & addNNEN(byte nn_en[EE_HASH_BYTES])
+  {
+    for (int i = 0 ; i < EE_HASH_BYTES ; i++)
+    {
+      addData(nn_en[i]);
+    }
+    return *this;
   }
 };
 
@@ -134,7 +147,8 @@ public:
   Parameters & getParams() { return module_config->getParams(); }
   unsigned char getParam(VlcbParams param) const { return module_config->getParam(param); }
 
-  bool sendMessage(const VlcbMessage *msg);
+  bool sendMessage(const VlcbMessage &msg); /// Send a message
+  bool sendMessage(const VlcbMessage *msg); /// @deprecated Use the message directly instead of using a pointer.
 
   void begin();
   inline bool sendMessageWithNN(VlcbOpCodes opc);
