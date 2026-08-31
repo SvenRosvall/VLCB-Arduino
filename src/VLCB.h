@@ -126,17 +126,37 @@ bool doesEventExistAtIndex(byte eventIndex);
 byte findEmptyEventSpace();
 void createEventAtIndex(byte eventIndex, unsigned int nn, unsigned int en);
 void writeEventVariable(byte eventIndex, byte evIndex, byte value);
+///@}
 
+///@name Sending messages
+///@{
+
+/// Send a VLCB message to the bus.
+bool sendMessage(const VlcbMessage & msg);
+
+/// Send a VLCB message with OP-code and the node number for this node.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc);
+/// Send a VLCB message with OP-code, the node number for this node and one data byte.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
+/// Send a VLCB message with OP-code, the node number for this node and two data bytes.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2);
+/// Send a VLCB message with OP-code, the node number for this node and three data bytes.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3);
+/// Send a VLCB message with OP-code, the node number for this node and four data bytes.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
+/// Send a VLCB message with OP-code, the node number for this node and five data bytes.
+/// @deprecated Use sendMessage()
 bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
 
+/// @brief Add a task that produces a number for response messages in a timed fashion.
+/// 
+/// This is used to send response messages slowly to avoid congenstion on the LCB bus.
 void addTimedResponseTask(TimedResponse::Task * task);
-
-void resetModule();
 
 ///@}
 
@@ -147,6 +167,8 @@ void resetModule();
 /// It lets the VLCB library core execute its tasks such as check for new
 /// incoming messages and run queued tasks.
 void process();
+
+void resetModule();
 
 ///@}
 }

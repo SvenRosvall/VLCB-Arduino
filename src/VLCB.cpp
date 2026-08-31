@@ -138,6 +138,11 @@ void writeEventVariable(byte eventIndex, byte evIndex, byte value)
   modconfig.writeEventEV(eventIndex, evIndex, value);
 }
 
+bool sendMessage(const VlcbMessage &msg)
+{
+  return controller.sendMessage(msg);
+}
+
 bool sendMessageWithNN(VlcbOpCodes opc)
 {
   return controller.sendMessageWithNN(opc);
