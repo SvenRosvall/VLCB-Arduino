@@ -131,6 +131,7 @@ public:
 private:
   void (*requesteventhandler)(byte index, const VlcbMessage *msg);
   void handleProdSvcMessage(const VlcbMessage *msg);
+  void sendEventAtIndexVarData(bool isResponse, bool state, byte evIndex, int dataLen, byte data1, byte data2, byte data3);
 
 /// @cond LIBRARY
 protected:

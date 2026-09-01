@@ -204,17 +204,30 @@ bool Controller::sendMessage(const VlcbMessage *msg)
   return sendMessage(*msg);
 }
 
-bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
+bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int dataLen, byte data1, byte data2, byte data3, byte data4, byte data5)
 {
-  va_list args;
-  va_start(args, len);
   VlcbMessage msg(opc);
   msg.addNN(module_config->nodeNum);
-  for (int i = 0 ; i < len ; ++i)
+  if (dataLen >= 1)
   {
-    msg.addData(va_arg(args, int));
+    msg.addData(data1);
   }
-  va_end(args);
+  if (dataLen >= 2)
+  {
+    msg.addData(data2);
+  }
+  if (dataLen >= 3)
+  {
+    msg.addData(data3);
+  }
+  if (dataLen >= 4)
+  {
+    msg.addData(data4);
+  }
+  if (dataLen >= 5)
+  {
+    msg.addData(data5);
+  }
   return sendMessage(msg);  
 }
 
