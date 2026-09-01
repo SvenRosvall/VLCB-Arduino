@@ -177,8 +177,8 @@ private:
   CircularBuffer<Action, ACTION_QUEUE_SIZE> actionQueue;
   TimedResponse timedResponses;
 
-  bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0, 0); }
-  bool sendMessageWithNNandData(VlcbOpCodes opc, int len, ...);
+  bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0); }
+  bool sendMessageWithNNandData(VlcbOpCodes opc, int len, byte data1=0, byte data2=0, byte data3=0, byte data4=0, byte data5=0);
 
   // Really an MNS diagnostic but placed here as its data is collected across all services.
   unsigned int diagMsgsActed = 0;
