@@ -146,16 +146,15 @@ void EventSlotTeachingService::handleReadEventIndex(unsigned int nn, byte eventI
   // it's a valid stored event
   // read the event data from EEPROM
   // construct and send a ENRSP message
-  VlcbMessage response;
-  response.len = 8;
-  response.data[0] = OPC_ENRSP;     // response opcode
-  response.data[1] = highByte(nn);  // my NN hi
-  response.data[2] = lowByte(nn);   // my NN lo
-  module_config->readEvent(eventIndex, &response.data[3]);
-  response.data[7] = eventIndex;  // event table index
+  byte nn_en[EE_HASH_BYTES];
+  module_config->readEvent(eventIndex, nn_en);
+  VlcbMessage response(OPC_ENRSP);
+  response.addNN(module_config->nodeNum);
+  response.addNNEN(nn_en);
+  response.addData(eventIndex);  // event table index
 
   // DEBUG_SERIAL << F("ets> sending ENRSP reply for event index = ") << eventIndex << endl;
-  controller->sendMessage(&response);
+  controller->sendMessage(response);
 }
 
 } // VLCB

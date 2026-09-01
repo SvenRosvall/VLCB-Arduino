@@ -132,7 +132,6 @@ private:
   void (*requesteventhandler)(byte index, const VlcbMessage *msg);
   void handleProdSvcMessage(const VlcbMessage *msg);
 
-  void sendMessage(VlcbMessage &msg, byte opCode, const byte *nn_en);
 /// @cond LIBRARY
 protected:
   unsigned int diagEventsProduced = 0;

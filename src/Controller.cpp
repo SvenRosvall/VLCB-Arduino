@@ -27,6 +27,28 @@ namespace VLCB
 //  module_config = &config;
 //}
 
+VlcbMessage & VlcbMessage::addData(byte b)
+{
+  data[len++] = b;
+  return *this;
+}
+
+VlcbMessage & VlcbMessage::add2Bytes(unsigned int n)
+{
+  data[len++] = highByte(n);
+  data[len++] = lowByte(n);
+  return *this;
+}
+
+VlcbMessage & VlcbMessage::addNNEN(byte nn_en[EE_HASH_BYTES])
+{
+  for (int i = 0; i < EE_HASH_BYTES; ++i)
+  {
+    addData(nn_en[i]);
+  }
+  return *this;
+}
+
 Controller::Controller(Configuration *conf)
   : module_config(conf)
 {
@@ -120,8 +142,7 @@ void Controller::updateParamFlags()
 void Controller::indicateMode(VlcbModeParams mode)
 {
   //DEBUG_SERIAL << F("ctrl> indicating mode = ") << mode << endl;
-  Action action = {ACT_INDICATE_MODE};
-  action.mode = mode;
+  Action action = {ACT_INDICATE_MODE, mode};
   putAction(action);
   
   setParamFlag(PF_NORMAL, mode == MODE_NORMAL);
@@ -171,27 +192,30 @@ void Controller::process()
   module_config->commitToEEPROM();
 }
 
-bool Controller::sendMessage(const VlcbMessage *msg)
+bool Controller::sendMessage(const VlcbMessage &msg)
 {
-  Action action = {ACT_MESSAGE_OUT, *msg};
+  Action action = {ACT_MESSAGE_OUT, msg};
   actionQueue.put(action);
   return true;
+}
+
+bool Controller::sendMessage(const VlcbMessage *msg)
+{
+  return sendMessage(*msg);
 }
 
 bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
 {
   va_list args;
   va_start(args, len);
-  VlcbMessage msg;
-  msg.len = len + 3;
-  msg.data[0] = opc;
-  Configuration::setTwoBytes(&msg.data[1], module_config->nodeNum);
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
   for (int i = 0 ; i < len ; ++i)
   {
-    msg.data[3 + i] = va_arg(args, int);
+    msg.addData(va_arg(args, int));
   }
   va_end(args);
-  return sendMessage(&msg);  
+  return sendMessage(msg);  
 }
 
 //
@@ -200,7 +224,7 @@ bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
 bool Controller::sendWRACK()
 {
   // send a write acknowledgement response
-  return sendMessageWithNN(OPC_WRACK);
+  return sendMessage(VlcbMessage(OPC_WRACK).addNN(module_config->nodeNum));
 }
 
 //
@@ -209,17 +233,17 @@ bool Controller::sendWRACK()
 bool Controller::sendCMDERR(byte cerrno)
 {
   // send a command error response
-  return sendMessageWithNN(OPC_CMDERR, cerrno);
+  return sendMessage(VlcbMessage(OPC_CMDERR).addNN(module_config->nodeNum).addData(cerrno));
 }
 
 void Controller::sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode)
 {
-  sendMessageWithNN(OPC_GRSP, opCode, serviceType, errCode);
+  sendMessage(VlcbMessage(OPC_GRSP).addNN(module_config->nodeNum).addData(opCode).addData(serviceType).addData(errCode));
 }
 
 void Controller::sendDGN(byte serviceIndex, byte diagCode, unsigned int counter)
 {
-  sendMessageWithNN(OPC_DGN, serviceIndex, diagCode, highByte(counter), lowByte(counter));
+  sendMessage(VlcbMessage(OPC_DGN).addNN(module_config->nodeNum).addData(serviceIndex).addData(diagCode).add2Bytes(counter));
 }
 
 void Controller::putAction(const Action &action)

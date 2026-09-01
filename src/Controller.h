@@ -23,13 +23,48 @@ namespace VLCB
 // Set size to 8 to be on the safe side.
 const int ACTION_QUEUE_SIZE = 8;
 
-//
-/// CAN/Controller message type
-//
+/// @brief VLCB message type
+/// 
+/// Describes messages send and received from other nodes on the LCB.
+/// 
+/// Construct the VlcbMessage object directly from a set of data bytes
+/// or use functions to add one data item to the message at a time.
+/// 
+/// Example:
+/// @code 
+/// VlcbMessage msg = VlcbMessage(OPC_ACON).addNN(eventNodeNumber).addEN(eventNumber);
+/// @endcode 
 struct VlcbMessage
 {
   uint8_t len; // Value 0-7 or FF for messages handled in CanTransport
   uint8_t data[8];
+  
+  VlcbMessage() = default;
+  
+  /// Construct a message from existing data
+  VlcbMessage(uint8_t len, uint8_t data[])
+    : len(len)
+  {
+    memcpy(this->data, data, len);
+  }
+
+  /// Construct a message and populate the message OP-code
+  explicit VlcbMessage(VlcbOpCodes opc)
+    : len(1)
+  {
+    data[0] = opc;
+  }
+  
+  /// Add a data byte to the message
+  VlcbMessage & addData(byte b);
+  /// Add a number as two bytes of data to the message
+  VlcbMessage & add2Bytes(unsigned int n);
+  /// Add a node number (two bytes) to the message
+  VlcbMessage & addNN(unsigned int nn) { return add2Bytes(nn); }
+  /// Add an event number (two bytes) to the message
+  VlcbMessage & addEN(unsigned int en) { return add2Bytes(en); }
+  /// Add an event identifier (NN/EN) to the message
+  VlcbMessage & addNNEN(byte nn_en[EE_HASH_BYTES]);
 };
 
 /// Type of Action.
@@ -56,6 +91,25 @@ struct Action
     bool fromENUM; ///< with ACT_START_CAN_ENUMERATION
     VlcbModeParams mode; ///< with ACT_INDICATE_MODE
   };
+
+  Action() = default;
+
+  Action(ACTION type)
+    : actionType(type)
+    , fromENUM(false) // Must include one item from the union.
+  {}
+
+  Action(ACTION type, bool fromENUM)
+    : actionType(type), fromENUM(fromENUM)
+  {}
+
+  Action(ACTION type, const VlcbMessage & msg)
+    : actionType(type), vlcbMessage(msg)
+  {}
+
+  Action(ACTION type, VlcbModeParams mode)
+    : actionType(type), mode(mode)
+  {}
 };
 
 class Service;
@@ -84,7 +138,8 @@ public:
   Parameters & getParams() { return module_config->getParams(); }
   unsigned char getParam(VlcbParams param) const { return module_config->getParam(param); }
 
-  bool sendMessage(const VlcbMessage *msg);
+  bool sendMessage(const VlcbMessage &msg); /// Send a message
+  bool sendMessage(const VlcbMessage *msg); /// @deprecated Use the message directly instead of using a pointer.
 
   void begin();
   inline bool sendMessageWithNN(VlcbOpCodes opc);

@@ -209,8 +209,7 @@ void CanService::checkIncomingCanFrame()
   }
 
   // The incoming CAN frame is a VLCB message.
-  Action action = {ACT_MESSAGE_IN, {canFrame.len}};
-  memcpy(action.vlcbMessage.data, canFrame.data, canFrame.len);
+  Action action = {ACT_MESSAGE_IN, VlcbMessage(canFrame.len, canFrame.data)};
 
   controller->putAction(action);
 }

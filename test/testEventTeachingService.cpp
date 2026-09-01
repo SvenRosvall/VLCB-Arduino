@@ -52,7 +52,7 @@ VLCB::Controller createControllerWithEventSlots()
 
 void enterLearnMode(VLCB::Controller &controller)
 {
-  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_LEARN_ON);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -62,7 +62,7 @@ void enterLearnMode(VLCB::Controller &controller)
 
 void leaveLearnMode(VLCB::Controller &controller)
 {
-  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_OFF}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_LEARN_OFF);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -76,7 +76,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -106,7 +106,7 @@ void testServiceDiscoveryEventProdSvc()
   controller.getModuleConfig()->setNumEvents(42);
   controller.getModuleConfig()->setNumEVs(7);
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -127,7 +127,7 @@ void testEventSlotsLeftAtStart()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {3, {OPC_NNEVN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -144,7 +144,7 @@ void testEventsStoredAtStart()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -162,7 +162,7 @@ void testEnterLearnModeOld()
   VLCB::Controller controller = createController();
 
   // Send NNLRN
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -171,7 +171,7 @@ void testEnterLearnModeOld()
   
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -182,7 +182,7 @@ void testEnterLearnModeOld()
   mockTransportService->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
-  msg = {4, {OPC_RQNPN, 0x01, 0x04, 8}};
+  msg = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(8);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -194,7 +194,7 @@ void testEnterLearnModeOld()
   mockTransportService->clearMessages();
   
   // Send NNULN
-  msg = {3, {OPC_NNULN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_NNULN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -203,7 +203,7 @@ void testEnterLearnModeOld()
   
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  VLCB::VlcbMessage msg2 = {3, {OPC_QNN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg2 = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg2);
 
   process(controller);
@@ -214,7 +214,7 @@ void testEnterLearnModeOld()
   mockTransportService->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
-  VLCB::VlcbMessage msg3 = {4, {OPC_RQNPN, 0x01, 0x04, 8}};
+  VLCB::VlcbMessage msg3 = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(8);
   mockTransportService->setNextMessage(msg3);
 
   process(controller);
@@ -236,7 +236,7 @@ void testEnterLearnModeViaMode()
 
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  VLCB::VlcbMessage msg = {3, {OPC_QNN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -247,7 +247,7 @@ void testEnterLearnModeViaMode()
   mockTransportService->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
-  msg = {4, {OPC_RQNPN, 0x01, 0x04, 8}};
+  msg = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(8);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -262,7 +262,7 @@ void testEnterLearnModeViaMode()
 
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  VLCB::VlcbMessage msg2 = {3, {OPC_QNN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg2 = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg2);
 
   process(controller);
@@ -273,7 +273,7 @@ void testEnterLearnModeViaMode()
   mockTransportService->clearMessages();
 
   // or RQNPN->PARAN : PARAM[8] bit 6
-  VLCB::VlcbMessage msg3 = {4, {OPC_RQNPN, 0x01, 0x04, 8}};
+  VLCB::VlcbMessage msg3 = VLCB::VlcbMessage(OPC_RQNPN).addNN(260).addData(8);
   mockTransportService->setNextMessage(msg3);
 
   process(controller);
@@ -292,7 +292,7 @@ void testEnterLearnModeForOtherNode()
   VLCB::Controller controller = createController();
 
   // Learn mode
-  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x05, MODE_LEARN_ON}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_MODE).addNN(261).addData(MODE_LEARN_ON);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -301,7 +301,7 @@ void testEnterLearnModeForOtherNode()
 
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -322,7 +322,7 @@ void testTeachEvent()
   
   // Teach an event
   // Data: OP, NN, EN, EV#, EV Value
-  VLCB::VlcbMessage msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -335,7 +335,7 @@ void testTeachEvent()
   // Verify the event variable 1
   // Note: CBUS lib does not implement OPC_REQEV.
   // Data: OP, NN, EN, EV#
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -353,7 +353,7 @@ void testTeachEvent()
   // Verify all event variables
   // Note: CBUS lib does not implement OPC_REQEV.
   // Data: OP, NN, EN, EV#
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 0}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(0);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -388,7 +388,7 @@ void testTeachEvent()
   leaveLearnMode(controller);
 
   // Verify there still is an event.
-  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -402,7 +402,7 @@ void testTeachEvent()
   
   // Verify the taught EV of this event.
   // Data: OP, NN, EN, Event index
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -430,7 +430,7 @@ void testTeachEventIndexedAndClear()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(0).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -444,7 +444,7 @@ void testTeachEventIndexedAndClear()
 
   // Verify the event variable 1
   // Data: OP, NN, Event index, EV#
-  msg = {6, {OPC_REVAL, 0x01, 0x04, 0, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -462,7 +462,7 @@ void testTeachEventIndexedAndClear()
 
   // Clear all events.
   // Data: OP, NN, EN
-  msg = {3, {OPC_NNCLR, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_NNCLR).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -475,7 +475,7 @@ void testTeachEventIndexedAndClear()
   leaveLearnMode(controller);
 
   // Verify there are no events.
-  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -496,7 +496,7 @@ void testTeachEventIndexedWithNullNNEN()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 7, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(7).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -508,7 +508,7 @@ void testTeachEventIndexedWithNullNNEN()
 
   // Teach an event with null NN/EN
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  msg = {8, {OPC_EVLRNI, 0, 0, 0, 0, 7, 1, 43}};
+  msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(0).addEN(0).addData(7).addData(1).addData(43);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -522,7 +522,7 @@ void testTeachEventIndexedWithNullNNEN()
 
   // Verify that NN/EN is unchanged
   // Data: OP, NN, Event index
-  msg = {4, { OPC_NENRD, 0x01, 0x04, 7}};
+  msg = VLCB::VlcbMessage( OPC_NENRD).addNN(260).addData(7);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -540,7 +540,7 @@ void testTeachEventIndexedWithNullNNEN()
 
   // Verify the event variable 1
   // Data: OP, NN, Event index, EV#
-  msg = {6, {OPC_REVAL, 0x01, 0x04, 7, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(7).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -565,7 +565,7 @@ void testTeachEventIndexedWithEV0()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 7, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(7).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -577,7 +577,7 @@ void testTeachEventIndexedWithEV0()
 
   // Teach an event with null NN/EN
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  msg = {8, {OPC_EVLRNI, 0x04, 0x06, 0x05, 0x08, 7, 0, 17}};
+  msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1030).addEN(1288).addData(7).addData(0).addData(17);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -589,7 +589,7 @@ void testTeachEventIndexedWithEV0()
 
   // Read event at index 7
   // Data: OP, NN, Event index
-  msg = {4, { OPC_NENRD, 0x01, 0x04, 7}};
+  msg = VLCB::VlcbMessage( OPC_NENRD).addNN(260).addData(7);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -616,7 +616,7 @@ void testTeachEventIndexedWithoutEV()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 7, 0, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(7).addData(0).addData(0);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -628,7 +628,7 @@ void testTeachEventIndexedWithoutEV()
 
   // Read event at index 0
   // Data: OP, NN, Event index
-  msg = {4, { OPC_NENRD, 0x01, 0x04, 7}};
+  msg = VLCB::VlcbMessage( OPC_NENRD).addNN(260).addData(7);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -655,7 +655,7 @@ void testLearnEventIndexedDelete()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 7, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(7).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -669,7 +669,7 @@ void testLearnEventIndexedDelete()
 
   // Verify the event variable 1
   // Data: OP, NN, Event index, EV#
-  msg = {6, {OPC_REVAL, 0x01, 0x04, 7, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(7).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -686,7 +686,7 @@ void testLearnEventIndexedDelete()
   enterLearnMode(controller);
   
   // Delete the event. Do this with NN==0, EN==0, EV#==0 and EV value==0
-  msg = {8, {OPC_EVLRNI, 0, 0, 0, 0, 7, 0, 0}};
+  msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(0).addEN(0).addData(7).addData(0).addData(0);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -699,7 +699,7 @@ void testLearnEventIndexedDelete()
   leaveLearnMode(controller);
 
   // Verify there are no events.
-  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -720,7 +720,7 @@ void testEventHashCollisionAndUnlearn()
 
   // Teach an event
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  VLCB::VlcbMessage msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -732,7 +732,7 @@ void testEventHashCollisionAndUnlearn()
   
   // Teach second event with same hash.
   // Data: OP, NN, EN, Event index, EV#, EV Value
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x08, 0x07, 1, 43}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(2055).addData(1).addData(43);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -745,7 +745,7 @@ void testEventHashCollisionAndUnlearn()
   // Verify the second event, variable 1. Ensure we can get it despite duplicate hash
   // Note: CBUS lib does not implement OPC_REQEV.
   // Data: OP, NN, EN, EV#
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x08, 0x07, 1}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(2055).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -763,7 +763,7 @@ void testEventHashCollisionAndUnlearn()
   leaveLearnMode(controller);
 
   // Verify there are two events now.
-  msg = {3, {OPC_RQEVN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -776,7 +776,7 @@ void testEventHashCollisionAndUnlearn()
   enterLearnMode(controller);
 
   // Unlearn the second event
-  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  msg = VLCB::VlcbMessage(OPC_EVULN).addNN(1286).addEN(2055);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -790,7 +790,7 @@ void testEventHashCollisionAndUnlearn()
 
   // Verify events left.
   // Data: OP, NN, Event index
-  msg = {3, {OPC_NERD, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_NERD).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -811,7 +811,7 @@ void testIgnoreMsgsForOtherNodes()
   VLCB::Controller controller = createController();
 
   // Send NNLRN to other node
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x05}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -819,7 +819,7 @@ void testIgnoreMsgsForOtherNodes()
   assertEquals(0, mockTransportService->sent_messages.size());
 
   // Verify parameter learn set.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -830,7 +830,7 @@ void testIgnoreMsgsForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send NNCLR to other node
-  msg = {3, {OPC_NNCLR, 0x01, 0x05}};
+  msg = VLCB::VlcbMessage(OPC_NNCLR).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -840,7 +840,7 @@ void testIgnoreMsgsForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send NNEVN to other node
-  msg = {3, {OPC_NNEVN, 0x01, 0x05}};
+  msg = VLCB::VlcbMessage(OPC_NNEVN).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -850,7 +850,7 @@ void testIgnoreMsgsForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send NERD to other node
-  msg = {3, {OPC_NERD, 0x01, 0x05}};
+  msg = VLCB::VlcbMessage(OPC_NERD).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -860,7 +860,7 @@ void testIgnoreMsgsForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send RQEVN to other node
-  msg = {3, {OPC_RQEVN, 0x01, 0x05}};
+  msg = VLCB::VlcbMessage(OPC_RQEVN).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -869,7 +869,7 @@ void testIgnoreMsgsForOtherNodes()
   assertEquals(0, mockTransportService->sent_messages.size());
 
   // Send NENRD to other node
-  msg = {4, {OPC_NENRD, 0x01, 0x05, 1}};
+  msg = VLCB::VlcbMessage(OPC_NENRD).addNN(261).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -879,7 +879,7 @@ void testIgnoreMsgsForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send REVAL to other node
-  msg = {4, {OPC_REVAL, 0x01, 0x05, 0,1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(261).addData(0).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -896,7 +896,7 @@ void testIgnoreUnlearnForOtherNodes()
   VLCB::Controller controller = createController();
 
   // Send NNLRN
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -904,7 +904,7 @@ void testIgnoreUnlearnForOtherNodes()
   assertEquals(0, mockTransportService->sent_messages.size());
 
   // Verify parameter learn set.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -915,7 +915,7 @@ void testIgnoreUnlearnForOtherNodes()
   mockTransportService->clearMessages();
 
   // Send NNULN to other node
-  msg = {3, {OPC_NNULN, 0x01, 0x05}};
+  msg = VLCB::VlcbMessage(OPC_NNULN).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -923,7 +923,7 @@ void testIgnoreUnlearnForOtherNodes()
   assertEquals(0, mockTransportService->sent_messages.size());
 
   // Verify node is still in learn mode.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -940,7 +940,7 @@ void testIgnoreIfNotInLearnMode()
   VLCB::Controller controller = createController();
 
   // Send EVULN
-  VLCB::VlcbMessage msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x07}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVULN).addNN(1286).addEN(2055);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -949,7 +949,7 @@ void testIgnoreIfNotInLearnMode()
   mockTransportService->clearMessages();
   
   // Send EVLRN
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -958,7 +958,7 @@ void testIgnoreIfNotInLearnMode()
   mockTransportService->clearMessages();
 
   // Send EVLRNI
-  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(0).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -967,7 +967,7 @@ void testIgnoreIfNotInLearnMode()
   mockTransportService->clearMessages();
 
   // Send REQEV
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -983,7 +983,7 @@ void testUpdateProducedEventNNEN()
   VLCB::Controller controller = createController();
 
   // Send NNLRN
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -992,7 +992,7 @@ void testUpdateProducedEventNNEN()
 
   // Teach an event
   // Data: OP, NN, EN, EV#, EV Value
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1003,7 +1003,7 @@ void testUpdateProducedEventNNEN()
   mockTransportService->clearMessages();
 
   // Add another event with same EV#1 value. This is OK in library version 2.xx.
-  msg = {7, {OPC_EVLRN, 0x01, 0x06, 0x01, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(262).addEN(264).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1020,7 +1020,7 @@ void testUpdateProducedEventNNENToExistingEvent()
   VLCB::Controller controller = createController();
 
   // Send NNLRN
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1029,7 +1029,7 @@ void testUpdateProducedEventNNENToExistingEvent()
 
   // Teach an event
   // Data: OP, NN, EN, EV#, EV Value
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1040,7 +1040,7 @@ void testUpdateProducedEventNNENToExistingEvent()
   mockTransportService->clearMessages();
 
   // Teach a second event
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x09, 1, 43}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1801).addData(1).addData(43);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1051,7 +1051,7 @@ void testUpdateProducedEventNNENToExistingEvent()
   mockTransportService->clearMessages();
 
   // Update the EV#1 of second event to match the first event. This is OK in library version 2.xx.
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x09, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1801).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1068,7 +1068,7 @@ void testEnterLearnModeOldOtherNode()
   VLCB::Controller controller = createController();
 
   // Send NNLRN
-  VLCB::VlcbMessage msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1077,7 +1077,7 @@ void testEnterLearnModeOldOtherNode()
 
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1088,7 +1088,7 @@ void testEnterLearnModeOldOtherNode()
   mockTransportService->clearMessages();
 
   // Send NNLRN for another node
-   msg = {3, {OPC_NNLRN, 0x01, 0x05}};
+   msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(261);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1097,7 +1097,7 @@ void testEnterLearnModeOldOtherNode()
 
   // Verify parameter learn set.
   // Send QNN - PNN response contains bit 5 as learn mode.
-  msg = {3, {OPC_QNN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_QNN).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1115,7 +1115,7 @@ void testEnterLearnModeViaModeInSetup()
   minimumNodeService->setSetupMode();
 
   // Learn mode
-  VLCB::VlcbMessage msg = {4, {OPC_MODE, 0x01, 0x04, MODE_LEARN_ON}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_MODE).addNN(260).addData(MODE_LEARN_ON);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1133,7 +1133,7 @@ void testClearEventsNotLearnMode()
 
   VLCB::Controller controller = createController();
   
-  VLCB::VlcbMessage msg = {3, {OPC_NNCLR, 0x01, 0x04}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NNCLR).addNN(260);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1154,7 +1154,7 @@ void testNenrdWithBadIndex()
 
   VLCB::Controller controller = createControllerWithEventSlots();
 
-  VLCB::VlcbMessage msg = {4, {OPC_NENRD, 0x01, 0x04, 30}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NENRD).addNN(260).addData(30);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1176,7 +1176,7 @@ void testNenrdForEmptyIndex()
 
   VLCB::Controller controller = createControllerWithEventSlots();
 
-  VLCB::VlcbMessage msg = {4, {OPC_NENRD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_NENRD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1201,7 +1201,7 @@ void testEvulnErrors()
   enterLearnMode(controller);
 
   // Short message
-  VLCB::VlcbMessage msg = {4, {OPC_EVULN, 0x05, 0x06, 0x08}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVULN).addNN(1286).addData(0x08);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1215,7 +1215,7 @@ void testEvulnErrors()
   mockTransportService->clearMessages();
 
   // Unlearn unknown event
-  msg = {5, {OPC_EVULN, 0x05, 0x06, 0x08, 0x17}};
+  msg = VLCB::VlcbMessage(OPC_EVULN).addNN(1286).addData(0x08).addData(0x17);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1240,7 +1240,7 @@ void testReval()
   // Create one event.
   enterLearnMode(controller);
 
-  VLCB::VlcbMessage msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 17}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(17);
   mockTransportService->setNextMessage(msg);
   process(controller);
   assertEquals(2, mockTransportService->sent_messages.size());
@@ -1248,7 +1248,7 @@ void testReval()
   assertEquals(OPC_GRSP, mockTransportService->sent_messages[1].data[0]);
   mockTransportService->clearMessages();
 
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 2, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(2).addData(42);
   mockTransportService->setNextMessage(msg);
   process(controller);
   assertEquals(2, mockTransportService->sent_messages.size());
@@ -1260,7 +1260,7 @@ void testReval()
 
   // Verify count of event variables.
   // Data: OP, NN, Event index, EV#
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 0}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(0);
   mockTransportService->setNextMessage(msg);
   processWithTasks(controller);
   assertEquals(3, mockTransportService->sent_messages.size());
@@ -1282,7 +1282,7 @@ void testReval()
 
   // Verify the event variable 1
   // Data: OP, NN, Event index, EV#
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(1);
   mockTransportService->setNextMessage(msg);
   process(controller);
   assertEquals(1, mockTransportService->sent_messages.size());
@@ -1294,7 +1294,7 @@ void testReval()
 
   // Verify the event variable 2
   // Data: OP, NN, Event index, EV#
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 2}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(2);
   mockTransportService->setNextMessage(msg);
   process(controller);
   assertEquals(1, mockTransportService->sent_messages.size());
@@ -1312,7 +1312,7 @@ void testRevalErrors()
   VLCB::Controller controller = createController();
 
   // Short message
-  VLCB::VlcbMessage msg = {4, {OPC_REVAL, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1326,7 +1326,7 @@ void testRevalErrors()
   mockTransportService->clearMessages();
 
   // Event index out of range
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 20, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(20).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1343,7 +1343,7 @@ void testRevalErrors()
   mockTransportService->clearMessages();
 
   // Missing event - none taught yet.
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 1}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1360,12 +1360,12 @@ void testRevalErrors()
   mockTransportService->clearMessages();
 
   // Teach an event for following tests
-  msg = {3, {OPC_NNLRN, 0x01, 0x04}};
+  msg = VLCB::VlcbMessage(OPC_NNLRN).addNN(260);
   mockTransportService->setNextMessage(msg);
   process(controller);
   assertEquals(0, mockTransportService->sent_messages.size());
 
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1376,7 +1376,7 @@ void testRevalErrors()
   mockTransportService->clearMessages();
 
   // Event variable out of range
-  msg = {5, {OPC_REVAL, 0x01, 0x04, 0, 3}};
+  msg = VLCB::VlcbMessage(OPC_REVAL).addNN(260).addData(0).addData(3);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1404,7 +1404,7 @@ void testReqevErrors()
   enterLearnMode(controller);
 
   // Short message
-  VLCB::VlcbMessage msg = {5, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1418,7 +1418,7 @@ void testReqevErrors()
   mockTransportService->clearMessages();
 
   // No such event
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 1}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1435,7 +1435,7 @@ void testReqevErrors()
   mockTransportService->clearMessages();
 
   // Teach an event for following tests
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1446,7 +1446,7 @@ void testReqevErrors()
   mockTransportService->clearMessages();
 
   // EV# too large
-  msg = {6, {OPC_REQEV, 0x05, 0x06, 0x07, 0x08, 3}};
+  msg = VLCB::VlcbMessage(OPC_REQEV).addNN(1286).addEN(1800).addData(3);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1472,7 +1472,7 @@ void testLearnErrors()
   enterLearnMode(controller);
 
   // Short message
-  VLCB::VlcbMessage msg = {6, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1486,7 +1486,7 @@ void testLearnErrors()
   mockTransportService->clearMessages();
 
   // EV index out of range
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 3, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(3).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1505,7 +1505,7 @@ void testLearnErrors()
   // Event table full
   for (byte i = 1 ; i <= configuration->getNumEvents() ; ++i)
   {
-    msg = {7, {OPC_EVLRN, 0x05, 0x06, 0, i, 1, i}};
+    msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(i).addData(1).addData(i);
     mockTransportService->setNextMessage(msg);
 
     process(controller);
@@ -1516,7 +1516,7 @@ void testLearnErrors()
   }
   
 
-  msg = {7, {OPC_EVLRN, 0x05, 0x06, 0x07, 0x08, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRN).addNN(1286).addEN(1800).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1542,7 +1542,7 @@ void testLearnIndexErrors()
   enterLearnMode(controller);
 
   // Short message
-  VLCB::VlcbMessage msg = {7, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(0).addData(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -1556,7 +1556,7 @@ void testLearnIndexErrors()
   mockTransportService->clearMessages();
 
   // Event index out of range
-  msg = {8, {OPC_EVLRNI, 0x05, 0x06, 0x07, 0x08, 20, 1, 42}};
+  msg = VLCB::VlcbMessage(OPC_EVLRNI).addNN(1286).addEN(1800).addData(20).addData(1).addData(42);
   mockTransportService->setNextMessage(msg);
 
   process(controller);

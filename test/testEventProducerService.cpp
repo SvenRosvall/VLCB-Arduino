@@ -41,7 +41,7 @@ void testServiceDiscovery()
   VLCB::Controller controller = createController();
   controller.begin();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -70,7 +70,7 @@ void testServiceDiscoveryEventProdSvc()
   VLCB::Controller controller = createController();
   controller.begin();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -287,7 +287,7 @@ void testLongRequestStatus()
   configuration->writeEvent(1, 260, 1);
   configuration->updateEvHashEntry(1);
 
-  VLCB::VlcbMessage msg = {5, {OPC_AREQ, 0x01, 0x04, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_AREQ).addNN(260).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -315,7 +315,7 @@ void testShortRequestStatusWithNN()
   configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x04, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ASRQ).addNN(260).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -343,7 +343,7 @@ void testShortRequestStatusWithoutNN()
   configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0, 0, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ASRQ).addNN(0).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -371,7 +371,7 @@ void testShortRequestStatusWithDifferentNN()
   configuration->writeEvent(1, 0, 1);
   configuration->updateEvHashEntry(1);
 
-  VLCB::VlcbMessage msg = {5, {OPC_ASRQ, 0x01, 0x05, 0, 1}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_ASRQ).addNN(261).addEN(1);
   mockTransportService->setNextMessage(msg);
 
   process(controller);

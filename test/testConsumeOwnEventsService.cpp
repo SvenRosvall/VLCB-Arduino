@@ -49,7 +49,7 @@ void testServiceDiscovery()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 0}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(0);
   mockTransportService->setNextMessage(msg);
 
   processWithTasks(controller);
@@ -77,7 +77,7 @@ void testServiceDiscoveryEventProdSvc()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg = {4, {OPC_RQSD, 0x01, 0x04, 2}};
+  VLCB::VlcbMessage msg = VLCB::VlcbMessage(OPC_RQSD).addNN(260).addData(2);
   mockTransportService->setNextMessage(msg);
 
   process(controller);
@@ -96,7 +96,7 @@ void testCoeFlag()
 
   VLCB::Controller controller = createController();
 
-  VLCB::VlcbMessage msg_rqsd = {1, {OPC_QNN}};
+  VLCB::VlcbMessage msg_rqsd = VLCB::VlcbMessage(OPC_QNN);
   mockTransportService->setNextMessage(msg_rqsd);
 
   process(controller);
