@@ -63,8 +63,7 @@ VlcbOpCodes EventProducerService::findEventOpCode(bool state, bool isShortEvent,
       return choices.shortOff;
 }
 
-void EventProducerService::sendEventAtIndexVarData(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices,
-                                                   int dataLen, byte data1=0, byte data2=0, byte data3=0)
+VlcbMessage EventProducerService::createEventMessage(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
@@ -78,42 +77,41 @@ void EventProducerService::sendEventAtIndexVarData(bool state, byte evIndex, con
   VlcbOpCodes opCode = findEventOpCode(state, isShortEvent, opCodeChoices);
   VlcbMessage msg(opCode);
   msg.addNNEN(nn_en);
-  
-  if (dataLen >= 1)
-  {
-    msg.addData(data1);
-  }
-  if (dataLen >= 2)
-  {
-    msg.addData(data2);
-  }
-  if (dataLen >= 3)
-  {
-    msg.addData(data3);
-  }
-
-  controller->sendMessage(msg);
-  ++diagEventsProduced;
+  return msg;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ACON, OPC_ACOF, OPC_ASON, OPC_ASOF}, 0);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON, OPC_ACOF, OPC_ASON, OPC_ASOF});
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ACON1, OPC_ACOF1, OPC_ASON1, OPC_ASOF1}, 1, data1);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON1, OPC_ACOF1, OPC_ASON1, OPC_ASOF1});
+  msg.addData(data1);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ACON2, OPC_ACOF2, OPC_ASON2, OPC_ASOF2}, 2, data1, data2);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON2, OPC_ACOF2, OPC_ASON2, OPC_ASOF2});
+  msg.addData(data1);
+  msg.addData(data2);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ACON3, OPC_ACOF3, OPC_ASON3, OPC_ASOF3}, 3, data1, data2, data3);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON3, OPC_ACOF3, OPC_ASON3, OPC_ASOF3});
+  msg.addData(data1);
+  msg.addData(data2);
+  msg.addData(data3);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg) 
@@ -158,21 +156,35 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ARON, OPC_AROF, OPC_ARSON, OPC_ARSOF}, 0);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON, OPC_AROF, OPC_ARSON, OPC_ARSOF});
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ARON1, OPC_AROF1, OPC_ARSON1, OPC_ARSOF1}, 1, data1);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON1, OPC_AROF1, OPC_ARSON1, OPC_ARSOF1});
+  msg.addData(data1);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ARON2, OPC_AROF2, OPC_ARSON2, OPC_ARSOF2}, 2, data1, data2);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON2, OPC_AROF2, OPC_ARSON2, OPC_ARSOF2});
+  msg.addData(data1);
+  msg.addData(data2);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  sendEventAtIndexVarData(state, evIndex, {OPC_ARON3, OPC_AROF3, OPC_ARSON3, OPC_ARSOF3}, 3, data1, data2, data3);
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON3, OPC_AROF3, OPC_ARSON3, OPC_ARSOF3});
+  msg.addData(data1);
+  msg.addData(data2);
+  msg.addData(data3);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 }

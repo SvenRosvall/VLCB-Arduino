@@ -138,7 +138,8 @@ private:
   };
 
   static VlcbOpCodes findEventOpCode(bool state, bool isShortEvent, const EventOpCodeChoices &choices);
-  void sendEventAtIndexVarData(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices, int dataLen, byte data1, byte data2, byte data3);
+
+  VlcbMessage createEventMessage(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices);
 
 /// @cond LIBRARY
 protected:
