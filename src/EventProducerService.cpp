@@ -49,33 +49,21 @@ void EventProducerService::sendLongEventWithSpoofedNodeNumber(bool state, int no
   ++diagEventsProduced;
 }
 
-static VlcbOpCodes findEventOpCode(bool isResponse, bool state, bool isShortEvent, int nDataBytes)
+VlcbOpCodes EventProducerService::findEventOpCode(bool state, bool isShortEvent, const EventOpCodeChoices & choices)
 {
-  int opCode = OPC_ACON; // Starting point
-  if (!state)
-  {
-    opCode++; // OFF op-codes are one higher.
-  }
-  if (isShortEvent)
-  {
-    opCode += 8;
-  }
-  if (isResponse)
-  {
-    if (isShortEvent)
-    {
-      opCode += 5;
-    }
+  if (!isShortEvent)
+    if (state)
+      return choices.longOn;
     else
-    {
-      opCode += 3;
-    }
-  }
-  opCode += 0x20 * nDataBytes;
-  return (VlcbOpCodes) opCode;
+      return choices.longOff;
+  else
+    if (state)
+      return choices.shortOn;
+    else
+      return choices.shortOff;
 }
 
-void EventProducerService::sendEventAtIndexVarData(bool isResponse, bool state, byte evIndex,
+void EventProducerService::sendEventAtIndexVarData(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices,
                                                    int dataLen, byte data1=0, byte data2=0, byte data3=0)
 {
   byte nn_en[EE_HASH_BYTES];
@@ -87,7 +75,7 @@ void EventProducerService::sendEventAtIndexVarData(bool isResponse, bool state, 
     Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
   }
 
-  VlcbOpCodes opCode = findEventOpCode(isResponse, state, isShortEvent, dataLen);
+  VlcbOpCodes opCode = findEventOpCode(state, isShortEvent, opCodeChoices);
   VlcbMessage msg(opCode);
   msg.addNNEN(nn_en);
   
@@ -110,22 +98,22 @@ void EventProducerService::sendEventAtIndexVarData(bool isResponse, bool state, 
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex)
 {
-  sendEventAtIndexVarData(false, state, evIndex, 0);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ACON, OPC_ACOF, OPC_ASON, OPC_ASOF}, 0);
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1)
 {
-  sendEventAtIndexVarData(false, state, evIndex, 1, data1);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ACON1, OPC_ACOF1, OPC_ASON1, OPC_ASOF1}, 1, data1);
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2)
 {
-  sendEventAtIndexVarData(false, state, evIndex, 2, data1, data2);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ACON2, OPC_ACOF2, OPC_ASON2, OPC_ASOF2}, 2, data1, data2);
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  sendEventAtIndexVarData(false, state, evIndex, 3, data1, data2, data3);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ACON3, OPC_ACOF3, OPC_ASON3, OPC_ASOF3}, 3, data1, data2, data3);
 }
 
 void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg) 
@@ -170,21 +158,21 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex)
 {
-  sendEventAtIndexVarData(true, state, evIndex, 0);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ARON, OPC_AROF, OPC_ARSON, OPC_ARSOF}, 0);
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1)
 {
-  sendEventAtIndexVarData(true, state, evIndex, 1, data1);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ARON1, OPC_AROF1, OPC_ARSON1, OPC_ARSOF1}, 1, data1);
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2)
 {
-  sendEventAtIndexVarData(true, state, evIndex, 2, data1, data2);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ARON2, OPC_AROF2, OPC_ARSON2, OPC_ARSOF2}, 2, data1, data2);
 }
 
 void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  sendEventAtIndexVarData(true, state, evIndex, 3, data1, data2, data3);
+  sendEventAtIndexVarData(state, evIndex, {OPC_ARON3, OPC_AROF3, OPC_ARSON3, OPC_ARSOF3}, 3, data1, data2, data3);
 }
 }
