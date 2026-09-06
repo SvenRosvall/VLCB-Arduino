@@ -142,12 +142,12 @@ public:
   bool sendMessage(const VlcbMessage *msg); /// @deprecated Use the message directly instead of using a pointer.
 
   void begin();
-  inline bool sendMessageWithNN(VlcbOpCodes opc);
-  inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
-  inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2);
-  inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3);
-  inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
-  inline bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
+  bool sendMessageWithNN(VlcbOpCodes opc);
+  bool sendMessageWithNN(VlcbOpCodes opc, byte b1);
+  bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2);
+  bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3);
+  bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4);
+  bool sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5);
   bool sendWRACK();
   bool sendCMDERR(byte cerrno);
   void sendGRSP(VlcbOpCodes opCode, byte serviceType, byte errCode);
@@ -177,41 +177,8 @@ private:
   CircularBuffer<Action, ACTION_QUEUE_SIZE> actionQueue;
   TimedResponse timedResponses;
 
-  bool sendMessageWithNNandData(VlcbOpCodes opc) { return sendMessageWithNNandData(opc, 0); }
-  bool sendMessageWithNNandData(VlcbOpCodes opc, int len, byte data1=0, byte data2=0, byte data3=0, byte data4=0, byte data5=0);
-
   // Really an MNS diagnostic but placed here as its data is collected across all services.
   unsigned int diagMsgsActed = 0;
 };
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc)
-{
-  return sendMessageWithNNandData(opc);
-}
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1)
-{
-  return sendMessageWithNNandData(opc, 1, b1);
-}
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2)
-{
-  return sendMessageWithNNandData(opc, 2, b1, b2);
-}
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3)
-{
-  return sendMessageWithNNandData(opc, 3, b1, b2, b3);
-}
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
-{
-  return sendMessageWithNNandData(opc, 4, b1, b2, b3, b4);
-}
-
-bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
-{
-  return sendMessageWithNNandData(opc, 5, b1, b2, b3, b4, b5);
-}
 
 }
