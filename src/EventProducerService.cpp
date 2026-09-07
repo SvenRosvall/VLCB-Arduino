@@ -49,83 +49,68 @@ void EventProducerService::sendLongEventWithSpoofedNodeNumber(bool state, int no
   ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventAtIndex(bool state, byte evIndex)
+VlcbOpCodes EventProducerService::findEventOpCode(bool state, bool isShortEvent, const EventOpCodeChoices & choices)
+{
+  if (!isShortEvent)
+    if (state)
+      return choices.longOn;
+    else
+      return choices.longOff;
+  else
+    if (state)
+      return choices.shortOn;
+    else
+      return choices.shortOff;
+}
+
+VlcbMessage EventProducerService::createEventMessage(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices)
 {
   byte nn_en[EE_HASH_BYTES];
   controller->getModuleConfig()->readEvent(evIndex, nn_en);
 
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
+  bool isShortEvent = (nn_en[0] == 0) && (nn_en[1] == 0);
+  if (isShortEvent)
   {
-    opCode = (state ? OPC_ASON : OPC_ASOF);
     Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
   }
-  else
-  {
-    opCode = (state ? OPC_ACON : OPC_ACOF);
-  }
 
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en));
+  VlcbOpCodes opCode = findEventOpCode(state, isShortEvent, opCodeChoices);
+  VlcbMessage msg(opCode);
+  msg.addNNEN(nn_en);
+  return msg;
+}
+
+void EventProducerService::sendEventAtIndex(bool state, byte evIndex)
+{
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON, OPC_ACOF, OPC_ASON, OPC_ASOF});
+  controller->sendMessage(msg);
   ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(evIndex, nn_en);
-
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ASON1 : OPC_ASOF1);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ACON1 : OPC_ACOF1);
-  }
-
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON1, OPC_ACOF1, OPC_ASON1, OPC_ASOF1});
+  msg.addData(data1);
+  controller->sendMessage(msg);
   ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(evIndex, nn_en);
-
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ASON2 : OPC_ASOF2);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ACON2 : OPC_ACOF2);
-  }
-
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1).addData(data2));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON2, OPC_ACOF2, OPC_ASON2, OPC_ASOF2});
+  msg.addData(data1);
+  msg.addData(data2);
+  controller->sendMessage(msg);
   ++diagEventsProduced;
 }
 
 void EventProducerService::sendEventAtIndex(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(evIndex, nn_en);
-
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ASON3 : OPC_ASOF3);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ACON3 : OPC_ACOF3);
-  }
-
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1).addData(data2).addData(data3));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ACON3, OPC_ACOF3, OPC_ASON3, OPC_ASOF3});
+  msg.addData(data1);
+  msg.addData(data2);
+  msg.addData(data3);
+  controller->sendMessage(msg);
   ++diagEventsProduced;
 }
 
@@ -169,83 +154,37 @@ void EventProducerService::handleProdSvcMessage(const VlcbMessage *msg)
   }
 }
 
-void EventProducerService::sendEventResponse(bool state, byte index)
+void EventProducerService::sendEventResponse(bool state, byte evIndex)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(index, nn_en);
-  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
-  
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ARSON : OPC_ARSOF);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ARON : OPC_AROF);
-  }
-  
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON, OPC_AROF, OPC_ARSON, OPC_ARSOF});
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventResponse(bool state, byte index, byte data1)
+void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(index, nn_en);
-  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
-  
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ARSON1 : OPC_ARSOF1);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ARON1 : OPC_AROF1);
-  }
-  
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON1, OPC_AROF1, OPC_ARSON1, OPC_ARSOF1});
+  msg.addData(data1);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2)
+void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(index, nn_en);
-  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
-  
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ARSON2 : OPC_ARSOF2);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ARON2 : OPC_AROF2);
-  }
-  
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1).addData(data2));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON2, OPC_AROF2, OPC_ARSON2, OPC_ARSOF2});
+  msg.addData(data1);
+  msg.addData(data2);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 
-void EventProducerService::sendEventResponse(bool state, byte index, byte data1, byte data2, byte data3)
+void EventProducerService::sendEventResponse(bool state, byte evIndex, byte data1, byte data2, byte data3)
 {
-  byte nn_en[EE_HASH_BYTES];
-  controller->getModuleConfig()->readEvent(index, nn_en);
-  //DEBUG_SERIAL << ">EPService node number = 0x" << _HEX(nn_en[0]) << _HEX(nn_en[1])<< endl;
-  
-  VlcbOpCodes opCode;
-  if ((nn_en[0] == 0) && (nn_en[1] == 0))
-  {
-    opCode = (state ? OPC_ARSON3 : OPC_ARSOF3);
-    Configuration::setTwoBytes(&nn_en[0], controller->getModuleConfig()->nodeNum);
-  }
-  else
-  {
-    opCode = (state ? OPC_ARON3 : OPC_AROF3);
-  }
-  
-  controller->sendMessage(VlcbMessage(opCode).addNNEN(nn_en).addData(data1).addData(data2).addData(data3));
+  VlcbMessage msg = createEventMessage(state, evIndex, {OPC_ARON3, OPC_AROF3, OPC_ARSON3, OPC_ARSOF3});
+  msg.addData(data1);
+  msg.addData(data2);
+  msg.addData(data3);
+  controller->sendMessage(msg);
+  ++diagEventsProduced;
 }
 }

@@ -132,6 +132,17 @@ private:
   void (*requesteventhandler)(byte index, const VlcbMessage *msg);
   void handleProdSvcMessage(const VlcbMessage *msg);
 
+  struct EventOpCodeChoices
+  {
+    VlcbOpCodes longOn, longOff, shortOn, shortOff;
+  };
+
+  /// Find what op-code to use for an event.
+  static VlcbOpCodes findEventOpCode(bool state, bool isShortEvent, const EventOpCodeChoices &choices);
+
+  /// Create a populated event message
+  VlcbMessage createEventMessage(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices);
+
 /// @cond LIBRARY
 protected:
   unsigned int diagEventsProduced = 0;

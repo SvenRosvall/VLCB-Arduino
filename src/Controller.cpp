@@ -204,18 +204,61 @@ bool Controller::sendMessage(const VlcbMessage *msg)
   return sendMessage(*msg);
 }
 
-bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int len, ...)
+bool Controller::sendMessageWithNN(VlcbOpCodes opc)
 {
-  va_list args;
-  va_start(args, len);
   VlcbMessage msg(opc);
   msg.addNN(module_config->nodeNum);
-  for (int i = 0 ; i < len ; ++i)
-  {
-    msg.addData(va_arg(args, int));
-  }
-  va_end(args);
-  return sendMessage(msg);  
+  return sendMessage(msg);
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1)
+{
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
+  msg.addData(b1);
+  return sendMessage(msg);
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2)
+{
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
+  msg.addData(b1);
+  msg.addData(b2);
+  return sendMessage(msg);
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3)
+{
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
+  msg.addData(b1);
+  msg.addData(b2);
+  msg.addData(b3);
+  return sendMessage(msg);
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
+{
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
+  msg.addData(b1);
+  msg.addData(b2);
+  msg.addData(b3);
+  msg.addData(b4);
+  return sendMessage(msg);
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
+{
+  VlcbMessage msg(opc);
+  msg.addNN(module_config->nodeNum);
+  msg.addData(b1);
+  msg.addData(b2);
+  msg.addData(b3);
+  msg.addData(b4);
+  msg.addData(b5);
+  return sendMessage(msg);
 }
 
 //
