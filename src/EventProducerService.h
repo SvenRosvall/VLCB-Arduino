@@ -137,8 +137,10 @@ private:
     VlcbOpCodes longOn, longOff, shortOn, shortOff;
   };
 
+  /// Find what op-code to use for an event.
   static VlcbOpCodes findEventOpCode(bool state, bool isShortEvent, const EventOpCodeChoices &choices);
 
+  /// Create a populated event message
   VlcbMessage createEventMessage(bool state, byte evIndex, const EventOpCodeChoices &opCodeChoices);
 
 /// @cond LIBRARY
