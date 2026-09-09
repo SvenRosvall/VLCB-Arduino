@@ -242,7 +242,7 @@ public:
       // construct and send a ENRSP message
       module_config->readEvent(sequence, &msg.data[3]);
       msg.data[7] = sequence;  // event table index
-      controller->sendMessage(&msg);
+      controller->sendMessage(msg);
     }
     return TimedResponse::PROGRESS;
   }

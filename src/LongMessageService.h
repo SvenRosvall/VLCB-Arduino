@@ -57,7 +57,7 @@ public:
 protected:
 
   void handleMessage(const VlcbMessage *msg);
-  bool sendMessageFragment(VlcbMessage *frame);
+  bool sendMessageFragment(VlcbMessage & frame);
 
   bool _is_receiving = false;
   byte *_send_buffer, *_receive_buffer;

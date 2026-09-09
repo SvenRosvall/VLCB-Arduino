@@ -296,7 +296,7 @@ void MinimumNodeService::handleRequestNodeParameters()
   response.addData(controller->getParam(PAR_NVNUM));     // number of NVs
   response.addData(controller->getParam(PAR_MAJVER));     // major code ver
 
-  controller->sendMessage(&response);
+  controller->sendMessage(response);
   controller->messageActedOn();
 }
 

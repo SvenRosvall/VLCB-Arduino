@@ -64,7 +64,7 @@ public:
     }
     response.data[5] = sequence + 1;
     response.data[6] = module_config->getEventEVval(eventIndex, sequence + 1);
-    controller->sendMessage(&response);
+    controller->sendMessage(response);
     return TimedResponse::PROGRESS;
   }
 };
@@ -114,7 +114,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
     // Reuse the incoming message as it contains the event NN/EN and event index.
     response.data[5] = 0;
     response.data[6] = module_config->getNumEVs();
-    controller->sendMessage(&response);
+    controller->sendMessage(response);
     if (!module_config->fcuCompatible)
     {
       controller->addTimedResponseTask(new RespondEV(controller, module_config, response, eventIndex));
@@ -124,7 +124,7 @@ void EventTeachingService::handleRequestEventVariable(const VlcbMessage *msg, un
   {
     // Reuse the incoming message as it contains the event NN/EN and event index.
     response.data[6] = module_config->getEventEVval(eventIndex, evnum);    
-    controller->sendMessage(&response);
+    controller->sendMessage(response);
   }
 }
 

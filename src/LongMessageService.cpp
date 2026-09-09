@@ -84,7 +84,7 @@ bool LongMessageService::sendLongMessage(const void *msg, const unsigned int msg
 	frame.data[6] = 0;
 	frame.data[7] = 0;																																// flags - 0 = standard data message
 
-	bool ret = sendMessageFragment(&frame);														// send the header packet
+	bool ret = sendMessageFragment(frame);														// send the header packet
 	++_send_sequence_num;																															// increment the sending sequence number - it's fine if it wraps around
 
 	// DEBUG_SERIAL << F("> L: message header sent, stream id = ") << _send_stream_id << F(", message length = ") << _send_buffer_len << endl;
@@ -132,7 +132,7 @@ void LongMessageService::process()
 			++_send_buffer_index;
 		}
 
-		sendMessageFragment(&frame);																			// send the data packet
+		sendMessageFragment(frame);																			// send the data packet
 		// DEBUG_SERIAL << F("> L: process: sent message fragment, seq = ") << _send_sequence_num << F(", size = ") << i << endl;
 
 		++_send_sequence_num;
@@ -295,11 +295,11 @@ bool LongMessageService::is_sending()
 //
 /// send next message fragment
 //
-bool LongMessageService::sendMessageFragment(VlcbMessage *frame)
+bool LongMessageService::sendMessageFragment(VlcbMessage & frame)
 {
 	// these are common to all messages
-	frame->len = 8;
-	frame->data[0] = OPC_DTXC;
+	frame.len = 8;
+	frame.data[0] = OPC_DTXC;
 
 	return (controller->sendMessage(frame));
 }
@@ -445,7 +445,7 @@ bool LongMessageServiceEx::sendLongMessage(const void *msg, const unsigned int m
 	frame.data[6] = lowByte(msg_crc);
 	frame.data[7] = 0;																																// flags - 0 = standard data message
 
-	bool ret = sendMessageFragment(&frame);					// send the header packet
+	bool ret = sendMessageFragment(frame);					// send the header packet
 	_send_context[i]->send_sequence_num = 1;																	  			// the next send sequence number - it's fine if it wraps around
 
 	// DEBUG_SERIAL << F("> Lex: message header sent, stream id = ") << stream_id << F(", message length = ") << msg_len << F(", ret = ") << ret << endl;
@@ -495,7 +495,7 @@ void LongMessageServiceEx::process()
 			++_send_context[context]->send_buffer_index;
 		}
 
-		sendMessageFragment(&frame);																												// send the data packet
+		sendMessageFragment(frame);																												// send the data packet
 		// DEBUG_SERIAL << F("> Lex: process: sent message fragment, seq = ") << _send_context[context]->send_sequence_num << F(", size = ") << i << F(", ret  = ") << ret << endl;
 
 		// release context once message content exhausted
