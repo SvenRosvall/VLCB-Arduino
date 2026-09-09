@@ -46,11 +46,11 @@ protected:
   /// @endcond 
 
 private:
-  void handleCanServiceMessage(const VlcbMessage *msg);
+  void handleCanServiceMessage(const VlcbMessage &msg);
   void handleEnumeration(unsigned int nn);
-  void handleSetCANID(const VlcbMessage *msg, unsigned int nn);
+  void handleSetCANID(const VlcbMessage &msg, unsigned int nn);
 
-  bool sendMessage(const VlcbMessage *msg);
+  bool sendMessage(const VlcbMessage &msg);
   bool sendRtrFrame();
   bool sendEmptyFrame(bool rtr = false);
   bool sendCanFrame(CANFrame *msg) { return canTransport->sendCanFrame(msg); }
