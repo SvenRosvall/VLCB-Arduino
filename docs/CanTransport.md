@@ -26,11 +26,20 @@ This library provides the following concrete transport classes:
 
 SerialGC
 : Use the GridConnect protocol for sending CAN frames over a serial connection.
+This is useful for testing a VLCB module with FCU/MMC without the need for 
+setting up a CAN bus.
 
 The following concrete transports exist externally.
 
 [VCAN2515](https://github.com/SvenRosvall/VCAN2515)
-: Implementation for using the MCP2515 CAN transceiver.
+: Implementation for using the MCP2515 CAN controller.
+This has been tested with Arduino Uno/Nano and Raspberry Pi Pico.
+It should work with any board that compiles with the Arduino IDE.
 
 [VCAN2040](https://github.com/MartinDaCosta53/VCAN2040)
-: Implementation for Raspberry Pi Pico using a software CAN transceiver.
+: Implementation for Raspberry Pi Pico using a software CAN controller.
+You only need to add a CAN transceiver.
+
+[VCANESP32](https://github.com/obdevel/VCANESP32)
+: Implementation for ESP32 boards with an onboard TWAI controller that
+acts as a CAN controller.
