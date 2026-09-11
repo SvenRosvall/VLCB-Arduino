@@ -204,61 +204,61 @@ bool Controller::sendMessage(const VlcbMessage *msg)
   return sendMessage(*msg);
 }
 
-bool Controller::sendMessageWithNN(VlcbOpCodes opc)
+bool Controller::sendMessageWithNNandData(VlcbOpCodes opc, int dataLen, byte data1, byte data2, byte data3, byte data4, byte data5)
 {
   VlcbMessage msg(opc);
   msg.addNN(module_config->nodeNum);
-  return sendMessage(msg);
+  if (dataLen >= 1)
+  {
+    msg.addData(data1);
+  }
+  if (dataLen >= 2)
+  {
+    msg.addData(data2);
+  }
+  if (dataLen >= 3)
+  {
+    msg.addData(data3);
+  }
+  if (dataLen >= 4)
+  {
+    msg.addData(data4);
+  }
+  if (dataLen >= 5)
+  {
+    msg.addData(data5);
+  }
+  return sendMessage(msg);  
+}
+
+bool Controller::sendMessageWithNN(VlcbOpCodes opc)
+{
+  return sendMessageWithNNandData(opc, 0);
 }
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1)
 {
-  VlcbMessage msg(opc);
-  msg.addNN(module_config->nodeNum);
-  msg.addData(b1);
-  return sendMessage(msg);
+  return sendMessageWithNNandData(opc, 1, b1);
 }
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2)
 {
-  VlcbMessage msg(opc);
-  msg.addNN(module_config->nodeNum);
-  msg.addData(b1);
-  msg.addData(b2);
-  return sendMessage(msg);
+  return sendMessageWithNNandData(opc, 2, b1, b2);
 }
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3)
 {
-  VlcbMessage msg(opc);
-  msg.addNN(module_config->nodeNum);
-  msg.addData(b1);
-  msg.addData(b2);
-  msg.addData(b3);
-  return sendMessage(msg);
+  return sendMessageWithNNandData(opc, 3, b1, b2, b3);
 }
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4)
 {
-  VlcbMessage msg(opc);
-  msg.addNN(module_config->nodeNum);
-  msg.addData(b1);
-  msg.addData(b2);
-  msg.addData(b3);
-  msg.addData(b4);
-  return sendMessage(msg);
+  return sendMessageWithNNandData(opc, 4, b1, b2, b3, b4);
 }
 
 bool Controller::sendMessageWithNN(VlcbOpCodes opc, byte b1, byte b2, byte b3, byte b4, byte b5)
 {
-  VlcbMessage msg(opc);
-  msg.addNN(module_config->nodeNum);
-  msg.addData(b1);
-  msg.addData(b2);
-  msg.addData(b3);
-  msg.addData(b4);
-  msg.addData(b5);
-  return sendMessage(msg);
+  return sendMessageWithNNandData(opc, 5, b1, b2, b3, b4, b5);
 }
 
 //
