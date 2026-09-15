@@ -138,8 +138,8 @@ public:
   Parameters & getParams() { return module_config->getParams(); }
   unsigned char getParam(VlcbParams param) const { return module_config->getParam(param); }
 
-  bool sendMessage(const VlcbMessage &msg); /// Send a message
-  bool sendMessage(const VlcbMessage *msg); /// @deprecated Use the message directly instead of using a pointer.
+  bool sendMessage(const VlcbMessage &msg); ///< Send a message
+  bool sendMessage(const VlcbMessage *msg); ///< @deprecated Use the message directly instead of using a pointer.
 
   void begin();
   bool sendMessageWithNN(VlcbOpCodes opc);
