@@ -81,15 +81,19 @@ enum ACTION : byte
   // ...
 };
 
-/// An action to be performed.
+/// @brief An action to be performed.
+/// 
+/// Actions tell services that something needs to be done. 
+/// Services act on actions they know about.
+/// Other services create actions when needed.
 struct Action
 {
   enum ACTION actionType; ///< Type of action.
-  union
+  union                   ///< Data associated with specific action types.
   {
-    VlcbMessage vlcbMessage; ///< with ACT_MESSAGE_IN & ACT_MESSAGE_OUT
-    bool fromENUM; ///< with ACT_START_CAN_ENUMERATION
-    VlcbModeParams mode; ///< with ACT_INDICATE_MODE
+    VlcbMessage vlcbMessage; ///< message used with ACT_MESSAGE_IN & ACT_MESSAGE_OUT
+    bool fromENUM;           ///< used with ACT_START_CAN_ENUMERATION to tell if the action came from an ENUM message
+    VlcbModeParams mode;     ///< requested new mode used with ACT_INDICATE_MODE
   };
 
   Action() = default;
