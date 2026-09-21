@@ -22,7 +22,12 @@ namespace VLCB
 class LEDUserInterface : public Service
 {
 public:
+  LEDUserInterface() {}
   LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pushButtonPin);
+  
+  void setGreenLedPin(byte pin);
+  void setYellowLedPin(byte pin);
+  void setSwitchPin(byte pin);
 
   /// @cond LIBRARY
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
