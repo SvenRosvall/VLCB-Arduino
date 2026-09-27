@@ -23,6 +23,21 @@ LEDUserInterface::LEDUserInterface(byte greenLedPin, byte yellowLedPin, byte pus
 
 }
 
+void LEDUserInterface::setGreenLedPin(byte pin)
+{
+  greenLed.setPin(pin);
+}
+
+void LEDUserInterface::setYellowLedPin(byte pin)
+{
+  yellowLed.setPin(pin);
+}
+
+void LEDUserInterface::setSwitchPin(byte pin)
+{
+  pushButton.setPin(pin, INPUT_PULLUP);
+}
+
 bool LEDUserInterface::isButtonPressed()
 {
   return pushButton.isPressed();
