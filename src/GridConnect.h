@@ -9,5 +9,5 @@
 namespace VLCB
 {
   bool decodeGridConnect(const char * gcBuffer, CANFrame *frame);
-  bool encodeGridConnect(char * txBuffer, CANFrame *frame);
+  bool encodeGridConnect(char * txBuffer, const CANFrame *frame);
 }

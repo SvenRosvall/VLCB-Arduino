@@ -16,7 +16,7 @@
 namespace VLCB
 {
 
-static uint16_t crc16(uint8_t *data_p, uint16_t length);
+static uint16_t crc16(const uint8_t *data_p, uint16_t length);
 static uint32_t crc32(const char *s, size_t n);
 
 //
