@@ -75,7 +75,7 @@ private:
   /// Gets and sends node parameters when ACT_MESSAGE_IN is OPC_RQNP and the node is in
   /// MODE_SETUP.
   void handleRequestNodeParameters();
-  /// Gets and sends node parameters when ACT_MESSAGE_IN is OPC_RQNP and the node is in
+  /// Gets and sends node parameters when ACT_MESSAGE_IN is OPC_RQNPN and the node is in
   /// MODE_NORMAL.
   void handleRequestNodeParameter(const VlcbMessage *msg, unsigned int nn);
   /// Sets the Node Number according to the content of the VLCB message in ACT_MESSAGE_IN
