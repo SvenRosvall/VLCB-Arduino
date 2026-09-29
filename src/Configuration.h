@@ -40,7 +40,7 @@ class Configuration
 {
 public:
   Configuration();
-  Configuration(Storage * theStorage);
+  explicit Configuration(Storage * theStorage);
   void begin();
 
   byte findExistingEvent(unsigned int nn, unsigned int en, byte startIndex = 0) const;

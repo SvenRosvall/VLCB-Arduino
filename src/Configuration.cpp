@@ -102,10 +102,10 @@ void Configuration::setModuleNormalMode(unsigned int nodeNumber)
   setNodeNum(nodeNumber);
 }
 
-void Configuration::setModuleMode(VlcbModeParams f)
+void Configuration::setModuleMode(VlcbModeParams m)
 {
-  currentMode = f;
-  storage->write(LOCATION_MODE, f);
+  currentMode = m;
+  storage->write(LOCATION_MODE, m);
 }
 
 void Configuration::setHeartbeat(bool beat)

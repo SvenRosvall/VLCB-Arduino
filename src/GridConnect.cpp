@@ -52,7 +52,7 @@
 namespace VLCB
 {
 
-  bool encodeGridConnect(char * gcBuffer, CANFrame *frame)
+  bool encodeGridConnect(char * gcBuffer, const CANFrame *frame)
   {
       byte offset = 0;
       gcBuffer[0] = 0;  // null terminate buffer to start with

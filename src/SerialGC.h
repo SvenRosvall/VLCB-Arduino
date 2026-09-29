@@ -33,7 +33,7 @@ namespace VLCB
     virtual CANFrame getNextCanFrame() override;
     virtual bool sendCanFrame(CANFrame *frame) override;
     virtual void reset() override;
-    virtual byte getHardwareType() { return CAN_HW_SERIAL; };
+    virtual byte getHardwareType() { return CAN_HW_SERIAL; }
 
     virtual unsigned int receiveCounter() override { return receivedCount; }
     virtual unsigned int transmitCounter() override { return transmitCount; }
@@ -41,10 +41,10 @@ namespace VLCB
     virtual unsigned int transmitBufferSize() override { return RXBUFFERSIZE; }
     virtual unsigned int receiveErrorCounter() override { return receiveErrorCount; }
     virtual unsigned int transmitErrorCounter() override { return transmitErrorCount; }
-    virtual unsigned int receiveBufferUsage() override { return 0; };
-    virtual unsigned int transmitBufferUsage() override { return 0; };
-    virtual unsigned int receiveBufferPeak() override { return 0; };
-    virtual unsigned int transmitBufferPeak() override { return 0; };
+    virtual unsigned int receiveBufferUsage() override { return 0; }
+    virtual unsigned int transmitBufferUsage() override { return 0; }
+    virtual unsigned int receiveBufferPeak() override { return 0; }
+    virtual unsigned int transmitBufferPeak() override { return 0; }
     virtual unsigned int errorStatus() override { return 0; }
     /// @endcond
 

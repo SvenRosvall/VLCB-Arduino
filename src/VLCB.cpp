@@ -33,7 +33,7 @@ void setServices(std::initializer_list<Service *> services)
   controller.setServices(services);
 }
 
-void setName(char *mname)
+void setName(const char *mname)
 {
   modconfig.setName(mname);
 }

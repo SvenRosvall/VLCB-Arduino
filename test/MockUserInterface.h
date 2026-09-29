@@ -15,8 +15,8 @@ class MockUserInterface : public VLCB::Service
 {
 public:
   virtual void processAction(const VLCB::Action &action) override;
-  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
-  virtual byte getServiceVersionID() const override { return 1; };
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; }
+  virtual byte getServiceVersionID() const override { return 1; }
   
   VlcbModeParams getIndicatedMode();
 

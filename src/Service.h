@@ -63,7 +63,7 @@ public:
   /// This method does not need to be implemented if the service does react to any actions.
   /// 
   /// @param action The action that the service may have interest in.
-  virtual void processAction(const Action & action) {};
+  virtual void processAction(const Action & action) {}
 
   /// @brief Report a given diagnostic value
   /// 

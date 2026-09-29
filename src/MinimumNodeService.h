@@ -95,7 +95,7 @@ protected:
   virtual void handleMessage(const VlcbMessage *msg);
   /// Called whenever the node number is changed.  Count is recorded and held in
   /// Minimum Node Service With Diagnostics.
-  virtual void diagNodeNumberChanged() {};
+  virtual void diagNodeNumberChanged() {}
 
   /// @endcond
 };

@@ -303,7 +303,7 @@ void MinimumNodeService::handleRequestNodeParameters()
 class RespondParam : public TimedResponse::Task
 {
 public: 
-  RespondParam(Controller *controller) : Task(controller) {}
+  explicit RespondParam(Controller *controller) : Task(controller) {}
   virtual TimedResponse::Result runStep() override
   {
     if (sequence > controller->getParam(PAR_NUM))
@@ -394,7 +394,7 @@ static int countServices(const VLCB::ArrayHolder<Service *> &services)
 class RespondService : public TimedResponse::Task
 {
 public: 
-  RespondService(Controller *controller) : Task(controller) {}
+  explicit RespondService(Controller *controller) : Task(controller) {}
   virtual TimedResponse::Result runStep() override
   {
     if (sequence >= controller->getServices().size())

@@ -25,7 +25,7 @@ public:
   class Task
   {
   public:
-    Task(Controller * controller) : controller(controller) {}
+    explicit Task(Controller * controller) : controller(controller) {}
     Task() : controller(nullptr) {}
     virtual ~Task() = default;
     virtual Result runStep() = 0;

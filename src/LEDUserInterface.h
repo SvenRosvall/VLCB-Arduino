@@ -30,8 +30,8 @@ public:
   void setSwitchPin(byte pin);
 
   /// @cond LIBRARY
-  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
-  virtual byte getServiceVersionID() const override { return 1; };
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; }
+  virtual byte getServiceVersionID() const override { return 1; }
 
   bool isButtonPressed();
   virtual void process() override;
@@ -44,7 +44,6 @@ private:
   Switch pushButton;
 
   bool resetRequested();
-  void handleAction(const Action &action);
   void checkRequestedAction();
 
   void indicateMode(VlcbModeParams mode);

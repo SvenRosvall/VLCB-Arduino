@@ -31,12 +31,12 @@ void testCreateTimedResponse()
     : callCount(callCount), deleted(deleted)
     {}
 
-    ~TestResponder()
+    ~TestResponder() override
     {
       deleted = true;
     }
 
-    VLCB::TimedResponse::Result runStep()
+    VLCB::TimedResponse::Result runStep() override
     {
       ++callCount;
       return VLCB::TimedResponse::Result::FINISHED;
@@ -70,11 +70,11 @@ void testTimeResponseCalledAtInterval()
   {
   public:
     int & callCount;
-    TestResponder(int &callCount)
+    explicit TestResponder(int &callCount)
     : callCount(callCount)
     {}
 
-    VLCB::TimedResponse::Result runStep()
+    VLCB::TimedResponse::Result runStep() override
     {
       ++callCount;
       if (sequence == 3)

@@ -22,11 +22,11 @@ namespace VLCB
 class SerialUserInterface : public Service
 {
 public:
-  SerialUserInterface(Stream& _serial = Serial) : serial(_serial) {}
+  explicit SerialUserInterface(Stream& _serial = Serial) : serial(_serial) {}
 
   /// @cond LIBRARY
-  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; };
-  virtual byte getServiceVersionID() const override { return 1; };
+  virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_NONE; }
+  virtual byte getServiceVersionID() const override { return 1; }
 
   virtual void process() override;
   virtual void processAction(const Action &action) override;
@@ -37,7 +37,7 @@ private:
 
   void handleAction(const Action &action);
   void processSerialInput();
-  void indicateMode(VlcbModeParams i);
+  void indicateMode(VlcbModeParams mode);
 };
 
 }

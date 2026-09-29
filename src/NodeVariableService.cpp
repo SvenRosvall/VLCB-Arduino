@@ -52,7 +52,8 @@ void NodeVariableService::handleMessage(const VlcbMessage *msg)
 class RespondNodeVar : public TimedResponse::Task
 {
 public: 
-  RespondNodeVar(Controller *controller) : Task(controller) {}
+  explicit RespondNodeVar(Controller *controller) : Task(controller) {}
+
   virtual TimedResponse::Result runStep() override
   {
     if (sequence >= controller->getModuleConfig()->getNumNodeVariables())

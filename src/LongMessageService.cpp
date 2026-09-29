@@ -743,7 +743,7 @@ static uint32_t crc32(const byte *s, size_t n)
 
 #define POLY 0x8408
 
-uint16_t crc16(uint8_t *data_p, uint16_t length)
+uint16_t crc16(const uint8_t *data_p, uint16_t length)
 {
 	uint8_t i;
 	uint16_t data;

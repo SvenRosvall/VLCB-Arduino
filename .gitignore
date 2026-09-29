@@ -10,15 +10,6 @@ build/
 html.sketch/
 html.library/
 
-# Visual Studio Code
-.vscode/
-build-vscode/
-CMakePresets.json
-
-# Local working notes
-notes/
-
-
 #
 # MacOS
 #
@@ -36,6 +27,8 @@ __MACOSX/
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 !*.code-workspace
+build-vscode/
+CMakePresets.json
 # Built Visual Studio Code Extensions
 *.vsix
 

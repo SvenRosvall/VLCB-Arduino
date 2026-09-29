@@ -125,7 +125,7 @@ class Controller
 {
 public:
 //  Controller();
-  Controller(Configuration *conf);
+  explicit Controller(Configuration *conf);
 //  Controller(std::initializer_list<Service *> services);
   Controller(Configuration *conf, std::initializer_list<Service *> services);
   

@@ -281,7 +281,7 @@ byte createEvent(unsigned int nn, byte preferredEN)
   }
 }
 
-void processSwitches(void) 
+void processSwitches() 
 {
   for (byte i = 0; i < NUM_SWITCHES; i++)
   {

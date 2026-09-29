@@ -53,7 +53,7 @@ class AllServiceDiagnosticsResponse : public TimedResponse::Task
   int serviceIndex;
   ServiceDiagnosticsResponse * svcResponder = nullptr;
 public:
-  AllServiceDiagnosticsResponse(Controller * controller) 
+  explicit AllServiceDiagnosticsResponse(Controller * controller) 
     : Task(controller), serviceIndex(0)
   { }
 

@@ -31,12 +31,12 @@ class CanService : public Service
 public:
   /// Construct a CanService with a concrete CanTransport object to use for 
   /// transmission on the CAN bus.
-  CanService(CanTransport * tpt) : canTransport(tpt) {}
+  explicit CanService(CanTransport * tpt) : canTransport(tpt) {}
 
   /// @cond LIBRARY
   virtual VlcbServiceTypes getServiceID() const override { return SERVICE_ID_CAN; }
   virtual byte getServiceVersionID() const override { return 2; }
-  virtual Data getServiceData();
+  virtual Data getServiceData() override;
 
   virtual void process() override;
   virtual void processAction(const Action &action) override;

@@ -16,7 +16,7 @@ namespace VLCB
 class EepromExternalStorage : public Storage
 {
 public:
-  EepromExternalStorage(byte address);
+  explicit EepromExternalStorage(byte address);
   EepromExternalStorage(byte address, TwoWire *bus);
   virtual void begin(unsigned int size) override;
 
