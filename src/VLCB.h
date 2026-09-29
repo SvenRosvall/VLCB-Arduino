@@ -94,7 +94,7 @@ void setModuleId(byte manu, byte moduleId);
 
 /// Set the name of the module.
 /// The name shall be a string of max 7 characters.
-void setName(char *mname);
+void setName(const char *mname);
 
 /// Set number of node variables that the module will use.
 void setNumNodeVariables(byte n);
