@@ -37,7 +37,13 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
+        
+      - name: Check out VCAN2515
+        uses: actions/checkout@v7
+        with:
+          repository: SvenRosvall/VCAN2515
+          path: VCAN2515
 
       - name: Generate ${{ matrix.label }} docs
         run: docker run --rm -v $PWD:/work -w /work ghcr.io/doxygen/doxygen ${{ matrix.config }}
