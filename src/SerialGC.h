@@ -53,6 +53,7 @@ namespace VLCB
 	
     char rxBuffer[RXBUFFERSIZE]; // Define a byte array to store the incoming data
     char txBuffer[RXBUFFERSIZE]; // Define a byte array to store the outgoing data
+    int rxIndex = 0;
     CANFrame rxCANFrame;
 
     unsigned int receivedCount = 0;

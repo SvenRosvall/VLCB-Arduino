@@ -32,7 +32,6 @@ namespace VLCB
   bool SerialGC::available()
   {
     bool result = false;
-    static int rxIndex = 0;
     if (serial.available())
     {     
       char c = serial.read();
