@@ -47,6 +47,7 @@ public:
   }
 
 private:
+  // TODO: These task pointers are owning pointers which are not deleted if overwritten by buffer overflows.
   CircularBuffer<Task *> tasks;
   unsigned long lastTaskTime = 0;
 };

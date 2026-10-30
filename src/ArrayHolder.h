@@ -12,6 +12,9 @@
 namespace VLCB
 {
 
+/// Simple object storage for objects created with an initializer list.
+/// 
+/// This is used for storing copyable elements and non-owning pointers.
 template<typename E>
 class ArrayHolder
 {
@@ -19,6 +22,9 @@ public:
   ArrayHolder();
   ArrayHolder(const std::initializer_list<E> & il);
   ~ArrayHolder();
+  
+  // Note: Default copy ctor and copy assignment are valid as the the elements
+  // shall be copyable, or non-owning pointers.
   
   ArrayHolder & operator=(const std::initializer_list<E> & il);
 
